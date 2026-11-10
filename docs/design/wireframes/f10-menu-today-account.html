@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arcwell Wireframes F10</title>
+<link rel="stylesheet" href="wireframe.css">
+</head>
+<body>
+<header>
+  <h1>Arcwell — Wireframes: F10 Navigation, side menu, Today, account and privacy</h1>
+  <p>Drawn 2026-11-11 in the review pass. <b>Drawn only — not reviewed or approved by the founder, not tested with users.</b> Notes mark each point as <b>Rule</b> (confirmed, with decision ID from DECISIONS.md), <b>Proposal</b> (layout for review) or <b>Open</b> (needs a founder decision).</p>
+  <div class="legend"><span class="l-primary">Primary action / selected</span><span>Secondary</span><span class="l-note">Rule · Proposal · Open</span></div>
+</header>
+
+<section class="flow">
+  <h2>Bottom bars and Today by tier</h2>
+  <p class="arrowrow">Rule D2 / D2a / D2b: free · AI-coached · human-coached bottom bars. Today's exact contents are pending (D2d), so these Home layouts are proposals.</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>8:00</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px"><span class="burger">☰</span>&nbsp; Today</span><span></span></div>
+        <div class="hc"><small>Training</small><b>Full body A · 45 min</b>Starter programme · day 2 of 3<br><span class="b">Start workout</span></div>
+        <div class="hc"><small>Nutrition</small><b>1,240 kcal left</b>Target 1,850<br><span class="b o">Log food</span></div>
+        <div class="hc"><small>Bodyweight</small><b>74.1 kg</b>Log today's weight<br><span class="b o">Log weight</span></div>
+        <div class="tabs"><span class="on">Today</span><span>Training</span><span>Nutrition</span></div>
+      </div>
+      <figcaption><b><span class="id">N-01</span>Today — free</b>
+        <div class="note"><ul><li><span class="rule">Rule D2b:</span> Today · Training · Nutrition only. No Recovery, no extra tabs.</li><li><span class="rule">Rule D5:</span> calories only; weight is a free tool.</li><li><span class="prop">Proposal:</span> card order and the weight card (D2d pending).</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>8:00</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px"><span class="burger">☰</span>&nbsp; Today</span><span></span></div>
+        <div class="hc"><small>Training · AI plan</small><b>Upper body · 50 min</b>Week 2 of your plan<br><span class="b">Start workout</span></div>
+        <div class="hc"><small>Nutrition</small><b>1,240 kcal left</b>Protein 62 / 130 g<br><span class="b o">Log food</span></div>
+        <div class="hc"><small>Recovery</small><b>How did you sleep?</b>Sleep, soreness, fatigue<br><span class="b o">Log recovery</span></div>
+        <div class="hc"><small>AI Coaching</small><b>Your plan was adjusted</b>Fewer leg sets after high soreness</div>
+        <div class="tabs"><span class="on">Today</span><span>Training</span><span>Nutrition</span><span>Recovery</span><span>AI Coaching</span></div>
+      </div>
+      <figcaption><b><span class="id">N-02</span>Today — AI-coached</b>
+        <div class="note"><ul><li><span class="rule">Rule D2:</span> Today · Training · Nutrition · Recovery · AI Coaching.</li><li><span class="prop">Proposal:</span> card order; the "plan adjusted" card (D2d pending).</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>8:00</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px"><span class="burger">☰</span>&nbsp; Today</span><span></span></div>
+        <div class="hc" style="border-color:var(--ink);border-width:2px"><small>Check-in due today</small><b>Week 3 check-in</b><span class="b">Start check-in</span></div>
+        <div class="hc"><small>Training · from Coach Joseph</small><b>Push day · 50 min</b><span class="b">Start workout</span></div>
+        <div class="hc"><small>Nutrition</small><b>1,240 kcal left</b>Coach's meal plan · lunch next<br><span class="b o">Log food</span></div>
+        <div class="hc"><small>Recovery</small><b>How did you sleep?</b><span class="b o">Log recovery</span></div>
+        <div class="tabs"><span class="on">Today</span><span>Training</span><span>Nutrition</span><span>Recovery</span><span>Progress</span></div>
+      </div>
+      <figcaption><b><span class="id">N-03</span>Today — human-coached</b>
+        <div class="note"><ul><li><span class="rule">Rule D2a:</span> Today · Training · Nutrition · Recovery · Progress (Progress = Check-ins · Progress · Chat, D11).</li><li><span class="rule">Rule D7:</span> training, nutrition and recovery come from the coach; no AI anywhere.</li><li><span class="prop">Proposal:</span> check-in card shown on Today when due (your brief puts check-ins on Home); D2d pending.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<section class="flow">
+  <h2>Side menu (☰)</h2>
+  <p class="arrowrow">Rule D9: one menu for all athletes, supplementing the bottom bar. Rule D10: AI subscribers and human-coached athletes get Pro tools; free users get the free tools. "?" = access not decided.</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>8:00</span><span>▮▮ ◔</span></div>
+        <div class="dimmed"></div>
+        <div class="drawer">
+          <div class="dh"><i></i><span><b>Sanjeev</b><small>Free</small></span></div>
+          <div class="mi">Account<span class="chev">›</span></div>
+          <div class="mi">Notifications<span class="chev">›</span></div>
+          <div class="mi grp">Training<span class="chev">▾</span></div>
+          <div class="msub">
+            <div class="mi">Exercises<span class="acc unk">?</span></div>
+            <div class="mi">Workouts<span class="acc unk">?</span></div>
+            <div class="mi">Programs<span class="acc lim">2–3 templates</span></div>
+            <div class="mi">History<span class="acc unk">?</span></div>
+            <div class="mi">Set Videos<span class="acc unk">?</span></div>
+            <div class="mi">Muscle Analytics<span class="acc unk">?</span></div>
+          </div>
+          <div class="mi">Gyms<span class="acc unk">?</span></div>
+          <div class="mi grp">Physique<span class="chev">▾</span></div>
+          <div class="msub">
+            <div class="mi">Bodyweight<span class="acc ok"></span></div>
+            <div class="mi">Measurements<span class="acc ok"></span></div>
+            <div class="mi">Photos<span class="acc ok"></span></div>
+            <div class="mi">Charts<span class="acc ok"></span></div>
+          </div>
+        </div>
+      </div>
+      <figcaption><b><span class="id">N-04</span>Side menu — free</b>
+        <div class="note"><ul><li><span class="rule">Rule D5, D9:</span> Physique tools (bodyweight, measurements, photos, charts) are free and live here for everyone.</li><li><span class="opn">Open:</span> free access to Exercises, Workouts, History, Set Videos, Muscle Analytics, Gyms.</li><li>No Recovery and no AI (D5a).</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>8:00</span><span>▮▮ ◔</span></div>
+        <div class="dimmed"></div>
+        <div class="drawer">
+          <div class="dh"><i></i><span><b>Priya</b><small>Pro · AI plan or Coach Joseph</small></span></div>
+          <div class="mi">Account<span class="chev">›</span></div>
+          <div class="mi">Notifications<span class="chev">›</span></div>
+          <div class="mi grp">Training<span class="chev">▾</span></div>
+          <div class="msub">
+            <div class="mi">Exercises<span class="acc ok"></span></div>
+            <div class="mi">Workouts<span class="acc ok"></span></div>
+            <div class="mi">Programs<span class="acc ok"></span></div>
+            <div class="mi">History<span class="acc ok"></span></div>
+            <div class="mi">Set Videos<span class="acc ok"></span></div>
+            <div class="mi">Muscle Analytics<span class="acc ok"></span></div>
+          </div>
+          <div class="mi">Gyms<span class="acc ok"></span></div>
+          <div class="mi grp">Physique<span class="chev">▾</span></div>
+          <div class="msub">
+            <div class="mi">Bodyweight<span class="acc ok"></span></div>
+            <div class="mi">Measurements<span class="acc ok"></span></div>
+            <div class="mi">Photos<span class="acc ok"></span></div>
+            <div class="mi">Charts<span class="acc ok"></span></div>
+          </div>
+        </div>
+      </div>
+      <figcaption><b><span class="id">N-05</span>Side menu — Pro</b>
+        <div class="note"><ul><li><span class="rule">Rule D10:</span> same menu for AI subscribers and human-coached athletes; coached athletes need no AI subscription.</li><li>No AI item in the menu: AI Coaching is only in the AI subscriber's bottom bar (D2), never shown to coached athletes.</li><li><span class="opn">Open:</span> what Set Videos, Muscle Analytics, Gyms do; Workouts vs Programs. Entries only — no detailed screens until defined.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:10</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Back</span><span style="color:var(--ink);font-weight:700">Notifications</span><span>Settings</span></div>
+        <div class="inrow"><span class="t"><b>Coach Joseph replied to your check-in</b><small>Week 3 · 18:20</small></span><span class="r">now</span></div>
+        <div class="inrow"><span class="t"><b>Your plan was updated</b><small>Incline press 3 → 4 sets</small></span><span class="r">1 h</span></div>
+        <div class="inrow"><span class="t"><b>Push day is ready</b><small>5 exercises</small></span><span class="r">7:00</span></div>
+        <div class="inrow"><span class="t"><b>Weekly check-in due tomorrow</b><small>Sunday</small></span><span class="r">Sat</span></div>
+        <div class="seclab">Settings — send me</div>
+        <div class="toggle"><div><b>Messages from my coach</b></div><div class="sw"></div></div>
+        <div class="toggle"><div><b>Check-in reminders</b></div><div class="sw"></div></div>
+        <div class="toggle"><div><b>Plan assigned or updated</b></div><div class="sw"></div></div>
+        <div class="toggle"><div><b>Daily workout reminder</b></div><div class="sw"></div></div>
+      </div>
+      <figcaption><b><span class="id">N-06</span>Notifications</b>
+        <div class="note"><ul><li>Covers the agreed notification types (SPEC.md); each shown only where it applies to the user's tier.</li><li><span class="prop">Proposal:</span> one screen with a list and settings; tapping an item opens the related screen.</li><li>If Android notification permission is off: banner "Notifications are off — turn on in phone settings".</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<section class="flow">
+  <h2>Account, privacy, export and deletion</h2>
+  <p class="arrowrow">☰ → Account → profile · subscription · my coach · privacy and permissions · export · delete · sign out</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:20</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Back</span><span style="color:var(--ink);font-weight:700">Account</span><span></span></div>
+        <div class="mi">Profile<span class="acc">name, photo, body stats, goals, diet ›</span></div>
+        <div class="mi">Subscription<span class="acc">Free · Pro · trial ›</span></div>
+        <div class="mi">My coach<span class="acc">coached only ›</span></div>
+        <div class="mi">Privacy and permissions<span class="chev">›</span></div>
+        <div class="mi">Units<span class="acc">kg, cm ›</span></div>
+        <div class="mi">Export my data<span class="chev">›</span></div>
+        <div class="mi">Help and support<span class="chev">›</span></div>
+        <div class="mi">Delete account<span class="chev">›</span></div>
+        <div class="pinned"><div class="btn">Sign out</div></div>
+      </div>
+      <figcaption><b><span class="id">AC-01</span>Account</b>
+        <div class="note"><ul><li>Replaces the earlier profile-photo shortcut: Account lives in the side menu (D9).</li><li>Subscription → F8-06 (paid) or the paywall F8-01 (free). My coach → L-01 (f12).</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:21</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Account</span><span style="color:var(--ink);font-weight:700">Privacy</span><span></span></div>
+        <div class="toggle"><div><b>Health and fitness data</b><small>Required to use Arcwell. To stop, delete your account.</small></div><div class="sw"></div></div>
+        <div class="toggle"><div><b>Progress photos</b><small>Optional. Check-ins can be sent without photos.</small></div><div class="sw off"></div></div>
+        <div class="toggle"><div><b>AI features</b><small>Turning this off stops AI plans and photo logging. Your logs stay.</small></div><div class="sw"></div></div>
+        <div class="mi">Coach's access to my history<span class="acc">coached only ›</span></div>
+        <div class="mi">Shared progress photos<span class="acc">F9-06 ›</span></div>
+        <div class="open"><b>Turning AI off</b>What happens to an active AI trial or subscription.</div>
+      </div>
+      <figcaption><b><span class="id">AC-02</span>Privacy and permissions</b>
+        <div class="note"><ul><li><span class="rule">Rule D8:</span> AI permission can be changed here; non-AI features keep working.</li><li><span class="rule">D12:</span> photo consent is separate from check-ins.</li><li><span class="opn">Open:</span> the history-access screen's options (SPEC: coach sees from join date unless granted).</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:22</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Account</span><span style="color:var(--ink);font-weight:700">Export my data</span><span></span></div>
+        <div class="sub">We'll prepare a copy of everything Arcwell stores about you.</div>
+        <div class="card"><b>Included</b><small>Profile · workouts and sets · food logs · recovery logs · measurements · progress photos · check-ins · messages</small></div>
+        <div class="card"><small>When it's ready we'll email you a download link. Large exports can take a while.</small></div>
+        <div class="pinned"><div class="btn primary">Request export</div></div>
+      </div>
+      <figcaption><b><span class="id">AC-03</span>Export my data</b>
+        <div class="note"><ul><li>Required by SPEC.md (Key rules). After requesting: "We're preparing your export" state; failure → retry.</li><li><span class="prop">Proposal:</span> emailed link, file format to be decided at build time.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:23</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Account</span><span style="color:var(--ink);font-weight:700">Delete account</span><span></span></div>
+        <div class="q">Delete your Arcwell account?</div>
+        <div class="sub">This permanently deletes your profile, logs, photos, check-ins and messages. It can't be undone.</div>
+        <div class="card"><small>Paying for AI? Deleting your account doesn't cancel Google Play billing — cancel your subscription first.</small></div>
+        <div class="card"><small>Coached? Your coach will lose access to your data.</small></div>
+        <div class="card"><small>Want a copy first? <u>Export my data</u></small></div>
+        <div class="field"><small>Type DELETE to confirm</small>&nbsp;</div>
+        <div class="pinned"><div class="btn primary">Delete my account</div><div class="btn ghost">Keep my account</div></div>
+      </div>
+      <figcaption><b><span class="id">AC-04</span>Delete account</b>
+        <div class="note"><ul><li>Required by SPEC.md (Key rules). Explicit, irreversible, with export offered first.</li><li><span class="opn">Open:</span> whether Arcwell cancels an active subscription itself on deletion (see J-02 cancellation options).</li><li>Keyboard: confirm field and button stay visible.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:30</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Sign in</span><span></span></div>
+        <div class="q">Reset your password</div>
+        <div class="sub">Enter the email you signed up with. We'll send you a link.</div>
+        <div class="field"><small>Email</small>&nbsp;</div>
+        <div class="pinned"><div class="btn primary">Send reset link</div><div class="btn ghost">Signed up with Google? Continue with Google</div></div>
+      </div>
+      <figcaption><b><span class="id">AC-05</span>Forgot password</b>
+        <div class="note"><ul><li>From F1-04 "Forgot password?". Invalid email → inline message under the field.</li><li>Keyboard: button stays above the keyboard.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:31</span><span>▮▮ ◔</span></div>
+        <div class="grow center">
+          <div class="img" style="width:90px;height:70px;margin-bottom:10px">Email</div>
+          <div class="q">Check your email</div>
+          <div class="sub" style="max-width:220px">If an account exists for that email, we've sent a reset link. Open it on this phone to choose a new password.</div>
+        </div>
+        <div class="pinned"><div class="btn">Back to sign in</div><div class="btn ghost">Resend link</div></div>
+      </div>
+      <figcaption><b><span class="id">AC-06</span>Reset link sent</b>
+        <div class="note"><ul><li>The same pattern is used for email verification after sign-up (F1-03): "Check your email to confirm your account".</li><li>Wording doesn't reveal whether an account exists.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+</body>
+</html>

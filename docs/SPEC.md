@@ -17,14 +17,18 @@ Market: India first. Android only at launch. Compliance: India DPDP Act.
 
 | User | Pays | Gets |
 |---|---|---|
-| Free athlete | ₹0 | 2–3 training templates and basic logging; food logging by search, calories only. No recovery, no AI. |
-| Paid athlete (AI) | Monthly via Google Play (RevenueCat) | AI-built/adjusted training plans, full macros, AI meal plans, AI photo food logging, recovery, full progress |
-| Coached athlete | ₹0 | Whatever their coach assigns. **AI is never shown.** |
+| Free athlete | ₹0 | 2–3 training templates and basic logging; food logging by search, calories only; bodyweight, measurements, progress photos and charts. No Recovery, no AI. |
+| Paid athlete (AI) | Monthly via Google Play (RevenueCat); one-week AI trial | Pro tools + AI-built/adjusted training plans, full macros, AI meal plans, AI photo food logging, Recovery |
+| Coached athlete | ₹0 | Pro tools without an AI subscription, plus whatever their coach assigns (training, nutrition, recovery). **AI is never shown.** |
 | Coach | Monthly SaaS fee via Razorpay (outside the app). Price TBD after build; plan limits are configurable settings. | Client dashboard, profiles, plan builder, check-ins, chat, leads, client lifecycle, coach profile |
 
 ## v1 scope
 
-**Athlete app:** Home, Training, Nutrition, Recovery, Progress; plus Coach chat (coached) or AI coach (paid).
+**Athlete app** (decisions D1–D12 in [DECISIONS.md](DECISIONS.md); labels are working names):
+
+- Bottom bar — free: Today · Training · Nutrition. AI-coached: Today · Training · Nutrition · Recovery · AI Coaching. Human-coached: Today · Training · Nutrition · Recovery · Progress, where Progress is the combined Check-ins · Progress · Chat area.
+- Side menu (☰) for all athletes: Account · Notifications · Training (Exercises, Workouts, Programs, History, Set Videos, Muscle Analytics) · Gyms · Physique (Bodyweight, Measurements, Photos, Charts). Set Videos, Muscle Analytics and Gyms are named but their behaviour is not yet defined.
+- Recovery: sleep / sleep score, soreness, fatigue only. No stretching or mobility routines.
 
 - Training: Hevy-style workout logging; small exercise library of common gym equipment; demo media from a commercially licensed source.
 - Nutrition: IFCT 2017 + curated Indian dishes, Indian portions (katori, roti, piece); coach meal plans as fixed meals with exact foods and quantities.
@@ -44,7 +48,8 @@ Market: India first. Android only at launch. Compliance: India DPDP Act.
 - A coach sees a client's data only while linked, only from the join date, unless the athlete grants earlier history.
 - On leaving: coach access ends immediately; athlete keeps all history and becomes a free athlete.
 - Transformation photos: coach requests, **athlete approves** (optional face blur), athlete can withdraw at any time.
-- Consent at sign-up for health data and AI processing; account export and deletion available.
+- Consent at sign-up for health data; AI permission asked at sign-up **and** again at first AI use; declining AI never blocks non-AI features. Optional photo consent never blocks a check-in. Account export and deletion available.
+- Joining a coach: the coach's guidance replaces active training, nutrition and recovery guidance; an AI subscriber's switch includes an explicit subscription-cancellation step. Leaving a coach: the coach's plan stays usable. No history is ever deleted by these changes.
 - AI and all privileged actions run server-side only; paid AI users have a daily request cap.
 
 ## Architecture

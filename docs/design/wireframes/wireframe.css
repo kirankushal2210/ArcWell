@@ -141,3 +141,56 @@
 .filters .on { background: var(--ink); border-color: var(--ink); color: #fff; }
 .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 6px; }
 .compare .img { aspect-ratio: 3 / 4; font-size: 9px; }
+
+/* ---- Review pass 2026-11-11: scrolling, side menu, flags ---- */
+/* Screens scroll inside the frame when content is taller than the phone; the primary button stays pinned. */
+.phone { overflow-y: auto; scrollbar-width: none; }
+.phone::-webkit-scrollbar { display: none; }
+.pinned { position: sticky; bottom: 0; background: var(--phone); padding-bottom: 2px; z-index: 2; }
+.tabs { z-index: 3; }
+.burger { font-size: 15px; font-weight: 800; color: var(--ink); }
+/* Side menu (drawer) */
+.drawer { position: absolute; top: 0; bottom: 0; left: 0; width: 82%; background: #fff; border-right: 2px solid var(--ink); padding: 14px 12px; overflow-y: auto; z-index: 5; }
+.dimmed { position: absolute; inset: 0; background: rgba(29,29,27,.35); z-index: 4; }
+.dh { display: flex; align-items: center; gap: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--fill2); margin-bottom: 6px; font-size: 12px; }
+.dh i { width: 30px; height: 30px; border-radius: 50%; background: var(--fill2); display: inline-block; }
+.dh small { display: block; color: var(--muted); font-size: 9.5px; }
+.mi { display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; padding: 6px 2px; border-bottom: 1px solid var(--fill); }
+.mi.grp { font-weight: 700; }
+.mi .chev { color: var(--muted); font-size: 10px; }
+.msub { padding-left: 14px; }
+.msub .mi { font-size: 11px; padding: 4.5px 2px; }
+.acc { font-size: 9px; color: var(--muted); }
+.acc.ok::before { content: "✓"; color: var(--ink); font-weight: 700; }
+.acc.lim { color: var(--ink); }
+.acc.unk { border: 1px dashed var(--ink); border-radius: 4px; padding: 0 4px; color: var(--ink); font-weight: 700; }
+/* Segmented switch inside a screen */
+.subtabs { display: flex; border: 1.5px solid var(--ink); border-radius: 9px; overflow: hidden; margin-bottom: 8px; }
+.subtabs span { flex: 1; text-align: center; font-size: 10.5px; padding: 5px 0; font-weight: 600; }
+.subtabs .on { background: var(--ink); color: #fff; }
+/* Unresolved decision shown inside a screen */
+.open { border: 1.5px dashed var(--ink); border-radius: 9px; padding: 7px 8px; font-size: 10px; margin-bottom: 6px; }
+.open b { display: block; font-size: 10.5px; }
+.open b::before { content: "Open decision · "; font-weight: 800; }
+/* Note prefixes: Rule (confirmed, with decision id), Proposal (layout for review), Open (needs founder) */
+.note .rule, .note .prop, .note .opn { font-weight: 800; }
+.tag-rule { display: inline-block; font-size: 9px; font-weight: 800; border: 1px solid var(--ink); border-radius: 4px; padding: 0 4px; margin-right: 4px; }
+.status-chip { display: inline-block; font-size: 10px; font-weight: 700; border: 1px solid var(--ink); border-radius: 999px; padding: 1px 8px; margin-left: 6px; vertical-align: 2px; }
+.mini-chart { height: 64px; border: 1.5px solid var(--line); border-radius: 8px; margin-bottom: 6px; background: linear-gradient(170deg, transparent 48%, var(--ink) 49%, var(--ink) 51%, transparent 52%); }
+.slider { margin: 4px 0 8px; font-size: 10.5px; }
+.slider .track { height: 6px; border-radius: 3px; background: var(--fill); position: relative; margin: 6px 0 2px; }
+.slider .track i { position: absolute; top: -5px; width: 16px; height: 16px; border-radius: 50%; background: var(--ink); }
+.slider .ends { display: flex; justify-content: space-between; font-size: 8.5px; color: var(--muted); }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 6px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 6px; }
+.grid3 .img, .grid2 .img { aspect-ratio: 3 / 4; font-size: 9px; }
+.kv { display: flex; justify-content: space-between; font-size: 10.5px; padding: 6px 0; border-bottom: 1px solid var(--fill); }
+.kv span:first-child { color: var(--muted); }
+.hc { border: 1.5px solid var(--line); border-radius: 9px; padding: 7px 8px; margin-bottom: 6px; font-size: 10.5px; }
+.hc small { display: block; color: var(--muted); font-size: 8.5px; text-transform: uppercase; letter-spacing: .04em; }
+.hc b { display: block; font-size: 11px; }
+.hc .b { display: inline-block; margin-top: 5px; background: var(--ink); color: #fff; border-radius: 7px; padding: 3px 9px; font-weight: 700; font-size: 10px; }
+.hc .b.o { background: #fff; color: var(--ink); border: 1.5px solid var(--ink); }
+/* When a screen has a bottom bar, the pinned button sits just above it */
+.phone:has(> .tabs) .pinned { bottom: 46px; }
+.phone:has(> .tabs) { padding-bottom: 50px; }

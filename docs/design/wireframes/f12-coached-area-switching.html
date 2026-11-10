@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arcwell Wireframes F12</title>
+<link rel="stylesheet" href="wireframe.css">
+</head>
+<body>
+<header>
+  <h1>Arcwell — Wireframes: F12 Human-coached Progress area, waiting for a plan, joining and leaving a coach</h1>
+  <p>Drawn 2026-11-11 in the review pass. <b>Drawn only — not reviewed or approved, not tested with users.</b> Notes mark <b>Rule</b> (confirmed, DECISIONS.md ID), <b>Proposal</b> (layout for review) or <b>Open</b> (needs a decision).</p>
+  <div class="legend"><span class="l-primary">Primary action / selected</span><span>Secondary</span><span class="l-note">Rule · Proposal · Open</span></div>
+</header>
+
+<section class="flow">
+  <h2>Progress area: Check-ins · Progress · Chat (human-coached only)</h2>
+  <p class="arrowrow">Rule D2a / D11: the fifth bottom-bar item. Athletes submit check-ins and talk to their coach; they never see the coach's review or management tools.</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:00</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span class="burger">☰</span><span style="color:var(--ink);font-weight:700">Coach Joseph</span><span></span></div>
+        <div class="subtabs"><span class="on">Check-ins</span><span>Progress</span><span>Chat <b>·2</b></span></div>
+        <div class="hc" style="border-color:var(--ink);border-width:2px"><small>Due today</small><b>Week 3 check-in</b>Measurements · photos (optional) · how the week went<br><span class="b">Start check-in</span></div>
+        <div class="open"><b>Past check-ins</b>Can athletes see what they sent before, and the coach's feedback?</div>
+        <div class="tabs"><span>Today</span><span>Training</span><span>Nutrition</span><span>Recovery</span><span class="on">Progress</span></div>
+      </div>
+      <figcaption><b><span class="id">CP-01</span>Check-ins — due</b>
+        <div class="note"><ul><li><span class="rule">Rule D11:</span> combined area; athletes submit only.</li><li>"Start check-in" runs F6-02 → F6-05.</li><li><span class="prop">Proposal:</span> unread count on the Chat switch so coach messages stay noticeable.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>19:00</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span class="burger">☰</span><span style="color:var(--ink);font-weight:700">Coach Joseph</span><span></span></div>
+        <div class="subtabs"><span class="on">Check-ins</span><span>Progress</span><span>Chat</span></div>
+        <div class="hc"><small>Sent · Sun 10 Nov, 9:05</small><b>Week 3 check-in sent</b>Coach Joseph will reply here. You'll get a notification.</div>
+        <div class="hc"><small>Next check-in</small><b>Sunday 17 Nov</b></div>
+        <div class="tabs"><span>Today</span><span>Training</span><span>Nutrition</span><span>Recovery</span><span class="on">Progress</span></div>
+      </div>
+      <figcaption><b><span class="id">CP-02</span>Check-ins — sent, awaiting feedback</b>
+        <div class="note"><ul><li>No reply-time promise (unconfirmed).</li><li>When feedback arrives: F6-06 opens from the notification.</li><li>Overdue state: "Week 3 check-in is overdue" with the same Start button.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:02</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>←</span><span>2 of 3</span></div>
+        <div class="bar"><i style="width:66%"></i></div>
+        <div class="q">Progress photos</div>
+        <div class="sub">You haven't allowed progress photos. That's fine — you can send this check-in without them.</div>
+        <div class="card"><b>Want to add photos?</b><small>Photos help Coach Joseph see changes the scale misses. They stay private to you and your coach.</small><div class="btn" style="margin-top:6px">Allow photos</div></div>
+        <div class="pinned"><div class="btn primary">Continue without photos</div></div>
+      </div>
+      <figcaption><b><span class="id">CP-03</span>Check-in — photos not allowed</b>
+        <div class="note"><ul><li><span class="rule">Rule D12:</span> optional photo consent never blocks a check-in.</li><li>"Allow photos" asks for permission here, at the moment it's relevant, then shows F6-03.</li><li>The coach sees "No photos this week".</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:10</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span class="burger">☰</span><span style="color:var(--ink);font-weight:700">Coach Joseph</span><span></span></div>
+        <div class="subtabs"><span>Check-ins</span><span class="on">Progress</span><span>Chat</span></div>
+        <div class="open"><b>What goes here</b>The same Physique tools as the side menu (bodyweight, measurements, photos, charts), or something coach-specific?</div>
+        <div class="tabs"><span>Today</span><span>Training</span><span>Nutrition</span><span>Recovery</span><span class="on">Progress</span></div>
+      </div>
+      <figcaption><b><span class="id">CP-04</span>Progress switch</b>
+        <div class="note"><ul><li>Left empty on purpose: contents not decided. Physique tools are already in the side menu for everyone (D9).</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>18:25</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span class="burger">☰</span><span style="color:var(--ink);font-weight:700">Coach Joseph</span><span></span></div>
+        <div class="subtabs"><span>Check-ins</span><span>Progress</span><span class="on">Chat</span></div>
+        <div class="card" style="margin-left:auto;max-width:80%;background:var(--ink);color:#fff;border-color:var(--ink)">Shoulder felt tight on press</div>
+        <div class="card" style="max-width:80%;background:var(--fill)">Send me a clip of your next set</div>
+        <div class="pinned"><div class="field" style="margin:0">Message Coach Joseph</div></div>
+        <div class="tabs"><span>Today</span><span>Training</span><span>Nutrition</span><span>Recovery</span><span class="on">Progress</span></div>
+      </div>
+      <figcaption><b><span class="id">CP-05</span>Chat switch</b>
+        <div class="note"><ul><li>The existing chat (F7-01 → F7-03) inside the combined area.</li><li>Keyboard: the message box rises above the keyboard; the bottom bar hides while typing.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<section class="flow">
+  <h2>Waiting for the coach's plan</h2>
+  <p class="arrowrow">After joining (F1-13b) and before the coach assigns anything</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:20</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px"><span class="burger">☰</span>&nbsp; Today</span><span></span></div>
+        <div class="hc" style="border-color:var(--ink);border-width:2px"><small>Waiting for your plan</small><b>Coach Joseph is preparing your plan</b>We'll notify you when it's ready.</div>
+        <div class="hc"><small>Meanwhile</small><b>Log today's weight</b><span class="b o">Log weight</span></div>
+        <div class="hc"><b>Add a starting photo</b><span class="b o">Add photo</span></div>
+        <div class="hc"><b>Say hello to your coach</b><span class="b o">Open chat</span></div>
+        <div class="tabs"><span class="on">Today</span><span>Training</span><span>Nutrition</span><span>Recovery</span><span>Progress</span></div>
+      </div>
+      <figcaption><b><span class="id">W-01</span>Today — waiting for plan</b>
+        <div class="note"><ul><li>No turnaround promise. Useful baseline tasks instead of an empty screen.</li><li><span class="opn">Open:</span> can they log free-form workouts while waiting?</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:21</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px"><span class="burger">☰</span>&nbsp; Training</span><span></span></div>
+        <div class="grow center">
+          <div class="img" style="width:110px;height:80px;margin-bottom:10px">Illustration</div>
+          <div class="q" style="font-size:14px">Your training plan is on its way</div>
+          <div class="sub" style="max-width:220px">Coach Joseph will assign it. The same message appears in Nutrition and Recovery until their guidance arrives.</div>
+        </div>
+        <div class="tabs"><span>Today</span><span class="on">Training</span><span>Nutrition</span><span>Recovery</span><span>Progress</span></div>
+      </div>
+      <figcaption><b><span class="id">W-02</span>Training — waiting for plan</b>
+        <div class="note"><ul><li>Pattern reused for Nutrition and Recovery waiting states.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<section class="flow">
+  <h2>AI subscriber joins a human coach</h2>
+  <p class="arrowrow">Rule D7 / D7a: coach's guidance replaces the AI plan; cancelling the AI subscription is an explicit step, never automatic; history is kept (D7c)</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>10:00</span><span>▮▮ ◔</span></div>
+        <div class="grow center"><div class="avatar" style="width:64px;height:64px"></div><div class="q">Join Coach Joseph?</div></div>
+        <div class="card"><b>What changes</b><small>• Coach Joseph's training, nutrition and recovery guidance replaces your AI plan<br>• AI Coaching disappears from your app<br>• Your workouts, logs and history stay</small></div>
+        <div class="card"><b>Your Arcwell AI subscription</b><small>You'll be asked to end it in the next step so you aren't charged for AI you can't use.</small></div>
+        <div class="pinned"><div class="btn primary">Continue</div><div class="btn ghost">Not now — keep my AI plan</div></div>
+      </div>
+      <figcaption><b><span class="id">J-01</span>Join coach — AI subscriber</b>
+        <div class="note"><ul><li>Replaces the old note in F3-03 for paid users.</li><li><span class="rule">Rule D7c:</span> no data deleted.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>10:01</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Back</span><span></span></div>
+        <div class="q">End your AI subscription</div>
+        <div class="sub">Arcwell AI · yearly · renews 12 Mar</div>
+        <div class="open"><b>Unused paid time</b>Refund the remaining days, or no refund? This screen's wording depends on it.</div>
+        <div class="card"><small>If ending here doesn't work, you can also cancel in Google Play → Subscriptions.</small></div>
+        <div class="pinned"><div class="btn primary">End subscription and join Joseph</div><div class="btn ghost">Cancel in Google Play instead</div></div>
+      </div>
+      <figcaption><b><span class="id">J-02</span>End AI subscription</b>
+        <div class="note"><ul><li><span class="rule">Rule D7a:</span> an explicit step the athlete confirms.</li><li><span class="prop">Proposal:</span> Arcwell ends it from its server, with Google Play as a fallback (proposal sent 2026-11-11, not yet decided).</li><li>During the trial: no charge to discuss.</li><li>If ending fails: error with "Try again" and the Google Play link; joining waits until it's ended.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>10:02</span><span>▮▮ ◔</span></div>
+        <div class="grow center">
+          <div class="q">You're now coached by Joseph</div>
+          <div class="sub" style="max-width:230px">Your AI subscription has ended. Here's what changed:</div>
+          <div class="card" style="text-align:left;width:100%"><small>• Bottom bar: AI Coaching → <b>Progress</b> (check-ins and chat with Joseph)<br>• Training, Nutrition and Recovery will follow Joseph's guidance<br>• Your past AI workouts are in ☰ → Training → History</small></div>
+        </div>
+        <div class="pinned"><div class="btn primary">Got it</div></div>
+      </div>
+      <figcaption><b><span class="id">J-03</span>Joined — what changed</b>
+        <div class="note"><ul><li>"What changed" pattern reused whenever the bottom bar changes (upgrade, trial end, joining, leaving).</li><li>Then W-01 until Joseph assigns the plan.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<section class="flow">
+  <h2>Leaving a human coach</h2>
+  <p class="arrowrow">☰ → Account → My coach → Leave · Rule D7b: the coach's plan stays usable · Rule D7c: history kept</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>11:00</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Account</span><span style="color:var(--ink);font-weight:700">My coach</span><span></span></div>
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px"><div class="avatar" style="width:44px;height:44px;margin:0"></div><div><b>Coach Joseph Mathew</b><div class="sub" style="margin:0">Coaching you since 27 Oct</div></div></div>
+        <div class="mi">Coach profile<span class="chev">›</span></div>
+        <div class="mi">Access to my earlier history<span class="acc unk">?</span></div>
+        <div class="pinned"><div class="btn">Leave Coach Joseph</div></div>
+      </div>
+      <figcaption><b><span class="id">L-01</span>My coach</b>
+        <div class="note"><ul><li>Coached athletes only.</li><li><span class="opn">Open:</span> how history access is granted or removed (SPEC: coach sees from the join date unless granted).</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>11:01</span><span>▮▮ ◔</span></div>
+        <div class="q">Leave Coach Joseph?</div>
+        <div class="card"><small>• Joseph will no longer see your data or message you here<br>• You keep all your workouts, logs and history<br>• Joseph's current plan stays in Training so you can keep following it</small></div>
+        <div class="open"><b>Editing the kept plan</b>Can you change it after leaving, or only follow it?</div>
+        <div class="open"><b>Recovery after leaving</b>Recovery is hidden for free users. Does access end, and what happens to recovery history?</div>
+        <div class="open"><b>Shared photos</b>Do photo approvals stay or end?</div>
+        <div class="pinned"><div class="btn primary">Leave coach</div><div class="btn ghost">Stay with Joseph</div></div>
+      </div>
+      <figcaption><b><span class="id">L-02</span>Leave coach — confirm</b>
+        <div class="note"><ul><li><span class="rule">Rule D7b, D7c:</span> plan stays usable; nothing deleted.</li><li>Three open decisions shown on the screen so they can't be missed.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>11:02</span><span>▮▮ ◔</span></div>
+        <div class="grow center">
+          <div class="q">You've left Coach Joseph</div>
+          <div class="card" style="text-align:left;width:100%"><small>• Bottom bar: Today · Training · Nutrition<br>• Joseph's plan is still in Training<br>• Want AI coaching? You can start a one-week trial</small></div>
+        </div>
+        <div class="pinned"><div class="btn primary">Go to Training</div><div class="btn ghost">See AI coaching</div></div>
+        <div class="tabs"><span>Today</span><span class="on">Training</span><span>Nutrition</span></div>
+      </div>
+      <figcaption><b><span class="id">L-03</span>After leaving — what changed</b>
+        <div class="note"><ul><li><span class="rule">SPEC:</span> a former client becomes a free athlete, so the free bar applies (D2b).</li><li>Depends on the Recovery-after-leaving decision.</li><li><span class="rule">Rule D6:</span> trial is one week; offered here as a proposal.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+</body>
+</html>

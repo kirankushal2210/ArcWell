@@ -45,33 +45,31 @@ Mockups and wireframes live in `docs/design/`.
 
 ## 3. App structure (information architecture)
 
-### Athlete (free, paid, or coached)
+Confirmed rules come from [DECISIONS.md](DECISIONS.md) (IDs in brackets). Section names are working labels until D3 is decided.
 
-Bottom tabs:
+### Athlete bottom bar, by tier
 
-| Tab | Free | Paid (AI) | Coached |
-|---|---|---|---|
-| **Today** | Today's workout, calories | Workout, macro targets, recovery task, AI tips | Workout, targets, check-in due, coach messages |
-| **Train** | 2–3 templates, logging, history | Full library, AI plan | Coach's plan |
-| **Eat** | Search and log, calories only | Full macros, AI meal plan, photo logging | Coach's meal plan, full macros |
-| **Progress** | Weight only | Measurements, photos, trends, recovery | Measurements, photos, trends, recovery |
-| **Coach** | Upgrade / find out about coaching | AI coach | Chat with their coach, check-ins |
+| Tier | Bottom bar | Source |
+|---|---|---|
+| Free | Today · Training · Nutrition (no Recovery, no extra tabs) | D2b |
+| AI-coached (Pro) | Today · Training · Nutrition · Recovery · AI Coaching | D2 |
+| Human-coached (Pro) | Today · Training · Nutrition · Recovery · Progress — Progress is the combined Check-ins · Progress · Chat area | D2a, D11 |
 
-Recovery lives inside Today (daily task) and Progress (trends) rather than its own tab, to keep five tabs. It is hidden for free users.
+- **Side menu (☰)** for all athletes, supplementing the bottom bar (D9): Account · Notifications · Training (Exercises, Workouts, Programs, History, Set Videos, Muscle Analytics) · Gyms · Physique (Bodyweight, Measurements, Photos, Charts).
+- **Physique tools** are free and live in the side menu for everyone (D5, D9).
+- **Pro access** covers AI subscribers and human-coached athletes; coached athletes need no AI subscription and never see AI coaching (D10).
+- **Recovery** = sleep / sleep score, soreness, fatigue; hidden for free users (D4, D5a).
+- **Open:** Today's exact contents (D2d); free access to Exercises, Workouts, History, Set Videos, Muscle Analytics, Gyms; what Set Videos, Muscle Analytics and Gyms do; Workouts vs Programs; contents of the coached Progress switch.
 
-### Coach
-
-Bottom tabs:
+### Coach (proposal — coach navigation not yet reviewed)
 
 | Tab | Contents |
 |---|---|
-| **Clients** | Client list sorted by "needs attention": overdue check-ins, low adherence, unread messages; filters by status |
+| **Clients** | Client list sorted by "needs attention"; filters by status; client profiles |
 | **Check-ins** | Inbox of submitted check-ins to review and reply to |
-| **Plans** | Training and meal plan templates; plan builder |
+| **Plans** | Training and meal plan templates; plan builders; assigning |
 | **Messages** | All client chats |
-| **Business** | Leads, invite link, coach profile, transformations, plan/billing |
-
-Tapping a client opens the **client profile**: overview, plans, logs, measurements, photos, check-in history, chat.
+| **Business** | Leads, invite link, coach profile, transformations, plan and billing, settings |
 
 ## 4. Core flows to design first
 
@@ -87,7 +85,12 @@ Tapping a client opens the **client profile**: overview, plans, logs, measuremen
 | F8 | Upgrade to paid AI tier (paywall) | Wireframed — [f8-f9-paywall-photos.html](design/wireframes/f8-f9-paywall-photos.html) |
 | F9 | Transformation photo consent (request → approve with blur → withdraw) | Wireframed — [f8-f9-paywall-photos.html](design/wireframes/f8-f9-paywall-photos.html) |
 
-**Still to wireframe (beyond the nine core flows):** plan builder, meal plan builder, coach client dashboard and client profile, Business tab (leads, profile, billing), Today dashboard in full, Progress tab, recovery log, AI coach chat, profile and settings.
+| F10 | Bottom bars, side menu, Today by tier, notifications, account, privacy, export, delete, password reset | Wireframed — [f10-menu-today-account.html](design/wireframes/f10-menu-today-account.html) |
+| F11 | Recovery, Physique tools, AI Coaching | Wireframed — [f11-recovery-physique-ai.html](design/wireframes/f11-recovery-physique-ai.html) |
+| F12 | Coached Progress area, waiting for a plan, joining and leaving a coach | Wireframed — [f12-coached-area-switching.html](design/wireframes/f12-coached-area-switching.html) |
+| F13 | Coach clients, client profile, plan and meal plan builders, assigning, leads, business | Wireframed — [f13-coach-tools.html](design/wireframes/f13-coach-tools.html) |
+
+"Wireframed" means **drawn only**. No screen has been reviewed and approved by the founder or tested with users.
 
 ## 5. Design tokens (v0 — draft)
 
@@ -147,7 +150,7 @@ Light theme: same roles; values to be defined in the design-system step. All tex
 
 ## 7. Screen inventory
 
-Tracked here as screens are designed (Wireframe → Mockup → Built).
+Tracked here as screens are designed (Wireframe → Mockup → Built). **✅ in the Wireframe column means drawn only** — not reviewed by the founder, not tested with users.
 
 | Screen | Role | Wireframe | Mockup | Built |
 |---|---|---|---|---|
@@ -205,7 +208,7 @@ Tracked here as screens are designed (Wireframe → Mockup → Built).
 | F5-12 Coach meal plan | Athlete (coached) | ✅ | — | — |
 | F5-13 AI meal plan | Athlete (paid) | ✅ | — | — |
 | F5-14 Upgrade moment | Athlete (free) | ✅ | — | — |
-| F6-01 Coach tab — check-in due | Athlete (coached) | ✅ | — | — |
+| F6-01 Progress area — check-in due | Athlete (coached) | ✅ | — | — |
 | F6-02 Check-in step 1 — measurements | Athlete (coached) | ✅ | — | — |
 | F6-03 Check-in step 2 — photos | Athlete (coached) | ✅ | — | — |
 | F6-04 Check-in step 3 — how the week went | Athlete (coached) | ✅ | — | — |
@@ -234,6 +237,53 @@ Tracked here as screens are designed (Wireframe → Mockup → Built).
 | F9-04 Adjust blur and crop | Athlete (coached) | ✅ | — | — |
 | F9-05 Export approved photo | Coach | ✅ | — | — |
 | F9-06 Manage and withdraw approvals | Athlete | ✅ | — | — |
+| N-01 Today — free | Athlete (free) | ✅ | — | — |
+| N-02 Today — AI-coached | Athlete (AI) | ✅ | — | — |
+| N-03 Today — human-coached | Athlete (coached) | ✅ | — | — |
+| N-04 Side menu — free | Athlete (free) | ✅ | — | — |
+| N-05 Side menu — Pro | Athlete (Pro) | ✅ | — | — |
+| N-06 Notifications | Athlete | ✅ | — | — |
+| AC-01 Account | Athlete | ✅ | — | — |
+| AC-02 Privacy and permissions | Athlete | ✅ | — | — |
+| AC-03 Export my data | Athlete | ✅ | — | — |
+| AC-04 Delete account | Athlete | ✅ | — | — |
+| AC-05 Forgot password | All | ✅ | — | — |
+| AC-06 Reset link sent / email check | All | ✅ | — | — |
+| R-01 Recovery — log today | Athlete (Pro) | ✅ | — | — |
+| R-02 Recovery — trends | Athlete (Pro) | ✅ | — | — |
+| R-03 Recovery — first use | Athlete (Pro) | ✅ | — | — |
+| PH-01 Bodyweight | Athlete | ✅ | — | — |
+| PH-02 Measurements | Athlete | ✅ | — | — |
+| PH-03 Photos | Athlete | ✅ | — | — |
+| PH-04 Charts | Athlete | ✅ | — | — |
+| AI-01 AI Coaching | Athlete (AI) | ✅ | — | — |
+| AI-02 AI Coaching — permission declined | Athlete (AI) | ✅ | — | — |
+| CP-01 Progress area — check-in due | Athlete (coached) | ✅ | — | — |
+| CP-02 Check-in sent, awaiting feedback | Athlete (coached) | ✅ | — | — |
+| CP-03 Check-in without photo permission | Athlete (coached) | ✅ | — | — |
+| CP-04 Progress switch (contents open) | Athlete (coached) | ✅ | — | — |
+| CP-05 Chat switch | Athlete (coached) | ✅ | — | — |
+| W-01 Today — waiting for plan | Athlete (coached) | ✅ | — | — |
+| W-02 Training — waiting for plan | Athlete (coached) | ✅ | — | — |
+| J-01 Join coach — AI subscriber | Athlete (AI) | ✅ | — | — |
+| J-02 End AI subscription | Athlete (AI) | ✅ | — | — |
+| J-03 Joined — what changed | Athlete (coached) | ✅ | — | — |
+| L-01 My coach | Athlete (coached) | ✅ | — | — |
+| L-02 Leave coach — confirm | Athlete (coached) | ✅ | — | — |
+| L-03 After leaving — what changed | Athlete (free) | ✅ | — | — |
+| K-01 Client list | Coach | ✅ | — | — |
+| K-02 Client profile — overview | Coach | ✅ | — | — |
+| K-03 Client profile — training | Coach | ✅ | — | — |
+| K-04 Change client status | Coach | ✅ | — | — |
+| K-05 Plans — templates | Coach | ✅ | — | — |
+| K-06 Plan builder — week | Coach | ✅ | — | — |
+| K-07 Plan builder — exercise | Coach | ✅ | — | — |
+| K-08 Assign and customise | Coach | ✅ | — | — |
+| K-09 Meal plan builder | Coach | ✅ | — | — |
+| K-10 Leads | Coach | ✅ | — | — |
+| K-11 Lead — add or edit | Coach | ✅ | — | — |
+| K-12 Business | Coach | ✅ | — | — |
+| K-13 Plan and billing | Coach | ✅ | — | — |
 
 ## 8. Accessibility and quality checklist
 
@@ -250,3 +300,4 @@ Tracked here as screens are designed (Wireframe → Mockup → Built).
 | Date | Decision |
 |---|---|
 | 2026-11-10 | DESIGN.md created; working assumptions in section 0 pending founder confirmation |
+| 2026-11-11 | Founder decisions D1–D12 recorded in [DECISIONS.md](DECISIONS.md); section 3 rewritten; F10–F13 drawn; existing screens updated |

@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arcwell Wireframes F13</title>
+<link rel="stylesheet" href="wireframe.css">
+</head>
+<body>
+<header>
+  <h1>Arcwell — Wireframes: F13 Coach tools — clients, plan builders, leads, business</h1>
+  <p>Drawn 2026-11-11 in the review pass, from SPEC.md's coach workspace scope. <b>Drawn only — not reviewed or approved, not tested with users.</b> The coach bottom bar (Clients · Check-ins · Plans · Messages · Business) is a proposal: coach navigation hasn't been reviewed yet.</p>
+  <div class="legend"><span class="l-primary">Primary action / selected</span><span>Secondary</span><span class="l-note">Rule · Proposal · Open</span></div>
+</header>
+
+<section class="flow">
+  <h2>Clients and client profile</h2>
+  <p class="arrowrow">SPEC: client list with adherence and overdue check-ins; client profiles; lifecycle (active, paused, leaving, completed)</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:00</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px">Clients</span><span>+ Invite</span></div>
+        <div class="filters"><span class="on">Needs attention · 4</span><span>Active · 28</span><span>Paused · 3</span><span>Leaving · 1</span><span>Completed · 9</span></div>
+        <div class="inrow"><span class="av"></span><span class="t"><b>Rahul Verma <span class="pill">Check-in overdue</span></b><small>Adherence 62% · last workout 4 days ago</small></span><span class="r">›</span></div>
+        <div class="inrow"><span class="av"></span><span class="t"><b>Sneha Reddy <span class="pill">Low adherence</span></b><small>Adherence 48% · 3 meals logged this week</small></span><span class="r">›</span></div>
+        <div class="inrow"><span class="av"></span><span class="t"><b>Karan Mehta <span class="pill">2 unread</span></b><small>Adherence 91%</small></span><span class="r">›</span></div>
+        <div class="inrow"><span class="av"></span><span class="t"><b>Ananya Iyer <span class="pill ghost">Needs plan</span></b><small>Joined yesterday</small></span><span class="r">›</span></div>
+        <div class="seclab">On track</div>
+        <div class="inrow"><span class="av"></span><span class="t"><b>Priya Sharma</b><small>Adherence 94% · check-in sent</small></span><span class="r">›</span></div>
+        <div class="tabs"><span class="on">Clients</span><span>Check-ins</span><span>Plans</span><span>Messages</span><span>Business</span></div>
+      </div>
+      <figcaption><b><span class="id">K-01</span>Client list</b>
+        <div class="note"><ul><li>"Needs attention" first: overdue check-ins, low adherence, unread messages, needs a plan.</li><li><span class="prop">Proposal:</span> what counts as "low adherence" (e.g. under 60%) to be set later.</li><li>Empty state: F2-08. List doesn't reorder while the coach is using it.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:02</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Clients</span><span>···</span></div>
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:6px"><div class="avatar" style="width:40px;height:40px;margin:0"></div><div><b>Rahul Verma</b> <span class="pill">Active</span><div class="sub" style="margin:0">Strength · week 5 · since 7 Oct</div></div></div>
+        <div class="chips"><span class="chip sel">Overview</span><span class="chip">Training</span><span class="chip">Nutrition</span><span class="chip">Recovery</span><span class="chip">Progress</span><span class="chip">Check-ins</span><span class="chip">Notes</span></div>
+        <div class="grid2"><div class="card" style="margin:0"><b>62%</b><small>adherence (7 days)</small></div><div class="card" style="margin:0"><b>2 / 4</b><small>workouts this week</small></div></div>
+        <div class="grid2"><div class="card" style="margin:0"><b>81.2 kg</b><small>+0.3 this week</small></div><div class="card" style="margin:0"><b>5.8 h</b><small>avg sleep</small></div></div>
+        <div class="card"><b>Recent</b><small>Legs · skipped 2 exercises · "knee sore"<br>Check-in overdue since Sunday</small></div>
+        <div class="card"><small>You can see Rahul's data from 7 Oct (when he joined).</small></div>
+        <div class="pinned"><div class="btn primary">Message Rahul</div></div>
+      </div>
+      <figcaption><b><span class="id">K-02</span>Client profile — overview</b>
+        <div class="note"><ul><li>Sections from the sitemap: Overview, Training, Nutrition, Recovery, Progress, Check-ins, private Notes.</li><li><span class="rule">SPEC:</span> data visible only from the join date unless the client grants earlier history.</li><li>Recovery section shows the client's logs and trends (R-02). <span class="opn">Open:</span> coach recovery controls.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:03</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Rahul Verma</span><span></span></div>
+        <div class="chips"><span class="chip">Overview</span><span class="chip sel">Training</span><span class="chip">Nutrition</span><span class="chip">Recovery</span></div>
+        <div class="card"><b>Plan: Strength block 2</b><small>4 days · week 5 of 8</small><div class="btn" style="margin-top:6px">Edit Rahul's plan</div></div>
+        <div class="seclab">Workout log</div>
+        <div class="inrow"><span class="t"><b>Legs · Mon</b><small>4 of 6 exercises · note: "knee sore on squats"</small></span><span class="r">›</span></div>
+        <div class="inrow"><span class="t"><b>Push · Sat</b><small>All done · bench 80 kg × 5 (best)</small></span><span class="r">›</span></div>
+        <div class="inrow"><span class="t"><b>Pull · Thu</b><small>Swapped lat pulldown → pull-up (today only)</small></span><span class="r">›</span></div>
+      </div>
+      <figcaption><b><span class="id">K-03</span>Client profile — training</b>
+        <div class="note"><ul><li>Each logged workout opens read-only, as the athlete logged it (F4-03 layout), with notes, skips and swaps visible.</li><li>Nutrition section follows the same pattern: meal plan + daily food logs + adherence.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:05</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Rahul Verma</span><span></span></div>
+        <div class="dimmed"></div>
+        <div class="sheet" style="z-index:6">
+          <div class="grab"></div>
+          <div class="q" style="font-size:14px">Change Rahul's status</div>
+          <div class="opt sel"><span class="ic"></span><span>Active</span></div>
+          <div class="opt"><span class="ic"></span><span>Paused<small>e.g. travelling; reminders stop</small></span></div>
+          <div class="opt"><span class="ic"></span><span>Leaving<small>finishing soon</small></span></div>
+          <div class="opt"><span class="ic"></span><span>Completed<small>coaching finished</small></span></div>
+          <div class="open"><b>Status effects</b>What a client sees, and whether access ends, for paused / leaving / completed.</div>
+          <div class="btn primary">Save</div>
+        </div>
+      </div>
+      <figcaption><b><span class="id">K-04</span>Change client status</b>
+        <div class="note"><ul><li><span class="rule">SPEC:</span> lifecycle states active, paused, leaving, completed.</li><li>Effects on the athlete side aren't defined — flagged, not invented.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<section class="flow">
+  <h2>Plans: templates, plan builder, meal plan builder, assigning</h2>
+  <p class="arrowrow">SPEC: plan builder with reusable templates; coach meal plans as fixed meals with exact foods and quantities</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>10:00</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px">Plans</span><span>+ New</span></div>
+        <div class="seg"><span class="on">Training</span><span>Meal plans</span></div>
+        <div class="inrow"><span class="t"><b>Strength block · 4 days</b><small>8 weeks · used by 6 clients</small></span><span class="r">›</span></div>
+        <div class="inrow"><span class="t"><b>Fat loss · full body 3 days</b><small>6 weeks · used by 11 clients</small></span><span class="r">›</span></div>
+        <div class="inrow"><span class="t"><b>Home dumbbells · 3 days</b><small>4 weeks · used by 2 clients</small></span><span class="r">›</span></div>
+        <div class="tabs"><span>Clients</span><span>Check-ins</span><span class="on">Plans</span><span>Messages</span><span>Business</span></div>
+      </div>
+      <figcaption><b><span class="id">K-05</span>Plans — templates</b>
+        <div class="note"><ul><li>Training and meal plan templates in one tab. "+ New" → K-06 or K-09.</li><li>Empty state: "Create your first template" (F2-06 options).</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>10:02</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Plans</span><span>Save</span></div>
+        <div class="field"><small>Template name</small><b>Strength block · 4 days</b></div>
+        <div class="chips"><span class="chip sel">Week 1</span><span class="chip">Week 2</span><span class="chip">Week 3</span><span class="chip">+ Week</span></div>
+        <div class="hc"><small>Day 1</small><b>Push</b>Bench press 4×5 · Incline DB 3×8 · OHP 3×6<br><span class="b o">Edit day</span></div>
+        <div class="hc"><small>Day 2</small><b>Pull</b>Deadlift 3×5 · Row 4×8 · Pull-up 3×max</div>
+        <div class="hc"><small>Day 3</small><b>Legs</b>Squat 4×5 · RDL 3×8 · Lunge 3×10</div>
+        <div class="hc" style="border-style:dashed"><b>+ Add day</b></div>
+        <div class="pinned"><div class="btn">Copy week to all weeks</div></div>
+      </div>
+      <figcaption><b><span class="id">K-06</span>Plan builder — week</b>
+        <div class="note"><ul><li>Weeks → days → exercises (sitemap structure). Reorder days by dragging.</li><li>↕ Scrolls; Save always in the header.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>10:03</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Day 1 · Push</span><span>Done</span></div>
+        <div class="exh" style="display:flex;gap:8px;align-items:center;margin-bottom:8px"><span class="img" style="width:34px;height:34px"></span><b>Barbell bench press</b><span style="margin-left:auto;font-size:10px">Change</span></div>
+        <div class="grid2"><div class="field" style="margin:0"><small>Sets</small><b>4</b></div><div class="field" style="margin:0"><small>Reps</small><b>5</b></div></div>
+        <div class="grid2"><div class="field" style="margin:0"><small>Rest</small><b>2:30</b></div><div class="field" style="margin:0"><small>Effort target</small><b>RIR 1–2</b></div></div>
+        <div class="field" style="height:48px"><small>Note for client</small>Pause 1 s on the chest</div>
+        <div class="btn">+ Add exercise from library</div>
+      </div>
+      <figcaption><b><span class="id">K-07</span>Plan builder — exercise</b>
+        <div class="note"><ul><li>Sets, reps, rest, effort target (sitemap). Exercises come from the shared library.</li><li>Keyboard: number fields use the numeric keypad; the edited field scrolls above it.</li><li><span class="opn">Open:</span> coach "lock" so clients can't swap an exercise (F4-07).</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>10:05</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Plans</span><span>Save</span></div>
+        <div class="field"><small>Meal plan name</small><b>Veg fat loss · 1,850 kcal</b></div>
+        <div class="kcal" style="border:1.5px solid var(--line);border-radius:10px;padding:7px 9px;margin-bottom:6px;font-size:10.5px"><b>1,840 kcal</b> · P 128 g · C 190 g · F 55 g</div>
+        <div class="hc"><small>Breakfast · 420 kcal</small><b>Besan chilla × 2 · Curd 1 katori</b><span class="b o">Edit</span></div>
+        <div class="hc"><small>Lunch · 560 kcal</small><b>Paneer bhurji 1 katori · Phulka × 2 · Salad</b></div>
+        <div class="hc"><small>Snack · 250 kcal</small><b>Whey shake · Banana × 1</b></div>
+        <div class="hc"><small>Dinner · 610 kcal</small><b>Rajma 1 katori · Jeera rice 1 katori</b></div>
+        <div class="hc" style="border-style:dashed"><b>+ Add meal</b></div>
+      </div>
+      <figcaption><b><span class="id">K-09</span>Meal plan builder</b>
+        <div class="note"><ul><li><span class="rule">SPEC:</span> fixed meals with exact foods and quantities; totals update live.</li><li>Foods and portions from the same database as athlete logging (F5-05, F5-06).</li><li>↕ Scrolls.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>10:10</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>✕</span><span style="color:var(--ink);font-weight:700">Assign to Ananya</span><span></span></div>
+        <div class="label">Training plan</div>
+        <div class="opt sel"><span class="ic"></span><span>Fat loss · full body 3 days<small>Start Monday 18 Nov</small></span></div>
+        <div class="label">Meal plan</div>
+        <div class="opt sel"><span class="ic"></span><span>Veg fat loss · 1,850 kcal</span></div>
+        <div class="label">Targets</div>
+        <div class="grid2"><div class="field" style="margin:0"><small>Calories</small><b>1,850</b></div><div class="field" style="margin:0"><small>Protein</small><b>110 g</b></div></div>
+        <div class="open"><b>Recovery guidance</b>What a coach sets here isn't defined.</div>
+        <div class="toggle"><div><b>Customise for Ananya after assigning</b><small>Changes apply to her copy only, not the template</small></div><div class="sw"></div></div>
+        <div class="pinned"><div class="btn primary">Assign</div></div>
+      </div>
+      <figcaption><b><span class="id">K-08</span>Assign and customise</b>
+        <div class="note"><ul><li>Opened from F2-10 or a client profile. The client's copy is separate from the template.</li><li><span class="rule">Rule D7:</span> once assigned, this replaces the client's active guidance; history kept (D7c).</li><li>Assigning sends the "plan assigned" notification and ends the client's waiting state (W-01).</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<section class="flow">
+  <h2>Leads and business</h2>
+  <p class="arrowrow">SPEC: basic leads; coach profile; coach pays a monthly fee via Razorpay outside the app</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>12:00</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Business</span><span>+ Add lead</span></div>
+        <div class="filters"><span class="on">All · 12</span><span>New · 5</span><span>Contacted · 4</span><span>Converted · 2</span><span>Lost · 1</span></div>
+        <div class="inrow"><span class="t"><b>Arjun K <span class="pill">New</span></b><small>Instagram DM · wants fat loss · 2 days ago</small></span><span class="r">›</span></div>
+        <div class="inrow"><span class="t"><b>Meera S <span class="pill ghost">Contacted</span></b><small>Call booked Fri · budget ₹4k/month</small></span><span class="r">›</span></div>
+        <div class="inrow"><span class="t"><b>Rohit P <span class="pill ghost">Converted</span></b><small>Joined 3 Nov</small></span><span class="r">›</span></div>
+      </div>
+      <figcaption><b><span class="id">K-10</span>Leads</b>
+        <div class="note"><ul><li><span class="rule">SPEC:</span> basic leads — list, status, notes.</li><li>Leads are added by the coach (no marketplace in v1).</li><li>Empty state: "Add people who've asked about coaching".</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>12:02</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>✕</span><span style="color:var(--ink);font-weight:700">Lead</span><span>Save</span></div>
+        <div class="field"><small>Name</small><b>Arjun K</b></div>
+        <div class="field"><small>Where they came from</small><b>Instagram</b></div>
+        <div class="label">Status</div>
+        <div class="seg"><span class="on">New</span><span>Contacted</span><span>Converted</span><span>Lost</span></div>
+        <div class="field" style="height:56px"><small>Notes</small>Wants fat loss before wedding in March</div>
+        <div class="pinned"><div class="btn primary">Send invite link</div></div>
+      </div>
+      <figcaption><b><span class="id">K-11</span>Lead — add or edit</b>
+        <div class="note"><ul><li>"Send invite link" shares the coach's link (F2-07); when they join, the lead becomes Converted.</li><li><span class="opn">Open:</span> chatting with leads inside Arcwell (F7-04).</li><li>No phone or email stored unless the coach types it (privacy).</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>12:05</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px">Business</span><span></span></div>
+        <div class="mi">Leads<span class="acc">5 new ›</span></div>
+        <div class="mi">Invite link and QR<span class="chev">›</span></div>
+        <div class="mi">Coach profile<span class="chev">›</span></div>
+        <div class="mi">Transformations<span class="acc">F9-01 ›</span></div>
+        <div class="mi">Plan and billing<span class="chev">›</span></div>
+        <div class="mi">Settings<span class="acc">notifications, privacy, sign out ›</span></div>
+        <div class="open"><b>Coach profile audience</b>Who sees it without a marketplace?</div>
+        <div class="tabs"><span>Clients</span><span>Check-ins</span><span>Plans</span><span>Messages</span><span class="on">Business</span></div>
+      </div>
+      <figcaption><b><span class="id">K-12</span>Business</b>
+        <div class="note"><ul><li>Items from the sitemap's Business tab. Coach settings include data export and account deletion (same pattern as AC-03, AC-04).</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>12:06</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Business</span><span style="color:var(--ink);font-weight:700">Plan and billing</span><span></span></div>
+        <div class="kv"><span>Plan</span><b>Beta · free</b></div>
+        <div class="kv"><span>Clients</span><b>32 active</b></div>
+        <div class="kv"><span>Client limit</span><b>Set when pricing is decided</b></div>
+        <div class="card"><small>Payments for Arcwell happen on our website through Razorpay, not in the app.</small></div>
+        <div class="open"><b>Limits and lapses</b>What happens when a coach hits their client limit or stops paying.</div>
+        <div class="pinned"><div class="btn">Open billing website</div></div>
+      </div>
+      <figcaption><b><span class="id">K-13</span>Plan and billing</b>
+        <div class="note"><ul><li><span class="rule">SPEC:</span> coach fee via Razorpay outside the app; price decided after the build; plan limits are settings.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+</body>
+</html>

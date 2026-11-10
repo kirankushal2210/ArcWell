@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arcwell Wireframes F11</title>
+<link rel="stylesheet" href="wireframe.css">
+</head>
+<body>
+<header>
+  <h1>Arcwell — Wireframes: F11 Recovery, Physique tools, AI Coaching</h1>
+  <p>Drawn 2026-11-11 in the review pass. <b>Drawn only — not reviewed or approved, not tested with users.</b> Notes mark <b>Rule</b> (confirmed, DECISIONS.md ID), <b>Proposal</b> (layout for review) or <b>Open</b> (needs a decision).</p>
+  <div class="legend"><span class="l-primary">Primary action / selected</span><span>Secondary</span><span class="l-note">Rule · Proposal · Open</span></div>
+</header>
+
+<section class="flow">
+  <h2>Recovery (AI-coached and human-coached only)</h2>
+  <p class="arrowrow">Rule D4: sleep / sleep score, soreness, fatigue — nothing else. Rule D5a: hidden entirely for free users.</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>7:30</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px"><span class="burger">☰</span>&nbsp; Recovery</span><span>Trends</span></div>
+        <div class="sub">Wed 11 Nov · takes about 10 seconds</div>
+        <div class="label">Sleep</div>
+        <div class="stepper"><span class="pm">−</span><span class="val">6.5 <small>hours</small></span><span class="pm">+</span></div>
+        <div class="slider">How well did you sleep?<div class="track"><i style="left:60%"></i></div><div class="ends"><span>Badly</span><span>Very well</span></div></div>
+        <div class="slider">Soreness<div class="track"><i style="left:35%"></i></div><div class="ends"><span>None</span><span>Very sore</span></div></div>
+        <div class="slider">Fatigue<div class="track"><i style="left:45%"></i></div><div class="ends"><span>Fresh</span><span>Exhausted</span></div></div>
+        <div class="open"><b>Sleep score</b>How it's worked out is not decided (no wearables in v1).</div>
+        <div class="pinned"><div class="btn primary">Save</div></div>
+        <div class="tabs"><span>Today</span><span>Training</span><span>Nutrition</span><span class="on">Recovery</span><span>AI Coaching</span></div>
+      </div>
+      <figcaption><b><span class="id">R-01</span>Recovery — log today</b>
+        <div class="note"><ul><li><span class="rule">Rule D4:</span> only sleep, sleep quality/score, soreness, fatigue. No routines.</li><li><span class="prop">Proposal:</span> hours stepper + three sliders; soreness as one overall level (per-body-area soreness not agreed).</li><li>Shown with the AI-coached bar; coached athletes see the same screen with their bar.</li><li>↕ Scrolls on small phones; Save stays pinned.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>7:31</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Recovery</span><span style="color:var(--ink);font-weight:700">Trends</span><span></span></div>
+        <div class="seg"><span class="on">7 days</span><span>30 days</span><span>3 months</span></div>
+        <div class="label">Sleep (hours)</div><div class="mini-chart"></div>
+        <div class="label">Soreness</div><div class="mini-chart"></div>
+        <div class="label">Fatigue</div><div class="mini-chart"></div>
+        <div class="tabs"><span>Today</span><span>Training</span><span>Nutrition</span><span class="on">Recovery</span><span>Progress</span></div>
+      </div>
+      <figcaption><b><span class="id">R-02</span>Recovery — trends</b>
+        <div class="note"><ul><li>Shown with the human-coached bar. Their coach also sees these trends in the client profile (K-02).</li><li><span class="opn">Open:</span> what a coach can set for recovery (D7) — no coach controls drawn.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>7:32</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px"><span class="burger">☰</span>&nbsp; Recovery</span><span></span></div>
+        <div class="grow center">
+          <div class="img" style="width:110px;height:80px;margin-bottom:10px">Illustration</div>
+          <div class="q" style="font-size:14px">Start tracking your recovery</div>
+          <div class="sub" style="max-width:220px">Log sleep, soreness and fatigue each morning. Trends appear after a few days.</div>
+          <div class="btn primary" style="width:80%">Log today</div>
+        </div>
+        <div class="tabs"><span>Today</span><span>Training</span><span>Nutrition</span><span class="on">Recovery</span><span>AI Coaching</span></div>
+      </div>
+      <figcaption><b><span class="id">R-03</span>Recovery — first use</b>
+        <div class="note"><ul><li>First-use empty state for Pro users. Free users never reach this (no Recovery item, D2b).</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<section class="flow">
+  <h2>Physique tools (side menu · all athletes)</h2>
+  <p class="arrowrow">Rule D5 / D9: bodyweight, measurements, photos and charts are free and live in the side menu for everyone.</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>8:00</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Menu</span><span style="color:var(--ink);font-weight:700">Bodyweight</span><span></span></div>
+        <div class="kcal" style="border:1.5px solid var(--line);border-radius:12px;padding:9px 10px;margin-bottom:8px"><span style="font-size:20px;font-weight:800">73.8 <small style="font-size:10px;color:var(--muted)">kg · 7-day average</small></span></div>
+        <div class="seg"><span>1 month</span><span class="on">3 months</span><span>All</span></div>
+        <div class="mini-chart"></div>
+        <div class="inrow"><span class="t"><b>73.6 kg</b><small>Today</small></span><span class="r">Edit</span></div>
+        <div class="inrow"><span class="t"><b>74.0 kg</b><small>Yesterday</small></span><span class="r">Edit</span></div>
+        <div class="pinned"><div class="btn primary">Log weight</div></div>
+      </div>
+      <figcaption><b><span class="id">PH-01</span>Bodyweight</b>
+        <div class="note"><ul><li><span class="rule">Rule D5:</span> free for everyone.</li><li><span class="prop">Proposal:</span> 7-day average as the headline (less noisy). Log weight opens the F4-05-style keypad.</li><li>Empty state: "Log your first weigh-in".</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>8:01</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Menu</span><span style="color:var(--ink);font-weight:700">Measurements</span><span></span></div>
+        <div class="meas" style="display:flex;justify-content:space-between;font-size:11px;padding:6px 0;border-bottom:1px solid var(--fill)"><span>Waist<small style="display:block;color:var(--muted);font-size:9px">−3.0 cm since start</small></span><b>83.0 cm</b></div>
+        <div class="meas" style="display:flex;justify-content:space-between;font-size:11px;padding:6px 0;border-bottom:1px solid var(--fill)"><span>Chest<small style="display:block;color:var(--muted);font-size:9px">no change</small></span><b>98.0 cm</b></div>
+        <div class="meas" style="display:flex;justify-content:space-between;font-size:11px;padding:6px 0;border-bottom:1px solid var(--fill)"><span>Hips</span><b>96.0 cm</b></div>
+        <div class="meas" style="display:flex;justify-content:space-between;font-size:11px;padding:6px 0;border-bottom:1px solid var(--fill)"><span>Arm (right)</span><b>33.0 cm</b></div>
+        <div class="meas" style="display:flex;justify-content:space-between;font-size:11px;padding:6px 0;border-bottom:1px solid var(--fill)"><span>Thigh (right)</span><b>56.0 cm</b></div>
+        <div class="pinned"><div class="btn primary">Add measurements</div></div>
+      </div>
+      <figcaption><b><span class="id">PH-02</span>Measurements</b>
+        <div class="note"><ul><li>Same body parts as the check-in form (F6-02), so coached clients' check-in entries appear here too.</li><li>Tap a row → its history and chart.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>8:02</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Menu</span><span style="color:var(--ink);font-weight:700">Photos</span><span>Compare</span></div>
+        <div class="seg"><span class="on">Front</span><span>Side</span><span>Back</span></div>
+        <div class="grid3"><div class="img">Week 3</div><div class="img">Week 2</div><div class="img">Week 1</div></div>
+        <div class="grid3"><div class="img">Start</div></div>
+        <div class="card"><small>🔒 Private. Only you, and your coach if you have one, can see these.</small></div>
+        <div class="pinned"><div class="btn primary">Add photo</div></div>
+      </div>
+      <figcaption><b><span class="id">PH-03</span>Photos</b>
+        <div class="note"><ul><li>"Compare" → pick any two dates side by side.</li><li>If photo permission is off: "Allow photos" prompt with the purpose; declining keeps everything else working (D12).</li><li>Camera permission denied → "Turn on camera in phone settings".</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>8:03</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Menu</span><span style="color:var(--ink);font-weight:700">Charts</span><span></span></div>
+        <div class="chips"><span class="chip sel">Bodyweight</span><span class="chip">Waist</span><span class="chip">Chest</span><span class="chip">Hips</span><span class="chip">Calories</span></div>
+        <div class="seg"><span>1 month</span><span class="on">3 months</span><span>All</span></div>
+        <div class="mini-chart" style="height:120px"></div>
+        <div class="card"><b>−4.2 kg since you started</b><small>12 weeks</small></div>
+      </div>
+      <figcaption><b><span class="id">PH-04</span>Charts</b>
+        <div class="note"><ul><li><span class="rule">Rule D5:</span> free.</li><li><span class="prop">Proposal:</span> one chart with a metric picker. Pro-only metrics (e.g. recovery, macros) not decided — <span class="opn">Open:</span> does Pro add any charts?</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<section class="flow">
+  <h2>AI Coaching (AI subscribers only)</h2>
+  <p class="arrowrow">Rule D2: fifth bottom-bar item for AI subscribers. Never shown to human-coached athletes. Research-backed AI chat is out of v1 (SPEC.md), so this tab manages the AI plan.</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:00</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px"><span class="burger">☰</span>&nbsp; AI Coaching</span><span></span></div>
+        <div class="hc" style="border-color:var(--ink);border-width:2px"><small>Your AI plan</small><b>Fat loss · 4 days · 45 min</b>Week 2 of 8 · built from your onboarding answers</div>
+        <div class="hc"><small>This week's change</small><b>Leg volume reduced</b>You reported high soreness on 3 days</div>
+        <div class="label">Adjust my plan</div>
+        <div class="opt"><span class="ic"></span><span>Change training days or time</span></div>
+        <div class="opt"><span class="ic"></span><span>Change equipment or gym</span></div>
+        <div class="opt"><span class="ic"></span><span>New injury or limitation</span></div>
+        <div class="opt"><span class="ic"></span><span>Change my goal</span></div>
+        <div class="card"><small>Preparing for a contest or recovering from an injury? These need a human coach.</small></div>
+        <div class="tabs"><span>Today</span><span>Training</span><span>Nutrition</span><span>Recovery</span><span class="on">AI Coaching</span></div>
+      </div>
+      <figcaption><b><span class="id">AI-01</span>AI Coaching</b>
+        <div class="note"><ul><li><span class="rule">SPEC:</span> AI builds and adjusts plans from the approved library only; out-of-scope goals go to coaches.</li><li><span class="prop">Proposal:</span> structured "adjust" options instead of open chat.</li><li><span class="opn">Open:</span> where "need a human coach" sends people — there's no marketplace in v1.</li><li>Daily AI limit reached → "You've used today's AI adjustments; try again tomorrow".</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:01</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px"><span class="burger">☰</span>&nbsp; AI Coaching</span><span></span></div>
+        <div class="grow center">
+          <div class="q" style="font-size:14px">AI features are off</div>
+          <div class="sub" style="max-width:230px">You haven't allowed Arcwell's AI to use your data. Your workouts, food logs and recovery still work as normal.</div>
+          <div class="btn primary" style="width:80%">Review AI permission</div>
+        </div>
+        <div class="open"><b>Declining AI permission</b>What happens to an active trial or subscription.</div>
+        <div class="tabs"><span>Today</span><span>Training</span><span>Nutrition</span><span>Recovery</span><span class="on">AI Coaching</span></div>
+      </div>
+      <figcaption><b><span class="id">AI-02</span>AI Coaching — permission declined</b>
+        <div class="note"><ul><li><span class="rule">Rule D8:</span> declining never blocks non-AI features.</li><li>"Review AI permission" opens F8-03 (the first-use step).</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+</body>
+</html>

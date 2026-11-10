@@ -4,87 +4,84 @@ Every screen in the v1 Android app, by role. Tier markers: **[F]** free athlete,
 
 ## Overview
 
+Confirmed rules are in [DECISIONS.md](../DECISIONS.md) (IDs in brackets). Labels are working names (D3 pending).
+
 ```mermaid
 flowchart TD
   Launch[Splash] --> Auth{Signed in?}
-  Auth -- No --> Welcome[Welcome] --> SignIn[Sign in: Google / Email] --> Consent[Consent: health data, AI, photos]
-  Consent --> Role{Role}
-  Auth -- Yes --> Shell{Role}
-  Role -- Athlete --> AOnb[Athlete onboarding] --> AShell
-  Role -- Coach --> COnb[Coach onboarding] --> CShell
-  Invite[Invite link] --> SignIn
-  Shell -- Athlete --> AShell[Athlete tabs]
-  Shell -- Coach --> CShell[Coach tabs]
-  AShell --> Today & Train & Eat & Progress & CoachTab[Coach / AI]
-  CShell --> Clients & Checkins[Check-ins] & Plans & Messages & Business
+  Auth -- No --> Welcome[Welcome: I'm training / I'm a coach] --> SignUp[Sign up / Sign in: Google, email] --> Consent[Consent: health data, AI permission step 1, photos]
+  Invite[Coach invite link] --> InviteLanding[Invite landing] --> SignUp
+  Consent --> AOnb[Athlete onboarding] --> Tier{Tier}
+  Consent --> COnb[Coach onboarding] --> CShell[Coach tabs]
+  Auth -- Yes --> Tier
+  Tier -- Free --> FBar[Today · Training · Nutrition]
+  Tier -- AI-coached --> ABar[Today · Training · Nutrition · Recovery · AI Coaching]
+  Tier -- Human-coached --> HBar[Today · Training · Nutrition · Recovery · Progress]
+  FBar & ABar & HBar --> Menu[☰ Side menu]
 ```
 
 ## 1. Entry and account (shared)
 
-- Splash
-- Welcome (value proposition, "I'm a coach" / "I'm training")
-- Sign in / sign up — Google, email (+ email verification, forgot password)
-- Invite landing (opened from a coach's link: "Join Coach Joseph")
-- Consent — health data, AI processing [P only when upgrading], photos
-- Role choice (skipped when arriving via invite → athlete)
+- Splash · Welcome · Sign up / Sign in (Google, email) · Email verification · Forgot password → reset link sent
+- Invite landing (from a coach's link) · Already coached (switch coach) · AI subscriber joining a coach (cancellation step, D7a)
+- Consent — health data, **AI permission step 1** (D8), photos (optional, D12)
+- Open: role chosen before or after sign-up; role switching; whether invite sign-ups see the AI step
 
 ## 2. Athlete onboarding
 
-1. Goal
-2. Experience level
-3. Age, height, weight
-4. Injuries / limitations
-5. Training days and session length
-6. Equipment access (gym / home / none)
-7. Diet type (veg, non-veg, eggetarian, vegan, Jain)
-8. Summary → [F] starter templates · [P] AI plan generation · [C] "Your coach will assign your plan"
+1. Goal · 2. Experience · 3. Age, height, weight (sex: open) · 4. Injuries / limitations · 5. Training days and session length · 6. Equipment · 7. Diet type
+8. Summary → [F] calorie target + starter templates (calories only, D5) · [C] connected to coach, waiting for plan (no turnaround promise)
 
 ## 3. Athlete app
 
-### Tab: Today
-- Today dashboard — workout card, calorie/macro progress, recovery task [P][C], check-in due [C], coach message preview [C], AI tip [P]
-- Notifications inbox
+### Bottom bar by tier (D2, D2a, D2b)
 
-### Tab: Train
-- Plan overview — [F] starter templates · [P] AI plan · [C] coach's plan
-- Workout detail (exercises, sets, targets)
-- **Active workout** — set logging (previous values), rest timer sheet, swap exercise, notes
-- Workout summary (volume, PRs)
-- Exercise library [P][C] / limited [F] → Exercise detail (demo media, cues, muscles, alternatives)
-- Workout history → past workout detail
-- AI plan: adjust / regenerate [P]
-- Custom workout builder [F][P] (ASSUMPTION — free users can edit templates lightly)
+| Tier | Bottom bar |
+|---|---|
+| Free | Today · Training · Nutrition |
+| AI-coached (Pro) | Today · Training · Nutrition · Recovery · AI Coaching |
+| Human-coached (Pro) | Today · Training · Nutrition · Recovery · Progress |
 
-### Tab: Eat
-- Day log — meals (breakfast, lunch, snacks, dinner), totals — [F] calories only · [P][C] full macros
-- Food search → Food detail + portion picker (katori, roti, piece, grams) → add to meal
-- Recent / frequent foods
-- Photo food logging [P] (camera → AI estimate → confirm/edit) 🔒
-- Meal plan — [P] AI meal plan · [C] coach's fixed-meal plan → follow/mark eaten
-- Custom food (user-entered)
-- Targets (calories/macros) — set by AI [P], coach [C], or self [F]
+### Today
+- Today by tier (contents pending, D2d) · waiting-for-plan state [C] · notifications open from ☰
 
-### Tab: Progress
-- Overview — weight trend [All]; measurements, photos, recovery trends [P][C] 🔒
-- Log weight
-- Measurements (log + history)
-- Progress photos (capture, compare side by side)
-- Recovery log — sleep, soreness, fatigue (daily) [P][C] 🔒 → recovery trends
-- Milestones / PRs
+### Training
+- Plan / programme landing — [F] 2–3 templates · [AI] AI plan · [C] coach's plan (not yet drawn)
+- Workout preview → active workout (set logging, rest timer, swap, notes) → summary
+- Exercise detail · Workout history (also ☰ → Training → History)
+- Waiting for plan [C]
 
-### Tab: Coach
-- [C] **Coach chat** (text, image, PDF) · Coach profile (view) · Weekly check-in form → submitted check-ins + coach feedback · Transformation photo requests (approve with blur / decline / withdraw)
-- [P] **AI coach** — plan questions, adjustments, out-of-scope → "consider a coach" message
-- [F] Upgrade explainer — AI tier benefits 🔒
+### Nutrition
+- Day log — [F] calories only · [AI][C] full macros
+- Food search → portion picker · quick add · custom food · photo logging [AI only] · meal plan [AI] or coach's [C]
+- Upgrade moment [F]
 
-### Profile and settings (from avatar)
-- Profile (name, photo, body stats, goals, diet type)
-- Subscription — [F] upgrade paywall · [P] manage via Google Play
-- My coach [C] — coach info, history-access permission toggle, leave coach
-- Notifications preferences
-- Units and preferences
-- Privacy — consents, data export, delete account
-- Help and support, About, Sign out
+### Recovery [AI][C] — hidden for free (D4, D5a)
+- Log today (sleep hours, sleep quality / score — formula open, soreness, fatigue) · Trends · First use
+- Coach recovery controls: open
+
+### AI Coaching [AI only] (D2)
+- AI plan overview and structured adjustments · AI permission declined · daily limit · out-of-scope → human coach (destination open)
+
+### Progress [C only] — combined Check-ins · Progress · Chat (D2a, D11)
+- Check-ins: due · sent / awaiting feedback · overdue · check-in flow (measurements, photos optional, how the week went, review) · feedback received
+- Progress switch: contents open
+- Chat: text, image, PDF
+- Athletes never see the coach's review tools. Past check-ins visibility: open
+
+### Side menu ☰ (all athletes, D9)
+- **Account:** profile · subscription · my coach [C] (history access, leave coach) · privacy and permissions (photos, AI permission) · units · export my data · help · delete account · sign out
+- **Notifications:** list + preferences
+- **Training:** Exercises · Workouts · Programs · History · Set Videos · Muscle Analytics — Pro: all (D10); Free: Programs limited to templates, others open
+- **Gyms** — behaviour open
+- **Physique:** Bodyweight · Measurements · Photos · Charts — free for everyone (D5)
+
+### Subscription and trial
+- Paywall (one-week trial, D6; billing at trial end open) · AI permission step 2 before purchase (proposal) · Google Play purchase · subscription details · payment problem · subscription ended (what happens to AI plan and recovery history: open)
+
+### Coaching changes
+- AI subscriber joins coach → end subscription step (refund: open) → what changed
+- Leave coach → confirm (edit rights, Recovery access, photo approvals: open) → what changed (free bar)
 
 ## 4. Coach onboarding
 
@@ -95,6 +92,8 @@ flowchart TD
 5. Coach plan info (beta: free)
 
 ## 5. Coach app
+
+_Coach navigation below is a proposal; it has not been reviewed yet._
 
 ### Tab: Clients
 - Client list — sorted by "needs attention" (overdue check-in, low adherence, unread); filters: active, paused, leaving, completed
@@ -140,10 +139,4 @@ flowchart TD
 
 ## 7. Screen count (approx.)
 
-| Area | Screens |
-|---|---|
-| Entry, account, onboarding | ~16 |
-| Athlete app | ~38 |
-| Coach app | ~30 |
-| System | ~8 |
-| **Total** | **~90** (many share components) |
+See DESIGN.md §7 for the screen inventory and status (drawn only; none reviewed or tested).
