@@ -1,0 +1,3 @@
+-- Local development seed data.
+-- Runs on `npm run db:reset`. Never put real user data here.
+-- Phase 2 adds the starter exercise library; Phase 3 adds IFCT foods.

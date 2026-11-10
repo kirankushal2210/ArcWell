@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arcwell Wireframes F8 F9</title>
+<link rel="stylesheet" href="wireframe.css">
+<style>
+  /* F8–F9-specific wireframe pieces */
+  .feat { display: flex; gap: 8px; align-items: flex-start; font-size: 10.5px; margin-bottom: 6px; }
+  .feat::before { content: "✓"; font-weight: 800; width: 14px; flex: none; }
+  .feat small { display: block; color: var(--muted); font-size: 9px; }
+  .plan { border: 1.5px solid var(--line); border-radius: 12px; padding: 9px 10px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; position: relative; }
+  .plan small { display: block; color: var(--muted); font-size: 9.5px; }
+  .plan .price { text-align: right; font-weight: 800; font-size: 13px; font-variant-numeric: tabular-nums; }
+  .plan .price small { font-weight: 500; }
+  .plan.sel { border-color: var(--ink); border-width: 2px; }
+  .plan .badge { position: absolute; top: -8px; left: 10px; background: var(--ink); color: #fff; font-size: 8.5px; font-weight: 700; border-radius: 999px; padding: 1px 7px; }
+  .timeline { border-left: 2px solid var(--ink); margin: 4px 0 8px 6px; padding-left: 10px; font-size: 10px; }
+  .timeline div { position: relative; margin-bottom: 6px; }
+  .timeline div::before { content: ""; position: absolute; left: -15px; top: 3px; width: 8px; height: 8px; border-radius: 50%; background: var(--ink); }
+  .timeline small { display: block; color: var(--muted); font-size: 9px; }
+  .gp { position: absolute; left: 0; right: 0; bottom: 0; background: #fff; border-top: 1px solid var(--fill2); border-radius: 14px 14px 0 0; padding: 12px 14px; font-size: 10.5px; }
+  .gp .gprow { display: flex; justify-content: space-between; padding: 4px 0; }
+  .gp .gpbtn { background: #5f6368; color: #fff; text-align: center; border-radius: 8px; padding: 8px; font-weight: 700; margin-top: 8px; }
+  .kv { display: flex; justify-content: space-between; font-size: 10.5px; padding: 6px 0; border-bottom: 1px solid var(--fill); }
+  .kv span:first-child { color: var(--muted); }
+  .photo-frame { border: 2px solid var(--ink); border-radius: 12px; padding: 6px; margin-bottom: 6px; }
+  .compare .img { position: relative; overflow: hidden; }
+  .blur { position: absolute; top: 8%; left: 30%; width: 40%; height: 18%; border-radius: 50%; background: var(--fill2); border: 1.5px dashed var(--ink); font-size: 7.5px; display: flex; align-items: center; justify-content: center; color: var(--ink); }
+  .caption-line { font-size: 10px; text-align: center; font-weight: 700; margin-top: 3px; }
+  .caption-line small { display: block; font-weight: 500; color: var(--muted); font-size: 8.5px; }
+  .warn { border: 1.5px solid var(--ink); border-radius: 10px; padding: 8px; font-size: 10px; margin-bottom: 8px; }
+  .warn b { display: block; font-size: 11px; margin-bottom: 2px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Arcwell — Wireframes: F8 Paywall &amp; subscription, F9 Transformation photos</h1>
+  <p><b>F8:</b> an honest paywall, shown only when a free athlete reaches for a paid feature — never during onboarding, never to coached athletes. Clear INR prices, a trial timeline with a reminder, easy cancel. Pattern adapted from Strava's honest paywall (see references.md). <b>F9:</b> transformation photos belong to the athlete. A coach can only request; the athlete approves each photo, can blur their face, and can withdraw at any time (DPDP).</p>
+  <div class="legend"><span class="l-primary">Primary action / selected</span><span>Secondary / editable</span><span class="l-note">Decision or open question</span></div>
+</header>
+
+<section class="flow">
+  <h2>F8 · Upgrading to the AI tier</h2>
+  <p class="arrowrow">Upgrade moment (F5-14, macros, recovery, AI plan) → paywall → AI consent → Google Play purchase → welcome → AI builds the plan</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>20:10</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>✕</span><span>Restore purchase</span></div>
+        <div class="q" style="font-size:17px">Arcwell Plus</div>
+        <div class="sub">A plan built around you — for a fraction of a personal coach.</div>
+        <div class="feat"><span>AI training plan<small>Built from your goals, schedule, equipment and injuries; adjusts every week</small></span></div>
+        <div class="feat"><span>Full macros and AI meal plans<small>Indian foods that fit your diet type</small></span></div>
+        <div class="feat"><span>Photo food logging<small>Snap your plate, confirm, done</small></span></div>
+        <div class="feat"><span>Recovery tracking<small>Sleep, soreness and fatigue trends</small></span></div>
+        <div class="plan sel"><span class="badge">Best value</span><span>Yearly<small>₹___ / month, billed yearly</small></span><span class="price">₹___<small>/ year</small></span></div>
+        <div class="plan"><span>Monthly<small>Cancel any time</small></span><span class="price">₹___<small>/ month</small></span></div>
+        <div class="pinned"><div class="btn primary">Start 7-day free trial</div><div class="tiny">Then ₹___ / year. Cancel any time in Google Play.</div></div>
+      </div>
+      <figcaption><b><span class="id">F8-01</span>Paywall</b>
+        <div class="note"><ul><li>Prices are placeholders (pricing not decided). Shown in INR, per month and per year.</li><li>Four benefits only, in plain language. No countdown timers, fake discounts or "only 2 spots left".</li><li><b>Open:</b> free trial length (7 days shown) — or no trial?</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>20:10</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Back</span><span></span></div>
+        <div class="q">How your free trial works</div>
+        <div class="timeline">
+          <div><b>Today</b><small>Full access to Arcwell Plus. Your AI plan is built straight away.</small></div>
+          <div><b>Day 5</b><small>We'll remind you that your trial is ending.</small></div>
+          <div><b>Day 7</b><small>Your subscription starts. Cancel before then and you won't be charged.</small></div>
+        </div>
+        <div class="card"><small>You can cancel in two taps from Profile → Subscription, or in Google Play.</small></div>
+        <div class="pinned"><div class="btn primary">Start free trial</div></div>
+      </div>
+      <figcaption><b><span class="id">F8-02</span>Trial timeline</b>
+        <div class="note"><ul><li>Can be part of F8-01 (below the plans) or a second step — test both.</li><li>Day-5 reminder is a promise: it must be sent as a push notification and email.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>20:11</span><span>▮▮ ◔</span></div>
+        <div class="q">Before the AI builds your plan</div>
+        <div class="sub">Arcwell's AI uses your information to create and adjust your plans.</div>
+        <div class="toggle"><div><b>Use my profile and logs for AI plans</b><small>Goals, body stats, injuries, workouts, meals and recovery. Required for Arcwell Plus.</small></div><div class="sw"></div></div>
+        <div class="toggle"><div><b>Use my food photos for logging</b><small>Photos are analysed to estimate your meal, then deleted from the AI service.</small></div><div class="sw"></div></div>
+        <div class="card" style="margin-top:8px"><small>The AI gives general fitness and nutrition guidance, not medical advice. For pain, injuries or health conditions, talk to a doctor or a qualified coach.</small></div>
+        <div style="font-size:10px;color:var(--muted)"><u>How Arcwell uses AI</u></div>
+        <div class="pinned"><div class="btn primary">Agree and continue</div></div>
+      </div>
+      <figcaption><b><span class="id">F8-03</span>AI consent</b>
+        <div class="note"><ul><li>Asked once, at upgrade (deferred from F1-05) — never shown to coached athletes.</li><li>Clear limits of AI advice, in the flow rather than in the terms.</li><li>Wording about photo deletion depends on the AI provider's data terms — must be verified before launch.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>20:11</span><span>▮▮ ◔</span></div>
+        <div style="opacity:.35"><div class="q">Arcwell Plus</div><div class="plan sel"><span>Yearly</span><span class="price">₹___</span></div></div>
+        <div class="scrim"></div>
+        <div class="gp">
+          <div style="font-weight:700;margin-bottom:6px">Google Play</div>
+          <div class="gprow"><span>Arcwell Plus (Yearly)</span><span>Free for 7 days</span></div>
+          <div class="gprow"><span>Starting 18 Nov</span><span>₹___ / year</span></div>
+          <div class="gprow" style="color:var(--muted)"><span>UPI / card on file</span><span>›</span></div>
+          <div class="gpbtn">Subscribe</div>
+        </div>
+      </div>
+      <figcaption><b><span class="id">F8-04</span>Google Play purchase</b>
+        <div class="note"><ul><li>System sheet from Google Play Billing (via RevenueCat) — shown only to place it in the flow; we don't design it.</li><li>Payment details are entered in Google's sheet, never in Arcwell.</li><li>If the purchase is cancelled or fails, return to F8-01 with a short message, nothing else.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>20:12</span><span>▮▮ ◔</span></div>
+        <div class="grow center">
+          <div class="spinner" style="width:46px;height:46px;border-radius:50%;border:5px solid var(--fill);border-top-color:var(--ink);margin:0 auto 12px"></div>
+          <div class="q">Building your plan</div>
+          <div class="sub" style="max-width:220px">Using your goal, 4 days a week, 45 minutes, gym equipment and your lower-back note.</div>
+          <div class="card" style="text-align:left;width:100%"><small>✓ Choosing exercises from the Arcwell library<br>✓ Avoiding movements that load the lower back<br>◷ Setting your calorie and protein targets</small></div>
+        </div>
+      </div>
+      <figcaption><b><span class="id">F8-05</span>Welcome — AI builds the plan</b>
+        <div class="note"><ul><li>Immediate payoff after paying: the plan is generated from onboarding answers.</li><li>Steps shown reflect what actually happens (library-only exercises, injury rules) — builds trust without "AI magic" claims.</li><li>Ends on Train → the new AI plan, with a short "What changed" summary.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<section class="flow">
+  <h2>F8 · Managing the subscription</h2>
+  <p class="arrowrow">Profile → Subscription · trial ending · payment problems · cancelled · expired</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:00</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Profile</span><span></span></div>
+        <div class="q">Subscription</div>
+        <div class="kv"><span>Plan</span><b>Arcwell Plus · Yearly</b></div>
+        <div class="kv"><span>Status</span><b>Free trial · 2 days left</b></div>
+        <div class="kv"><span>First payment</span><b>18 Nov · ₹___</b></div>
+        <div class="kv"><span>Billed through</span><b>Google Play</b></div>
+        <div class="pinned"><div class="btn">Change plan</div><div class="btn">Cancel subscription</div><div class="tiny">Cancelling keeps Plus until the end of the trial or billing period.</div></div>
+      </div>
+      <figcaption><b><span class="id">F8-06</span>Subscription details</b>
+        <div class="note"><ul><li>"Cancel" is as visible as "Change plan" — it deep-links to Google Play's subscription page (we can't cancel in-app).</li><li>Status comes from the server (RevenueCat webhook), not the phone.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:00</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px">Today</span><span>◯</span></div>
+        <div class="warn"><b>Payment didn't go through</b>Google Play couldn't charge your UPI. You still have Plus for 3 more days while you fix it.<div class="btn primary" style="margin-top:6px">Update payment in Google Play</div></div>
+        <div class="card"><small>TRAINING</small><b>Upper body</b><small>5 exercises · ~45 min</small></div>
+        <div class="card"><small>NUTRITION</small><b>1,850 kcal left</b></div>
+        <div class="tabs"><span class="on">Today</span><span>Train</span><span>Eat</span><span>Progress</span><span>Coach</span></div>
+      </div>
+      <figcaption><b><span class="id">F8-07</span>Payment problem (grace period)</b>
+        <div class="note"><ul><li>Uses Google Play's grace period: access continues for a few days while the user fixes payment.</li><li>One calm banner on Today — not a blocking screen.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:00</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px">Train</span><span></span></div>
+        <div class="card" style="border-color:var(--ink);border-width:2px"><b>Your Arcwell Plus has ended</b><small>Your workouts, meals and progress are all still here. Your AI plan is paused — you can keep following it as a normal programme.</small><div class="btn primary" style="margin-top:7px">Restart Plus</div><div class="btn ghost">Switch to a free starter programme</div></div>
+        <div class="card"><b>AI plan · Week 6 (paused)</b><small>Won't adjust automatically</small></div>
+        <div class="tabs"><span>Today</span><span class="on">Train</span><span>Eat</span><span>Progress</span><span>Coach</span></div>
+      </div>
+      <figcaption><b><span class="id">F8-08</span>Subscription ended</b>
+        <div class="note"><ul><li>Nothing is deleted; history stays. The last AI plan stays usable but stops adapting; macros and recovery go back to locked.</li><li><b>Open:</b> keep the paused AI plan usable after expiry, or switch them to a starter template? Recommendation: keep it — losing a plan mid-programme feels punitive.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<section class="flow">
+  <h2>F9 · Transformation photos — coach requests, athlete decides</h2>
+  <p class="arrowrow">Coach: Business → Transformations → request → athlete reviews (blur, caption) → approve / decline → coach exports or shows on profile · athlete can withdraw any time</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>18:00</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Business</span><span>+ Request</span></div>
+        <div class="q">Transformations</div>
+        <div class="filters"><span class="on">All · 5</span><span>Approved · 2</span><span>Waiting · 2</span><span>Declined or withdrawn · 1</span></div>
+        <div class="inrow"><span class="av"></span><span class="t"><b>Karan Mehta <span class="pill">Approved</span></b><small>−9 kg in 16 weeks · face blurred</small></span><span class="r">Export ›</span></div>
+        <div class="inrow"><span class="av"></span><span class="t"><b>Ananya Iyer <span class="pill">Approved</span></b><small>12 weeks · shown on profile</small></span><span class="r">Export ›</span></div>
+        <div class="inrow"><span class="av"></span><span class="t"><b>Priya Sharma <span class="pill ghost">Waiting</span></b><small>Requested yesterday</small></span><span class="r"></span></div>
+        <div class="inrow"><span class="av"></span><span class="t"><b>Sneha Reddy <span class="pill ghost">Waiting</span></b><small>Requested 3 days ago</small></span><span class="r"></span></div>
+        <div class="inrow"><span class="av"></span><span class="t"><b>Vikram Rao <span class="pill ghost">Withdrawn</span></b><small>Removed from your profile on 2 Nov</small></span><span class="r"></span></div>
+        <div class="tabs"><span>Clients</span><span>Check-ins</span><span>Plans</span><span>Messages</span><span class="on">Business</span></div>
+      </div>
+      <figcaption><b><span class="id">F9-01</span>Coach — transformations list</b>
+        <div class="note"><ul><li>Status always visible. Only approved items can be exported or shown on the coach profile.</li><li>Withdrawn items stay in the list (greyed) so the coach knows to remove any old posts.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>18:02</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>✕</span><span></span></div>
+        <div class="q">Request photos from Priya</div>
+        <div class="sub">Priya decides. She can blur her face, change the caption or say no.</div>
+        <div class="label">Before and after</div>
+        <div class="compare"><div class="img">Week 1 · front</div><div class="img">Week 12 · front</div></div>
+        <div class="field"><small>Suggested caption</small><b>−7 kg in 12 weeks</b></div>
+        <div class="field" style="height:44px"><small>Message to Priya</small>Your progress has been amazing — would you be happy for me to share this?</div>
+        <div class="label">I'd like to use it on</div>
+        <div class="chips"><span class="chip sel">My Arcwell profile</span><span class="chip sel">Instagram</span><span class="chip">WhatsApp status</span></div>
+        <div class="pinned"><div class="btn primary">Send request</div></div>
+      </div>
+      <figcaption><b><span class="id">F9-02</span>Coach — request photos</b>
+        <div class="note"><ul><li>Coach chooses the two photos (from check-ins), a caption and where they want to share — the athlete sees all of it.</li><li>Request only; nothing is visible to anyone else until the athlete approves.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>18:30</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Coach</span><span></span></div>
+        <div class="q">Coach Joseph would like to share your progress</div>
+        <div class="sub">"Your progress has been amazing — would you be happy for me to share this?"</div>
+        <div class="photo-frame">
+          <div class="compare"><div class="img">Week 1<span class="blur">face blurred</span></div><div class="img">Week 12<span class="blur">face blurred</span></div></div>
+          <div class="caption-line">−7 kg in 12 weeks<small>Coached by Coach Joseph · arcwell</small></div>
+        </div>
+        <div class="toggle" style="padding:5px 0"><div><b>Blur my face</b></div><div class="sw"></div></div>
+        <div class="toggle" style="padding:5px 0"><div><b>Show my first name</b></div><div class="sw off"></div></div>
+        <div style="font-size:9.5px;color:var(--muted);margin:4px 0">Used on: Joseph's Arcwell profile, Instagram · <u>Edit caption</u></div>
+        <div class="pinned"><div class="btn primary">Approve</div><div class="btn">Decline</div></div>
+      </div>
+      <figcaption><b><span class="id">F9-03</span>Athlete — review request</b>
+        <div class="note"><ul><li>Athlete sees exactly what will be published, with face blur on by default and name off by default.</li><li>Can edit the caption and see every place it will be used. Declining is as easy as approving; the coach just sees "Declined".</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>18:31</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Back</span><span></span></div>
+        <div class="q">Edit what's shown</div>
+        <div class="label">Adjust the blur</div>
+        <div class="compare"><div class="img">Drag to move<span class="blur">blur</span></div><div class="img">Pinch to resize<span class="blur">blur</span></div></div>
+        <div class="chips"><span class="chip sel">Face</span><span class="chip">+ Add another blur area</span></div>
+        <div class="label">Crop</div>
+        <div class="seg"><span class="on">Full body</span><span>Waist up</span><span>Custom</span></div>
+        <div class="field"><small>Caption</small><b>−7 kg in 12 weeks</b></div>
+        <div class="pinned"><div class="btn primary">Save changes</div></div>
+      </div>
+      <figcaption><b><span class="id">F9-04</span>Athlete — adjust blur and crop</b>
+        <div class="note"><ul><li>Automatic face blur as a starting point, adjustable by hand (detection isn't perfect); extra blur areas for tattoos or backgrounds.</li><li>Blur is burned into the exported image, so it can't be undone by the coach.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>18:40</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Transformations</span><span></span></div>
+        <div class="q" style="font-size:14px">Karan Mehta · Approved</div>
+        <div class="photo-frame">
+          <div class="compare"><div class="img">Before<span class="blur">blurred</span></div><div class="img">After<span class="blur">blurred</span></div></div>
+          <div class="caption-line">−9 kg in 16 weeks<small>Coached by Coach Joseph · arcwell</small></div>
+        </div>
+        <div class="seg"><span class="on">Square (post)</span><span>Story 9:16</span></div>
+        <div class="toggle"><div><b>Show on my Arcwell profile</b></div><div class="sw"></div></div>
+        <div class="pinned"><div class="btn primary">Save image to share</div><div class="tiny">Approved by Karan for: Arcwell profile, Instagram</div></div>
+      </div>
+      <figcaption><b><span class="id">F9-05</span>Coach — export approved photo</b>
+        <div class="note"><ul><li>Exports a branded before/after image (square or story), with the athlete's blur and caption baked in.</li><li>The approved uses are shown at the moment of export as a reminder.</li><li>Arcwell branding on every export is free marketing — <b>open:</b> allow coaches to remove it on a higher plan?</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>10:00</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Privacy</span><span></span></div>
+        <div class="q">Shared progress photos</div>
+        <div class="sub">Photos you've approved for your coach to share.</div>
+        <div class="inrow"><span class="t"><b>Before / after · 12 weeks</b><small>Coach Joseph · Arcwell profile, Instagram · approved 3 Nov</small></span><span class="r">Withdraw</span></div>
+        <div class="seclab">Withdrawn</div>
+        <div class="inrow"><span class="t" style="color:var(--muted)"><b>Before / after · 8 weeks</b><small>Withdrawn 20 Oct</small></span><span class="r"></span></div>
+        <div class="scrim" style="top:auto;height:58%"></div>
+        <div class="sheet">
+          <div class="grab"></div>
+          <div class="q" style="font-size:14px">Withdraw approval?</div>
+          <div class="sub" style="margin-bottom:6px">We'll remove it from Joseph's Arcwell profile straight away and tell him you've withdrawn it.</div>
+          <div class="card"><small>If Joseph already posted it on Instagram or elsewhere, Arcwell can't delete those posts. We'll ask him to remove them.</small></div>
+          <div class="btn primary">Withdraw</div>
+          <div class="btn ghost">Keep sharing</div>
+        </div>
+      </div>
+      <figcaption><b><span class="id">F9-06</span>Athlete — manage and withdraw</b>
+        <div class="note"><ul><li>Profile → Privacy → Shared photos lists every approval, with one-tap withdraw (DPDP: consent as easy to withdraw as to give).</li><li>Honest about limits: we can't delete what's already posted outside Arcwell, but the coach is notified and asked to remove it (and agreed to in F2-02).</li><li>Leaving a coach does <b>not</b> auto-withdraw approvals — <b>open:</b> should it?</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<section class="flow">
+  <h2>Open questions from these wireframes</h2>
+  <div class="note" style="max-width:820px"><ul>
+    <li><b>F8-01:</b> Prices (monthly and yearly, in INR) and the tier name ("Arcwell Plus" is a placeholder).</li>
+    <li><b>F8-01:</b> Free trial — 7 days, 3 days, or none? Recommendation: 7 days, long enough to follow the AI plan for a full week.</li>
+    <li><b>F8-03:</b> Exact wording on photo deletion depends on the AI provider's data terms (Groq) — verify before launch.</li>
+    <li><b>F8-08:</b> After the subscription ends, keep the last AI plan usable (paused) or switch to a starter template? Recommendation: keep it.</li>
+    <li><b>F9-05:</b> Should coaches be able to remove Arcwell branding from exports on a higher coach plan?</li>
+    <li><b>F9-06:</b> When an athlete leaves a coach, should photo approvals be withdrawn automatically? Recommendation: ask the athlete at the moment they leave.</li>
+  </ul></div>
+</section>
+</body>
+</html>

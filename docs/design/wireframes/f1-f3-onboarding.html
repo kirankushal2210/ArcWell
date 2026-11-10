@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arcwell Wireframes F1 F3</title>
+<link rel="stylesheet" href="wireframe.css">
+</head>
+<body>
+<header>
+  <h1>Arcwell — Wireframes: F1 Sign-up &amp; onboarding, F3 Invite link</h1>
+  <p>Low-fidelity, greyscale on purpose: these decide structure, order and content, not colour or style. Each screen has an ID used in DESIGN.md §7. Notes in yellow explain decisions and open questions.</p>
+  <div class="legend"><span class="l-primary">Primary action (pinned to bottom, thumb zone)</span><span>Secondary / option</span><span class="l-note">Decision or open question</span></div>
+</header>
+
+<section class="flow">
+  <h2>F1 · Entry and account</h2>
+  <p class="arrowrow">Splash → Welcome → Sign in / Sign up → Consent → Onboarding (athlete) <i>or</i> Coach onboarding (F2)</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="grow center"><div class="logo"></div><div style="font-weight:800;font-size:20px;margin-top:14px;letter-spacing:.02em">arcwell</div></div>
+        <div class="tiny">v1.0</div>
+      </div>
+      <figcaption><b><span class="id">F1-01</span>Splash</b>
+        <div class="note"><ul><li>Shown only while the session loads (&lt;1.5 s). No tagline here.</li><li>Logo direction still open (arc symbol shown as placeholder).</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="img" style="height:44%;margin-bottom:12px">Hero visual: Indian gym / coach + client</div>
+        <div class="q" style="font-size:19px">Training, nutrition and recovery, coached as one.</div>
+        <div class="sub">One app for your workouts, meals and progress — with your coach or on your own.</div>
+        <div class="pinned">
+          <div class="btn primary">I'm training</div>
+          <div class="btn">I'm a coach</div>
+          <div class="btn ghost">I already have an account · Sign in</div>
+        </div>
+      </div>
+      <figcaption><b><span class="id">F1-02</span>Welcome</b>
+        <div class="note"><ul><li>Role is chosen first so sign-up copy and onboarding fit the person.</li><li>Athlete is the primary button: most installs come from coach invites and self-starters.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Back</span><span></span></div>
+        <div class="q">Create your account</div>
+        <div class="sub">Training as an athlete · <u>change</u></div>
+        <div class="btn g">Continue with Google</div>
+        <div class="divider">or</div>
+        <div class="field"><small>Name</small>&nbsp;</div>
+        <div class="field"><small>Email</small>&nbsp;</div>
+        <div class="field"><small>Password</small>8+ characters</div>
+        <div class="pinned">
+          <div class="btn primary">Create account</div>
+          <div class="tiny">By continuing you agree to the Terms and Privacy Policy</div>
+          <div class="btn ghost">Have an account? Sign in</div>
+        </div>
+      </div>
+      <figcaption><b><span class="id">F1-03</span>Sign up</b>
+        <div class="note"><ul><li>Google first (fastest, no password). No Apple sign-in on Android launch.</li><li>Email sign-up sends a verification link; user can continue onboarding while unverified.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Back</span><span></span></div>
+        <div class="q">Welcome back</div>
+        <div class="sub">&nbsp;</div>
+        <div class="btn g">Continue with Google</div>
+        <div class="divider">or</div>
+        <div class="field"><small>Email</small>&nbsp;</div>
+        <div class="field"><small>Password</small>&nbsp;</div>
+        <div style="font-size:10px;text-align:right;color:var(--muted)">Forgot password?</div>
+        <div class="pinned">
+          <div class="btn primary">Sign in</div>
+          <div class="btn ghost">New here? Create account</div>
+        </div>
+      </div>
+      <figcaption><b><span class="id">F1-04</span>Sign in</b>
+        <div class="note"><ul><li>Returning users skip role and onboarding and land on their role's home tab.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="q">Your data, your choice</div>
+        <div class="sub">Arcwell stores health information to personalise your plan. You can change these any time in Settings.</div>
+        <div class="toggle"><div><b>Health and fitness data</b><small>Body stats, workouts, meals, recovery. Required to use Arcwell.</small></div><div class="sw"></div></div>
+        <div class="toggle"><div><b>Progress photos</b><small>Stored privately. Only you, and your coach if you have one, can see them.</small></div><div class="sw off"></div></div>
+        <div class="toggle"><div><b>Reminders and notifications</b><small>Workout, check-in and coach messages.</small></div><div class="sw"></div></div>
+        <div style="font-size:10px;color:var(--muted);margin-top:8px"><u>Read the Privacy Policy</u></div>
+        <div class="pinned"><div class="btn primary">Continue</div></div>
+      </div>
+      <figcaption><b><span class="id">F1-05</span>Consent</b>
+        <div class="note"><ul><li>DPDP: plain-language, specific, reversible consent. Health data is required; photos optional.</li><li>AI-processing consent is asked later, only when someone upgrades to the AI tier — never shown to coached athletes.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<section class="flow">
+  <h2>F1 · Athlete onboarding</h2>
+  <p class="arrowrow">One question per screen · thin progress bar · Back always available · answers editable later in Profile</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>←</span><span>1 of 7</span></div>
+        <div class="bar"><i style="width:14%"></i></div>
+        <div class="q">What's your main goal?</div>
+        <div class="sub">Pick one. You can change it later.</div>
+        <div class="opt sel"><span class="ic"></span><span>Lose fat<small>Get leaner while keeping muscle</small></span></div>
+        <div class="opt"><span class="ic"></span><span>Build muscle<small>Gain size and strength</small></span></div>
+        <div class="opt"><span class="ic"></span><span>Get stronger<small>Lift more on key exercises</small></span></div>
+        <div class="opt"><span class="ic"></span><span>General fitness<small>Feel fitter and healthier</small></span></div>
+        <div class="pinned"><div class="btn primary">Continue</div></div>
+      </div>
+      <figcaption><b><span class="id">F1-06</span>Goal</b>
+        <div class="note"><ul><li>Single select: goal drives calorie target and programme type.</li><li>Outcome wording, not jargon ("cut", "bulk").</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>←</span><span>2 of 7</span></div>
+        <div class="bar"><i style="width:28%"></i></div>
+        <div class="q">How much training experience do you have?</div>
+        <div class="sub">&nbsp;</div>
+        <div class="opt"><span class="ic"></span><span>New to the gym<small>Less than 6 months, or returning after a long break</small></span></div>
+        <div class="opt sel"><span class="ic"></span><span>Some experience<small>6 months – 2 years of regular training</small></span></div>
+        <div class="opt"><span class="ic"></span><span>Experienced<small>2+ years, comfortable with most lifts</small></span></div>
+        <div class="pinned"><div class="btn primary">Continue</div></div>
+      </div>
+      <figcaption><b><span class="id">F1-07</span>Experience</b>
+        <div class="note"><ul><li>Described by time and comfort, not labels like "intermediate", so people self-rate accurately.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>←</span><span>3 of 7</span></div>
+        <div class="bar"><i style="width:42%"></i></div>
+        <div class="q">About you</div>
+        <div class="sub">Used to set your calorie and training targets.</div>
+        <div class="label">Age</div>
+        <div class="stepper"><span class="pm">−</span><span class="val">27 <small>yrs</small></span><span class="pm">+</span></div>
+        <div class="label">Height</div>
+        <div class="seg"><span class="on">cm</span><span>ft / in</span></div>
+        <div class="stepper"><span class="pm">−</span><span class="val">172 <small>cm</small></span><span class="pm">+</span></div>
+        <div class="label">Weight</div>
+        <div class="stepper"><span class="pm">−</span><span class="val">74.5 <small>kg</small></span><span class="pm">+</span></div>
+        <div class="label">Sex (for calorie calculation)</div>
+        <div class="seg"><span class="on">Male</span><span>Female</span><span>Prefer not to say</span></div>
+        <div class="pinned"><div class="btn primary">Continue</div></div>
+      </div>
+      <figcaption><b><span class="id">F1-08</span>Body stats</b>
+        <div class="note"><ul><li>Steppers with large ± (tap or type); cm by default, ft/in for those who think in feet.</li><li><b>Open:</b> sex isn't in the agreed onboarding list, but calorie formulas need it. "Prefer not to say" uses an average. Confirm.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>←</span><span>4 of 7</span></div>
+        <div class="bar"><i style="width:57%"></i></div>
+        <div class="q">Any injuries or limitations?</div>
+        <div class="sub">We'll avoid exercises that could aggravate them. Select all that apply.</div>
+        <div class="chips">
+          <span class="chip">None</span><span class="chip sel">Lower back</span><span class="chip">Knee</span><span class="chip">Shoulder</span>
+          <span class="chip">Wrist / elbow</span><span class="chip">Neck</span><span class="chip">Ankle</span><span class="chip">Hip</span><span class="chip">Other</span>
+        </div>
+        <div class="field" style="height:56px"><small>Anything else? (optional)</small>e.g. slipped disc 2 years ago</div>
+        <div class="card"><small>Arcwell isn't a medical service. For pain or recent injuries, check with a doctor or physiotherapist first.</small></div>
+        <div class="pinned"><div class="btn primary">Continue</div></div>
+      </div>
+      <figcaption><b><span class="id">F1-09</span>Injuries &amp; limitations</b>
+        <div class="note"><ul><li>"None" deselects others. Chips map to exercise exclusions in the library.</li><li>Safety note shown here, not buried in terms.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>←</span><span>5 of 7</span></div>
+        <div class="bar"><i style="width:71%"></i></div>
+        <div class="q">How often can you train?</div>
+        <div class="label">Days per week</div>
+        <div class="chips"><span class="chip">2</span><span class="chip">3</span><span class="chip sel">4</span><span class="chip">5</span><span class="chip">6</span></div>
+        <div class="label">Preferred days (optional)</div>
+        <div class="chips"><span class="chip sel">M</span><span class="chip">T</span><span class="chip sel">W</span><span class="chip">T</span><span class="chip sel">F</span><span class="chip sel">S</span><span class="chip">S</span></div>
+        <div class="label">Time per session</div>
+        <div class="chips"><span class="chip">30 min</span><span class="chip sel">45 min</span><span class="chip">60 min</span><span class="chip">90 min</span></div>
+        <div class="pinned"><div class="btn primary">Continue</div></div>
+      </div>
+      <figcaption><b><span class="id">F1-10</span>Schedule</b>
+        <div class="note"><ul><li>Preferred days feed workout reminders. Optional to keep it fast.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>←</span><span>6 of 7</span></div>
+        <div class="bar"><i style="width:85%"></i></div>
+        <div class="q">Where do you train?</div>
+        <div class="sub">&nbsp;</div>
+        <div class="opt sel"><span class="ic"></span><span>Gym<small>Machines, barbells, dumbbells</small></span></div>
+        <div class="opt"><span class="ic"></span><span>Home<small>Some equipment</small></span></div>
+        <div class="opt"><span class="ic"></span><span>No equipment<small>Bodyweight only</small></span></div>
+        <div class="label" style="opacity:.5">If Home: what do you have?</div>
+        <div class="chips" style="opacity:.5"><span class="chip">Dumbbells</span><span class="chip">Resistance bands</span><span class="chip">Pull-up bar</span><span class="chip">Bench</span><span class="chip">Kettlebell</span></div>
+        <div class="pinned"><div class="btn primary">Continue</div></div>
+      </div>
+      <figcaption><b><span class="id">F1-11</span>Equipment</b>
+        <div class="note"><ul><li>Home reveals an equipment checklist (shown faded) so starter templates only use what they own.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>←</span><span>7 of 7</span></div>
+        <div class="bar"><i style="width:100%"></i></div>
+        <div class="q">How do you eat?</div>
+        <div class="sub">We'll only suggest foods that fit.</div>
+        <div class="opt sel"><span class="ic"></span><span>Vegetarian<small>Dairy, no meat or eggs</small></span></div>
+        <div class="opt"><span class="ic"></span><span>Eggetarian<small>Vegetarian plus eggs</small></span></div>
+        <div class="opt"><span class="ic"></span><span>Non-vegetarian</span></div>
+        <div class="opt"><span class="ic"></span><span>Vegan<small>No animal products</small></span></div>
+        <div class="opt"><span class="ic"></span><span>Jain<small>No root vegetables, meat or eggs</small></span></div>
+        <div class="pinned"><div class="btn primary">See my plan</div></div>
+      </div>
+      <figcaption><b><span class="id">F1-12</span>Diet type</b>
+        <div class="note"><ul><li>Indian diet categories with one-line definitions (Jain and eggetarian are often misunderstood).</li><li>Allergies are out of v1 scope — <b>open:</b> add a free-text field?</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="q">You're set, Priya</div>
+        <div class="sub">Based on your answers</div>
+        <div class="card"><b>1,850 kcal a day</b><small>to lose about 0.4 kg a week · protein 120 g</small></div>
+        <div class="label">Pick a starter programme</div>
+        <div class="card" style="border-color:var(--ink);border-width:2px"><b>Full body · 3 days</b><small>45 min · gym · beginner-friendly</small></div>
+        <div class="card"><b>Upper / lower · 4 days</b><small>45 min · gym</small></div>
+        <div class="card"><b>Home strength · 3 days</b><small>30 min · dumbbells</small></div>
+        <div class="pinned">
+          <div class="btn primary">Start with this programme</div>
+          <div class="btn ghost">Have a coach? Enter invite code</div>
+        </div>
+      </div>
+      <figcaption><b><span class="id">F1-13a</span>Summary — free athlete</b>
+        <div class="note"><ul><li>Immediate value: a calorie target and a programme on day one.</li><li>No paywall here (research: paywalls in onboarding hurt trust). AI tier is introduced later, at natural moments.</li><li>Free users see calories; protein shown as guidance only — <b>open:</b> confirm.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="grow center">
+          <div class="avatar"></div>
+          <div class="q">You're connected with Coach Joseph</div>
+          <div class="sub" style="max-width:220px">Joseph will review your answers and assign your training and meal plan, usually within 24 hours.</div>
+          <div class="card" style="text-align:left;width:100%"><b>While you wait</b><small>• Log today's weight<br>• Add your first progress photo<br>• Say hello in chat</small></div>
+        </div>
+        <div class="pinned"><div class="btn primary">Go to Today</div><div class="btn ghost">Message Joseph</div></div>
+      </div>
+      <figcaption><b><span class="id">F1-13b</span>Summary — coached athlete</b>
+        <div class="note"><ul><li>No calorie target or AI shown — the coach sets targets.</li><li>"While you wait" tasks give the coach useful baseline data and avoid an empty first day.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<section class="flow">
+  <h2>F3 · Joining through a coach's invite link</h2>
+  <p class="arrowrow">Coach shares link on WhatsApp → client taps → Play Store (if not installed) → app opens on invite → sign up (role skipped) → consent → onboarding → F1-13b</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:6px">WhatsApp · Joseph</div>
+        <div class="card" style="margin-left:auto;max-width:85%"><small>Hey! I'll be coaching you on Arcwell. Tap to join:</small></div>
+        <div class="card" style="margin-left:auto;max-width:85%"><div class="img" style="height:70px;margin-bottom:6px">Link preview</div><b>Join Coach Joseph on Arcwell</b><small>arcwell.app/j/joseph</small></div>
+        <div class="grow"></div>
+      </div>
+      <figcaption><b><span class="id">F3-01</span>Invite shared</b>
+        <div class="note"><ul><li>Link preview (title, coach photo) generated on our side so it looks trustworthy in WhatsApp.</li><li>Requires a small web page at the link domain to redirect to Play Store / open the app.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="grow center">
+          <div class="avatar" style="width:84px;height:84px"></div>
+          <div class="q">Coach Joseph Mathew</div>
+          <div class="sub">Fat loss · Strength · Bengaluru</div>
+          <div class="card" style="text-align:left;width:100%"><small>Joseph will build your training and meal plans, review your weekly check-ins and chat with you here.</small></div>
+          <div class="card" style="text-align:left;width:100%"><small>Your coach can see your workouts, meals, recovery and progress from the day you join.</small></div>
+        </div>
+        <div class="pinned"><div class="btn primary">Join Joseph</div><div class="btn ghost">Not now</div></div>
+      </div>
+      <figcaption><b><span class="id">F3-02</span>Invite landing (in app)</b>
+        <div class="note"><ul><li>Shown before sign-up so the client knows who they're joining and what the coach will see.</li><li>Leads to F1-03 with role = athlete pre-set; Welcome role choice is skipped.</li><li>Invalid / expired link → friendly error with "Ask your coach for a new link".</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="q">Already have an account?</div>
+        <div class="sub">You're joining Coach Joseph.</div>
+        <div class="card"><b>You're currently coached by Coach Anita</b><small>You can only have one coach at a time. Joining Joseph ends your coaching with Anita; she'll lose access to your data. Your history stays with you.</small></div>
+        <div class="pinned"><div class="btn primary">Switch to Joseph</div><div class="btn">Keep Coach Anita</div></div>
+      </div>
+      <figcaption><b><span class="id">F3-03</span>Already coached (edge case)</b>
+        <div class="note"><ul><li>Enforces one coach at a time with an explicit, reversible-in-spirit choice.</li><li>Paid AI subscribers joining a coach see a note that AI will be hidden and how to cancel in Google Play.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<section class="flow">
+  <h2>Open questions from these wireframes</h2>
+  <div class="note" style="max-width:820px"><ul>
+    <li><b>F1-08:</b> Add "sex (for calorie calculation)" to onboarding? Needed for accurate targets.</li>
+    <li><b>F1-12:</b> Add an optional allergies / foods-to-avoid field?</li>
+    <li><b>F1-13a:</b> Show protein guidance to free users, or calories only?</li>
+    <li><b>F3-01:</b> Invite links need a small web page on an Arcwell domain (link preview + redirect). Confirm domain.</li>
+  </ul></div>
+</section>
+</body>
+</html>
