@@ -144,19 +144,19 @@ Visual direction per D24: dark charcoal, electric blue / cyan accents, minimal a
 
 | Component | Notes | Status |
 |---|---|---|
-| Button (primary, secondary, ghost, destructive) | 48dp min height | Spec\'d (spec sheet) |
-| Text input, number stepper | Number stepper for kg/reps with big ± targets | Spec\'d (spec sheet) |
-| Card, list row, section header | | Spec\'d (spec sheet) |
-| Tab bar (athlete, coach variants) | | Spec\'d (spec sheet) |
-| Set row | Previous value, weight, reps, done tick; the heart of logging | Spec\'d (spec sheet) |
-| Rest timer | Bottom sheet, haptic at end | Spec\'d (spec sheet) |
-| Macro ring / calorie bar | Pillar colours | Spec\'d (spec sheet) |
-| Food result row, portion picker | Indian portions | Spec\'d (spec sheet) |
-| Chat bubble, attachment tile | Images, PDFs | Spec\'d (spec sheet) |
-| Check-in form fields, photo slot | | Spec\'d (spec sheet) |
-| Empty state, error state, skeleton loader | Every list has all three | Spec\'d (spec sheet) |
-| Paywall / locked-feature card | Shown only at upgrade moments | Spec\'d (spec sheet) |
-| Avatar, status chip (active, paused, leaving, completed) | | Spec\'d (spec sheet) |
+| Button (primary, secondary, ghost, destructive) | 48dp min height | In spec sheet · not built |
+| Text input, number stepper | Number stepper for kg/reps with big ± targets | In spec sheet · not built |
+| Card, list row, section header | | In spec sheet · not built |
+| Tab bar (athlete, coach variants) | | In spec sheet · not built |
+| Set row | Previous value, weight, reps, done tick; the heart of logging | In spec sheet · not built |
+| Rest timer | Bottom sheet, haptic at end | In spec sheet · not built |
+| Macro ring / calorie bar | Pillar colours; spec sheet uses bars, not rings | In spec sheet · not built |
+| Food result row, portion picker | Indian portions | In spec sheet · not built |
+| Chat bubble, attachment tile | Images, PDFs | In spec sheet · not built |
+| Check-in form fields, photo slot | | Not in spec sheet yet |
+| Empty state, error state, skeleton loader | Every list has all three | In spec sheet · not built |
+| Paywall / locked-feature card | Shown only at upgrade moments | In spec sheet · not built |
+| Avatar, status chip (active, paused, leaving, completed) | | In spec sheet · not built |
 
 ## 7. Screen inventory
 
