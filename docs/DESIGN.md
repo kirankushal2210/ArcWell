@@ -15,7 +15,7 @@ Mockups and wireframes live in `docs/design/`.
 | [Assets and licences](design/assets.md) | Fonts, icons, illustrations, photos, exercise media, data — with licence status |
 | [Design generation prompt](design/design-prompt.md) | AI design-tool prompts for the athlete app and coach workspace |
 
-## 0. Working decisions (ASSUMPTIONS — confirm or change)
+## 0. Working decisions (adopted as v1 defaults, 2026-11-11 — DECISIONS.md D45)
 
 | Decision | Current default | Why |
 |---|---|---|
@@ -270,7 +270,7 @@ Tracked here as screens are designed (Wireframe → Mockup → Built). **✅ in 
 | CP-01 Progress area — check-in due | Athlete (coached) | ✅ | — | — |
 | CP-02 Check-in sent, awaiting feedback | Athlete (coached) | ✅ | — | — |
 | CP-03 Check-in without photo permission | Athlete (coached) | ✅ | — | — |
-| CP-04 Progress switch (contents open) | Athlete (coached) | ✅ | — | — |
+| CP-04 Progress switch — check-in timeline | Athlete (coached) | ✅ | — | — |
 | CP-05 Chat switch | Athlete (coached) | ✅ | — | — |
 | W-01 Today — waiting for plan | Athlete (coached) | ✅ | — | — |
 | W-02 Training — waiting for plan | Athlete (coached) | ✅ | — | — |
@@ -377,6 +377,6 @@ Tracked here as screens are designed (Wireframe → Mockup → Built). **✅ in 
 
 | Date | Decision |
 |---|---|
-| 2026-11-10 | DESIGN.md created; working assumptions in section 0 pending founder confirmation |
+| 2026-11-10 | DESIGN.md created; working assumptions in section 0 (adopted as v1 defaults on 2026-11-11, D45) |
 | 2026-11-11 | Founder decisions D1–D12 recorded in [DECISIONS.md](DECISIONS.md); section 3 rewritten; F10–F13 drawn; existing screens updated |
 | 2026-11-11 | F14–F16 drawn. Founder Executive Defaults (D13–D24) and Claude-applied defaults (D25–D45) recorded; every open box resolved; F17–F18 drawn; tokens moved from green to electric blue / cyan (D24) |
