@@ -51,6 +51,12 @@ SPACING AND SHAPE
 Group related items tightly (8) and separate unrelated groups generously (24–32). Not one gap everywhere.
 Radius: 8 inputs and chips · 12 cards · 20 sheets · full for pills and avatars.
 Depth from surface steps (#111316 → #191C21 → #22262D), not shadows.
+Dividers #2D323A; input and control outlines #6B7482.
+
+MOTION
+Numbers roll to new values instead of jumping. 120 ms press feedback, 200 ms standard,
+280 ms sheets. One big 600 ms moment: the workout summary. Skeleton loaders, never spinners.
+No animated backgrounds. Everything instant when "Remove animations" is on.
 
 ICONS
 Lucide (line icons, 1.5 px stroke, 24 dp). No other icon set.
@@ -107,6 +113,7 @@ Each card gives the four things a prompt must specify (platform comes from the d
 - **Goal:** fix every component's look before any screen is designed.
 - **Tone:** systematic, neutral.
 - **Content:** buttons (primary, secondary, ghost, destructive) · text input · number stepper with large ± for kg and reps · card · list row · section label · bottom navigation (3-item and 5-item) · side menu drawer with an expandable group and a locked row · set row (previous · kg · reps · tick), plus bodyweight and timed variants · rest-timer sheet · calorie bar and three macro bars · portion picker chips (katori, roti, piece, g) · chat bubbles with an image and a PDF tile · status chips (active, paused, leaving, completed) · 0–100 dial · empty, loading (skeleton) and error blocks · locked-feature card.
+- **Already done:** [spec-sheet.html](spec-sheet.html) renders all of these. Attach screenshots of it to every screen prompt instead of regenerating components.
 - **References:** WHOOP colour system, Linear UI refresh, Fit Note design system (references.md §9).
 
 ### Card 1 — Today

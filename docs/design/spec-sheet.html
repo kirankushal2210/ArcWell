@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arcwell Spec Sheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<style>
+  :root {
+    --bg:#111316; --surface:#191C21; --raised:#22262D; --border:#2D323A; --borderStrong:#6B7482;
+    --text:#F2F4F7; --muted:#9AA4B2;
+    --brand:#3D8BFF; --onBrand:#04101F; --accent:#22D3EE;
+    --training:#22D3EE; --nutrition:#F5A524; --recovery:#8B7CFF;
+    --success:#22C55E; --warning:#F59E0B; --danger:#EF4444;
+    --r-sm:8px; --r-md:12px; --r-lg:20px;
+    --t-micro:120ms; --t-std:200ms; --t-sheet:280ms; --t-big:600ms;
+    --ease:cubic-bezier(.2,0,0,1);
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:16px/1.5 Inter, system-ui, sans-serif; font-feature-settings:"tnum" 1; }
+  .num { font-variant-numeric:tabular-nums; }
+  header, section { max-width:1240px; margin:0 auto; padding:0 16px; }
+  header { padding-top:40px; padding-bottom:8px; }
+  header h1 { font-size:32px; line-height:40px; font-weight:700; margin:0 0 8px; }
+  header p { color:var(--muted); margin:0 0 4px; max-width:820px; font-size:14px; }
+  .status { display:inline-block; margin-top:12px; font-size:12px; font-weight:600; color:var(--warning); border:1px solid var(--warning); border-radius:999px; padding:2px 10px; }
+  nav.toc { max-width:1240px; margin:16px auto 0; padding:0 16px; display:flex; flex-wrap:wrap; gap:8px; }
+  nav.toc a { color:var(--muted); font-size:13px; text-decoration:none; border:1px solid var(--border); border-radius:999px; padding:4px 12px; }
+  nav.toc a:hover { color:var(--text); border-color:var(--borderStrong); }
+  section { padding-top:48px; }
+  h2 { font-size:22px; line-height:28px; font-weight:600; margin:0 0 4px; }
+  .lead { color:var(--muted); font-size:14px; margin:0 0 20px; max-width:820px; }
+  h3 { font-size:14px; font-weight:500; color:var(--muted); margin:24px 0 8px; text-transform:uppercase; letter-spacing:.06em; }
+  .grid { display:grid; gap:16px; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); }
+  .grid.wide { grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); }
+  .panel { background:var(--surface); border-radius:var(--r-md); padding:16px; }
+  .panel > .cap { font-size:12px; color:var(--muted); margin-top:12px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th { text-align:left; font-weight:500; color:var(--muted); padding:8px; border-bottom:1px solid var(--border); }
+  td { padding:8px; border-bottom:1px solid var(--border); vertical-align:middle; }
+  code { font:12px/1.4 ui-monospace, Menlo, monospace; color:var(--muted); }
+  .tablewrap { overflow-x:auto; }
+
+  /* swatches */
+  .sw { display:flex; gap:12px; align-items:center; }
+  .chip-c { width:44px; height:44px; border-radius:var(--r-sm); flex:none; border:1px solid var(--border); }
+  .sw b { display:block; font-size:14px; font-weight:600; }
+  .sw small { color:var(--muted); font-size:12px; }
+
+  /* type */
+  .type-row { display:flex; align-items:baseline; gap:16px; padding:10px 0; border-bottom:1px solid var(--border); }
+  .type-row code { width:150px; flex:none; }
+
+  /* spacing */
+  .space-row { display:flex; align-items:center; gap:12px; font-size:13px; padding:4px 0; }
+  .space-row i { display:block; height:12px; background:var(--accent); border-radius:2px; }
+  .space-row code { width:40px; }
+
+  /* components */
+  .stack { display:flex; flex-direction:column; gap:8px; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .btn { height:48px; padding:0 20px; border-radius:var(--r-md); font:600 16px/48px Inter, sans-serif; border:1px solid transparent; background:none; color:var(--text); cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; transition:background var(--t-micro) var(--ease), transform var(--t-micro) var(--ease); }
+  .btn:active { transform:scale(.98); }
+  .btn.primary { background:var(--brand); color:var(--onBrand); }
+  .btn.primary:hover { background:#5A9CFF; }
+  .btn.secondary { border-color:var(--borderStrong); }
+  .btn.ghost { color:var(--muted); }
+  .btn.destructive { color:var(--danger); border-color:var(--danger); }
+  .btn[disabled] { background:var(--raised); color:#5F6670; border-color:transparent; cursor:not-allowed; }
+  .btn.full { width:100%; }
+  .btn svg { width:20px; height:20px; }
+  .input { height:48px; border-radius:var(--r-sm); background:var(--raised); border:1px solid var(--borderStrong); padding:0 14px; display:flex; align-items:center; font-size:16px; color:var(--text); gap:8px; }
+  .input.focus { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent); }
+  .input.error { border-color:var(--danger); }
+  .input .ph { color:var(--muted); }
+  .field-label { font-size:14px; font-weight:500; margin-bottom:6px; }
+  .field-help { font-size:12px; color:var(--muted); margin-top:6px; }
+  .field-help.err { color:var(--danger); }
+  .stepper { display:flex; align-items:center; justify-content:space-between; background:var(--raised); border-radius:var(--r-md); padding:6px; }
+  .stepper button { width:48px; height:48px; border-radius:var(--r-sm); background:var(--surface); border:0; color:var(--text); display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  .stepper .val { font-size:32px; font-weight:700; line-height:40px; }
+  .stepper .val small { font-size:14px; font-weight:500; color:var(--muted); margin-left:4px; }
+  .fchip { height:32px; padding:0 12px; border-radius:var(--r-sm); border:1px solid var(--borderStrong); font-size:14px; font-weight:500; display:inline-flex; align-items:center; gap:6px; color:var(--text); }
+  .fchip.on { border-color:var(--accent); color:var(--accent); background:var(--raised); }
+  .schip { height:24px; padding:0 10px; border-radius:999px; font-size:12px; font-weight:600; display:inline-flex; align-items:center; gap:6px; background:var(--raised); color:var(--muted); }
+  .schip::before { content:""; width:6px; height:6px; border-radius:50%; background:currentColor; }
+  .schip.active { color:var(--success); } .schip.paused { color:var(--muted); } .schip.leaving { color:var(--warning); } .schip.completed { color:var(--brand); }
+  .card { background:var(--surface); border-radius:var(--r-md); padding:16px; }
+  .card.raised { background:var(--raised); }
+  .eyebrow { font-size:12px; font-weight:500; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; display:flex; align-items:center; gap:6px; }
+  .eyebrow .dot { width:8px; height:8px; border-radius:2px; }
+  .listrow { display:flex; gap:12px; align-items:center; padding:12px 0; border-bottom:1px solid var(--border); min-height:56px; }
+  .listrow .av { width:40px; height:40px; border-radius:50%; background:var(--raised); flex:none; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:600; color:var(--muted); }
+  .listrow .t { flex:1; min-width:0; }
+  .listrow .t b { display:block; font-size:16px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .listrow .t small { color:var(--muted); font-size:14px; }
+  .listrow .r { color:var(--muted); font-size:14px; text-align:right; }
+  .listrow svg { color:var(--muted); width:20px; height:20px; }
+
+  /* phone frame for nav components */
+  .frame { background:var(--bg); border:1px solid var(--border); border-radius:24px; overflow:hidden; position:relative; }
+  .bnav { display:flex; justify-content:space-around; background:var(--surface); border-top:1px solid var(--border); height:72px; align-items:center; }
+  .bnav span { display:flex; flex-direction:column; align-items:center; gap:4px; font-size:12px; font-weight:500; color:var(--muted); min-width:48px; }
+  .bnav span svg { width:24px; height:24px; }
+  .bnav .on { color:var(--text); }
+  .bnav .on .pill { background:var(--raised); border-radius:999px; padding:4px 16px; color:var(--accent); display:flex; }
+  .bnav .pill { padding:4px 16px; display:flex; }
+  .drawer { width:280px; background:var(--surface); padding:16px 12px; border-radius:0 var(--r-lg) var(--r-lg) 0; }
+  .drawer .who { display:flex; gap:12px; align-items:center; padding:4px 8px 16px; border-bottom:1px solid var(--border); margin-bottom:8px; }
+  .drawer .who .av { width:40px; height:40px; border-radius:50%; background:var(--raised); }
+  .drawer .who small { display:block; color:var(--muted); font-size:12px; }
+  .mi { display:flex; align-items:center; gap:12px; height:48px; padding:0 8px; border-radius:var(--r-sm); font-size:14px; font-weight:500; }
+  .mi svg { width:20px; height:20px; color:var(--muted); }
+  .mi .end { margin-left:auto; color:var(--muted); font-size:12px; display:flex; align-items:center; gap:4px; }
+  .mi .end svg { width:16px; height:16px; }
+  .mi.sub { padding-left:40px; color:var(--text); font-weight:400; }
+  .mi.on { background:var(--raised); }
+
+  /* set rows */
+  .sets { width:100%; border-collapse:separate; border-spacing:0 4px; font-size:16px; }
+  .sets th { font-size:12px; font-weight:500; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; text-align:center; border:0; padding:0 4px 4px; }
+  .sets td { text-align:center; padding:0; border:0; height:48px; }
+  .sets td.prev { color:var(--muted); font-size:14px; }
+  .sets .in { display:inline-flex; align-items:center; justify-content:center; min-width:64px; height:40px; border-radius:var(--r-sm); background:var(--raised); font-weight:600; }
+  .sets .tick { display:inline-flex; align-items:center; justify-content:center; width:48px; height:40px; border-radius:var(--r-sm); border:1px solid var(--borderStrong); color:var(--muted); cursor:pointer; transition:background var(--t-std) var(--ease), color var(--t-std) var(--ease); }
+  .sets .tick svg { width:20px; height:20px; }
+  .sets tr.done td:not(.prev) .in { background:transparent; color:var(--muted); }
+  .sets tr.done .tick { background:var(--training); border-color:var(--training); color:var(--onBrand); }
+  .sets tr.cur .in { box-shadow:0 0 0 1px var(--accent); }
+
+  /* sheet */
+  .sheet { background:var(--surface); border-radius:var(--r-lg) var(--r-lg) 0 0; padding:12px 16px 20px; }
+  .grab { width:32px; height:4px; border-radius:2px; background:var(--borderStrong); margin:0 auto 16px; }
+  .bigtime { font-size:48px; line-height:56px; font-weight:700; text-align:center; }
+
+  /* nutrition */
+  .hero-num { font-size:40px; line-height:48px; font-weight:700; }
+  .bar { height:8px; border-radius:4px; background:var(--raised); overflow:hidden; }
+  .bar i { display:block; height:100%; border-radius:4px; background:var(--nutrition); }
+  .macro { display:grid; grid-template-columns:64px 1fr 72px; gap:8px; align-items:center; font-size:14px; }
+  .macro span:last-child { text-align:right; color:var(--muted); }
+
+  /* chat */
+  .bubbles { display:flex; flex-direction:column; gap:8px; }
+  .bub { max-width:78%; padding:10px 12px; border-radius:16px; font-size:16px; line-height:22px; }
+  .bub small { display:block; font-size:12px; color:var(--muted); margin-top:4px; text-align:right; }
+  .bub.them { background:var(--raised); border-bottom-left-radius:4px; }
+  .bub.me { background:#1B3A66; align-self:flex-end; border-bottom-right-radius:4px; }
+  .bub.me small { color:#A9C4EE; }
+  .att { display:flex; gap:10px; align-items:center; background:var(--bg); border-radius:var(--r-sm); padding:10px; margin-bottom:6px; }
+  .att svg { width:24px; height:24px; color:var(--muted); }
+  .att small { color:var(--muted); display:block; font-size:12px; }
+  .att-img { height:120px; border-radius:var(--r-sm); background:var(--bg); margin-bottom:6px; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:12px; }
+
+  /* dial */
+  .dial { position:relative; width:120px; height:120px; }
+  .dial svg { transform:rotate(-90deg); }
+  .dial .v { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .dial .v b { font-size:32px; line-height:36px; font-weight:700; }
+  .dial .v small { font-size:12px; color:var(--muted); }
+  .dial circle.track { stroke:var(--raised); }
+  .dial circle.fill { stroke:var(--recovery); transition:stroke-dashoffset var(--t-big) var(--ease); }
+
+  /* skeleton */
+  .sk { background:var(--raised); border-radius:var(--r-sm); animation:pulse 1.4s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity:.55; } 50% { opacity:1; } }
+
+  /* empty / error / locked / toast / banner */
+  .empty { text-align:center; padding:24px 8px; }
+  .empty .ic { width:56px; height:56px; border-radius:16px; background:var(--raised); margin:0 auto 12px; display:flex; align-items:center; justify-content:center; color:var(--muted); }
+  .empty b { display:block; font-size:18px; font-weight:600; margin-bottom:4px; }
+  .empty p { color:var(--muted); font-size:14px; margin:0 0 16px; }
+  .inline-err { display:flex; gap:12px; align-items:flex-start; background:var(--raised); border-radius:var(--r-md); padding:12px; font-size:14px; }
+  .inline-err svg { color:var(--danger); flex:none; width:20px; height:20px; }
+  .inline-err a { color:var(--brand); font-weight:600; text-decoration:none; }
+  .locked { display:flex; gap:12px; align-items:center; }
+  .locked svg { width:20px; height:20px; color:var(--muted); flex:none; }
+  .toast { background:var(--text); color:var(--bg); border-radius:var(--r-sm); padding:12px 16px; display:flex; justify-content:space-between; font-size:14px; font-weight:500; }
+  .toast b { color:#1F5FC4; }
+  .banner { display:flex; gap:8px; align-items:center; background:var(--raised); border-radius:var(--r-sm); padding:8px 12px; font-size:14px; color:var(--muted); }
+  .banner svg { width:16px; height:16px; }
+
+  /* motion demos */
+  .roll { display:inline-flex; overflow:hidden; height:48px; font-size:40px; line-height:48px; font-weight:700; }
+  .roll .col { display:flex; flex-direction:column; transition:transform var(--t-std) var(--ease); }
+  .roll .col span { height:48px; }
+  .roll .sep { height:48px; }
+  .big-moment { text-align:center; padding:16px; }
+  .ring { width:140px; height:140px; margin:0 auto 12px; position:relative; }
+  .ring svg { transform:rotate(-90deg); }
+  .ring circle.fill { stroke:var(--training); transition:stroke-dashoffset var(--t-big) var(--ease); }
+  .ring .v { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; }
+  .ring .v b { font-size:24px; } .ring .v small { font-size:12px; color:var(--muted); }
+  .pr { display:inline-flex; align-items:center; gap:6px; background:var(--raised); color:var(--training); border-radius:999px; padding:4px 12px; font-size:14px; font-weight:600; opacity:0; transform:translateY(6px); transition:opacity var(--t-std) var(--ease), transform var(--t-std) var(--ease); }
+  .pr.show { opacity:1; transform:none; }
+  .pr svg { width:16px; height:16px; }
+
+  .rule { border-left:2px solid var(--accent); padding:2px 0 2px 12px; margin:8px 0; font-size:14px; }
+  .rule b { font-weight:600; }
+  .no { border-left-color:var(--danger); }
+  footer { max-width:1240px; margin:48px auto 0; padding:24px 16px 64px; color:var(--muted); font-size:13px; border-top:1px solid var(--border); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration:0s !important; transition-duration:0s !important; }
+    .sk { animation:none; opacity:.8; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Arcwell spec sheet</h1>
+  <p>Step 1 of the design process: every colour, type style, spacing step, corner radius, component and motion rule the screens are built from. Source of truth for values is <code>docs/DESIGN.md §5</code>; product rules are in <code>docs/DECISIONS.md</code>. Android (Material 3 conventions), dark theme, 48 dp tap targets, Inter (D46), Lucide icons.</p>
+  <p>Sample content is realistic on purpose: Indian foods and portions, uneven numbers, long names.</p>
+  <span class="status">Draft — for founder review. Not yet built in app/src/theme</span>
+</header>
+<nav class="toc">
+  <a href="#colour">Colour</a><a href="#type">Type</a><a href="#space">Spacing & radius</a><a href="#icons">Icons</a><a href="#buttons">Buttons & inputs</a><a href="#lists">Cards & lists</a><a href="#nav">Navigation</a><a href="#training">Training</a><a href="#nutrition">Nutrition</a><a href="#recovery">Recovery</a><a href="#chat">Chat</a><a href="#states">States</a><a href="#motion">Motion</a><a href="#rules">Rules</a>
+</nav>
+
+<!-- COLOUR -->
+<section id="colour">
+  <h2>Colour</h2>
+  <p class="lead">Solid colours only: no gradients, no glows. Most of every screen is charcoal and grey; colour always means something. Contrast ratios are against the background (#111316) unless noted.</p>
+  <h3>Surfaces and text</h3>
+  <div class="grid">
+    <div class="sw"><span class="chip-c" style="background:#111316"></span><span><b>bg</b><small>#111316 · app background</small></span></div>
+    <div class="sw"><span class="chip-c" style="background:#191C21"></span><span><b>surface</b><small>#191C21 · cards, sheets</small></span></div>
+    <div class="sw"><span class="chip-c" style="background:#22262D"></span><span><b>raised</b><small>#22262D · inputs, selected</small></span></div>
+    <div class="sw"><span class="chip-c" style="background:#2D323A"></span><span><b>border</b><small>#2D323A · dividers only (1.4:1)</small></span></div>
+    <div class="sw"><span class="chip-c" style="background:#6B7482"></span><span><b>borderStrong</b><small>#6B7482 · input and control outlines (3.9:1)</small></span></div>
+    <div class="sw"><span class="chip-c" style="background:#F2F4F7"></span><span><b>text</b><small>#F2F4F7 · 16.9:1</small></span></div>
+    <div class="sw"><span class="chip-c" style="background:#9AA4B2"></span><span><b>textMuted</b><small>#9AA4B2 · 7.4:1</small></span></div>
+  </div>
+  <h3>Brand, pillars and status</h3>
+  <div class="grid">
+    <div class="sw"><span class="chip-c" style="background:#3D8BFF"></span><span><b>brand</b><small>#3D8BFF · primary actions · 5.6:1</small></span></div>
+    <div class="sw"><span class="chip-c" style="background:#04101F"></span><span><b>onBrand</b><small>#04101F · text on brand · 5.8:1</small></span></div>
+    <div class="sw"><span class="chip-c" style="background:#22D3EE"></span><span><b>accent / training</b><small>#22D3EE · focus, selection, training · 10.3:1</small></span></div>
+    <div class="sw"><span class="chip-c" style="background:#F5A524"></span><span><b>nutrition</b><small>#F5A524 · 9.1:1</small></span></div>
+    <div class="sw"><span class="chip-c" style="background:#8B7CFF"></span><span><b>recovery</b><small>#8B7CFF · 5.7:1</small></span></div>
+    <div class="sw"><span class="chip-c" style="background:#22C55E"></span><span><b>success</b><small>#22C55E · 8.2:1</small></span></div>
+    <div class="sw"><span class="chip-c" style="background:#F59E0B"></span><span><b>warning</b><small>#F59E0B · needs attention · 8.7:1</small></span></div>
+    <div class="sw"><span class="chip-c" style="background:#EF4444"></span><span><b>danger</b><small>#EF4444 · errors, destructive only · 4.9:1</small></span></div>
+  </div>
+  <p class="lead" style="margin-top:16px">New since DESIGN.md v0: <b>borderStrong</b>. The divider colour is only 1.4:1, too faint to outline an input or a tick box (WCAG needs 3:1 for control boundaries), so controls use #6B7482.</p>
+</section>
+
+<!-- TYPE -->
+<section id="type">
+  <h2>Type</h2>
+  <p class="lead">Inter for everything (D46), tabular numerals on every number. Hierarchy from size and weight, never colour. Layouts must hold at 130% system font size.</p>
+  <div class="panel">
+    <div class="type-row"><code>display · 32/40 · 700</code><span style="font-size:32px;line-height:40px;font-weight:700" class="num">1,240 kcal left</span></div>
+    <div class="type-row"><code>title · 22/28 · 600</code><span style="font-size:22px;line-height:28px;font-weight:600">Push day</span></div>
+    <div class="type-row"><code>heading · 18/24 · 600</code><span style="font-size:18px;line-height:24px;font-weight:600">Week 3 check-in</span></div>
+    <div class="type-row"><code>body · 16/24 · 400</code><span style="font-size:16px;line-height:24px">Dal tadka, 1 katori · 150 kcal</span></div>
+    <div class="type-row"><code>label · 14/20 · 500</code><span style="font-size:14px;line-height:20px;font-weight:500">Log set</span></div>
+    <div class="type-row" style="border:0"><code>caption · 12/16 · 400</code><span style="font-size:12px;line-height:16px;color:var(--muted)">Last done Monday · 52 min</span></div>
+  </div>
+  <div class="panel" style="margin-top:12px">
+    <span class="eyebrow">Tabular numerals</span>
+    <div class="num" style="font-size:22px;font-weight:600;margin-top:8px">72.5 kg × 8<br>111.0 kg × 10</div>
+    <div class="cap">Digits share one width, so columns of weights and reps line up and numbers don't shift while they change.</div>
+  </div>
+</section>
+
+<!-- SPACING -->
+<section id="space">
+  <h2>Spacing, radius and depth</h2>
+  <p class="lead">4 dp grid. Group related things tightly (8) and separate unrelated groups generously (24–32), never one gap everywhere.</p>
+  <div class="grid wide">
+    <div class="panel">
+      <div class="space-row"><code>4</code><i style="width:4px"></i>icon to its label</div>
+      <div class="space-row"><code>8</code><i style="width:8px"></i>inside a group</div>
+      <div class="space-row"><code>12</code><i style="width:12px"></i>row padding</div>
+      <div class="space-row"><code>16</code><i style="width:16px"></i>screen edges, card padding</div>
+      <div class="space-row"><code>24</code><i style="width:24px"></i>between groups</div>
+      <div class="space-row"><code>32</code><i style="width:32px"></i>between sections</div>
+      <div class="space-row"><code>48</code><i style="width:48px"></i>minimum tap target</div>
+    </div>
+    <div class="panel">
+      <div class="row" style="gap:16px">
+        <div style="text-align:center"><div style="width:64px;height:64px;background:var(--raised);border-radius:8px"></div><code>8 · inputs, chips</code></div>
+        <div style="text-align:center"><div style="width:64px;height:64px;background:var(--raised);border-radius:12px"></div><code>12 · cards, buttons</code></div>
+        <div style="text-align:center"><div style="width:64px;height:64px;background:var(--raised);border-radius:20px 20px 0 0"></div><code>20 · sheets</code></div>
+        <div style="text-align:center"><div style="width:64px;height:64px;background:var(--raised);border-radius:999px"></div><code>full · pills</code></div>
+      </div>
+      <div class="cap">Depth comes from three surface steps (bg → surface → raised), not shadows.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ICONS -->
+<section id="icons">
+  <h2>Icons</h2>
+  <p class="lead">Lucide, 24 dp, 1.5 px stroke, muted grey unless active. No emoji as icons; the 🔒 and 🔔 in the wireframes are placeholders for <code>lock</code> and <code>bell</code>.</p>
+  <div class="panel">
+    <div class="row" style="gap:20px;color:var(--muted)" id="iconrow"></div>
+  </div>
+</section>
+
+<!-- BUTTONS & INPUTS -->
+<section id="buttons">
+  <h2>Buttons and inputs</h2>
+  <p class="lead">One primary button per screen, placed in the bottom half. Everything is 48 dp tall.</p>
+  <div class="grid wide">
+    <div class="panel stack">
+      <button class="btn primary full">Start workout</button>
+      <button class="btn secondary full">Log food</button>
+      <button class="btn ghost full">Not now</button>
+      <button class="btn destructive full">Delete my account</button>
+      <button class="btn full" disabled>Save</button>
+      <div class="cap">Primary · secondary · ghost · destructive · disabled. Pressed: scale 0.98 for 120 ms.</div>
+    </div>
+    <div class="panel stack">
+      <div><div class="field-label">Name</div><div class="input">Venkatalakshmi Subramanian</div></div>
+      <div><div class="field-label">Email</div><div class="input focus"><span>priya.sharma@</span></div><div class="field-help">Focused: cyan outline</div></div>
+      <div><div class="field-label">Password</div><div class="input error"><span class="ph">••••</span></div><div class="field-help err">Use at least 8 characters</div></div>
+      <div class="input"><i data-lucide="search" style="width:20px;color:var(--muted)"></i><span class="ph">Search foods, e.g. dal tadka</span></div>
+    </div>
+    <div class="panel stack">
+      <span class="eyebrow">Number stepper</span>
+      <div class="stepper"><button aria-label="Decrease" onclick="step(-2.5)"><i data-lucide="minus"></i></button><span class="val num"><span id="kg">72.5</span><small>kg</small></span><button aria-label="Increase" onclick="step(2.5)"><i data-lucide="plus"></i></button></div>
+      <div class="row"><span class="fchip">½</span><span class="fchip on">1 katori</span><span class="fchip">1½</span><span class="fchip">2</span><span class="fchip">grams</span></div>
+      <div class="row"><span class="fchip on">Needs attention · 4</span><span class="fchip">Active · 28</span><span class="fchip">Paused · 3</span></div>
+      <div class="row"><span class="schip active">Active</span><span class="schip paused">Paused</span><span class="schip leaving">Leaving</span><span class="schip completed">Completed</span></div>
+      <div class="cap">Tap ± to see the number roll (motion rule 1). Chips: portion, filter, status.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CARDS & LISTS -->
+<section id="lists">
+  <h2>Cards and list rows</h2>
+  <p class="lead">Cards group one task. List rows are at least 56 dp; long names truncate with an ellipsis, never wrap the row.</p>
+  <div class="grid wide">
+    <div class="stack">
+      <div class="card"><span class="eyebrow"><span class="dot" style="background:var(--training)"></span>Training</span><div style="font-size:22px;font-weight:600;margin:6px 0 2px">Push day · 50 min</div><div style="color:var(--muted);font-size:14px;margin-bottom:12px">6 exercises · week 2 of 8</div><button class="btn primary full">Start workout</button></div>
+      <div class="card"><span class="eyebrow"><span class="dot" style="background:var(--nutrition)"></span>Nutrition</span><div class="num" style="font-size:22px;font-weight:600;margin:6px 0 2px">1,240 kcal left</div><div style="color:var(--muted);font-size:14px">610 eaten · target 1,850</div></div>
+    </div>
+    <div class="panel">
+      <div class="listrow"><span class="av">VS</span><span class="t"><b>Venkatalakshmi Subramanian</b><small>Check-in overdue · 2 days</small></span><span class="r num">62%</span><i data-lucide="chevron-right"></i></div>
+      <div class="listrow"><span class="av">RV</span><span class="t"><b>Rahul Verma</b><small>Low adherence</small></span><span class="r num">48%</span><i data-lucide="chevron-right"></i></div>
+      <div class="listrow" style="border:0"><span class="av">KM</span><span class="t"><b>Karan Mehta</b><small>2 unread messages</small></span><span class="r num">91%</span><i data-lucide="chevron-right"></i></div>
+      <div class="cap">Coach row: name, the reason to act, adherence. Order freezes while the coach is using the list.</div>
+    </div>
+  </div>
+</section>
+
+<!-- NAV -->
+<section id="nav">
+  <h2>Navigation</h2>
+  <p class="lead">Bottom bar by tier (D2, D2a, D2b, D23) and the shared side menu (D9, D13, D14). The active item gets a raised pill and the accent colour.</p>
+  <div class="grid wide">
+    <div class="stack">
+      <div class="frame"><div class="bnav"><span class="on"><span class="pill"><i data-lucide="house"></i></span>Today</span><span><span class="pill"><i data-lucide="dumbbell"></i></span>Training</span><span><span class="pill"><i data-lucide="utensils"></i></span>Nutrition</span></div></div>
+      <div class="frame"><div class="bnav"><span><span class="pill"><i data-lucide="house"></i></span>Today</span><span class="on"><span class="pill"><i data-lucide="dumbbell"></i></span>Training</span><span><span class="pill"><i data-lucide="utensils"></i></span>Nutrition</span><span><span class="pill"><i data-lucide="moon"></i></span>Recovery</span><span><span class="pill"><i data-lucide="bot"></i></span>AI Coaching</span></div></div>
+      <div class="frame"><div class="bnav"><span><span class="pill"><i data-lucide="house"></i></span>Today</span><span><span class="pill"><i data-lucide="dumbbell"></i></span>Training</span><span><span class="pill"><i data-lucide="utensils"></i></span>Nutrition</span><span><span class="pill"><i data-lucide="moon"></i></span>Recovery</span><span class="on"><span class="pill"><i data-lucide="messages-square"></i></span>Progress</span></div></div>
+      <div class="frame"><div class="bnav"><span class="on"><span class="pill"><i data-lucide="users"></i></span>Clients</span><span><span class="pill"><i data-lucide="clipboard-check"></i></span>Check-ins</span><span><span class="pill"><i data-lucide="layout-list"></i></span>Plans</span><span><span class="pill"><i data-lucide="message-circle"></i></span>Messages</span><span><span class="pill"><i data-lucide="briefcase"></i></span>Business</span></div></div>
+      <div class="cap">Free · AI subscriber · human-coached · coach. Labels always shown.</div>
+    </div>
+    <div class="frame" style="background:#0B0C0E;display:flex">
+      <div class="drawer">
+        <div class="who"><span class="av"></span><span><b>Sanjeev</b><small>Free plan</small></span></div>
+        <div class="mi"><i data-lucide="user"></i>Account<span class="end"><i data-lucide="chevron-right"></i></span></div>
+        <div class="mi"><i data-lucide="bell"></i>Notifications<span class="end"><i data-lucide="chevron-right"></i></span></div>
+        <div class="mi on"><i data-lucide="dumbbell"></i>Training<span class="end"><i data-lucide="chevron-down"></i></span></div>
+        <div class="mi sub">Exercises</div>
+        <div class="mi sub">Workouts<span class="end">templates</span></div>
+        <div class="mi sub">Programs<span class="end"><i data-lucide="lock"></i>Plus</span></div>
+        <div class="mi sub">History</div>
+        <div class="mi sub">Muscle Analytics<span class="end"><i data-lucide="lock"></i>Plus</span></div>
+        <div class="mi"><i data-lucide="map-pin"></i>Gyms<span class="end"><i data-lucide="chevron-right"></i></span></div>
+        <div class="mi"><i data-lucide="activity"></i>Physique<span class="end"><i data-lucide="chevron-right"></i></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRAINING -->
+<section id="training">
+  <h2>Training components</h2>
+  <p class="lead">The set row is the heart of the app. Tap the tick to log a set: it fills in 200 ms and the rest timer starts.</p>
+  <div class="grid wide">
+    <div class="panel">
+      <div style="font-size:18px;font-weight:600;margin-bottom:4px">Barbell bench press</div>
+      <div style="color:var(--muted);font-size:14px;margin-bottom:8px">Rest 2:30 · RIR 1–2</div>
+      <table class="sets num">
+        <tr><th>Set</th><th>Previous</th><th>kg</th><th>Reps</th><th></th></tr>
+        <tr class="done"><td>1</td><td class="prev">70 × 8</td><td><span class="in">72.5</span></td><td><span class="in">8</span></td><td><span class="tick" onclick="tick(this)"><i data-lucide="check"></i></span></td></tr>
+        <tr class="cur"><td>2</td><td class="prev">70 × 8</td><td><span class="in">72.5</span></td><td><span class="in">8</span></td><td><span class="tick" onclick="tick(this)"><i data-lucide="check"></i></span></td></tr>
+        <tr><td>3</td><td class="prev">70 × 7</td><td><span class="in">72.5</span></td><td><span class="in">7</span></td><td><span class="tick" onclick="tick(this)"><i data-lucide="check"></i></span></td></tr>
+      </table>
+      <table class="sets num" style="margin-top:12px">
+        <tr><th>Set</th><th>Previous</th><th>Time</th><th></th></tr>
+        <tr class="cur"><td>1</td><td class="prev">0:40</td><td><span class="in">0:45</span></td><td><span class="tick"><i data-lucide="play"></i></span></td></tr>
+      </table>
+      <div class="cap">Weighted and timed variants (TR-08). Bodyweight hides the kg column.</div>
+    </div>
+    <div class="frame" style="display:flex;flex-direction:column;justify-content:flex-end;min-height:300px;background:#0B0C0E">
+      <div class="sheet">
+        <div class="grab"></div>
+        <div style="text-align:center;color:var(--muted);font-size:14px">Rest</div>
+        <div class="bigtime num" id="rest">1:45</div>
+        <div class="row" style="justify-content:center;margin:8px 0 16px"><button class="btn secondary">−15 s</button><button class="btn secondary">+15 s</button></div>
+        <button class="btn ghost full">Skip rest</button>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="banner"><i data-lucide="cloud-off"></i>Saved on your phone — will sync</div>
+      <div class="card raised" style="display:flex;justify-content:space-between;align-items:center"><span><b style="font-weight:600">Push day</b><br><small style="color:var(--muted)" class="num">32:10 · 3 of 6 exercises</small></span><button class="btn primary">Resume</button></div>
+      <div class="cap">Offline banner and the minimised-workout bar (F4-09, F4-10).</div>
+    </div>
+  </div>
+</section>
+
+<!-- NUTRITION -->
+<section id="nutrition">
+  <h2>Nutrition components</h2>
+  <p class="lead">"kcal left" is the hero number. Going over a target is neutral: the bar stays amber and the number says "over", never red.</p>
+  <div class="grid wide">
+    <div class="panel">
+      <span class="eyebrow"><span class="dot" style="background:var(--nutrition)"></span>Today, Wed 11 Nov</span>
+      <div class="hero-num num" style="margin-top:8px">1,240</div><div style="color:var(--muted);font-size:14px;margin-bottom:12px">kcal left · 610 eaten of 1,850</div>
+      <div class="bar"><i style="width:33%"></i></div>
+      <div class="stack" style="margin-top:16px">
+        <div class="macro num"><span>Protein</span><span class="bar"><i style="width:48%"></i></span><span>62 / 130 g</span></div>
+        <div class="macro num"><span>Carbs</span><span class="bar"><i style="width:39%"></i></span><span>78 / 200 g</span></div>
+        <div class="macro num"><span>Fat</span><span class="bar"><i style="width:100%"></i></span><span>58 / 55 g · over</span></div>
+      </div>
+      <div class="cap">Macros only for Plus and coached athletes (D5).</div>
+    </div>
+    <div class="panel">
+      <div style="display:flex;justify-content:space-between;font-weight:600"><span>Breakfast</span><span class="num">360 kcal</span></div>
+      <div class="listrow"><span class="t"><b>Poha, home-style</b><small>1.5 katori</small></span><span class="r num">270</span></div>
+      <div class="listrow"><span class="t"><b>Masala chai with sugar</b><small>1 cup</small></span><span class="r num">90</span></div>
+      <button class="btn ghost" style="padding:0"><i data-lucide="plus"></i>Add food</button>
+    </div>
+  </div>
+</section>
+
+<!-- RECOVERY -->
+<section id="recovery">
+  <h2>Recovery components</h2>
+  <p class="lead">Sleep score as a 0–100 dial (D18), muted violet. Explained in words under the number.</p>
+  <div class="grid wide">
+    <div class="panel" style="display:flex;gap:20px;align-items:center">
+      <div class="dial"><svg width="120" height="120"><circle class="track" cx="60" cy="60" r="52" fill="none" stroke-width="10"/><circle class="fill" id="dialfill" cx="60" cy="60" r="52" fill="none" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7"/></svg><div class="v"><b class="num" id="dialv">0</b><small>of 100</small></div></div>
+      <div><div style="font-size:18px;font-weight:600">Sleep score</div><div style="color:var(--muted);font-size:14px">From 6.5 hours and how well you slept. 1 h under your coach's target.</div><button class="btn ghost" style="padding:0;height:40px" onclick="dial()">Replay</button></div>
+    </div>
+    <div class="panel stack">
+      <span class="field-label">Soreness</span>
+      <div style="height:8px;border-radius:4px;background:var(--raised);position:relative"><i style="position:absolute;left:0;top:0;bottom:0;width:35%;background:var(--recovery);border-radius:4px"></i><i style="position:absolute;left:calc(35% - 12px);top:-8px;width:24px;height:24px;border-radius:50%;background:var(--text)"></i></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted)"><span>None</span><span>Very sore</span></div>
+      <div class="cap">Sliders have labelled ends; the thumb is 24 dp inside a 48 dp touch area.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CHAT -->
+<section id="chat">
+  <h2>Chat</h2>
+  <p class="lead">Familiar messaging layout. Images and PDFs only; no video (D14).</p>
+  <div class="grid wide">
+    <div class="panel bubbles">
+      <div class="bub them">Good that you flagged it. Can you send a photo of your bench setup?<small>18:12</small></div>
+      <div class="bub them"><div class="att"><i data-lucide="file-text"></i><span>Shoulder warm-up.pdf<small>2 pages · 340 KB</small></span></div>Do this before pressing for the next 2 weeks.<small>18:13</small></div>
+      <div class="bub me"><div class="att-img">Photo</div>My setup on the bench<small>18:20 · Read</small></div>
+    </div>
+  </div>
+</section>
+
+<!-- STATES -->
+<section id="states">
+  <h2>States</h2>
+  <p class="lead">Every list has loading, empty and error states (F15, F16). Loading uses a skeleton in the shape of the content, never a spinner (motion rule 4).</p>
+  <div class="grid wide">
+    <div class="panel stack">
+      <span class="eyebrow">Loading — skeleton</span>
+      <div class="sk" style="height:20px;width:40%"></div>
+      <div class="sk" style="height:96px;border-radius:12px"></div>
+      <div class="sk" style="height:56px;border-radius:12px"></div>
+      <div class="sk" style="height:56px;border-radius:12px"></div>
+    </div>
+    <div class="panel">
+      <span class="eyebrow">Empty</span>
+      <div class="empty"><div class="ic"><i data-lucide="dumbbell"></i></div><b>No workouts yet</b><p>Finished workouts show up here, grouped by week.</p><button class="btn primary full">Start today's workout</button></div>
+    </div>
+    <div class="panel stack">
+      <span class="eyebrow">Error and locked</span>
+      <div class="inline-err"><i data-lucide="circle-alert"></i><span>Couldn't load your food log. Your entries are safe. <a href="#states">Try again</a></span></div>
+      <div class="card raised locked"><i data-lucide="lock"></i><span><b style="font-weight:600">Programmes are part of Plus</b><br><small style="color:var(--muted)">Multi-week plans built around you.</small></span></div>
+      <div class="toast"><span>Poha removed</span><b>Undo</b></div>
+    </div>
+  </div>
+</section>
+
+<!-- MOTION -->
+<section id="motion">
+  <h2>Motion</h2>
+  <p class="lead">From the Nessie motion video, adapted to Arcwell and Android. Things that change should move, not jump. Short and functional, with one bigger moment saved for the app's biggest achievement.</p>
+  <div class="tablewrap panel">
+    <table>
+      <tr><th>Token</th><th>Duration</th><th>Used for</th></tr>
+      <tr><td><code>micro</code></td><td class="num">120 ms</td><td>press feedback, tick fill, toggles</td></tr>
+      <tr><td><code>standard</code></td><td class="num">200 ms</td><td>number rolls, cards appearing, tab and segment changes (about a fifth of a second)</td></tr>
+      <tr><td><code>sheet</code></td><td class="num">280 ms</td><td>bottom sheets and the side menu opening</td></tr>
+      <tr><td><code>big moment</code></td><td class="num">600 ms</td><td>workout summary only (see below)</td></tr>
+      <tr><td><code>easing</code></td><td colspan="2">Material 3 emphasized: <code>cubic-bezier(.2, 0, 0, 1)</code>. In the app: React Native Reanimated.</td></tr>
+    </table>
+  </div>
+  <div class="grid wide" style="margin-top:16px">
+    <div class="panel">
+      <span class="eyebrow">Rule 1 · Numbers roll</span>
+      <div style="margin:12px 0"><span class="roll num" id="rollbox"></span><span style="font-size:16px;color:var(--muted);margin-left:8px">kcal left</span></div>
+      <button class="btn secondary" onclick="addFood()">Log 150 kcal of dal</button>
+      <div class="cap">Calories left, set weights, timers and bodyweight roll to the new value in 200 ms, so you see the change. Equivalent of SwiftUI's numeric text transition.</div>
+    </div>
+    <div class="panel big-moment">
+      <span class="eyebrow" style="justify-content:center">Rule 3 · The big moment</span>
+      <div class="ring" style="margin-top:12px"><svg width="140" height="140"><circle cx="70" cy="70" r="60" fill="none" stroke="#22262D" stroke-width="10"/><circle class="fill" id="ringfill" cx="70" cy="70" r="60" fill="none" stroke-width="10" stroke-linecap="round" stroke-dasharray="377" stroke-dashoffset="377"/></svg><div class="v"><b class="num" id="ringv">0</b><small>kg lifted</small></div></div>
+      <div style="font-size:18px;font-weight:600;margin-bottom:8px">Push day done · 52 min</div>
+      <span class="pr" id="prpill"><i data-lucide="trending-up"></i>New best · bench 72.5 kg × 8</span>
+      <div style="margin-top:12px"><button class="btn ghost" onclick="moment()">Replay</button></div>
+      <div class="cap" style="text-align:left">Finishing a workout is Arcwell's biggest moment, so the summary (F4-12) gets the only long animation: the ring fills, volume rolls up, and any new best slides in. A strong haptic on Android. No confetti, flames or badges (D24).</div>
+    </div>
+    <div class="panel">
+      <span class="eyebrow">Rules 4 and 5 · Loading and background</span>
+      <div class="rule"><b>Skeletons, not spinners.</b> A soft outline of the screen pulses while it loads, so it feels faster (see States).</div>
+      <div class="rule no"><b>No animated background.</b> The video's slow-moving shader background is left out: it conflicts with Arcwell's solid-colour, minimal direction (D24) and costs battery on budget Android phones. If ever added (e.g. splash only), it must pause in battery saver and stay still with reduced motion.</div>
+      <div class="rule"><b>Reduced motion.</b> With Android "Remove animations" on, every transition becomes an instant change and skeletons stop pulsing. This page does the same.</div>
+    </div>
+  </div>
+</section>
+
+<!-- RULES -->
+<section id="rules">
+  <h2>Rules every screen follows</h2>
+  <div class="grid wide">
+    <div class="panel">
+      <div class="rule">One primary action per screen, in the bottom half.</div>
+      <div class="rule">Colour means something: cyan training, amber nutrition, violet recovery, blue for actions.</div>
+      <div class="rule">Text left-aligned; centre only single empty-state messages.</div>
+      <div class="rule">Numbers are tabular and roll when they change.</div>
+    </div>
+    <div class="panel">
+      <div class="rule no">No gradients, glows, glassmorphism or heavy shadows.</div>
+      <div class="rule no">No red for missed targets; red only for errors and destructive actions.</div>
+      <div class="rule no">No streaks, XP, badges or confetti.</div>
+      <div class="rule no">No emoji as icons; no invented logo or tagline.</div>
+    </div>
+  </div>
+</section>
+
+<footer>Arcwell spec sheet · draft 2026-11-11 · values mirror docs/DESIGN.md §5 · full rules in docs/design/design-prompt.md</footer>
+
+<script>
+  try { lucide.createIcons(); } catch (e) {}
+  const icons = ['house','dumbbell','utensils','moon','bot','messages-square','users','clipboard-check','layout-list','message-circle','briefcase','bell','lock','search','check','plus','minus','camera','file-text','map-pin','activity','trending-up','cloud-off','circle-alert'];
+  const row = document.getElementById('iconrow');
+  icons.forEach(n => { const d = document.createElement('span'); d.style.cssText='display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;width:72px'; d.innerHTML = `<i data-lucide="${n}"></i><code>${n}</code>`; row.appendChild(d); });
+  try { lucide.createIcons(); } catch (e) {}
+
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Rule 1: rolling digits
+  function renderRoll(el, value) {
+    const s = value.toLocaleString('en-IN');
+    if (el.dataset.len !== String(s.length)) {
+      el.innerHTML = [...s].map(c => /\d/.test(c) ? `<span class="col">${[0,1,2,3,4,5,6,7,8,9].map(d=>`<span>${d}</span>`).join('')}</span>` : `<span class="sep">${c}</span>`).join('');
+      el.dataset.len = s.length;
+    }
+    const cols = el.querySelectorAll('.col'); let i = 0;
+    [...s].forEach(c => { if (/\d/.test(c)) { cols[i].style.transform = `translateY(-${+c * 48}px)`; i++; } });
+  }
+  let kcal = 1240; const rollbox = document.getElementById('rollbox'); renderRoll(rollbox, kcal);
+  function addFood() { kcal = Math.max(0, kcal - 150); renderRoll(rollbox, kcal); }
+  let kg = 72.5;
+  function step(d) { kg = Math.max(0, kg + d); document.getElementById('kg').textContent = kg.toFixed(1); }
+  function tick(el) { el.closest('tr').classList.toggle('done'); el.closest('tr').classList.remove('cur'); }
+  // count-up helper
+  function count(el, to, ms) {
+    if (reduce) { el.textContent = to.toLocaleString('en-IN'); return; }
+    const t0 = performance.now();
+    function f(t) { const p = Math.min(1, (t - t0) / ms); const e = 1 - Math.pow(1 - p, 3); el.textContent = Math.round(to * e).toLocaleString('en-IN'); if (p < 1) requestAnimationFrame(f); }
+    requestAnimationFrame(f);
+  }
+  function dial() {
+    const f = document.getElementById('dialfill'); f.style.transition='none'; f.style.strokeDashoffset = 326.7; f.getBoundingClientRect(); f.style.transition='';
+    f.style.strokeDashoffset = 326.7 * (1 - .72); count(document.getElementById('dialv'), 72, 600);
+  }
+  function moment() {
+    const f = document.getElementById('ringfill'), pr = document.getElementById('prpill');
+    f.style.transition='none'; f.style.strokeDashoffset = 377; pr.classList.remove('show'); f.getBoundingClientRect(); f.style.transition='';
+    f.style.strokeDashoffset = 0; count(document.getElementById('ringv'), 4860, 600);
+    setTimeout(() => pr.classList.add('show'), reduce ? 0 : 600);
+  }
+  dial(); moment();
+</script>
+</body>
+</html>

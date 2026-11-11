@@ -13,6 +13,7 @@ Mockups and wireframes live in `docs/design/`.
 | [Competitor research](design/competitor-research.md) | Landscape, comparison, gaps Arcwell can own, UX patterns to adopt |
 | [Design references](design/references.md) | Dribbble/Behance/shipped-app references by category, patterns to avoid |
 | [Assets and licences](design/assets.md) | Fonts, icons, illustrations, photos, exercise media, data — with licence status |
+| [Spec sheet](design/spec-sheet.html) | Visual design system: every token, component and motion rule, rendered (open in a browser) |
 | [Design generation prompt](design/design-prompt.md) | AI design-tool prompts for the athlete app and coach workspace |
 
 ## 0. Working decisions (adopted as v1 defaults, 2026-11-11 — DECISIONS.md D45)
@@ -110,7 +111,8 @@ Dark theme (default):
 | `bg` | `#111316` | App background (dark charcoal) |
 | `surface` | `#191C21` | Cards, sheets |
 | `surfaceRaised` | `#22262D` | Inputs, pressed states |
-| `border` | `#2D323A` | Dividers, outlines |
+| `border` | `#2D323A` | Dividers only (1.4:1) |
+| `borderStrong` | `#6B7482` | Input, tick-box and secondary-button outlines (3:1+ on every surface) |
 | `text` | `#F2F4F7` | Primary text |
 | `textMuted` | `#9AA4B2` | Secondary text |
 | `brand` | `#3D8BFF` | Primary actions, brand accent (electric blue) |
@@ -136,25 +138,25 @@ Visual direction per D24: dark charcoal, electric blue / cyan accents, minimal a
 - **Spacing:** 4-point scale — 4, 8, 12, 16, 24, 32, 48.
 - **Radius:** 8 (inputs, chips) · 12 (cards) · 20 (sheets) · full (pills, avatars).
 - **Tap targets:** minimum 48 × 48dp.
-- **Motion:** short and functional (150–250 ms); respect the system "reduce motion" setting. Haptic tick when a set is logged.
+- **Motion** (rendered in the spec sheet): changing numbers roll instead of jumping. Tokens: micro 120 ms (press, tick), standard 200 ms (number rolls, cards, tabs), sheet 280 ms, big moment 600 ms. Easing `cubic-bezier(.2,0,0,1)`, built with React Native Reanimated. The only big animation is the workout summary (F4-12): ring fills, volume rolls up, new bests slide in, strong haptic, no confetti. Skeleton loaders, never spinners. No animated backgrounds. With Android "Remove animations" on, every transition is instant. Haptic tick when a set is logged.
 
 ## 6. Components (to build in `app/src/components/`)
 
 | Component | Notes | Status |
 |---|---|---|
-| Button (primary, secondary, ghost, destructive) | 48dp min height | Not started |
-| Text input, number stepper | Number stepper for kg/reps with big ± targets | Not started |
-| Card, list row, section header | | Not started |
-| Tab bar (athlete, coach variants) | | Not started |
-| Set row | Previous value, weight, reps, done tick; the heart of logging | Not started |
-| Rest timer | Bottom sheet, haptic at end | Not started |
-| Macro ring / calorie bar | Pillar colours | Not started |
-| Food result row, portion picker | Indian portions | Not started |
-| Chat bubble, attachment tile | Images, PDFs | Not started |
-| Check-in form fields, photo slot | | Not started |
-| Empty state, error state, skeleton loader | Every list has all three | Not started |
-| Paywall / locked-feature card | Shown only at upgrade moments | Not started |
-| Avatar, status chip (active, paused, leaving, completed) | | Not started |
+| Button (primary, secondary, ghost, destructive) | 48dp min height | Spec\'d (spec sheet) |
+| Text input, number stepper | Number stepper for kg/reps with big ± targets | Spec\'d (spec sheet) |
+| Card, list row, section header | | Spec\'d (spec sheet) |
+| Tab bar (athlete, coach variants) | | Spec\'d (spec sheet) |
+| Set row | Previous value, weight, reps, done tick; the heart of logging | Spec\'d (spec sheet) |
+| Rest timer | Bottom sheet, haptic at end | Spec\'d (spec sheet) |
+| Macro ring / calorie bar | Pillar colours | Spec\'d (spec sheet) |
+| Food result row, portion picker | Indian portions | Spec\'d (spec sheet) |
+| Chat bubble, attachment tile | Images, PDFs | Spec\'d (spec sheet) |
+| Check-in form fields, photo slot | | Spec\'d (spec sheet) |
+| Empty state, error state, skeleton loader | Every list has all three | Spec\'d (spec sheet) |
+| Paywall / locked-feature card | Shown only at upgrade moments | Spec\'d (spec sheet) |
+| Avatar, status chip (active, paused, leaving, completed) | | Spec\'d (spec sheet) |
 
 ## 7. Screen inventory
 
