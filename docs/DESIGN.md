@@ -89,6 +89,8 @@ Confirmed rules come from [DECISIONS.md](DECISIONS.md) (IDs in brackets). Sectio
 | F11 | Recovery, Physique tools, AI Coaching | Wireframed — [f11-recovery-physique-ai.html](design/wireframes/f11-recovery-physique-ai.html) |
 | F12 | Coached Progress area, waiting for a plan, joining and leaving a coach | Wireframed — [f12-coached-area-switching.html](design/wireframes/f12-coached-area-switching.html) |
 | F13 | Coach clients, client profile, plan and meal plan builders, assigning, leads, business | Wireframed — [f13-coach-tools.html](design/wireframes/f13-coach-tools.html) |
+| F14 | Coach client-profile sections (nutrition, recovery, progress, check-ins, notes), coach sign-up, profile, settings | Wireframed — [f14-coach-profile-settings.html](design/wireframes/f14-coach-profile-settings.html) |
+| F15 | Training landing by tier, exercise library, profile, units, help, upgrade "what changed", reusable states | Wireframed — [f15-training-account-states.html](design/wireframes/f15-training-account-states.html) |
 
 "Wireframed" means **drawn only**. No screen has been reviewed and approved by the founder or tested with users.
 
@@ -284,6 +286,26 @@ Tracked here as screens are designed (Wireframe → Mockup → Built). **✅ in 
 | K-11 Lead — add or edit | Coach | ✅ | — | — |
 | K-12 Business | Coach | ✅ | — | — |
 | K-13 Plan and billing | Coach | ✅ | — | — |
+| K-14 Client profile — nutrition | Coach | ✅ | — | — |
+| K-15 Client profile — recovery | Coach | ✅ | — | — |
+| K-16 Client profile — progress | Coach | ✅ | — | — |
+| K-17 Client profile — check-ins | Coach | ✅ | — | — |
+| K-18 Client profile — private notes | Coach | ✅ | — | — |
+| K-19 Coach sign-up | Coach | ✅ | — | — |
+| K-20 Edit coach profile | Coach | ✅ | — | — |
+| K-21 Coach settings | Coach | ✅ | — | — |
+| T-01 Training — free | Athlete (free) | ✅ | — | — |
+| T-02 Training — AI-coached | Athlete (AI) | ✅ | — | — |
+| T-03 Training — human-coached | Athlete (coached) | ✅ | — | — |
+| T-04 Exercise library | Athlete | ✅ | — | — |
+| AC-07 Edit profile | Athlete | ✅ | — | — |
+| AC-08 Units | Athlete | ✅ | — | — |
+| AC-09 Help and support | Athlete | ✅ | — | — |
+| U-01 Upgrade — what changed | Athlete (AI) | ✅ | — | — |
+| S-01 Loading (pattern) | All | ✅ | — | — |
+| S-02 Error and retry (pattern) | All | ✅ | — | — |
+| S-03 Form validation (pattern) | All | ✅ | — | — |
+| S-04 Permission denied (pattern) | All | ✅ | — | — |
 
 ## 8. Accessibility and quality checklist
 

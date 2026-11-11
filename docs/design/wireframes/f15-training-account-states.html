@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arcwell Wireframes F15</title>
+<link rel="stylesheet" href="wireframe.css">
+<style>
+  .skel { background: var(--fill); border-radius: 8px; margin-bottom: 7px; }
+  .err { border: 1.5px solid var(--ink); border-radius: 6px; }
+  .search { border: 1.5px solid var(--ink); border-radius: 10px; padding: 8px 10px; font-size: 11px; margin-bottom: 8px; display: flex; gap: 6px; }
+  .search::before { content: "⌕"; font-weight: 700; }
+  .result { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--fill); font-size: 11px; }
+  .result small { display: block; color: var(--muted); font-size: 9.5px; }
+  .result .r { color: var(--muted); }
+  .errtxt { font-size: 9.5px; color: var(--ink); font-weight: 600; margin: -3px 0 6px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Arcwell — Wireframes: F15 Training landing, exercise library, account extras, upgrade change, reusable states</h1>
+  <p>Drawn 2026-11-11. <b>Drawn only — not reviewed or approved, not tested with users.</b> Notes mark <b>Rule</b> (confirmed), <b>Proposal</b> (layout for review) or <b>Open</b> (needs a decision).</p>
+  <div class="legend"><span class="l-primary">Primary action / selected</span><span>Secondary</span><span class="l-note">Rule · Proposal · Open</span></div>
+</header>
+
+<section class="flow">
+  <h2>Training tab — landing by tier</h2>
+  <p class="arrowrow">The Training item in the bottom bar opens the athlete's current plan. How this relates to the menu's "Workouts" and "Programs" is not decided.</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>8:10</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px"><span class="burger">☰</span>&nbsp; Training</span><span></span></div>
+        <div class="hc" style="border-color:var(--ink);border-width:2px"><small>Your starter programme</small><b>Full body · 3 days · 45 min</b>Next: Day 2 — Full body B<br><span class="b">Start workout</span></div>
+        <div class="label">Starter programmes</div>
+        <div class="opt sel"><span class="ic"></span><span>Full body · 3 days<small>Gym · beginner-friendly</small></span></div>
+        <div class="opt"><span class="ic"></span><span>Upper / lower · 4 days<small>Gym</small></span></div>
+        <div class="opt"><span class="ic"></span><span>Home strength · 3 days<small>Dumbbells</small></span></div>
+        <div class="card"><small>Want a plan built around you? <u>Try AI coaching free for a week</u></small></div>
+        <div class="tabs"><span>Today</span><span class="on">Training</span><span>Nutrition</span></div>
+      </div>
+      <figcaption><b><span class="id">T-01</span>Training — free</b>
+        <div class="note"><ul><li><span class="rule">D5:</span> 2–3 free templates; switching between them allowed.</li><li><span class="rule">D6:</span> one-week trial offered as a quiet link.</li><li><span class="opn">Open:</span> whether free users can edit templates or build their own workouts.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>8:10</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px"><span class="burger">☰</span>&nbsp; Training</span><span></span></div>
+        <div class="hc" style="border-color:var(--ink);border-width:2px"><small>AI plan · week 2 of 8</small><b>Upper body · 50 min</b>Today<br><span class="b">Start workout</span></div>
+        <div class="label">This week</div>
+        <div class="inrow"><span class="t"><b>Mon · Lower body</b><small>Done · 52 min</small></span><span class="r">✓</span></div>
+        <div class="inrow"><span class="t"><b>Wed · Upper body</b><small>Today</small></span><span class="r">›</span></div>
+        <div class="inrow"><span class="t"><b>Fri · Lower body</b><small>Planned</small></span><span class="r">›</span></div>
+        <div class="inrow"><span class="t"><b>Sat · Full body</b><small>Planned</small></span><span class="r">›</span></div>
+        <div class="card"><small>Change the plan in AI Coaching</small></div>
+        <div class="tabs"><span>Today</span><span class="on">Training</span><span>Nutrition</span><span>Recovery</span><span>AI Coaching</span></div>
+      </div>
+      <figcaption><b><span class="id">T-02</span>Training — AI-coached</b>
+        <div class="note"><ul><li>Shows the AI plan's week; adjustments live in AI-01.</li><li>Each day opens the workout preview (F4-02).</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>8:10</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px"><span class="burger">☰</span>&nbsp; Training</span><span></span></div>
+        <div class="hc" style="border-color:var(--ink);border-width:2px"><small>From Coach Joseph · week 3 of 8</small><b>Push day · 50 min</b>Today<br><span class="b">Start workout</span></div>
+        <div class="coachnote">Coach Joseph: keep 1–2 reps in reserve on bench this week.</div>
+        <div class="label">This week</div>
+        <div class="inrow"><span class="t"><b>Mon · Legs</b><small>Done</small></span><span class="r">✓</span></div>
+        <div class="inrow"><span class="t"><b>Wed · Push</b><small>Today</small></span><span class="r">›</span></div>
+        <div class="inrow"><span class="t"><b>Fri · Pull</b><small>Planned</small></span><span class="r">›</span></div>
+        <div class="tabs"><span>Today</span><span class="on">Training</span><span>Nutrition</span><span>Recovery</span><span>Progress</span></div>
+      </div>
+      <figcaption><b><span class="id">T-03</span>Training — human-coached</b>
+        <div class="note"><ul><li><span class="rule">D7:</span> the coach's plan is the active plan.</li><li>Before a plan exists: W-02. After leaving a coach: the plan stays here (D7b); edit rights open.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>8:15</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Menu</span><span style="color:var(--ink);font-weight:700">Exercises</span><span></span></div>
+        <div class="search">Search exercises</div>
+        <div class="chips"><span class="chip sel">All</span><span class="chip">Chest</span><span class="chip">Back</span><span class="chip">Legs</span><span class="chip">Shoulders</span><span class="chip">Arms</span></div>
+        <div class="chips"><span class="chip">Barbell</span><span class="chip">Dumbbell</span><span class="chip">Machine</span><span class="chip">Bodyweight</span></div>
+        <div class="result"><span>Barbell bench press<small>Chest · barbell</small></span><span class="r">›</span></div>
+        <div class="result"><span>Incline dumbbell press<small>Upper chest · dumbbell</small></span><span class="r">›</span></div>
+        <div class="result"><span>Lat pulldown<small>Back · machine</small></span><span class="r">›</span></div>
+        <div class="result"><span>Goblet squat<small>Legs · dumbbell</small></span><span class="r">›</span></div>
+      </div>
+      <figcaption><b><span class="id">T-04</span>Exercise library</b>
+        <div class="note"><ul><li>☰ → Training → Exercises. Each row opens exercise detail (F4-08). Filters by muscle and equipment (library fields in SPEC).</li><li><span class="rule">D10:</span> full access for Pro. <span class="opn">Open:</span> free access.</li><li>Keyboard: results shrink above the keyboard.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<section class="flow">
+  <h2>Account extras and the free-to-AI change</h2>
+  <p class="arrowrow">☰ → Account → Profile · Units · Help · and the "what changed" screen after upgrading</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:40</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Account</span><span>Save</span></div>
+        <div class="photo" style="width:64px;height:64px;border-radius:50%;border:1.5px dashed var(--ink);margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--muted)">Photo</div>
+        <div class="field"><small>Name</small><b>Priya Sharma</b></div>
+        <div class="field"><small>Goal</small><b>Lose fat</b></div>
+        <div class="field"><small>Experience</small><b>6 months – 2 years</b></div>
+        <div class="field"><small>Injuries or limitations</small><b>Lower back</b></div>
+        <div class="field"><small>Training days and time</small><b>4 days · 45 min</b></div>
+        <div class="field"><small>Equipment</small><b>Gym</b></div>
+        <div class="field"><small>Diet type</small><b>Vegetarian</b></div>
+        <div class="card"><small>Coached? Changes are shared with Coach Joseph. AI subscriber? Your AI plan adjusts to them.</small></div>
+      </div>
+      <figcaption><b><span class="id">AC-07</span>Edit profile</b>
+        <div class="note"><ul><li>The onboarding answers (F1-06 to F1-12), editable. Each row opens the same question screen.</li><li>↕ Scrolls; Save in the header.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Account</span><span style="color:var(--ink);font-weight:700">Units</span><span></span></div>
+        <div class="label">Weight</div><div class="seg"><span class="on">kg</span><span class="unk" style="border:1px dashed var(--ink)">lb ?</span></div>
+        <div class="label">Height and measurements</div><div class="seg"><span class="on">cm</span><span>ft / in</span></div>
+        <div class="label">Food portions</div><div class="seg"><span class="on">Indian units first</span><span>Grams first</span></div>
+        <div class="open"><b>Pounds</b>Support lb for weights, or kg only?</div>
+      </div>
+      <figcaption><b><span class="id">AC-08</span>Units</b>
+        <div class="note"><ul><li>cm and ft/in already appear in onboarding (F1-08).</li><li><span class="opn">Open:</span> lb support (raised at F4-05). <span class="prop">Proposal:</span> portion-unit preference.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:42</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Account</span><span style="color:var(--ink);font-weight:700">Help</span><span></span></div>
+        <div class="search">Search help</div>
+        <div class="mi">Logging workouts<span class="chev">›</span></div>
+        <div class="mi">Logging food and portions<span class="chev">›</span></div>
+        <div class="mi">Subscriptions and the trial<span class="chev">›</span></div>
+        <div class="mi">Working with your coach<span class="chev">›</span></div>
+        <div class="mi">Privacy and your data<span class="chev">›</span></div>
+        <div class="pinned"><div class="btn">Contact support</div></div>
+      </div>
+      <figcaption><b><span class="id">AC-09</span>Help and support</b>
+        <div class="note"><ul><li><span class="prop">Proposal:</span> short help topics + contact (email form). Support runs through the Supabase dashboard in v1 (SPEC: no admin app).</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>20:13</span><span>▮▮ ◔</span></div>
+        <div class="grow center">
+          <div class="q">Your AI trial has started</div>
+          <div class="sub" style="max-width:230px">One week of AI coaching. Here's what changed:</div>
+          <div class="card" style="text-align:left;width:100%"><small>• New in the bottom bar: Recovery and AI Coaching<br>• Training now follows your AI plan<br>• Nutrition shows full macros and photo logging<br>• Your earlier workouts and logs are all still here</small></div>
+          <div class="open" style="text-align:left;width:100%"><b>Trial end</b>Billing and what happens after day 7.</div>
+        </div>
+        <div class="pinned"><div class="btn primary">See my AI plan</div></div>
+        <div class="tabs"><span>Today</span><span>Training</span><span>Nutrition</span><span>Recovery</span><span>AI Coaching</span></div>
+      </div>
+      <figcaption><b><span class="id">U-01</span>Upgrade — what changed</b>
+        <div class="note"><ul><li>After F8-05 builds the plan. Same "what changed" pattern as J-03 and L-03.</li><li><span class="rule">D2, D5a, D6:</span> AI bar, Recovery appears, one-week trial.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<section class="flow">
+  <h2>Reusable states (apply to every screen)</h2>
+  <p class="arrowrow">One pattern each, so individual screens don't need separate wireframes for these states</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>8:00</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px"><span class="burger">☰</span>&nbsp; Today</span><span></span></div>
+        <div class="skel" style="height:64px"></div><div class="skel" style="height:64px"></div><div class="skel" style="height:64px"></div><div class="skel" style="height:40px;width:70%"></div>
+        <div class="tabs"><span class="on">Today</span><span>Training</span><span>Nutrition</span></div>
+      </div>
+      <figcaption><b><span class="id">S-01</span>Loading</b>
+        <div class="note"><ul><li>Grey placeholder blocks in the shape of the content, not a full-screen spinner.</li><li>Long waits (AI) use a named step list instead (F5-10, F8-05).</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>8:00</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px"><span class="burger">☰</span>&nbsp; Nutrition</span><span></span></div>
+        <div class="grow center">
+          <div class="q" style="font-size:14px">Couldn't load your food log</div>
+          <div class="sub" style="max-width:220px">Check your connection and try again. Nothing you logged has been lost.</div>
+          <div class="btn primary" style="width:70%">Try again</div>
+        </div>
+        <div class="tabs"><span>Today</span><span>Training</span><span class="on">Nutrition</span></div>
+      </div>
+      <figcaption><b><span class="id">S-02</span>Error and retry</b>
+        <div class="note"><ul><li>Plain words, what to do next, reassurance about data. Never a code or "Something went wrong" alone.</li><li>Small failures (one card) show inline retry instead of a full screen.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:30</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Back</span><span></span></div>
+        <div class="q">Create your account</div>
+        <div class="field"><small>Name</small><b>Priya</b></div>
+        <div class="field err"><small>Email</small><b>priya@gmail</b></div>
+        <div class="errtxt">Enter a full email, like name@example.com</div>
+        <div class="field err"><small>Password</small>••••</div>
+        <div class="errtxt">Use at least 8 characters</div>
+        <div class="pinned"><div class="btn primary">Create account</div></div>
+      </div>
+      <figcaption><b><span class="id">S-03</span>Form validation</b>
+        <div class="note"><ul><li>Checked when leaving a field and on submit; message directly under the field, saying how to fix it.</li><li>Colour is never the only signal (bold outline + text).</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>13:20</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>✕</span><span></span></div>
+        <div class="grow center">
+          <div class="q" style="font-size:14px">Camera access is off</div>
+          <div class="sub" style="max-width:230px">Arcwell needs the camera to take progress or food photos. You can still log everything else.</div>
+          <div class="btn primary" style="width:80%">Open phone settings</div>
+          <div class="btn ghost" style="width:80%">Not now</div>
+        </div>
+      </div>
+      <figcaption><b><span class="id">S-04</span>Permission denied</b>
+        <div class="note"><ul><li>Same pattern for camera, photos and notifications: why it's needed, what still works, how to turn it on.</li><li>Asked first at the moment of use (e.g. CP-03); this screen appears only after a "no".</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+</body>
+</html>

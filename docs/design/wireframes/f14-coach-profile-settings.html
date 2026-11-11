@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arcwell Wireframes F14</title>
+<link rel="stylesheet" href="wireframe.css">
+</head>
+<body>
+<header>
+  <h1>Arcwell — Wireframes: F14 Coach — client profile sections, sign-up, profile and settings</h1>
+  <p>Drawn 2026-11-11. <b>Drawn only — not reviewed or approved, not tested with users.</b> Continues F13 (K-01 to K-13). Notes mark <b>Rule</b> (confirmed, DECISIONS.md / SPEC.md), <b>Proposal</b> (layout for review) or <b>Open</b> (needs a decision). Coach navigation is still a proposal.</p>
+  <div class="legend"><span class="l-primary">Primary action / selected</span><span>Secondary</span><span class="l-note">Rule · Proposal · Open</span></div>
+</header>
+
+<section class="flow">
+  <h2>Client profile — remaining sections</h2>
+  <p class="arrowrow">K-02 Overview · K-03 Training · then Nutrition · Recovery · Progress · Check-ins · Notes. Rule (SPEC): coach sees data only from the client's join date unless earlier history is granted.</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:10</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Rahul Verma</span><span></span></div>
+        <div class="chips"><span class="chip">Training</span><span class="chip sel">Nutrition</span><span class="chip">Recovery</span><span class="chip">Progress</span></div>
+        <div class="card"><b>Meal plan: Strength · 2,600 kcal</b><small>Targets: 2,600 kcal · 160 g protein</small><div class="btn" style="margin-top:6px">Edit Rahul's meal plan and targets</div></div>
+        <div class="grid2"><div class="card" style="margin:0"><b>5 / 7</b><small>days logged</small></div><div class="card" style="margin:0"><b>2,410</b><small>avg kcal (target 2,600)</small></div></div>
+        <div class="seclab">Food log</div>
+        <div class="inrow"><span class="t"><b>Mon · 2,350 kcal · P 142 g</b><small>Followed 3 of 4 planned meals · "ate out at lunch"</small></span><span class="r">›</span></div>
+        <div class="inrow"><span class="t"><b>Sun · 2,690 kcal · P 158 g</b><small>All planned meals</small></span><span class="r">›</span></div>
+        <div class="inrow"><span class="t"><b>Sat · not logged</b><small>&nbsp;</small></span><span class="r"></span></div>
+      </div>
+      <figcaption><b><span class="id">K-14</span>Client profile — nutrition</b>
+        <div class="note"><ul><li><span class="rule">SPEC:</span> meal plan adherence. Each day opens the client's log read-only (F5-01 layout).</li><li>Neutral wording: "not logged", no red.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:11</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Rahul Verma</span><span></span></div>
+        <div class="chips"><span class="chip">Nutrition</span><span class="chip sel">Recovery</span><span class="chip">Progress</span><span class="chip">Check-ins</span></div>
+        <div class="seg"><span class="on">7 days</span><span>30 days</span></div>
+        <div class="label">Sleep (hours)</div><div class="mini-chart"></div>
+        <div class="label">Soreness</div><div class="mini-chart"></div>
+        <div class="label">Fatigue</div><div class="mini-chart"></div>
+        <div class="open"><b>Coach recovery controls</b>What a coach can set for recovery isn't defined, so nothing is editable here yet.</div>
+      </div>
+      <figcaption><b><span class="id">K-15</span>Client profile — recovery</b>
+        <div class="note"><ul><li><span class="rule">D4:</span> sleep, soreness, fatigue only. Read-only view of the client's R-01 logs.</li><li><span class="opn">Open:</span> sleep score and coach recovery controls (D4, D7).</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:12</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Rahul Verma</span><span></span></div>
+        <div class="chips"><span class="chip">Recovery</span><span class="chip sel">Progress</span><span class="chip">Check-ins</span><span class="chip">Notes</span></div>
+        <div class="seg"><span class="on">Bodyweight</span><span>Measurements</span><span>Photos</span></div>
+        <div class="mini-chart" style="height:90px"></div>
+        <div class="kv"><span>Start (7 Oct)</span><b>83.5 kg</b></div>
+        <div class="kv"><span>Now</span><b>81.2 kg</b></div>
+        <div class="card"><small>Showing data from 7 Oct, when Rahul joined. Earlier history is only shown if Rahul allows it.</small></div>
+      </div>
+      <figcaption><b><span class="id">K-16</span>Client profile — progress</b>
+        <div class="note"><ul><li>The client's Physique data (PH-01 to PH-04), read-only.</li><li><span class="rule">SPEC:</span> join-date rule stated on screen.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:13</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Rahul Verma</span><span></span></div>
+        <div class="chips"><span class="chip">Progress</span><span class="chip sel">Check-ins</span><span class="chip">Notes</span></div>
+        <div class="kv"><span>Check-in day</span><b>Sunday 9:00 · <u>change</u></b></div>
+        <div class="inrow"><span class="t"><b>Week 5 <span class="pill">Overdue</span></b><small>Due Sun 10 Nov</small></span><span class="r">Remind</span></div>
+        <div class="inrow"><span class="t"><b>Week 4 <span class="pill ghost">Reviewed</span></b><small>−0.4 kg · no photos this week</small></span><span class="r">›</span></div>
+        <div class="inrow"><span class="t"><b>Week 3 <span class="pill ghost">Reviewed</span></b><small>−0.2 kg · 3 photos</small></span><span class="r">›</span></div>
+      </div>
+      <figcaption><b><span class="id">K-17</span>Client profile — check-ins</b>
+        <div class="note"><ul><li>Each row opens the coach review (F6-08); "change" opens the schedule (F6-10).</li><li><span class="rule">D12:</span> "no photos this week" shown neutrally.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:14</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Rahul Verma</span><span>+ Note</span></div>
+        <div class="chips"><span class="chip">Check-ins</span><span class="chip sel">Notes</span></div>
+        <div class="card"><small>🔒 Private to you. Rahul never sees these.</small></div>
+        <div class="card"><b>11 Nov</b><small>Knee sore on squats again. Swap to leg press 2 weeks, re-test.</small></div>
+        <div class="card"><b>20 Oct</b><small>Prefers training at 6 am. Vegetarian on Tuesdays.</small></div>
+      </div>
+      <figcaption><b><span class="id">K-18</span>Client profile — private notes</b>
+        <div class="note"><ul><li><span class="rule">Sitemap:</span> notes private to the coach.</li><li>Keyboard: new note opens a full-height text field.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<section class="flow">
+  <h2>Coach sign-up, profile and settings</h2>
+  <p class="arrowrow">Welcome "I'm a coach" → coach sign-up → F2-01 · Business → Coach profile / Settings</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>21:00</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Back</span><span></span></div>
+        <div class="q">Create your coach account</div>
+        <div class="sub">Coaching on Arcwell · <u>I'm training instead</u></div>
+        <div class="btn g">Continue with Google</div>
+        <div class="divider">or</div>
+        <div class="field"><small>Name</small>&nbsp;</div>
+        <div class="field"><small>Email</small>&nbsp;</div>
+        <div class="field"><small>Password</small>8+ characters</div>
+        <div class="pinned"><div class="btn primary">Create coach account</div><div class="tiny">By continuing you agree to the Coach Terms and Privacy Policy</div></div>
+      </div>
+      <figcaption><b><span class="id">K-19</span>Coach sign-up</b>
+        <div class="note"><ul><li>Coach version of F1-03; then email check (AC-06 pattern) → F2-01.</li><li>Coaches see no AI permission step (AI is an athlete feature).</li><li><span class="opn">Open:</span> role switching ("I'm training instead" link) — kept from F1-03 pending your decision.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>12:10</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Business</span><span>Save</span></div>
+        <div class="photo" style="width:64px;height:64px;border-radius:50%;border:1.5px dashed var(--ink);margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--muted)">Photo</div>
+        <div class="field"><small>Name clients see</small><b>Coach Joseph</b></div>
+        <div class="field"><small>City</small><b>Bengaluru</b></div>
+        <div class="field"><small>Specialisations</small><b>Fat loss · Strength</b></div>
+        <div class="field"><small>Bio</small>I help busy professionals lose fat and get strong.</div>
+        <div class="field"><small>Services</small><b>2 services · edit</b></div>
+        <div class="open"><b>Who sees this profile</b>No marketplace in v1 — currently only invite pages and the coach's own clients.</div>
+      </div>
+      <figcaption><b><span class="id">K-20</span>Edit coach profile</b>
+        <div class="note"><ul><li>Same fields as coach onboarding (F2-03 to F2-05).</li><li><span class="opn">Open:</span> certifications field (F2-04) — you said there's no certification check.</li><li>↕ Scrolls; keyboard keeps the active field visible.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>12:12</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Business</span><span style="color:var(--ink);font-weight:700">Settings</span><span></span></div>
+        <div class="mi">Notifications<span class="acc">new check-ins, messages, clients joining ›</span></div>
+        <div class="mi">Default check-in day<span class="acc">Sunday ›</span></div>
+        <div class="mi">Units<span class="acc">kg, cm ›</span></div>
+        <div class="mi">Privacy and Coach Terms<span class="chev">›</span></div>
+        <div class="mi">Export my data<span class="acc">AC-03 pattern ›</span></div>
+        <div class="mi">Help and support<span class="chev">›</span></div>
+        <div class="mi">Delete coach account<span class="chev">›</span></div>
+        <div class="open"><b>Deleting a coach account</b>What happens to their clients and plans.</div>
+        <div class="pinned"><div class="btn">Sign out</div></div>
+      </div>
+      <figcaption><b><span class="id">K-21</span>Coach settings</b>
+        <div class="note"><ul><li><span class="rule">SPEC:</span> export and deletion for every account. Delete uses the AC-04 pattern.</li><li><span class="opn">Open:</span> effect on clients when a coach deletes their account.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+</body>
+</html>

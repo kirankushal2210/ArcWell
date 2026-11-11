@@ -46,7 +46,7 @@ flowchart TD
 - Today by tier (contents pending, D2d) · waiting-for-plan state [C] · notifications open from ☰
 
 ### Training
-- Plan / programme landing — [F] 2–3 templates · [AI] AI plan · [C] coach's plan (not yet drawn)
+- Training landing — [F] 2–3 templates · [AI] AI plan · [C] coach's plan (T-01 to T-03; relation to menu Workouts / Programs open)
 - Workout preview → active workout (set logging, rest timer, swap, notes) → summary
 - Exercise detail · Workout history (also ☰ → Training → History)
 - Waiting for plan [C]
@@ -70,9 +70,9 @@ flowchart TD
 - Athletes never see the coach's review tools. Past check-ins visibility: open
 
 ### Side menu ☰ (all athletes, D9)
-- **Account:** profile · subscription · my coach [C] (history access, leave coach) · privacy and permissions (photos, AI permission) · units · export my data · help · delete account · sign out
+- **Account:** profile (edit, AC-07) · units (AC-08) · help (AC-09) · subscription · my coach [C] (history access, leave coach) · privacy and permissions (photos, AI permission) · units · export my data · help · delete account · sign out
 - **Notifications:** list + preferences
-- **Training:** Exercises · Workouts · Programs · History · Set Videos · Muscle Analytics — Pro: all (D10); Free: Programs limited to templates, others open
+- **Training:** Exercises (library, T-04) · Workouts · Programs · History · Set Videos · Muscle Analytics — Pro: all (D10); Free: Programs limited to templates, others open
 - **Gyms** — behaviour open
 - **Physique:** Bodyweight · Measurements · Photos · Charts — free for everyone (D5)
 
@@ -96,7 +96,7 @@ flowchart TD
 _Coach navigation below is a proposal; it has not been reviewed yet._
 
 ### Tab: Clients
-- Client list — sorted by "needs attention" (overdue check-in, low adherence, unread); filters: active, paused, leaving, completed
+- Client list — sorted by "needs attention" (K-01); client profile sections K-02, K-03, K-14 to K-18 (overdue check-in, low adherence, unread); filters: active, paused, leaving, completed
 - **Client profile**
   - Overview (adherence, recent activity, weight trend)
   - Training — assigned plan, workout logs, history
@@ -131,6 +131,9 @@ _Coach navigation below is a proposal; it has not been reviewed yet._
 - Settings — notifications, privacy, help, sign out
 
 ## 6. System screens (all roles)
+
+Reusable patterns: loading (S-01), error and retry (S-02), form validation (S-03), permission denied (S-04), offline (F4-09, F7-03).
+
 - Empty states (no clients, no workouts, no logs)
 - Offline banner; workout saved locally / syncing
 - Errors and retry
