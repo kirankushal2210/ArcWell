@@ -8,7 +8,7 @@ Wireframe status: **all v1 screens drawn (F1–F18); none reviewed screen by scr
 
 There are two sources of decisions:
 
-- **Founder** (D1–D12, and D13–D24 from the founder's "Executive Defaults" on 2026-11-11).
+- **Founder** (D1–D12; D13–D24 from the founder's "Executive Defaults" on 2026-11-11; D46 font).
 - **Default** (D25–D45). The founder told Claude to finish the wireframes without further questions. Where the founder's list didn't cover an open item, Claude chose a conservative default. These are applied so the wireframes are complete, but the founder did not pick them individually. **Review them before the build.**
 
 ## Confirmed — founder
@@ -45,6 +45,7 @@ There are two sources of decisions:
 | D22 | 2026-11-11 | **Out-of-scope AI requests** show a standard "I can't help with that" state. No routing to coaches (no marketplace). Replaces SPEC's earlier "routed to coaches". |
 | D23 | 2026-11-11 | **Navigation is final:** coach tabs Clients · Check-ins · Plans · Messages · Business; Today layouts N-01 to N-03. |
 | D24 | 2026-11-11 | **Visual direction:** dark charcoal backgrounds, electric blue / cyan accents, minimal premium UI (from the founder's Bulky AI prompt). The green palette is dropped. No streaks or XP. |
+| D46 | 2026-11-11 | **Font:** Inter for all text, headings included. No second typeface. |
 
 ## Applied defaults — chosen by Claude, review before build
 

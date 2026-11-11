@@ -379,4 +379,4 @@ Tracked here as screens are designed (Wireframe → Mockup → Built). **✅ in 
 | 2026-11-10 | DESIGN.md created; working assumptions in section 0 (adopted as v1 defaults on 2026-11-11, D45) |
 | 2026-11-11 | Founder decisions D1–D12 recorded in [DECISIONS.md](DECISIONS.md); section 3 rewritten; F10–F13 drawn; existing screens updated |
 | 2026-11-11 | F14–F16 drawn. Founder Executive Defaults (D13–D24) and Claude-applied defaults (D25–D45) recorded; every open box resolved; F17–F18 drawn; tokens moved from green to electric blue / cyan (D24) |
-| 2026-11-11 | design-prompt.md rewritten per the "Designing UI without the slop" guide: shared design language, negative list, one prompt per screen with references, variations and a critique pass. Gradient token removed. Icons: Lucide. Heading font left as an open visual choice |
+| 2026-11-11 | design-prompt.md rewritten per the "Designing UI without the slop" guide: shared design language, negative list, one prompt per screen with references, variations and a critique pass. Gradient token removed. Icons: Lucide. Heading font: founder kept Inter for everything (D46) |

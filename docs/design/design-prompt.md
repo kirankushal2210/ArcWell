@@ -318,6 +318,6 @@ Then fix and re-run once. This is not a substitute for testing with real users (
 - [ ] No AI shown to human-coached athletes; no video; kg only
 - [ ] Recorded in DESIGN.md §7 (Mockup column)
 
-## Open visual choice
+## Font
 
-- **Heading font.** The guide flags generic geometric sans fonts as a sign of AI-made design, and Inter is the most common. Inter stays for numbers and body text either way. Whether headings get a font with more character is the founder's call; until then, everything uses Inter.
+- **Inter for everything, headings included** (founder decision D46, 2026-11-11). Character comes from the type scale, weight and tabular numerals, not a second typeface.
