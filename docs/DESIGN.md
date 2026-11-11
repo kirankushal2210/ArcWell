@@ -116,7 +116,6 @@ Dark theme (default):
 | `brand` | `#3D8BFF` | Primary actions, brand accent (electric blue) |
 | `onBrand` | `#04101F` | Text on brand buttons |
 | `accent` | `#22D3EE` | Highlights, charts, focus rings (cyan) |
-| `brandGradient` | `#3D8BFF → #22D3EE` | Used sparingly: hero cards and the paywall only |
 | `training` | `#22D3EE` | Training pillar (cyan, shares the accent) |
 | `nutrition` | `#F5A524` | Nutrition pillar |
 | `recovery` | `#8B7CFF` | Recovery pillar |
@@ -124,7 +123,7 @@ Dark theme (default):
 | `warning` | `#F59E0B` | Needs attention |
 | `danger` | `#EF4444` | Destructive actions, errors only |
 
-Visual direction per D24: dark charcoal, electric blue / cyan accents, minimal and premium. Values are draft; the main pairs pass WCAG AA (checked 2026-11-11: text 16.9:1, muted 7.4:1, brand on bg 5.6:1, text on brand 5.8:1). No streaks, XP or badges. Light theme: same roles; values to be defined in the design-system step. All text/background pairs must meet WCAG AA contrast (4.5:1 for body text).
+Visual direction per D24: dark charcoal, electric blue / cyan accents, minimal and premium. Solid colours only: no gradients and no glows (design-prompt.md negative list). Values are draft; the main pairs pass WCAG AA (checked 2026-11-11: text 16.9:1, muted 7.4:1, brand on bg 5.6:1, text on brand 5.8:1). No streaks, XP or badges. Light theme: same roles; values to be defined in the design-system step. All text/background pairs must meet WCAG AA contrast (4.5:1 for body text).
 
 ### Typography
 
@@ -380,3 +379,4 @@ Tracked here as screens are designed (Wireframe → Mockup → Built). **✅ in 
 | 2026-11-10 | DESIGN.md created; working assumptions in section 0 (adopted as v1 defaults on 2026-11-11, D45) |
 | 2026-11-11 | Founder decisions D1–D12 recorded in [DECISIONS.md](DECISIONS.md); section 3 rewritten; F10–F13 drawn; existing screens updated |
 | 2026-11-11 | F14–F16 drawn. Founder Executive Defaults (D13–D24) and Claude-applied defaults (D25–D45) recorded; every open box resolved; F17–F18 drawn; tokens moved from green to electric blue / cyan (D24) |
+| 2026-11-11 | design-prompt.md rewritten per the "Designing UI without the slop" guide: shared design language, negative list, one prompt per screen with references, variations and a critique pass. Gradient token removed. Icons: Lucide. Heading font left as an open visual choice |
