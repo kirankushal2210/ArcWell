@@ -9,7 +9,7 @@
 <body>
 <header>
   <h1>Arcwell — Wireframes: F14 Coach — client profile sections, sign-up, profile and settings</h1>
-  <p>Drawn 2026-11-11. <b>Drawn only — not reviewed or approved, not tested with users.</b> Continues F13 (K-01 to K-13). Notes mark <b>Rule</b> (confirmed, DECISIONS.md / SPEC.md), <b>Proposal</b> (layout for review) or <b>Open</b> (needs a decision). Coach navigation is still a proposal.</p>
+  <p>Drawn 2026-11-11. <b>Drawn only — not reviewed or approved, not tested with users.</b> Continues F13 (K-01 to K-13). Notes mark <b>Rule</b> (confirmed, DECISIONS.md / SPEC.md), <b>Proposal</b> (layout for review) or <b>Open</b> (needs a decision). Coach navigation is final for v1 (D23).</p>
   <div class="legend"><span class="l-primary">Primary action / selected</span><span>Secondary</span><span class="l-note">Rule · Proposal · Open</span></div>
 </header>
 
@@ -43,10 +43,11 @@
         <div class="label">Sleep (hours)</div><div class="mini-chart"></div>
         <div class="label">Soreness</div><div class="mini-chart"></div>
         <div class="label">Fatigue</div><div class="mini-chart"></div>
-        <div class="open"><b>Coach recovery controls</b>What a coach can set for recovery isn't defined, so nothing is editable here yet.</div>
+        <div class="label">Sleep score</div><div class="mini-chart"></div>
+        <div class="card"><b>Sleep target 7.5 h · note</b><small>"Lights out by 11 on training days." · <u>Edit (K-24)</u></small></div>
       </div>
       <figcaption><b><span class="id">K-15</span>Client profile — recovery</b>
-        <div class="note"><ul><li><span class="rule">D4:</span> sleep, soreness, fatigue only. Read-only view of the client's R-01 logs.</li><li><span class="opn">Open:</span> sleep score and coach recovery controls (D4, D7).</li></ul></div></figcaption>
+        <div class="note"><ul><li><span class="rule">D4:</span> sleep, soreness, fatigue only. Read-only view of the client's R-01 logs.</li><li><span class="rule">D18, D31:</span> sleep score trend shown; the coach sets a sleep target and note in K-24.</li></ul></div></figcaption>
     </figure>
 
     <figure>
@@ -113,7 +114,7 @@
         <div class="pinned"><div class="btn primary">Create coach account</div><div class="tiny">By continuing you agree to the Coach Terms and Privacy Policy</div></div>
       </div>
       <figcaption><b><span class="id">K-19</span>Coach sign-up</b>
-        <div class="note"><ul><li>Coach version of F1-03; then email check (AC-06 pattern) → F2-01.</li><li>Coaches see no AI permission step (AI is an athlete feature).</li><li><span class="opn">Open:</span> role switching ("I'm training instead" link) — kept from F1-03 pending your decision.</li></ul></div></figcaption>
+        <div class="note"><ul><li>Coach version of F1-03; then email check (AC-06 pattern) → F2-01.</li><li>Coaches see no AI permission step (AI is an athlete feature).</li><li><span class="rule">D44:</span> one role per account. "I'm training instead" only switches this sign-up screen to the athlete version, before an account exists.</li></ul></div></figcaption>
     </figure>
 
     <figure>
@@ -126,10 +127,11 @@
         <div class="field"><small>Specialisations</small><b>Fat loss · Strength</b></div>
         <div class="field"><small>Bio</small>I help busy professionals lose fat and get strong.</div>
         <div class="field"><small>Services</small><b>2 services · edit</b></div>
-        <div class="open"><b>Who sees this profile</b>No marketplace in v1 — currently only invite pages and the coach's own clients.</div>
+        <div class="field"><small>Certifications (optional · self-reported)</small><b>ACE-CPT</b></div>
+        <div class="card"><small>Shown on your invite page and to your clients. Certifications aren't checked by Arcwell.</small></div>
       </div>
       <figcaption><b><span class="id">K-20</span>Edit coach profile</b>
-        <div class="note"><ul><li>Same fields as coach onboarding (F2-03 to F2-05).</li><li><span class="opn">Open:</span> certifications field (F2-04) — you said there's no certification check.</li><li>↕ Scrolls; keyboard keeps the active field visible.</li></ul></div></figcaption>
+        <div class="note"><ul><li>Same fields as coach onboarding (F2-03 to F2-05).</li><li><span class="rule">D43:</span> audience is the invite page and own clients. Certifications are optional, self-reported and unverified (SPEC: no certificate checks).</li><li>↕ Scrolls; keyboard keeps the active field visible.</li></ul></div></figcaption>
     </figure>
 
     <figure>
@@ -143,11 +145,11 @@
         <div class="mi">Export my data<span class="acc">AC-03 pattern ›</span></div>
         <div class="mi">Help and support<span class="chev">›</span></div>
         <div class="mi">Delete coach account<span class="chev">›</span></div>
-        <div class="open"><b>Deleting a coach account</b>What happens to their clients and plans.</div>
+        <div class="card"><small>Deleting moves all your clients to the free plan (K-28).</small></div>
         <div class="pinned"><div class="btn">Sign out</div></div>
       </div>
       <figcaption><b><span class="id">K-21</span>Coach settings</b>
-        <div class="note"><ul><li><span class="rule">SPEC:</span> export and deletion for every account. Delete uses the AC-04 pattern.</li><li><span class="opn">Open:</span> effect on clients when a coach deletes their account.</li></ul></div></figcaption>
+        <div class="note"><ul><li><span class="rule">SPEC:</span> export and deletion for every account. Delete uses the AC-04 pattern.</li><li><span class="rule">D42:</span> clients revert to Free as if they had left, and are told; their history stays with them (K-28).</li></ul></div></figcaption>
     </figure>
 
   </div>

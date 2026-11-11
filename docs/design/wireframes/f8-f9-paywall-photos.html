@@ -58,10 +58,10 @@
         <div class="feat"><span>Recovery tracking<small>Sleep, soreness and fatigue trends</small></span></div>
         <div class="plan sel"><span class="badge">Best value</span><span>Yearly<small>₹___ / month, billed yearly</small></span><span class="price">₹___<small>/ year</small></span></div>
         <div class="plan"><span>Monthly<small>Cancel any time</small></span><span class="price">₹___<small>/ month</small></span></div>
-        <div class="pinned"><div class="btn primary">Start 7-day free trial</div><div class="tiny">After the trial: billing not decided yet</div></div>
+        <div class="pinned"><div class="btn primary">Start 7-day free trial</div><div class="tiny">Free for 7 days, then ₹___ / year through Google Play unless you cancel</div></div>
       </div>
       <figcaption><b><span class="id">F8-01</span>Paywall</b>
-        <div class="note"><ul><li><span class="rule">Rule D6:</span> one-week AI trial. <span class="opn">Open:</span> trial billing and what happens when it ends.</li><li>Prices are placeholders (pricing not decided). Shown in INR, per month and per year.</li><li>Four benefits only, in plain language. No countdown timers, fake discounts or "only 2 spots left".</li><li><b>Open:</b> free trial length (7 days shown) — or no trial?</li></ul></div></figcaption>
+        <div class="note"><ul><li><span class="rule">D6, D17:</span> 7-day trial, then Google Play charges the chosen plan. If not paid, the user goes back to Free and Recovery hides (TL-02).</li><li><span class="rule">D45:</span> tier name "Arcwell Plus". Prices are set in Play Console, so ₹___ stays a placeholder here.</li><li>Four benefits only, in plain language. No countdown timers, fake discounts or "only 2 spots left".</li></ul></div></figcaption>
     </figure>
 
     <figure>
@@ -72,13 +72,13 @@
         <div class="timeline">
           <div><b>Today</b><small>Full access to Arcwell Plus. Your AI plan is built straight away.</small></div>
           <div><b>Day 5</b><small>Reminder that your trial is ending (proposal).</small></div>
-          <div><b>Day 7</b><small>Your trial ends. What happens next is not decided yet.</small></div>
+          <div><b>Day 7</b><small>Google Play charges your plan unless you cancelled. Not paid? You go back to the free plan.</small></div>
         </div>
         <div class="card"><small>You can cancel in two taps from Profile → Subscription, or in Google Play.</small></div>
         <div class="pinned"><div class="btn primary">Start free trial</div></div>
       </div>
       <figcaption><b><span class="id">F8-02</span>Trial timeline</b>
-        <div class="note"><ul><li><span class="rule">Rule D6:</span> trial lasts one week. <span class="opn">Open:</span> billing at the end of the trial; the Day-5 reminder is a proposal.</li><li>Can be part of F8-01 (below the plans) or a second step — test both.</li><li>Day-5 reminder is a promise: it must be sent as a push notification and email.</li></ul></div></figcaption>
+        <div class="note"><ul><li><span class="rule">D17, D34:</span> one week, then the hard paywall. Day-5 reminder in the app (TL-01) and by push.</li><li>Can be part of F8-01 (below the plans) or a second step — test both.</li><li>Day-5 reminder is a promise: it must be sent as a push notification and email.</li></ul></div></figcaption>
     </figure>
 
     <figure>
@@ -93,7 +93,7 @@
         <div class="pinned"><div class="btn primary">Allow and continue</div><div class="btn ghost">Not now</div></div>
       </div>
       <figcaption><b><span class="id">F8-03</span>AI consent</b>
-        <div class="note"><ul><li><span class="rule">Rule D8:</span> second AI permission step, at first AI activation. Never shown to human-coached athletes.</li><li><span class="opn">Open:</span> what "Not now" does to the trial or subscription. Non-AI features stay available either way (D8).</li><li><span class="prop">Proposal:</span> show this before the Google Play purchase so nobody pays and then declines.</li><li>Clear limits of AI advice, in the flow rather than in the terms.</li><li>Wording about photo deletion depends on the AI provider's data terms — must be verified before launch.</li></ul></div></figcaption>
+        <div class="note"><ul><li><span class="rule">Rule D8:</span> second AI permission step, at first AI activation. Never shown to human-coached athletes.</li><li><span class="rule">D35:</span> shown before the Google Play purchase. "Not now" returns to the paywall and no trial starts. Non-AI features stay available either way (D8).</li><li><span class="rule">D20:</span> turning AI off later hides AI features but keeps the subscription running (AI-03).</li><li>Clear limits of AI advice, in the flow rather than in the terms.</li><li>Wording about photo deletion depends on the AI provider's data terms — must be verified before launch.</li></ul></div></figcaption>
     </figure>
 
     <figure>
@@ -167,12 +167,12 @@
       <div class="phone">
         <div class="status"><span>9:00</span><span>▮▮ ◔</span></div>
         <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px"><span class="burger">☰</span>&nbsp; Training</span><span></span></div>
-        <div class="card" style="border-color:var(--ink);border-width:2px"><b>Your Arcwell Plus has ended</b><small>Your workouts, meals and progress are all still here. Your AI plan is paused — you can keep following it as a normal programme.</small><div class="btn primary" style="margin-top:7px">Restart Plus</div><div class="btn ghost">Switch to a free starter programme</div></div>
+        <div class="card" style="border-color:var(--ink);border-width:2px"><b>Your Arcwell Plus has ended</b><small>Your workouts, meals and progress are all still here. Your AI plan stays as a read-only plan — you can keep following it.</small><div class="btn primary" style="margin-top:7px">Restart Plus</div><div class="btn ghost">Switch to the free starter workouts</div></div>
         <div class="card"><b>AI plan · Week 6 (paused)</b><small>Won't adjust automatically</small></div>
         <div class="tabs"><span>Today</span><span class="on">Training</span><span>Nutrition</span></div>
       </div>
       <figcaption><b><span class="id">F8-08</span>Subscription ended</b>
-        <div class="note"><ul><li><span class="rule">Rule D2b:</span> free bottom bar; ☰ opens the side menu (D9).</li><li>Nothing is deleted; history stays. The last AI plan stays usable but stops adapting; macros and recovery go back to locked.</li><li><span class="opn">Open:</span> what happens to the AI plan when paid access ends ("paused" above is a proposal, not a rule).</li><li><span class="rule">Rule D5a:</span> Recovery disappears from the bottom bar. <span class="opn">Open:</span> what happens to recovery history.</li></ul></div></figcaption>
+        <div class="note"><ul><li><span class="rule">Rule D2b:</span> free bottom bar; ☰ opens the side menu (D9).</li><li>Nothing is deleted; history stays. The last AI plan stays usable but stops adapting; macros lock and Recovery is hidden.</li><li><span class="rule">D33:</span> the AI plan stays usable, read-only, and stops adapting.</li><li><span class="rule">D5a, D32:</span> Recovery disappears from the bottom bar. Recovery history is kept and comes back on resubscribing or joining a coach.</li></ul></div></figcaption>
     </figure>
 
   </div>
@@ -298,14 +298,13 @@
 </section>
 
 <section class="flow">
-  <h2>Open questions from these wireframes</h2>
+  <h2>Resolved for v1 (2026-11-11)</h2>
   <div class="note" style="max-width:820px"><ul>
-    <li><b>F8-01:</b> Prices (monthly and yearly, in INR) and the tier name ("Arcwell Plus" is a placeholder).</li>
-    <li><b>F8-01:</b> Free trial — 7 days, 3 days, or none? Recommendation: 7 days, long enough to follow the AI plan for a full week.</li>
-    <li><b>F8-03:</b> Exact wording on photo deletion depends on the AI provider's data terms (Groq) — verify before launch.</li>
-    <li><b>F8-08:</b> After the subscription ends, keep the last AI plan usable (paused) or switch to a starter template? Recommendation: keep it.</li>
-    <li><b>F9-05:</b> Should coaches be able to remove Arcwell branding from exports on a higher coach plan?</li>
-    <li><b>F9-06:</b> When an athlete leaves a coach, should photo approvals be withdrawn automatically? Recommendation: ask the athlete at the moment they leave.</li>
+    <li><b>F8-01:</b> tier name "Arcwell Plus"; prices set in Play Console (D45). 7-day trial (D6, D17).</li>
+    <li><b>F8-03:</b> photo-deletion wording depends on Groq's data terms — a pre-launch check in PLAN.md.</li>
+    <li><b>F8-08:</b> the last AI plan stays usable, read-only (D33).</li>
+    <li><b>F9-05:</b> removing Arcwell branding from exports moves to v1.1 (D45).</li>
+    <li><b>F9-06:</b> on leaving a coach, the athlete chooses to keep or withdraw shared photos (D38, L-02).</li>
   </ul></div>
 </section>
 </body>

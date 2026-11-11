@@ -98,7 +98,7 @@
         <div class="pinned"><div class="btn primary">Continue</div></div>
       </div>
       <figcaption><b><span class="id">F1-05</span>Consent</b>
-        <div class="note"><ul><li>DPDP: plain-language, specific, reversible consent. Health data is required; photos optional.</li><li><span class="rule">Rule D8:</span> first AI permission step, at sign-up, with its purpose. Declining never blocks non-AI features.</li><li><span class="opn">Open:</span> whether people joining through a coach's link (who never see AI) get this step.</li><li><span class="rule">D12:</span> photos stay optional; check-ins can be sent without them (CP-03).</li></ul></div></figcaption>
+        <div class="note"><ul><li>DPDP: plain-language, specific, reversible consent. Health data is required; photos optional.</li><li><span class="rule">Rule D8:</span> first AI permission step, at sign-up, with its purpose. Declining never blocks non-AI features.</li><li><span class="rule">D44:</span> people joining through a coach's link never see the AI step, because coached athletes never see AI (F1-05b in F17).</li><li><span class="rule">D12:</span> photos stay optional; check-ins can be sent without them (CP-03).</li></ul></div></figcaption>
     </figure>
 
   </div>
@@ -161,7 +161,7 @@
         <div class="pinned"><div class="btn primary">Continue</div></div>
       </div>
       <figcaption><b><span class="id">F1-08</span>Body stats</b>
-        <div class="note"><ul><li>↕ Scrolls on smaller phones; Continue stays pinned at the bottom.</li><li>Steppers with large ± (tap or type); cm by default, ft/in for those who think in feet.</li><li><b>Open:</b> sex isn't in the agreed onboarding list, but calorie formulas need it. "Prefer not to say" uses an average. Confirm.</li></ul></div></figcaption>
+        <div class="note"><ul><li>↕ Scrolls on smaller phones; Continue stays pinned at the bottom.</li><li>Steppers with large ± (tap or type); cm by default, ft/in for those who think in feet.</li><li><span class="rule">D44:</span> sex is optional, used only for the calorie estimate. "Prefer not to say" uses an average.</li></ul></div></figcaption>
     </figure>
 
     <figure>
@@ -243,17 +243,17 @@
         <div class="q">You're set, Priya</div>
         <div class="sub">Based on your answers</div>
         <div class="card"><b>1,850 kcal a day</b><small>to lose about 0.4 kg a week</small></div>
-        <div class="label">Pick a starter programme</div>
-        <div class="card" style="border-color:var(--ink);border-width:2px"><b>Full body · 3 days</b><small>45 min · gym · beginner-friendly</small></div>
-        <div class="card"><b>Upper / lower · 4 days</b><small>45 min · gym</small></div>
-        <div class="card"><b>Home strength · 3 days</b><small>30 min · dumbbells</small></div>
+        <div class="label">Your starter workouts</div>
+        <div class="card" style="border-color:var(--ink);border-width:2px"><b>Full body A</b><small>45 min · gym · beginner-friendly</small></div>
+        <div class="card"><b>Full body B</b><small>45 min · gym</small></div>
+        <div class="card"><b>Full body C</b><small>45 min · gym</small></div>
         <div class="pinned">
-          <div class="btn primary">Start with this programme</div>
+          <div class="btn primary">Start Full body A</div>
           <div class="btn ghost">Have a coach? Enter invite code</div>
         </div>
       </div>
       <figcaption><b><span class="id">F1-13a</span>Summary — free athlete</b>
-        <div class="note"><ul><li>Immediate value: a calorie target and a programme on day one.</li><li>No paywall here (research: paywalls in onboarding hurt trust). AI tier is introduced later, at natural moments.</li><li><span class="rule">Rule D5:</span> free nutrition is calories only, so no protein target here.</li></ul></div></figcaption>
+        <div class="note"><ul><li>Immediate value: a calorie target and workouts on day one.</li><li><span class="rule">D13, D27:</span> free users get 2–3 standalone starter workouts (templates), matched to the equipment answer. Multi-week Programs are Pro.</li><li><span class="rule">D44:</span> no trial offered during onboarding.</li><li>No paywall here (research: paywalls in onboarding hurt trust). AI tier is introduced later, at natural moments.</li><li><span class="rule">Rule D5:</span> free nutrition is calories only, so no protein target here.</li></ul></div></figcaption>
     </figure>
 
     <figure>
@@ -323,12 +323,12 @@
 </section>
 
 <section class="flow">
-  <h2>Open questions from these wireframes</h2>
+  <h2>Resolved for v1 (2026-11-11)</h2>
   <div class="note" style="max-width:820px"><ul>
-    <li><b>F1-08:</b> Add "sex (for calorie calculation)" to onboarding? Needed for accurate targets.</li>
-    <li><b>F1-12:</b> Add an optional allergies / foods-to-avoid field?</li>
-    <li><b>F1-13a:</b> Show protein guidance to free users, or calories only?</li>
-    <li><b>F3-01:</b> Invite links need a small web page on an Arcwell domain (link preview + redirect). Confirm domain.</li>
+    <li><b>F1-08:</b> sex is optional, for calorie estimates only (D44).</li>
+    <li><b>F1-12:</b> allergies / foods-to-avoid field moved to v1.1 (D45).</li>
+    <li><b>F1-13a:</b> free users see calories only, no protein guidance (D5).</li>
+    <li><b>F3-01:</b> the invite web page needs a domain — a setup task in PLAN.md, not a design decision.</li>
   </ul></div>
 </section>
 </body>

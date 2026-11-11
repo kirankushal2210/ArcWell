@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arcwell Wireframes F18</title>
+<link rel="stylesheet" href="wireframe.css">
+<style>
+  .empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 10px 6px; }
+  .empty .ill { width: 56px; height: 56px; border-radius: 14px; background: var(--fill); margin-bottom: 10px; }
+  .empty b { font-size: 13px; display: block; margin-bottom: 4px; }
+  .empty small { font-size: 10.5px; color: var(--muted); display: block; max-width: 210px; }
+  .empty .btn { width: 100%; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Arcwell — Wireframes: F18 Coach recovery targets, client completion, limits, billing lapse and account deletion</h1>
+  <p>Drawn 2026-11-11 from DECISIONS.md D23 (final coach tabs) and the applied defaults D31, D39–D42. <b>Drawn only — not reviewed screen by screen, not tested with users.</b> Notes mark <b>Rule</b> with the decision ID.</p>
+  <div class="legend"><span class="l-primary">Primary action / selected</span><span>Secondary</span><span class="l-note">Rule</span></div>
+</header>
+
+<section class="flow">
+  <h2>Recovery target and completing a client</h2>
+  <p class="arrowrow">K-15 / K-08 / F2-10 → set sleep target and note (K-24) → athlete sees it on Recovery (R-04) · K-04 Completed → confirm (K-30) → athlete sees L-03</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:15</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Rahul Verma</span><span></span></div>
+        <div class="dimmed"></div>
+        <div class="sheet" style="z-index:6">
+          <div class="grab"></div>
+          <div class="q" style="font-size:14px">Recovery guidance for Rahul</div>
+          <div class="label">Nightly sleep target</div>
+          <div class="stepper"><span class="pm">−</span><span class="val">7.5 <small>hours</small></span><span class="pm">+</span></div>
+          <div class="field" style="height:56px"><small>Note for Rahul (optional)</small>Lights out by 11 on training days.</div>
+          <div class="card"><small>Rahul sees this on his Recovery screen. Last 7 days: average 6.4 h, sleep score 68.</small></div>
+          <div class="btn primary">Save</div>
+        </div>
+        <div class="tabs"><span class="on">Clients</span><span>Check-ins</span><span>Plans</span><span>Messages</span><span>Business</span></div>
+      </div>
+      <figcaption><b><span class="id">K-24</span>Set sleep target and recovery note</b>
+        <div class="note"><ul><li><span class="rule">D31:</span> the coach sets a nightly sleep target and an optional note. That's all; no routines (D4).</li><li><span class="rule">D7:</span> this replaces any other recovery guidance the athlete had. The athlete sees it in R-04.</li><li>Opened from K-15, K-08 and F2-10.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:20</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Rahul Verma</span><span></span></div>
+        <div class="dimmed"></div>
+        <div class="sheet" style="z-index:6">
+          <div class="grab"></div>
+          <div class="q" style="font-size:14px">Mark Rahul as completed?</div>
+          <div class="card"><small>• Your access to Rahul's data ends now<br>• Rahul moves to the free plan and keeps your current plan, read-only<br>• Rahul keeps all his history; you keep your private notes<br>• The chat closes; you can't message Rahul in Arcwell</small></div>
+          <div class="btn primary">Mark as completed</div>
+          <div class="btn ghost">Cancel</div>
+        </div>
+        <div class="tabs"><span class="on">Clients</span><span>Check-ins</span><span>Plans</span><span>Messages</span><span>Business</span></div>
+      </div>
+      <figcaption><b><span class="id">K-30</span>Complete a client — confirm</b>
+        <div class="note"><ul><li><span class="rule">D39:</span> Completed has the same effect as the athlete leaving (D21). The athlete sees L-03.</li><li><span class="rule">SPEC:</span> coach access ends immediately; the athlete keeps all history. <span class="rule">D38:</span> the athlete is asked about shared photos.</li><li>The client stays in the coach's Completed filter (K-01) as a name only.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<section class="flow">
+  <h2>Client limit and coach billing lapse</h2>
+  <p class="arrowrow">At the limit: coach banner (K-25), invite page for new people (K-26) · payment fails: grace banner, then paused actions (K-27)</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:00</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px">Clients</span><span>+ Invite</span></div>
+        <div class="card" style="border-color:var(--ink);border-width:2px"><b>You're at your limit: 40 of 40 clients</b><small>New people can't join through your link right now. Your current clients aren't affected.</small><div class="btn" style="margin-top:6px">See plans (K-13)</div></div>
+        <div class="filters"><span class="on">Needs attention · 3</span><span>Active · 37</span><span>Paused · 3</span></div>
+        <div class="inrow"><span class="av"></span><span class="t"><b>Rahul Verma</b><small>Check-in overdue</small></span><span class="r">›</span></div>
+        <div class="inrow"><span class="av"></span><span class="t"><b>Sneha Reddy</b><small>Low adherence</small></span><span class="r">›</span></div>
+        <div class="tabs"><span class="on">Clients</span><span>Check-ins</span><span>Plans</span><span>Messages</span><span>Business</span></div>
+      </div>
+      <figcaption><b><span class="id">K-25</span>Client limit reached (coach)</b>
+        <div class="note"><ul><li><span class="rule">D40:</span> at the limit, new joins are blocked; existing clients are unaffected.</li><li><span class="rule">SPEC:</span> limits are plan settings, so the number comes from the coach's plan.</li><li>Moving a client to Completed frees a place.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="avatar"></div>
+        <div class="q" style="text-align:center">Coach Joseph Mathew</div>
+        <div class="sub" style="text-align:center">Fat loss · Strength · Bengaluru</div>
+        <div class="card" style="border-color:var(--ink);border-width:2px"><b>Joseph isn't taking new clients right now</b><small>Ask Joseph when a place opens up. You can still use Arcwell on your own in the meantime.</small></div>
+        <div class="pinned"><div class="btn primary">Use Arcwell on my own</div><div class="btn ghost">Close</div></div>
+      </div>
+      <figcaption><b><span class="id">K-26</span>Invite page — coach is full (athlete)</b>
+        <div class="note"><ul><li><span class="rule">D40:</span> replaces F3-02's "Join Joseph" when the coach is at their limit.</li><li>No client count is shown. "Use Arcwell on my own" goes to normal sign-up (F1-03) as a free athlete.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:00</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px">Clients</span><span style="opacity:.4">+ Invite</span></div>
+        <div class="card" style="border-color:var(--ink);border-width:2px"><b>Your Arcwell payment didn't go through</b><small>Grace period: 3 days left. After that, inviting clients and assigning or editing plans pause until you pay. Your clients aren't affected.</small><div class="btn primary" style="margin-top:6px">Open billing website</div></div>
+        <div class="card"><small>After the grace period this banner says <b style="display:inline">"Inviting and plan changes are paused"</b>, and those buttons are disabled. Chat, check-in reviews and client data still work.</small></div>
+        <div class="inrow"><span class="av"></span><span class="t"><b>Rahul Verma</b><small>Check-in overdue</small></span><span class="r">›</span></div>
+        <div class="tabs"><span class="on">Clients</span><span>Check-ins</span><span>Plans</span><span>Messages</span><span>Business</span></div>
+      </div>
+      <figcaption><b><span class="id">K-27</span>Coach billing lapsed</b>
+        <div class="note"><ul><li><span class="rule">D41:</span> 7-day grace, then no inviting and no assigning or editing plans until paid. Clients never notice.</li><li><span class="rule">SPEC:</span> payment through Razorpay outside the app; "Open billing website" is the K-13 link.</li><li>Banner on Clients, Plans and Business until resolved.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<section class="flow">
+  <h2>Deleting a coach account</h2>
+  <p class="arrowrow">K-21 Delete coach account → confirm (K-28) → each client sees K-29, then the L-03 free-plan summary</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>12:15</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Settings</span><span></span></div>
+        <div class="q">Delete your coach account?</div>
+        <div class="card"><small>• All 32 clients move to the free plan and are told by notification<br>• Each keeps your current plan, read-only, and all their history<br>• Your templates, notes, leads and transformations are deleted<br>• Approved transformation photos are removed from your profile</small></div>
+        <div class="card"><small>Paying for Arcwell? Cancel your Razorpay subscription on the billing website first.</small></div>
+        <div class="card"><small>Want a copy first? <u>Export my data</u> (X-09)</small></div>
+        <div class="field"><small>Type DELETE to confirm</small>&nbsp;</div>
+        <div class="pinned"><div class="btn primary">Delete coach account</div><div class="btn ghost">Keep my account</div></div>
+      </div>
+      <figcaption><b><span class="id">K-28</span>Delete coach account — confirm</b>
+        <div class="note"><ul><li><span class="rule">SPEC:</span> deletion for every account (AC-04 pattern, irreversible, export offered first).</li><li><span class="rule">D42:</span> every client reverts to Free as if they had left (D21); their history stays with them.</li><li>↕ Scrolls; the confirm field and button stay above the keyboard.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>12:30</span><span>▮▮ ◔</span></div>
+        <div class="empty">
+          <div class="ill"></div>
+          <b>Coach Joseph has closed their Arcwell account</b>
+          <small>Your coaching with Joseph has ended. You keep all your workouts, logs and history, and Joseph's plan stays in Training, read-only.</small>
+        </div>
+        <div class="card"><small>• You're on the free plan: Today · Training · Nutrition<br>• Recovery is hidden; your recovery history is kept</small></div>
+        <div class="pinned"><div class="btn primary">Continue</div></div>
+      </div>
+      <figcaption><b><span class="id">K-29</span>Coach account closed (athlete)</b>
+        <div class="note"><ul><li><span class="rule">D42, D21:</span> shown once to each client, then the app opens with the free bar (L-03 layout).</li><li>Shared transformation photos are already removed with the coach's account, so there's no photo question here.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+</body>
+</html>

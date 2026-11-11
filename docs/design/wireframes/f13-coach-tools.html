@@ -9,7 +9,7 @@
 <body>
 <header>
   <h1>Arcwell — Wireframes: F13 Coach tools — clients, plan builders, leads, business</h1>
-  <p>Drawn 2026-11-11 in the review pass, from SPEC.md's coach workspace scope. <b>Drawn only — not reviewed or approved, not tested with users.</b> The coach bottom bar (Clients · Check-ins · Plans · Messages · Business) is a proposal: coach navigation hasn't been reviewed yet.</p>
+  <p>Drawn 2026-11-11 in the review pass, from SPEC.md's coach workspace scope. <b>Drawn only — not reviewed or approved, not tested with users.</b> The coach bottom bar (Clients · Check-ins · Plans · Messages · Business) is final for v1 (D23).</p>
   <div class="legend"><span class="l-primary">Primary action / selected</span><span>Secondary</span><span class="l-note">Rule · Proposal · Open</span></div>
 </header>
 
@@ -48,7 +48,7 @@
         <div class="pinned"><div class="btn primary">Message Rahul</div></div>
       </div>
       <figcaption><b><span class="id">K-02</span>Client profile — overview</b>
-        <div class="note"><ul><li>Sections from the sitemap: Overview, Training, Nutrition, Recovery, Progress, Check-ins, private Notes.</li><li><span class="rule">SPEC:</span> data visible only from the join date unless the client grants earlier history.</li><li>Recovery section shows the client's logs and trends (R-02). <span class="opn">Open:</span> coach recovery controls.</li></ul></div></figcaption>
+        <div class="note"><ul><li>Sections from the sitemap: Overview, Training, Nutrition, Recovery, Progress, Check-ins, private Notes.</li><li><span class="rule">SPEC:</span> data visible only from the join date unless the client grants earlier history.</li><li>Recovery section shows the client's logs and trends (R-02). <span class="rule">D31:</span> coach sets a sleep target and note (K-24).</li></ul></div></figcaption>
     </figure>
 
     <figure>
@@ -78,12 +78,12 @@
           <div class="opt"><span class="ic"></span><span>Paused<small>e.g. travelling; reminders stop</small></span></div>
           <div class="opt"><span class="ic"></span><span>Leaving<small>finishing soon</small></span></div>
           <div class="opt"><span class="ic"></span><span>Completed<small>coaching finished</small></span></div>
-          <div class="open"><b>Status effects</b>What a client sees, and whether access ends, for paused / leaving / completed.</div>
+          <div class="card"><small>Paused: check-ins and reminders stop; plan and chat stay. Leaving: set an end date. Completed: coaching ends now and Rahul moves to the free plan.</small></div>
           <div class="btn primary">Save</div>
         </div>
       </div>
       <figcaption><b><span class="id">K-04</span>Change client status</b>
-        <div class="note"><ul><li><span class="rule">SPEC:</span> lifecycle states active, paused, leaving, completed.</li><li>Effects on the athlete side aren't defined — flagged, not invented.</li></ul></div></figcaption>
+        <div class="note"><ul><li><span class="rule">SPEC:</span> lifecycle states active, paused, leaving, completed.</li><li><span class="rule">D39:</span> effects as stated on the sheet. The athlete sees CS-01 (paused) or CS-02 (leaving) in F17; Completed shows L-03.</li><li>Completed asks for confirmation, because coach access ends immediately.</li></ul></div></figcaption>
     </figure>
 
   </div>
@@ -135,7 +135,7 @@
         <div class="btn">+ Add exercise from library</div>
       </div>
       <figcaption><b><span class="id">K-07</span>Plan builder — exercise</b>
-        <div class="note"><ul><li>Sets, reps, rest, effort target (sitemap). Exercises come from the shared library.</li><li>Keyboard: number fields use the numeric keypad; the edited field scrolls above it.</li><li><span class="opn">Open:</span> coach "lock" so clients can't swap an exercise (F4-07).</li></ul></div></figcaption>
+        <div class="note"><ul><li>Sets, reps, rest, effort target (sitemap). Exercises come from the shared library.</li><li>Keyboard: number fields use the numeric keypad; the edited field scrolls above it.</li><li><span class="rule">D45:</span> no exercise lock in v1; clients can swap for today only, and the coach is told (F4-07).</li></ul></div></figcaption>
     </figure>
 
     <figure>
@@ -164,7 +164,7 @@
         <div class="opt sel"><span class="ic"></span><span>Veg fat loss · 1,850 kcal</span></div>
         <div class="label">Targets</div>
         <div class="grid2"><div class="field" style="margin:0"><small>Calories</small><b>1,850</b></div><div class="field" style="margin:0"><small>Protein</small><b>110 g</b></div></div>
-        <div class="open"><b>Recovery guidance</b>What a coach sets here isn't defined.</div>
+        <div class="field"><small>Sleep target (K-24)</small><b>7.5 hours</b></div>
         <div class="toggle"><div><b>Customise for Ananya after assigning</b><small>Changes apply to her copy only, not the template</small></div><div class="sw"></div></div>
         <div class="pinned"><div class="btn primary">Assign</div></div>
       </div>
@@ -205,7 +205,7 @@
         <div class="pinned"><div class="btn primary">Send invite link</div></div>
       </div>
       <figcaption><b><span class="id">K-11</span>Lead — add or edit</b>
-        <div class="note"><ul><li>"Send invite link" shares the coach's link (F2-07); when they join, the lead becomes Converted.</li><li><span class="opn">Open:</span> chatting with leads inside Arcwell (F7-04).</li><li>No phone or email stored unless the coach types it (privacy).</li></ul></div></figcaption>
+        <div class="note"><ul><li>"Send invite link" shares the coach's link (F2-07); when they join, the lead becomes Converted.</li><li><span class="rule">D45:</span> no chat with leads in v1; coaches contact them outside the app.</li><li>No phone or email stored unless the coach types it (privacy).</li></ul></div></figcaption>
     </figure>
 
     <figure>
@@ -218,11 +218,11 @@
         <div class="mi">Transformations<span class="acc">F9-01 ›</span></div>
         <div class="mi">Plan and billing<span class="chev">›</span></div>
         <div class="mi">Settings<span class="acc">notifications, privacy, sign out ›</span></div>
-        <div class="open"><b>Coach profile audience</b>Who sees it without a marketplace?</div>
+        <div class="card"><small>Your profile is shown on your invite page and to your clients. There's no public directory.</small></div>
         <div class="tabs"><span>Clients</span><span>Check-ins</span><span>Plans</span><span>Messages</span><span class="on">Business</span></div>
       </div>
       <figcaption><b><span class="id">K-12</span>Business</b>
-        <div class="note"><ul><li>Items from the sitemap's Business tab. Coach settings include data export and account deletion (same pattern as AC-03, AC-04).</li></ul></div></figcaption>
+        <div class="note"><ul><li>Items from the sitemap's Business tab. Coach settings include data export and account deletion (X-09, K-28).</li><li><span class="rule">D43:</span> profile audience is the invite page and the coach's own clients.</li></ul></div></figcaption>
     </figure>
 
     <figure>
@@ -233,11 +233,11 @@
         <div class="kv"><span>Clients</span><b>32 active</b></div>
         <div class="kv"><span>Client limit</span><b>Set when pricing is decided</b></div>
         <div class="card"><small>Payments for Arcwell happen on our website through Razorpay, not in the app.</small></div>
-        <div class="open"><b>Limits and lapses</b>What happens when a coach hits their client limit or stops paying.</div>
+        <div class="card"><small>At your client limit, new people can't join through your link (K-25). If a payment fails, you have 7 days before inviting and plan changes pause (K-27). Your clients are never affected.</small></div>
         <div class="pinned"><div class="btn">Open billing website</div></div>
       </div>
       <figcaption><b><span class="id">K-13</span>Plan and billing</b>
-        <div class="note"><ul><li><span class="rule">SPEC:</span> coach fee via Razorpay outside the app; price decided after the build; plan limits are settings.</li></ul></div></figcaption>
+        <div class="note"><ul><li><span class="rule">SPEC:</span> coach fee via Razorpay outside the app; price decided after the build; plan limits are settings.</li><li><span class="rule">D40, D41:</span> limit and lapse behaviour as stated (K-25 to K-27 in F18).</li></ul></div></figcaption>
     </figure>
 
   </div>

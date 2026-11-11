@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arcwell Wireframes F16</title>
+<link rel="stylesheet" href="wireframe.css">
+<style>
+  .search { border: 1.5px solid var(--ink); border-radius: 10px; padding: 8px 10px; font-size: 11px; margin-bottom: 8px; display: flex; gap: 6px; }
+  .search::before { content: "⌕"; font-weight: 700; }
+  .result { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--fill); font-size: 11px; }
+  .result small { display: block; color: var(--muted); font-size: 9.5px; }
+  .result .r { color: var(--muted); }
+  .empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 10px 6px; }
+  .empty .ill { width: 56px; height: 56px; border-radius: 14px; background: var(--fill); margin-bottom: 10px; }
+  .empty b { font-size: 13px; display: block; margin-bottom: 4px; }
+  .empty small { font-size: 10.5px; color: var(--muted); display: block; max-width: 200px; }
+  .empty .btn { width: 100%; }
+  .toast { position: absolute; left: 10px; right: 10px; bottom: 54px; background: var(--ink); color: #fff; border-radius: 9px; padding: 8px 10px; font-size: 10.5px; display: flex; justify-content: space-between; z-index: 4; }
+  .toast u { font-weight: 700; }
+  .viewer { position: absolute; inset: 0; background: #1d1d1b; color: #fff; padding: 10px 14px; display: flex; flex-direction: column; z-index: 2; }
+  .viewer .vt { display: flex; justify-content: space-between; align-items: center; font-size: 11px; margin: 14px 0 10px; }
+  .viewer .vt small { display: block; color: #bbb; font-size: 9px; }
+  .viewer .img { flex: 1; border-radius: 4px; }
+  .viewer .cap { font-size: 10.5px; margin-top: 8px; color: #ddd; }
+  .pdfpage { flex: 1; background: #fff; border: 1.5px solid var(--line); border-radius: 4px; padding: 10px; font-size: 9px; color: var(--muted); }
+  .pdfpage i { display: block; height: 5px; background: var(--fill); border-radius: 2px; margin-bottom: 6px; }
+  .sysdlg { position: absolute; left: 18px; right: 18px; top: 34%; background: #fff; border: 2px solid var(--ink); border-radius: 16px; padding: 12px; font-size: 11px; z-index: 6; }
+  .sysdlg .btn { margin-top: 5px; }
+  .spin { width: 40px; height: 40px; border-radius: 50%; border: 4px solid var(--fill); border-top-color: var(--ink); margin: 0 auto 10px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Arcwell — Wireframes: F16 Missing states — AI limits, food edits, attachments, permissions, export, empty states, system screens</h1>
+  <p>Drawn 2026-11-11. <b>Drawn only — not reviewed or approved, not tested with users.</b> These are the "overlooked" items from the wireframe audit: states that need no new product decision. Notes mark <b>Rule</b> (confirmed, DECISIONS.md / SPEC.md), <b>Proposal</b> (layout or wording for review) or <b>Open</b> (needs a decision). New IDs: X- (extra states), E- (empty states), K-22 and K-23 (coach), S-05 and S-06 (system).</p>
+  <div class="legend"><span class="l-primary">Primary action / selected</span><span>Secondary</span><span class="l-note">Rule · Proposal · Open</span></div>
+</header>
+
+<!-- ============ ATHLETE: AI STATES ============ -->
+<section class="flow">
+  <h2>AI Coaching — limit and failure states (AI subscribers only)</h2>
+  <p class="arrowrow">AI-01 "Adjust my plan" → daily limit reached (X-01) · F8-05 or an adjustment → plan couldn't be built (X-02)</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>21:40</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px"><span class="burger">☰</span>&nbsp; AI Coaching</span><span></span></div>
+        <div class="hc"><small>Your AI plan</small><b>Fat loss · 4 days · 45 min</b>Week 2 of 8</div>
+        <div class="card" style="border-color:var(--ink);border-width:2px"><b>You've used today's AI adjustments</b><small>Try again tomorrow. Your plan, workouts and food logging keep working as normal.</small></div>
+        <div class="label">Adjust my plan</div>
+        <div class="opt" style="color:var(--muted)"><span class="ic"></span><span>Change training days or time<small>Available again tomorrow</small></span></div>
+        <div class="opt" style="color:var(--muted)"><span class="ic"></span><span>Change equipment or gym<small>Available again tomorrow</small></span></div>
+        <div class="opt" style="color:var(--muted)"><span class="ic"></span><span>New injury or limitation<small>Available again tomorrow</small></span></div>
+        <div class="tabs"><span>Today</span><span>Training</span><span>Nutrition</span><span>Recovery</span><span class="on">AI Coaching</span></div>
+      </div>
+      <figcaption><b><span class="id">X-01</span>AI daily limit reached</b>
+        <div class="note"><ul><li><span class="rule">SPEC:</span> paid AI users have a daily request cap. The number is a server setting, so no number is shown.</li><li><span class="prop">Proposal:</span> adjustment options stay visible but greyed out, with plain wording and no countdown. AI photo food logging uses the same message in F5-09.</li><li>Not shown to coached athletes: they never see AI.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:05</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px"><span class="burger">☰</span>&nbsp; AI Coaching</span><span></span></div>
+        <div class="empty">
+          <div class="ill"></div>
+          <b>We couldn't build your plan right now</b>
+          <small>Your answers are saved. This is usually temporary — try again in a minute.</small>
+          <div class="btn primary" style="margin-top:12px">Try again</div>
+          <div class="btn">Do a starter workout today</div>
+        </div>
+        <div class="tabs"><span>Today</span><span>Training</span><span>Nutrition</span><span>Recovery</span><span class="on">AI Coaching</span></div>
+      </div>
+      <figcaption><b><span class="id">X-02</span>AI plan couldn't be built</b>
+        <div class="note"><ul><li>Covers the AI provider being down, the server rules rejecting a generated plan (SPEC: plans are validated server-side), or no connection. The user sees one message, never the technical reason.</li><li>For a failed adjustment, the current plan stays as it was and the message says so.</li><li><span class="prop">Proposal:</span> the starter-workout fallback reuses the T-01 templates, so the user can still train today.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<!-- ============ ATHLETE: FOOD EDIT ============ -->
+<section class="flow">
+  <h2>Nutrition — edit or delete a logged food</h2>
+  <p class="arrowrow">F5-01 / F5-02 tap a logged item → edit sheet (X-03) → Save, or Remove → undo toast (X-04)</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>13:45</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px"><span class="burger">☰</span> Nutrition</span><span></span></div>
+        <div class="card"><b>Breakfast · 360 kcal</b><small>Poha · Masala chai</small></div>
+        <div class="card"><b>Lunch · 250 kcal</b><small>Dal tadka · Phulka</small></div>
+        <div class="scrim" style="z-index:4"></div>
+        <div class="sheet" style="z-index:5">
+          <div class="grab"></div>
+          <b style="font-size:13px">Poha</b><div class="sub" style="margin-bottom:6px">Home-style · logged at Breakfast</div>
+          <div class="stepper"><span class="pm">−</span><span class="val">1.5 <small>katori</small></span><span class="pm">+</span></div>
+          <div class="quick"><span>½</span><span>1</span><span>1½</span><span>2</span></div>
+          <div class="kv"><span>Calories</span><b>270 kcal</b></div>
+          <div class="kv"><span>Protein · Carbs · Fat</span><b>5 · 48 · 7 g</b></div>
+          <div class="kv"><span>Meal</span><b>Breakfast ›</b></div>
+          <div class="btnrow"><div class="btn">Remove</div><div class="btn primary">Save</div></div>
+        </div>
+        <div class="tabs"><span>Today</span><span>Training</span><span class="on">Nutrition</span><span>Recovery</span><span>AI Coaching</span></div>
+      </div>
+      <figcaption><b><span class="id">X-03</span>Edit a logged food</b>
+        <div class="note"><ul><li>Same portion controls as F5-06. "Meal" moves the item to another meal.</li><li><span class="rule">D5:</span> free users see calories only, with no macro row. Coached athletes see the human-coached bar.</li><li>Photo-logged items (F5-11) edit the same way once confirmed.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>13:46</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px"><span class="burger">☰</span> Nutrition</span><span></span></div>
+        <div class="hc"><small>Today, Wed 11 Nov</small><b>1,510 kcal left</b>340 eaten · target 1,850</div>
+        <div class="card"><b>Breakfast · 90 kcal</b><small>Masala chai with sugar · 1 cup</small></div>
+        <div class="card"><b>Lunch · 250 kcal</b><small>Dal tadka · Phulka</small></div>
+        <div class="toast"><span>Poha removed</span><u>Undo</u></div>
+        <div class="tabs"><span>Today</span><span>Training</span><span class="on">Nutrition</span></div>
+      </div>
+      <figcaption><b><span class="id">X-04</span>Removed — undo</b>
+        <div class="note"><ul><li>Removing a food never asks "Are you sure?"; it shows a few seconds of Undo instead, so mistakes are easy to reverse.</li><li>Shown with the free bar (D2b): calories only. Totals update straight away.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<!-- ============ ATHLETE + COACH: ATTACHMENTS ============ -->
+<section class="flow">
+  <h2>Chat attachments — opening an image or PDF</h2>
+  <p class="arrowrow">F7-01 / F7-05 tap a photo → image viewer (X-05) · tap a PDF → PDF viewer (X-06)</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="viewer">
+          <div class="status" style="color:#bbb"><span>18:22</span><span>▮▮ ◔</span></div>
+          <div class="vt"><span>✕</span><span style="text-align:center"><b>Priya Sharma</b><small>Today · 18:20</small></span><span>Save</span></div>
+          <div class="img">Photo · pinch to zoom</div>
+          <div class="cap">My setup on the bench</div>
+        </div>
+      </div>
+      <figcaption><b><span class="id">X-05</span>Image viewer</b>
+        <div class="note"><ul><li>Full screen with sender, time and caption. Pinch to zoom; swipe down or ✕ to close.</li><li>"Save" stores the photo on the phone. Same viewer for athletes and coaches.</li><li>Images load from short-lived signed links (SPEC architecture). An expired link refreshes without the user noticing; if that fails, S-02 is shown inline.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>18:30</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>✕</span><span style="color:var(--ink);font-weight:700">Shoulder warm-up.pdf</span><span>⋮</span></div>
+        <div class="sub" style="text-align:center">From Coach Joseph · 2 pages · 340 KB</div>
+        <div class="pdfpage"><i style="width:60%;height:8px;background:var(--fill2)"></i><i></i><i></i><i style="width:80%"></i><i></i><i style="width:70%"></i><div class="img" style="height:80px;margin:8px 0">Diagram</div><i></i><i style="width:50%"></i></div>
+        <div class="tiny">Page 1 of 2 · swipe for more</div>
+        <div class="pinned"><div class="btn">Open in another app</div></div>
+      </div>
+      <figcaption><b><span class="id">X-06</span>PDF viewer</b>
+        <div class="note"><ul><li><span class="prop">Proposal:</span> PDFs open inside Arcwell, with "Open in another app" (⋮ also offers Save). Handing off straight to the phone's PDF app is the alternative; either is fine to build.</li><li>While downloading: S-01-style progress. If the file can't open: S-02 with retry.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<!-- ============ PERMISSIONS + EXPORT ============ -->
+<section class="flow">
+  <h2>Notification permission and data export states</h2>
+  <p class="arrowrow">Notification permission is asked first in Arcwell's own words (X-07), then Android's dialog (X-08) · AC-03 Request export → preparing (X-09) → failed (X-10)</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:15</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span></span><span></span></div>
+        <div class="empty">
+          <div class="ill"></div>
+          <b>Stay on track with reminders</b>
+          <small>We'll only send what you choose: workout reminders, check-in reminders and messages from your coach. Change it any time in Notifications.</small>
+        </div>
+        <div class="pinned"><div class="btn primary">Turn on notifications</div><div class="btn ghost">Not now</div></div>
+      </div>
+      <figcaption><b><span class="id">X-07</span>Notification permission — before asking</b>
+        <div class="note"><ul><li><span class="rule">SPEC:</span> lists the notification types. Only the types that apply to the user's tier or role are named (coaches: new messages, check-ins submitted).</li><li><span class="prop">Proposal:</span> asked the first time a reminder becomes useful (the end of onboarding, or joining a coach), not on first launch.</li><li>"Not now" changes nothing else. N-06 shows the "notifications are off" banner afterwards.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:15</span><span>▮▮ ◔</span></div>
+        <div class="empty" style="opacity:.35">
+          <div class="ill"></div>
+          <b>Stay on track with reminders</b>
+        </div>
+        <div class="scrim" style="z-index:5"></div>
+        <div class="sysdlg">
+          <div style="text-align:center;font-size:16px">🔔</div>
+          <b style="display:block;text-align:center;margin:4px 0 8px">Allow Arcwell to send you notifications?</b>
+          <div class="btn">Allow</div>
+          <div class="btn">Don't allow</div>
+        </div>
+      </div>
+      <figcaption><b><span class="id">X-08</span>Android notification dialog (system)</b>
+        <div class="note"><ul><li>Android's own dialog (Android 13 and later). Arcwell can't change its wording, which is why X-07 explains the reason first.</li><li>Don't allow → nothing breaks. Re-enabling later goes through phone settings (S-04 pattern).</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:23</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Account</span><span></span></div>
+        <div class="q">Export my data</div>
+        <div class="empty">
+          <div class="spin"></div>
+          <b>We're preparing your export</b>
+          <small>We'll email you a download link when it's ready. You can close Arcwell; this keeps going.</small>
+        </div>
+        <div class="kv"><span>Requested</span><b>Today, 9:22</b></div>
+        <div class="kv"><span>Sent to</span><b>your sign-in email</b></div>
+      </div>
+      <figcaption><b><span class="id">X-09</span>Export — preparing</b>
+        <div class="note"><ul><li><span class="rule">SPEC:</span> export is available for every account. The coach version (K-21) uses the same screens.</li><li>While an export is being prepared, "Request export" isn't offered again.</li><li>The file format is still to be chosen at build time (AC-03 proposal).</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:40</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Account</span><span></span></div>
+        <div class="q">Export my data</div>
+        <div class="empty">
+          <div class="ill"></div>
+          <b>Your export didn't finish</b>
+          <small>Nothing was lost. Please try again. If it keeps happening, contact support and we'll send it to you.</small>
+        </div>
+        <div class="pinned"><div class="btn primary">Try again</div><div class="btn ghost">Contact support (AC-09)</div></div>
+      </div>
+      <figcaption><b><span class="id">X-10</span>Export — failed</b>
+        <div class="note"><ul><li>S-02 pattern: plain words, what to do next, reassurance.</li><li>The same message is also sent by email if the user has left the app.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<!-- ============ ATHLETE EMPTY STATES ============ -->
+<section class="flow">
+  <h2>Athlete empty states</h2>
+  <p class="arrowrow">First-time or no-result versions of F4-13, N-06, T-04 and PH-04</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>8:10</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Training</span><span style="color:var(--ink);font-weight:700">History</span><span></span></div>
+        <div class="empty">
+          <div class="ill"></div>
+          <b>No workouts yet</b>
+          <small>Finished workouts show up here, grouped by week.</small>
+          <div class="btn primary" style="margin-top:12px">Start today's workout</div>
+        </div>
+        <div class="tabs"><span>Today</span><span class="on">Training</span><span>Nutrition</span></div>
+      </div>
+      <figcaption><b><span class="id">E-01</span>Workout history — empty</b>
+        <div class="note"><ul><li>Empty version of F4-13. The button opens the next workout in the user's plan (T-01 to T-03).</li><li>Shown with the free bar (D2b). A coached athlete still waiting for a plan sees W-02 instead.</li><li><span class="rule">D13:</span> History is free from both the Training tab and the ☰ menu.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:10</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Back</span><span style="color:var(--ink);font-weight:700">Notifications</span><span>Settings</span></div>
+        <div class="empty">
+          <div class="ill"></div>
+          <b>You're all caught up</b>
+          <small>Reminders and updates will appear here.</small>
+        </div>
+      </div>
+      <figcaption><b><span class="id">E-02</span>Notifications — empty</b>
+        <div class="note"><ul><li>Empty version of N-06. "Settings" still opens the notification preferences.</li><li>If phone notifications are off, the N-06 "turn on in phone settings" banner sits above this.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>8:20</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Menu</span><span style="color:var(--ink);font-weight:700">Exercises</span><span></span></div>
+        <div class="search">zercher squat</div>
+        <div class="filters"><span class="on">Barbell ✕</span><span>Legs ✕</span></div>
+        <div class="empty">
+          <div class="ill"></div>
+          <b>No exercises match "zercher squat"</b>
+          <small>Try another name, or remove a filter.</small>
+          <div class="btn" style="margin-top:12px">Clear filters</div>
+        </div>
+      </div>
+      <figcaption><b><span class="id">E-03</span>Exercise library — no results</b>
+        <div class="note"><ul><li>No-results version of T-04. The v1 library is small (SPEC), so this will happen. The message suggests the next step.</li><li>Adding custom exercises isn't in SPEC, so it isn't offered here.</li><li><span class="rule">D25:</span> Exercises is free.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>8:05</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Menu</span><span style="color:var(--ink);font-weight:700">Charts</span><span></span></div>
+        <div class="seg"><span class="on">1 month</span><span>3 months</span><span>All</span></div>
+        <div class="card" style="height:110px;display:flex;align-items:center;justify-content:center;border-style:dashed"><small>Your chart appears after 2 entries</small></div>
+        <div class="label">Start tracking</div>
+        <div class="inrow"><span class="t"><b>Bodyweight</b><small>No entries yet</small></span><span class="r">Log ›</span></div>
+        <div class="inrow"><span class="t"><b>Measurements</b><small>No entries yet</small></span><span class="r">Log ›</span></div>
+        <div class="inrow"><span class="t"><b>Progress photos</b><small>No photos yet</small></span><span class="r">Add ›</span></div>
+      </div>
+      <figcaption><b><span class="id">E-04</span>Physique charts — no data</b>
+        <div class="note"><ul><li><span class="rule">D5:</span> Physique tools are free for everyone, so this appears for every tier.</li><li>Each row opens PH-01, PH-02 or PH-03. A line needs at least two points; until then the frame stays empty instead of showing a fake trend.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<!-- ============ COACH ============ -->
+<section class="flow">
+  <h2>Coach — empty states, meal plan templates and exercise library</h2>
+  <p class="arrowrow">Empty versions of F6-07, F7-04, K-10 and F9-01 · K-05 Meal plans tab (K-22) · exercise library from Plans (K-23). Coach tabs are final (D23).</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>19:00</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px">Check-ins</span><span></span></div>
+        <div class="filters"><span class="on">To review · 0</span><span>Overdue · 0</span><span>Reviewed · 24</span></div>
+        <div class="empty">
+          <div class="ill"></div>
+          <b>All caught up</b>
+          <small>No check-ins to review. New ones arrive on each client's check-in day.</small>
+          <div class="btn" style="margin-top:12px">See reviewed check-ins</div>
+        </div>
+        <div class="tabs"><span>Clients</span><span class="on">Check-ins</span><span>Plans</span><span>Messages</span><span>Business</span></div>
+      </div>
+      <figcaption><b><span class="id">E-05</span>Coach check-in inbox — empty</b>
+        <div class="note"><ul><li>Empty version of F6-07.</li><li>If the coach has no clients yet, the message becomes "Check-ins appear once clients join" with "Invite clients" (F2-07).</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>19:10</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px">Messages</span><span></span></div>
+        <div class="empty">
+          <div class="ill"></div>
+          <b>No conversations yet</b>
+          <small>A chat opens automatically with each client when they join.</small>
+          <div class="btn primary" style="margin-top:12px">Invite clients</div>
+        </div>
+        <div class="tabs"><span>Clients</span><span>Check-ins</span><span>Plans</span><span class="on">Messages</span><span>Business</span></div>
+      </div>
+      <figcaption><b><span class="id">E-06</span>Coach messages — empty</b>
+        <div class="note"><ul><li>Empty version of F7-04. "Invite clients" opens F2-07.</li><li><span class="prop">Proposal:</span> a chat is created when a client joins, so no "new chat" button is needed.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>12:20</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Business</span><span style="color:var(--ink);font-weight:700">Leads</span><span></span></div>
+        <div class="empty">
+          <div class="ill"></div>
+          <b>No leads yet</b>
+          <small>Keep track of people who've asked about coaching: where they came from, when you contacted them, and notes.</small>
+          <div class="btn primary" style="margin-top:12px">+ Add lead</div>
+        </div>
+        <div class="tabs"><span>Clients</span><span>Check-ins</span><span>Plans</span><span>Messages</span><span class="on">Business</span></div>
+      </div>
+      <figcaption><b><span class="id">E-07</span>Leads — empty</b>
+        <div class="note"><ul><li>Empty version of K-10. "+ Add lead" opens K-11.</li><li><span class="rule">SPEC:</span> basic leads only. Leads are added by hand; nothing is imported.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>18:00</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Business</span><span></span></div>
+        <div class="q">Transformations</div>
+        <div class="empty">
+          <div class="ill"></div>
+          <b>No transformation photos yet</b>
+          <small>Ask a client if you can use their progress photos. They choose what's shared, can blur their face, and can withdraw at any time.</small>
+          <div class="btn primary" style="margin-top:12px">Request photos</div>
+        </div>
+        <div class="tabs"><span>Clients</span><span>Check-ins</span><span>Plans</span><span>Messages</span><span class="on">Business</span></div>
+      </div>
+      <figcaption><b><span class="id">E-08</span>Transformations — empty</b>
+        <div class="note"><ul><li>Empty version of F9-01. "Request photos" opens F9-02.</li><li><span class="rule">SPEC:</span> coach requests, athlete approves (optional face blur), athlete can withdraw — stated up front.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>10:05</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px">Plans</span><span>+ New</span></div>
+        <div class="subtabs"><span>Training</span><span class="on">Meal plans</span><span>Exercises</span></div>
+        <div class="inrow"><span class="t"><b>Veg fat loss · 1,800 kcal</b><small>4 meals · P 120 g · used by 5 clients</small></span><span class="r">›</span></div>
+        <div class="inrow"><span class="t"><b>Lean bulk · 2,800 kcal</b><small>5 meals · non-veg · used by 3 clients</small></span><span class="r">›</span></div>
+        <div class="inrow"><span class="t"><b>Jain maintenance · 2,100 kcal</b><small>4 meals · used by 1 client</small></span><span class="r">›</span></div>
+        <div class="inrow"><span class="t"><b>Eggetarian cut · 1,600 kcal</b><small>4 meals · not assigned</small></span><span class="r">›</span></div>
+        <div class="tabs"><span>Clients</span><span>Check-ins</span><span class="on">Plans</span><span>Messages</span><span>Business</span></div>
+      </div>
+      <figcaption><b><span class="id">K-22</span>Plans — meal plan templates</b>
+        <div class="note"><ul><li>The Meal plans tab of K-05. Each row opens K-09; "+ New" starts a blank meal plan.</li><li><span class="rule">SPEC:</span> meal plans are fixed meals with exact foods and quantities. Diet types match onboarding (F1-12).</li><li>Empty state: "Create your first meal plan" with the F2-06 options.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>10:08</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px">Plans</span><span></span></div>
+        <div class="subtabs"><span>Training</span><span>Meal plans</span><span class="on">Exercises</span></div>
+        <div class="search">Search exercises</div>
+        <div class="filters"><span class="on">All</span><span>Chest</span><span>Back</span><span>Legs</span><span>Shoulders</span></div>
+        <div class="result"><span><b>Barbell bench press</b><small>Barbell · chest, triceps · used in 3 templates</small></span><span class="r">›</span></div>
+        <div class="result"><span><b>Incline dumbbell press</b><small>Dumbbells · upper chest</small></span><span class="r">›</span></div>
+        <div class="result"><span><b>Leg press</b><small>Machine · quads, glutes · used in 2 templates</small></span><span class="r">›</span></div>
+        <div class="result"><span><b>Lat pulldown</b><small>Cable · back</small></span><span class="r">›</span></div>
+        <div class="tabs"><span>Clients</span><span>Check-ins</span><span class="on">Plans</span><span>Messages</span><span>Business</span></div>
+      </div>
+      <figcaption><b><span class="id">K-23</span>Coach exercise library</b>
+        <div class="note"><ul><li>The sitemap's Plans → "Exercise library (browse)". Same library as T-04; each row opens F4-08 exercise detail. "Used in" helps the coach see what's in their templates.</li><li><span class="prop">Proposal:</span> a third tab in Plans (also shown in K-22). It's browse-only, because adding custom exercises isn't in SPEC.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<!-- ============ SYSTEM ============ -->
+<section class="flow">
+  <h2>System screens — force update and maintenance (all roles)</h2>
+  <p class="arrowrow">Shown at launch or on resume when the server says the app version is too old (S-05), or when Arcwell is unavailable (S-06)</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>8:00</span><span>▮▮ ◔</span></div>
+        <div class="empty">
+          <div class="logo" style="margin-bottom:14px"></div>
+          <b>Update Arcwell to keep going</b>
+          <small>This version is no longer supported. The update takes about a minute. Your data is saved, including any workout in progress.</small>
+        </div>
+        <div class="pinned"><div class="btn primary">Update on Google Play</div></div>
+      </div>
+      <figcaption><b><span class="id">S-05</span>Force update</b>
+        <div class="note"><ul><li>Used only when an old version would break, for example after a database change. No way past it.</li><li><span class="rule">SPEC:</span> an in-progress workout is cached on the phone and syncs after updating, so the "saved" promise holds.</li><li><span class="prop">Proposal:</span> a dismissible "update available" card on Today handles ordinary updates. This screen is only for required ones.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>2:10</span><span>▮▮ ◔</span></div>
+        <div class="empty">
+          <div class="ill"></div>
+          <b>Arcwell is down for maintenance</b>
+          <small>We're making improvements and expect to be back by 3:00 am. Your data is safe.</small>
+          <div class="btn" style="margin-top:12px">Try again</div>
+        </div>
+        <div class="card"><small>A workout already in progress keeps saving on your phone and syncs when we're back.</small></div>
+      </div>
+      <figcaption><b><span class="id">S-06</span>Maintenance / service down</b>
+        <div class="note"><ul><li>Planned maintenance shows the expected end time. For an unplanned outage, the time is replaced with "We're working on it".</li><li>Only the in-progress workout keeps working offline: full offline mode is out of v1 (SPEC). Food logging and chat wait until service is back.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+</body>
+</html>

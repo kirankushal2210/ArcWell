@@ -4,7 +4,7 @@ Every screen in the v1 Android app, by role. Tier markers: **[F]** free athlete,
 
 ## Overview
 
-Confirmed rules are in [DECISIONS.md](../DECISIONS.md) (IDs in brackets). Labels are working names (D3 pending).
+Confirmed rules are in [DECISIONS.md](../DECISIONS.md) (IDs in brackets). Labels as drawn are the v1 names (D45). Every screen below is drawn in F1–F18.
 
 ```mermaid
 flowchart TD
@@ -23,14 +23,14 @@ flowchart TD
 ## 1. Entry and account (shared)
 
 - Splash · Welcome · Sign up / Sign in (Google, email) · Email verification · Forgot password → reset link sent
-- Invite landing (from a coach's link) · Already coached (switch coach) · AI subscriber joining a coach (cancellation step, D7a)
-- Consent — health data, **AI permission step 1** (D8), photos (optional, D12)
-- Open: role chosen before or after sign-up; role switching; whether invite sign-ups see the AI step
+- Invite landing (from a coach's link) · coach is full (K-26) · Already coached (switch coach) · AI subscriber joining a coach (cancellation in Google Play, D7a, D19)
+- Consent — health data, **AI permission step 1** (D8), photos (optional, D12) · invite sign-ups skip the AI step (F1-05b, D44)
+- One role per account; role chosen before sign-up (D44)
 
 ## 2. Athlete onboarding
 
-1. Goal · 2. Experience · 3. Age, height, weight (sex: open) · 4. Injuries / limitations · 5. Training days and session length · 6. Equipment · 7. Diet type
-8. Summary → [F] calorie target + starter templates (calories only, D5) · [C] connected to coach, waiting for plan (no turnaround promise)
+1. Goal · 2. Experience · 3. Age, height, weight, sex (optional, D44) · 4. Injuries / limitations · 5. Training days and session length · 6. Equipment · 7. Diet type
+8. Summary → [F] calorie target + starter workouts (calories only, D5, D27) · [C] connected to coach, waiting for plan (no turnaround promise)
 
 ## 3. Athlete app
 
@@ -43,11 +43,11 @@ flowchart TD
 | Human-coached (Pro) | Today · Training · Nutrition · Recovery · Progress |
 
 ### Today
-- Today by tier (contents pending, D2d) · waiting-for-plan state [C] · notifications open from ☰
+- Today by tier (final, D2d, D23) · waiting-for-plan state [C] · coaching paused / ending banners [C] (CS-01, CS-02) · trial-ending card [AI] (TL-01) · notifications open from ☰
 
 ### Training
-- Training landing — [F] 2–3 templates · [AI] AI plan · [C] coach's plan (T-01 to T-03; relation to menu Workouts / Programs open)
-- Workout preview → active workout (set logging, rest timer, swap, notes) → summary
+- Training landing — [F] 2–3 starter workouts · [AI] AI plan · [C] coach's plan (T-01 to T-03)
+- Workout preview → active workout (set logging incl. timed and bodyweight sets, rest timer, swap, notes) → summary
 - Exercise detail · Workout history (also ☰ → Training → History)
 - Waiting for plan [C]
 
@@ -57,43 +57,45 @@ flowchart TD
 - Upgrade moment [F]
 
 ### Recovery [AI][C] — hidden for free (D4, D5a)
-- Log today (sleep hours, sleep quality / score — formula open, soreness, fatigue) · Trends · First use
-- Coach recovery controls: open
+- Log today (sleep hours, sleep quality, 0–100 sleep score dial, soreness, fatigue) · Trends · First use
+- [C] coach's sleep target and note shown on Recovery (R-04, set in K-24)
 
 ### AI Coaching [AI only] (D2)
-- AI plan overview and structured adjustments · AI permission declined · daily limit · out-of-scope → human coach (destination open)
+- AI plan overview and structured adjustments · AI permission off (AI-02, AI-03) · daily limit (X-01) · plan failed (X-02) · out of scope: "I can't help with that" (AI-04, D22)
 
 ### Progress [C only] — combined Check-ins · Progress · Chat (D2a, D11)
 - Check-ins: due · sent / awaiting feedback · overdue · check-in flow (measurements, photos optional, how the week went, review) · feedback received
-- Progress switch: contents open
+- Progress switch: timeline of past check-ins and coach feedback → past check-in (CP-04, CP-06, D16)
 - Chat: text, image, PDF
-- Athletes never see the coach's review tools. Past check-ins visibility: open
+- Athletes never see the coach's review tools.
 
 ### Side menu ☰ (all athletes, D9)
-- **Account:** profile (edit, AC-07) · units (AC-08) · help (AC-09) · subscription · my coach [C] (history access, leave coach) · privacy and permissions (photos, AI permission) · units · export my data · help · delete account · sign out
+- **Account:** profile (AC-07) · units, kg only (AC-08) · subscription · my coach [C] (history access AC-10, leave coach) · privacy and permissions (photos, AI permission) · export my data · help (AC-09) · delete account · sign out
 - **Notifications:** list + preferences
-- **Training:** Exercises (library, T-04) · Workouts · Programs · History · Set Videos · Muscle Analytics — Pro: all (D10); Free: Programs limited to templates, others open
-- **Gyms** — behaviour open
+- **Training:** Exercises (T-04, free) · Workouts (TR-01 free templates / TR-02 Pro, create TR-03) · Programs (TR-04 Pro / TR-05 locked) · History (F4-13, free) · Muscle Analytics (TR-06 Pro / TR-07 locked) — D13, D25. No Set Videos (D14).
+- **Gyms** — read-only map and directory (G-01, G-02), free (D15, D25)
 - **Physique:** Bodyweight · Measurements · Photos · Charts — free for everyone (D5)
 
 ### Subscription and trial
-- Paywall (one-week trial, D6; billing at trial end open) · AI permission step 2 before purchase (proposal) · Google Play purchase · subscription details · payment problem · subscription ended (what happens to AI plan and recovery history: open)
+- Paywall (one-week trial, D6) · AI permission step 2 before purchase (D35) · Google Play purchase · subscription details · payment problem · trial-ending reminder (TL-01) · trial ended, not paid → Free (TL-02, D17) · subscription ended (AI plan read-only, recovery history kept: D32, D33)
 
 ### Coaching changes
-- AI subscriber joins coach → end subscription step (refund: open) → what changed
-- Leave coach → confirm (edit rights, Recovery access, photo approvals: open) → what changed (free bar)
+- AI subscriber joins coach → cancel in Google Play (refunds out of app, D19) → what changed
+- Leave coach → confirm (plan read-only, Recovery hidden, photo choice: D21, D38) → what changed (free bar)
+- Coach marks Completed or deletes account → same outcome as leaving (K-30, K-29, D39, D42)
 
 ## 4. Coach onboarding
 
-1. Coach profile basics (name, photo, specialisations, bio)
-2. Services / packages (text, shown on profile)
-3. Create first plan template (or skip)
-4. Share invite link (copy / WhatsApp / Instagram)
-5. Coach plan info (beta: free)
+1. What you get, and Coach agreement (F2-01, F2-02)
+2. Coach profile basics (name, photo, specialisations, bio)
+3. Services / packages (text, shown on profile)
+4. Create first plan template (or skip)
+5. Share invite link (copy / WhatsApp / Instagram)
+6. Clients list with setup checklist, first clients, assign plan (F2-08 to F2-10). Coach plan info (beta: free) is in Plan and billing (K-13).
 
 ## 5. Coach app
 
-_Coach navigation below is a proposal; it has not been reviewed yet._
+_Coach navigation below is final for v1 (D23)._
 
 ### Tab: Clients
 - Client list — sorted by "needs attention" (K-01); client profile sections K-02, K-03, K-14 to K-18 (overdue check-in, low adherence, unread); filters: active, paused, leaving, completed
@@ -101,11 +103,11 @@ _Coach navigation below is a proposal; it has not been reviewed yet._
   - Overview (adherence, recent activity, weight trend)
   - Training — assigned plan, workout logs, history
   - Nutrition — meal plan, food logs, adherence
-  - Recovery — logs and trends
+  - Recovery — logs and trends, sleep target and note (K-24)
   - Progress — measurements, photos (respecting join date / history permission)
   - Check-ins — history and replies
   - Notes (private to coach)
-  - Status — change lifecycle state, end coaching
+  - Status — change lifecycle state (effects D39), complete a client (K-30)
 - Invite client (link, QR, share)
 
 ### Tab: Check-ins
@@ -117,22 +119,22 @@ _Coach navigation below is a proposal; it has not been reviewed yet._
 - Training templates → **Plan builder** (weeks, days, exercises, sets/reps/rest/effort)
 - Meal plan templates → **Meal plan builder** (meals, foods, quantities, totals)
 - Assign template to client → customise per client
-- Exercise library (browse)
+- Exercise library (browse; K-23 proposes it as a third Plans tab)
 
 ### Tab: Messages
-- Conversation list → chat (text, image, PDF)
+- Conversation list → chat (text, image, PDF; viewers X-05, X-06)
 
 ### Tab: Business
 - Leads — list, add, status (new, contacted, converted, lost), notes
 - Invite link and QR
-- Coach profile (edit) — services, specialisations, credentials (optional), transformations
+- Coach profile (edit) — services, specialisations, certifications (optional, self-reported, D43), transformations. Audience: invite page and own clients only
 - Transformations — request photo use from client → status (pending/approved/withdrawn) → export blurred before/after
-- Plan and billing — current plan, client limit, pay via Razorpay link
-- Settings — notifications, privacy, help, sign out
+- Plan and billing — current plan, client limit (K-25), billing lapse (K-27), pay via Razorpay link
+- Settings — notifications, privacy, help, export, delete coach account (K-28), sign out
 
 ## 6. System screens (all roles)
 
-Reusable patterns: loading (S-01), error and retry (S-02), form validation (S-03), permission denied (S-04), offline (F4-09, F7-03).
+Reusable patterns: loading (S-01), error and retry (S-02), form validation (S-03), permission denied (S-04), offline (F4-09, F7-03), force update (S-05), maintenance (S-06). Empty states E-01 to E-08 and other missing states X-01 to X-10 are in F16.
 
 - Empty states (no clients, no workouts, no logs)
 - Offline banner; workout saved locally / syncing

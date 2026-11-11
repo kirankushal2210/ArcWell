@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arcwell Wireframes F17</title>
+<link rel="stylesheet" href="wireframe.css">
+<style>
+  .search { border: 1.5px solid var(--ink); border-radius: 10px; padding: 8px 10px; font-size: 11px; margin-bottom: 8px; display: flex; gap: 6px; }
+  .search::before { content: "⌕"; font-weight: 700; }
+  .result { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--fill); font-size: 11px; }
+  .result small { display: block; color: var(--muted); font-size: 9.5px; }
+  .result .r { color: var(--muted); }
+  .empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 10px 6px; }
+  .empty .ill { width: 56px; height: 56px; border-radius: 14px; background: var(--fill); margin-bottom: 10px; }
+  .empty b { font-size: 13px; display: block; margin-bottom: 4px; }
+  .empty small { font-size: 10.5px; color: var(--muted); display: block; max-width: 210px; }
+  .empty .btn { width: 100%; }
+  .mbar { display: flex; align-items: center; gap: 6px; font-size: 10px; margin-bottom: 5px; }
+  .mbar span:first-child { width: 62px; color: var(--muted); }
+  .mbar .t { flex: 1; height: 9px; background: var(--fill); border-radius: 4px; overflow: hidden; }
+  .mbar .t i { display: block; height: 100%; background: var(--ink); }
+  .mbar b { width: 18px; text-align: right; font-size: 10px; }
+  .blur { filter: blur(2px); opacity: .55; }
+  .map { height: 120px; border-radius: 10px; margin-bottom: 6px; position: relative; }
+  .map .pin { position: absolute; width: 12px; height: 12px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: var(--ink); }
+  .dial { width: 64px; height: 64px; border-width: 6px; margin: 0; flex: none; }
+  .dial .bigtime { font-size: 17px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Arcwell — Wireframes: F17 Training menu, Gyms, coached Progress timeline, recovery, AI and trial states</h1>
+  <p>Drawn 2026-11-11 from the founder's Executive Defaults (D13–D24) and the defaults Claude applied for the remaining gaps (D25–D45) in DECISIONS.md. <b>Drawn only — not reviewed screen by screen, not tested with users.</b> Notes mark <b>Rule</b> with the decision ID.</p>
+  <div class="legend"><span class="l-primary">Primary action / selected</span><span>Secondary</span><span class="l-note">Rule</span></div>
+</header>
+
+<!-- ============ WORKOUTS ============ -->
+<section class="flow">
+  <h2>☰ Training → Workouts (standalone sessions)</h2>
+  <p class="arrowrow">Free: templates only (TR-01) · Pro: templates + my workouts + create (TR-02 → TR-03) · each workout opens the F4-02 preview</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>8:20</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Menu</span><span style="color:var(--ink);font-weight:700">Workouts</span><span></span></div>
+        <div class="seclab">Starter workouts</div>
+        <div class="inrow"><span class="t"><b>Full body A</b><small>6 exercises · 45 min · gym</small></span><span class="r">Start ›</span></div>
+        <div class="inrow"><span class="t"><b>Full body B</b><small>6 exercises · 45 min · gym</small></span><span class="r">Start ›</span></div>
+        <div class="inrow"><span class="t"><b>Full body C</b><small>5 exercises · 40 min · gym</small></span><span class="r">Start ›</span></div>
+        <div class="card" style="margin-top:8px"><b>🔒 Build your own workouts</b><small>Create and save your own sessions with Arcwell Plus.</small><div class="btn" style="margin-top:6px">See Plus</div></div>
+        <div class="tabs"><span>Today</span><span class="on">Training</span><span>Nutrition</span></div>
+      </div>
+      <figcaption><b><span class="id">TR-01</span>Workouts — free</b>
+        <div class="note"><ul><li><span class="rule">D13:</span> Workouts are standalone sessions. Free users get templates only.</li><li><span class="rule">D5, D27:</span> 2–3 starter workouts, matched to equipment. <span class="rule">D26:</span> no editing or creating for free.</li><li>"See Plus" opens F8-01. One quiet locked card, not a lock on every row.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>8:21</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Menu</span><span style="color:var(--ink);font-weight:700">Workouts</span><span>+ Create</span></div>
+        <div class="seclab">My workouts</div>
+        <div class="inrow"><span class="t"><b>Hotel gym · dumbbells</b><small>5 exercises · 35 min · used 3×</small></span><span class="r">›</span></div>
+        <div class="inrow"><span class="t"><b>Quick upper</b><small>4 exercises · 25 min</small></span><span class="r">›</span></div>
+        <div class="seclab">Templates</div>
+        <div class="inrow"><span class="t"><b>Full body A</b><small>6 exercises · 45 min</small></span><span class="r">›</span></div>
+        <div class="inrow"><span class="t"><b>Push · gym</b><small>6 exercises · 50 min</small></span><span class="r">›</span></div>
+        <div class="inrow"><span class="t"><b>Home strength</b><small>5 exercises · 30 min · dumbbells</small></span><span class="r">›</span></div>
+        <div class="tabs"><span>Today</span><span class="on">Training</span><span>Nutrition</span><span>Recovery</span><span>AI Coaching</span></div>
+      </div>
+      <figcaption><b><span class="id">TR-02</span>Workouts — Pro</b>
+        <div class="note"><ul><li><span class="rule">D10, D26:</span> Pro (AI subscribers and coached athletes) can create workouts. Shown with the AI bar; coached athletes see their own bar.</li><li>A one-off workout doesn't change the active programme. Coached athletes' extra workouts are visible to their coach in K-03.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>8:24</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>✕</span><span style="color:var(--ink);font-weight:700">New workout</span><span>Save</span></div>
+        <div class="field"><small>Name</small><b>Hotel gym · dumbbells</b></div>
+        <div class="inrow"><span class="t"><b>1. Goblet squat</b><small>3 × 10 · rest 1:30</small></span><span class="r">⋮</span></div>
+        <div class="inrow"><span class="t"><b>2. Dumbbell bench press</b><small>3 × 8 · rest 2:00</small></span><span class="r">⋮</span></div>
+        <div class="inrow"><span class="t"><b>3. One-arm row</b><small>3 × 10 each side</small></span><span class="r">⋮</span></div>
+        <div class="inrow"><span class="t"><b>4. Plank</b><small>3 × 45 s · timed</small></span><span class="r">⋮</span></div>
+        <div class="btn">+ Add exercise from library</div>
+        <div class="pinned"><div class="btn primary">Save and start</div></div>
+      </div>
+      <figcaption><b><span class="id">TR-03</span>Create workout (Pro)</b>
+        <div class="note"><ul><li><span class="rule">D26:</span> Pro only. Exercises come from the library (T-04); there are no custom exercises.</li><li>Same set, rep and rest fields as the coach builder (K-07), simplified. Drag to reorder; ⋮ edits or removes.</li><li><span class="rule">D45:</span> timed sets supported (plank). No supersets in v1.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>7:20</span><span>▮▮ ◔</span></div>
+        <div class="wtop"><span>⌄</span><span class="timer">18:40</span><span class="fin">Finish</span></div>
+        <div class="ex">
+          <div class="exh"><span class="img thumb"></span><span><b>Push-up</b><small>Bodyweight · reps only</small></span><span class="more">···</span></div>
+          <table class="sets"><tr><th>Set</th><th>Previous</th><th>Reps</th><th>✓</th></tr>
+            <tr class="done"><td>1</td><td class="prev">15</td><td><span class="in">16</span></td><td><span class="tick">✓</span></td></tr>
+            <tr class="cur"><td>2</td><td class="prev">14</td><td><span class="in">14</span></td><td><span class="tick"></span></td></tr></table>
+        </div>
+        <div class="ex active">
+          <div class="exh"><span class="img thumb"></span><span><b>Plank</b><small>Timed</small></span><span class="more">···</span></div>
+          <table class="sets"><tr><th>Set</th><th>Previous</th><th>Time</th><th>✓</th></tr>
+            <tr class="cur"><td>1</td><td class="prev">0:40</td><td><span class="in">0:45</span></td><td><span class="tick">▶</span></td></tr>
+            <tr><td>2</td><td class="prev">0:40</td><td><span class="in">0:45</span></td><td><span class="tick"></span></td></tr></table>
+        </div>
+      </div>
+      <figcaption><b><span class="id">TR-08</span>Timed and bodyweight sets</b>
+        <div class="note"><ul><li><span class="rule">D45:</span> timed and bodyweight sets are in v1. They're variants of the F4-03 set table.</li><li>Bodyweight: reps only, no kg column (an optional "+ kg" for weighted versions is in ···).</li><li>Timed: ▶ starts a countdown from the target time; the set is ticked when it ends or is stopped (actual time saved).</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<!-- ============ PROGRAMS + MUSCLE ANALYTICS ============ -->
+<section class="flow">
+  <h2>☰ Training → Programs and Muscle Analytics (Pro)</h2>
+  <p class="arrowrow">Pro: Programs (TR-04), Muscle Analytics (TR-06) · Free: locked screens (TR-05, TR-07) → F8-01 paywall</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>8:30</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Menu</span><span style="color:var(--ink);font-weight:700">Programs</span><span></span></div>
+        <div class="hc" style="border-color:var(--ink);border-width:2px"><small>Current programme</small><b>Fat loss · 4 days · 8 weeks</b>Week 2 of 8 · AI plan<br><span class="b">Open in Training</span></div>
+        <div class="seclab">Past programmes</div>
+        <div class="inrow"><span class="t"><b>Strength block · Coach Anita</b><small>12 weeks · ended 3 Oct · read-only</small></span><span class="r">›</span></div>
+        <div class="inrow"><span class="t"><b>Full body starter</b><small>4 weeks · finished 2 Aug</small></span><span class="r">›</span></div>
+        <div class="tabs"><span>Today</span><span class="on">Training</span><span>Nutrition</span><span>Recovery</span><span>AI Coaching</span></div>
+      </div>
+      <figcaption><b><span class="id">TR-04</span>Programs — Pro</b>
+        <div class="note"><ul><li><span class="rule">D13:</span> Programs are multi-week containers. The current one comes from the AI (AI subscribers) or the coach (coached athletes).</li><li><span class="rule">D7c, D21, D33:</span> past programmes, including a former coach's, stay as read-only plans that can still be followed.</li><li>No programme library to browse in v1 (not in SPEC).</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>8:30</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Menu</span><span style="color:var(--ink);font-weight:700">Programs</span><span></span></div>
+        <div class="blur"><div class="hc"><small>Current programme</small><b>Fat loss · 4 days · 8 weeks</b>Week 2 of 8</div><div class="inrow"><span class="t"><b>Strength block</b><small>12 weeks</small></span></div></div>
+        <div class="empty">
+          <div class="ill"></div>
+          <b>🔒 Programmes are part of Plus</b>
+          <small>A multi-week plan built around your goal, schedule and equipment, adjusted every week.</small>
+          <div class="btn primary" style="margin-top:12px">Try free for a week</div>
+          <div class="btn ghost">Keep using starter workouts</div>
+        </div>
+        <div class="tabs"><span>Today</span><span class="on">Training</span><span>Nutrition</span></div>
+      </div>
+      <figcaption><b><span class="id">TR-05</span>Programs — locked (free)</b>
+        <div class="note"><ul><li><span class="rule">D13:</span> Programs are Pro. Upgrade moment opened from the ☰ menu (🔒 marker in N-04).</li><li><span class="rule">D6:</span> trial offered. A blurred preview shows what Plus adds; no fake data.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>8:35</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Menu</span><span style="color:var(--ink);font-weight:700">Muscle Analytics</span><span></span></div>
+        <div class="seg"><span class="on">This week</span><span>4 weeks</span><span>3 months</span></div>
+        <div class="sub" style="margin-bottom:6px">Hard sets per muscle group, from your logged workouts</div>
+        <div class="mbar"><span>Chest</span><span class="t"><i style="width:70%"></i></span><b>12</b></div>
+        <div class="mbar"><span>Back</span><span class="t"><i style="width:80%"></i></span><b>14</b></div>
+        <div class="mbar"><span>Shoulders</span><span class="t"><i style="width:45%"></i></span><b>8</b></div>
+        <div class="mbar"><span>Quads</span><span class="t"><i style="width:55%"></i></span><b>10</b></div>
+        <div class="mbar"><span>Hamstrings</span><span class="t"><i style="width:25%"></i></span><b>4</b></div>
+        <div class="mbar"><span>Glutes</span><span class="t"><i style="width:35%"></i></span><b>6</b></div>
+        <div class="mbar"><span>Arms</span><span class="t"><i style="width:50%"></i></span><b>9</b></div>
+        <div class="card"><small>Tap a muscle to see which exercises counted.</small></div>
+        <div class="tabs"><span>Today</span><span class="on">Training</span><span>Nutrition</span><span>Recovery</span><span>Progress</span></div>
+      </div>
+      <figcaption><b><span class="id">TR-06</span>Muscle Analytics — Pro</b>
+        <div class="note"><ul><li><span class="rule">D13, D28:</span> Pro only. Weekly sets per muscle group, counted from logged sets using the library's muscle fields.</li><li>Plain numbers, no "under-trained" warnings in red (DESIGN principle 5). Shown with the human-coached bar.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>8:35</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Menu</span><span style="color:var(--ink);font-weight:700">Muscle Analytics</span><span></span></div>
+        <div class="blur"><div class="mbar"><span>Chest</span><span class="t"><i style="width:70%"></i></span><b>12</b></div><div class="mbar"><span>Back</span><span class="t"><i style="width:80%"></i></span><b>14</b></div><div class="mbar"><span>Legs</span><span class="t"><i style="width:55%"></i></span><b>10</b></div></div>
+        <div class="empty">
+          <div class="ill"></div>
+          <b>🔒 Muscle Analytics is part of Plus</b>
+          <small>See how many sets each muscle group gets every week, from the workouts you already log.</small>
+          <div class="btn primary" style="margin-top:12px">Try free for a week</div>
+        </div>
+        <div class="tabs"><span>Today</span><span class="on">Training</span><span>Nutrition</span></div>
+      </div>
+      <figcaption><b><span class="id">TR-07</span>Muscle Analytics — locked (free)</b>
+        <div class="note"><ul><li><span class="rule">D13:</span> Pro only; same locked pattern as TR-05.</li><li>Free users' logged workouts are still counted, so the data is ready if they upgrade.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<!-- ============ GYMS ============ -->
+<section class="flow">
+  <h2>☰ Gyms — read-only map and directory</h2>
+  <p class="arrowrow">☰ → Gyms → map + list (G-01) → gym detail (G-02). No booking, reviews or check-ins.</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>18:00</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Menu</span><span style="color:var(--ink);font-weight:700">Gyms</span><span></span></div>
+        <div class="search">Indiranagar, Bengaluru</div>
+        <div class="map img"><span class="pin" style="left:30%;top:30%"></span><span class="pin" style="left:62%;top:48%"></span><span class="pin" style="left:44%;top:70%"></span></div>
+        <div class="seg"><span class="on">Map</span><span>List</span></div>
+        <div class="inrow"><span class="t"><b>Iron Works Gym</b><small>1.2 km · free weights · cardio</small></span><span class="r">›</span></div>
+        <div class="inrow"><span class="t"><b>FitZone 100 Ft Road</b><small>2.0 km · machines · women's batch</small></span><span class="r">›</span></div>
+        <div class="tabs"><span>Today</span><span class="on">Training</span><span>Nutrition</span></div>
+      </div>
+      <figcaption><b><span class="id">G-01</span>Gyms — map and list</b>
+        <div class="note"><ul><li><span class="rule">D15:</span> read-only map / directory. <span class="rule">D25:</span> free for everyone.</li><li><span class="rule">D29:</span> searching by area works without location permission. "Use my location" asks with its purpose; declining keeps city search (S-04 pattern).</li><li>Gym data source chosen at build time (PLAN.md).</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>18:01</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Gyms</span><span></span></div>
+        <div class="img" style="height:80px;margin-bottom:8px">Gym photo</div>
+        <div class="q" style="font-size:14px">Iron Works Gym</div>
+        <div class="sub">12th Main, Indiranagar · 1.2 km</div>
+        <div class="kv"><span>Equipment</span><b>Free weights · racks · cardio</b></div>
+        <div class="kv"><span>Hours</span><b>5:30 am – 10:30 pm</b></div>
+        <div class="kv"><span>Phone</span><b>Shown if listed</b></div>
+        <div class="card"><small>Details come from public listings and may be out of date.</small></div>
+        <div class="pinned"><div class="btn">Open in Maps</div></div>
+      </div>
+      <figcaption><b><span class="id">G-02</span>Gym detail</b>
+        <div class="note"><ul><li><span class="rule">D15, D29:</span> read-only. "Open in Maps" hands off to the phone's maps app for directions.</li><li>Equipment tags are shown as listed; they aren't linked to the equipment answer from onboarding.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<!-- ============ COACHED ============ -->
+<section class="flow">
+  <h2>Coached athletes — past check-in, recovery target, history access, coaching status</h2>
+  <p class="arrowrow">Progress timeline (CP-04) → past check-in (CP-06) · Recovery with coach target (R-04) · My coach → history access (AC-10) · status banners from the coach (CS-01, CS-02) · invite sign-up consent (F1-05b)</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:12</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Progress</span><span style="color:var(--ink);font-weight:700">Week 2 check-in</span><span></span></div>
+        <div class="sub">Sent Sun 3 Nov · reviewed Mon 4 Nov</div>
+        <div class="card"><b>Coach Joseph's feedback</b><small>Great week — 4/4 sessions and waist down a centimetre. Keep protein around 110 g.</small></div>
+        <div class="seclab">What you sent</div>
+        <div class="kv"><span>Weight</span><b>68.6 kg (−0.4)</b></div>
+        <div class="kv"><span>Waist</span><b>78 cm (−1)</b></div>
+        <div class="kv"><span>Energy · hunger · stress</span><b>4 · 3 · 2</b></div>
+        <div class="kv"><span>Photos</span><b>3 · only you and Joseph</b></div>
+        <div class="kv"><span>Wins</span><b>"Hit every session"</b></div>
+        <div class="tabs"><span>Today</span><span>Training</span><span>Nutrition</span><span>Recovery</span><span class="on">Progress</span></div>
+      </div>
+      <figcaption><b><span class="id">CP-06</span>Past check-in — read-only</b>
+        <div class="note"><ul><li><span class="rule">D16:</span> athletes can open any past check-in with the coach's feedback. Read-only; replies go to chat.</li><li><span class="rule">D11:</span> no coach review tools. Same answers as F6-02 to F6-04; photos follow D12 (none is fine).</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>7:30</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px"><span class="burger">☰</span>&nbsp; Recovery</span><span>Trends</span></div>
+        <div class="card"><b>From Coach Joseph</b><small>Sleep target 7.5 h · "Lights out by 11 on training days."</small></div>
+        <div class="label">Sleep</div>
+        <div class="stepper"><span class="pm">−</span><span class="val">6.5 <small>hours · target 7.5</small></span><span class="pm">+</span></div>
+        <div class="slider">How well did you sleep?<div class="track"><i style="left:60%"></i></div><div class="ends"><span>Badly</span><span>Very well</span></div></div>
+        <div class="slider">Soreness<div class="track"><i style="left:35%"></i></div><div class="ends"><span>None</span><span>Very sore</span></div></div>
+        <div class="slider">Fatigue<div class="track"><i style="left:45%"></i></div><div class="ends"><span>Fresh</span><span>Exhausted</span></div></div>
+        <div class="card" style="display:flex;align-items:center;gap:10px"><div class="ring dial"><div class="bigtime">72</div></div><span><b>Sleep score 72 / 100</b><small>1 h under your coach's target</small></span></div>
+        <div class="pinned"><div class="btn primary">Save</div></div>
+        <div class="tabs"><span>Today</span><span>Training</span><span>Nutrition</span><span class="on">Recovery</span><span>Progress</span></div>
+      </div>
+      <figcaption><b><span class="id">R-04</span>Recovery — coached, with coach target</b>
+        <div class="note"><ul><li><span class="rule">D31:</span> the coach's sleep target and note (K-24) appear at the top; the gap is stated neutrally, not in red.</li><li><span class="rule">D18, D30:</span> 0–100 sleep-score dial from hours and quality. <span class="rule">D4:</span> nothing else added.</li><li>↕ Scrolls; Save stays pinned.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>11:05</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← My coach</span><span style="color:var(--ink);font-weight:700">History access</span><span></span></div>
+        <div class="toggle"><div><b>Share my history from before I joined</b><small>Coach Joseph can see workouts, food logs, recovery and progress from before 27 Oct.</small></div><div class="sw off"></div></div>
+        <div class="card"><small>Right now Joseph sees your data from 27 Oct, when you joined. You can turn this on or off any time. Turning it off removes access straight away.</small></div>
+        <div class="card"><small>Check-ins, messages and private notes aren't affected.</small></div>
+        <div class="tabs"><span>Today</span><span>Training</span><span>Nutrition</span><span>Recovery</span><span class="on">Progress</span></div>
+      </div>
+      <figcaption><b><span class="id">AC-10</span>Coach access to earlier history</b>
+        <div class="note"><ul><li><span class="rule">SPEC, D37:</span> coach sees data from the join date unless the athlete grants earlier history. One switch, off by default.</li><li>Opened from L-01 and AC-02. Turning it on asks once to confirm; the coach is told when access is granted.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>8:00</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px"><span class="burger">☰</span>&nbsp; Today</span><span></span></div>
+        <div class="card" style="border-color:var(--ink);border-width:2px"><b>Coaching paused until 20 Nov</b><small>Coach Joseph paused check-ins while you travel. Your plan and chat still work.</small></div>
+        <div class="hc"><small>Training</small><b>Hotel gym · dumbbells</b>Optional while paused<br><span class="b o">Start workout</span></div>
+        <div class="hc"><small>Nutrition</small><b>1,240 kcal left</b>Coach's meal plan<br><span class="b o">Log food</span></div>
+        <div class="tabs"><span class="on">Today</span><span>Training</span><span>Nutrition</span><span>Recovery</span><span>Progress</span></div>
+      </div>
+      <figcaption><b><span class="id">CS-01</span>Coaching paused (athlete)</b>
+        <div class="note"><ul><li><span class="rule">D39:</span> when the coach sets Paused (K-04), check-ins and reminders stop. Plan, chat and coach access stay.</li><li>No check-in card on Today while paused. The end date shows only if the coach sets one.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>8:00</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px"><span class="burger">☰</span>&nbsp; Today</span><span></span></div>
+        <div class="card" style="border-color:var(--ink);border-width:2px"><b>Coaching with Joseph ends on 30 Nov</b><small>Everything works as normal until then. Afterwards you'll move to the free plan and keep Joseph's plan, read-only.</small><div class="btn" style="margin-top:6px">What changes</div></div>
+        <div class="hc"><small>Training</small><b>Push day · 50 min</b><span class="b">Start workout</span></div>
+        <div class="hc"><small>Check-in</small><b>Week 6 check-in due Sunday</b></div>
+        <div class="tabs"><span class="on">Today</span><span>Training</span><span>Nutrition</span><span>Recovery</span><span>Progress</span></div>
+      </div>
+      <figcaption><b><span class="id">CS-02</span>Coaching ending (athlete)</b>
+        <div class="note"><ul><li><span class="rule">D39:</span> Leaving continues as normal until the coach's end date, with this banner.</li><li><span class="rule">D21:</span> on the end date, the athlete sees L-03 (free plan, Recovery hidden, plan read-only). "What changes" opens that summary early.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:43</span><span>▮▮ ◔</span></div>
+        <div class="bar"><i style="width:15%"></i></div>
+        <div class="q">Your privacy</div>
+        <div class="sub">Joining Coach Joseph. You can change these any time in Account → Privacy.</div>
+        <div class="toggle"><div><b>Health and fitness data (required)</b><small>Your workouts, food, recovery and body stats, shared with Coach Joseph from today.</small></div><div class="sw"></div></div>
+        <div class="toggle"><div><b>Progress photos (optional)</b><small>Only you and your coach can see them. Check-ins work without them.</small></div><div class="sw off"></div></div>
+        <div class="toggle"><div><b>Reminders and notifications</b><small>Workout, check-in and coach messages.</small></div><div class="sw"></div></div>
+        <div style="font-size:10px;color:var(--muted);margin-top:8px"><u>Read the Privacy Policy</u></div>
+        <div class="pinned"><div class="btn primary">Continue</div></div>
+      </div>
+      <figcaption><b><span class="id">F1-05b</span>Consent — invite sign-up</b>
+        <div class="note"><ul><li><span class="rule">D44:</span> people joining through a coach's link see no AI permission step, because coached athletes never see AI (D10).</li><li>Otherwise the same as F1-05. States what the coach will see, from the join date (SPEC).</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<!-- ============ AI + TRIAL ============ -->
+<section class="flow">
+  <h2>AI permission, out-of-scope requests and trial end (AI subscribers)</h2>
+  <p class="arrowrow">AC-02 AI switch off → confirm (AI-03) → AI-02 · AI-01 adjust → out of scope (AI-04) · day 5 → reminder (TL-01) · day 7 not paid → free plan (TL-02)</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:21</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← Account</span><span style="color:var(--ink);font-weight:700">Privacy</span><span></span></div>
+        <div class="toggle"><div><b>AI features</b><small>Lets Arcwell's AI use your data.</small></div><div class="sw"></div></div>
+        <div class="dimmed"></div>
+        <div class="sheet" style="z-index:6">
+          <div class="grab"></div>
+          <div class="q" style="font-size:14px">Turn off AI features?</div>
+          <div class="card"><small>• Your AI plan stops adjusting; you can keep following it<br>• AI meal plans and photo logging are hidden<br>• Your logs and history stay</small></div>
+          <div class="card" style="border-color:var(--ink)"><small><b style="display:inline">Your Plus subscription keeps running.</b> Turning AI off doesn't cancel it or give a refund.</small></div>
+          <div class="btn primary">Turn off AI</div>
+          <div class="btn">Manage subscription in Play Store</div>
+          <div class="btn ghost">Keep AI on</div>
+        </div>
+      </div>
+      <figcaption><b><span class="id">AI-03</span>Turn off AI — confirm</b>
+        <div class="note"><ul><li><span class="rule">D20:</span> AI features hide immediately; the trial or subscription stays active in the background.</li><li><span class="rule">D19:</span> cancelling or refunds only through Play Store, stated plainly so nobody thinks this cancels billing.</li><li>Afterwards the AI Coaching tab shows AI-02.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:03</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>← AI Coaching</span><span style="color:var(--ink);font-weight:700">Change my goal</span><span></span></div>
+        <div class="opt"><span class="ic"></span><span>Lose fat</span></div>
+        <div class="opt"><span class="ic"></span><span>Build muscle</span></div>
+        <div class="opt sel"><span class="ic"></span><span>Prepare for a bodybuilding contest</span></div>
+        <div class="card" style="border-color:var(--ink);border-width:2px"><b>I can't help with that</b><small>Arcwell's AI covers general fitness goals. Contest prep and injury rehab need specialist guidance, so your plan hasn't changed.</small></div>
+        <div class="btn">Choose another goal</div>
+        <div class="tabs"><span>Today</span><span>Training</span><span>Nutrition</span><span>Recovery</span><span class="on">AI Coaching</span></div>
+      </div>
+      <figcaption><b><span class="id">AI-04</span>Out of scope — "I can't help with that"</b>
+        <div class="note"><ul><li><span class="rule">D22:</span> out-of-scope requests show a standard "I can't help with that" state. No routing to coaches; nothing is sent anywhere.</li><li>The current plan stays as it was. Also shown when a "New injury" entry needs rehab rather than a training change.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>8:00</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px"><span class="burger">☰</span>&nbsp; Today</span><span></span></div>
+        <div class="card" style="border-color:var(--ink);border-width:2px"><b>Your free trial ends in 2 days</b><small>On 18 Nov, Google Play charges ₹___ for Plus yearly unless you cancel. Cancel any time before then and you won't be charged.</small><div class="btn" style="margin-top:6px">Manage subscription in Play Store</div></div>
+        <div class="hc"><small>Training</small><b>Push day · 50 min</b><span class="b">Start workout</span></div>
+        <div class="hc"><small>Nutrition</small><b>1,240 kcal left</b><span class="b o">Log food</span></div>
+        <div class="tabs"><span class="on">Today</span><span>Training</span><span>Nutrition</span><span>Recovery</span><span>AI Coaching</span></div>
+      </div>
+      <figcaption><b><span class="id">TL-01</span>Trial ending — day 5 reminder</b>
+        <div class="note"><ul><li><span class="rule">D17, D34:</span> card on Today and a push on day 5, two days before Google Play charges.</li><li><span class="rule">D19:</span> cancelling happens in Play Store. Dismissible; it doesn't come back once dismissed.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:00</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px"><span class="burger">☰</span>&nbsp; Today</span><span></span></div>
+        <div class="card" style="border-color:var(--ink);border-width:2px"><b>Your free trial has ended</b><small>You're on the free plan now. Your workouts, meals and recovery history are all kept. Your AI plan stays as a read-only plan.</small><div class="btn primary" style="margin-top:7px">Subscribe to Plus</div></div>
+        <div class="card"><small>• Bottom bar: Today · Training · Nutrition<br>• Nutrition shows calories only<br>• Recovery is hidden until you subscribe</small></div>
+        <div class="hc"><small>Training</small><b>Full body B · 45 min</b><span class="b o">Start workout</span></div>
+        <div class="tabs"><span class="on">Today</span><span>Training</span><span>Nutrition</span></div>
+      </div>
+      <figcaption><b><span class="id">TL-02</span>Trial ended — not paid</b>
+        <div class="note"><ul><li><span class="rule">D17:</span> 7-day hard paywall. If not paid (cancelled, or the payment failed after Play's retries), the user reverts to Free and the Recovery tab hides.</li><li><span class="rule">D32, D33:</span> recovery history and the AI plan are kept. Same outcome as F8-08 for a paid plan that ends.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+</body>
+</html>

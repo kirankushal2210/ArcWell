@@ -28,12 +28,12 @@
         <div class="slider">How well did you sleep?<div class="track"><i style="left:60%"></i></div><div class="ends"><span>Badly</span><span>Very well</span></div></div>
         <div class="slider">Soreness<div class="track"><i style="left:35%"></i></div><div class="ends"><span>None</span><span>Very sore</span></div></div>
         <div class="slider">Fatigue<div class="track"><i style="left:45%"></i></div><div class="ends"><span>Fresh</span><span>Exhausted</span></div></div>
-        <div class="open"><b>Sleep score</b>How it's worked out is not decided (no wearables in v1).</div>
+        <div class="card" style="display:flex;align-items:center;gap:10px"><div class="ring" style="width:58px;height:58px;border-width:5px;margin:0;flex:none"><div class="bigtime" style="font-size:16px">72</div></div><span><b>Sleep score 72 / 100</b><small>From your hours and how well you slept</small></span></div>
         <div class="pinned"><div class="btn primary">Save</div></div>
         <div class="tabs"><span>Today</span><span>Training</span><span>Nutrition</span><span class="on">Recovery</span><span>AI Coaching</span></div>
       </div>
       <figcaption><b><span class="id">R-01</span>Recovery — log today</b>
-        <div class="note"><ul><li><span class="rule">Rule D4:</span> only sleep, sleep quality/score, soreness, fatigue. No routines.</li><li><span class="prop">Proposal:</span> hours stepper + three sliders; soreness as one overall level (per-body-area soreness not agreed).</li><li>Shown with the AI-coached bar; coached athletes see the same screen with their bar.</li><li>↕ Scrolls on small phones; Save stays pinned.</li></ul></div></figcaption>
+        <div class="note"><ul><li><span class="rule">Rule D4:</span> only sleep, sleep quality/score, soreness, fatigue. No routines.</li><li><span class="rule">D18, D30:</span> sleep score is a 0–100 dial worked out from hours and sleep quality; it updates as the user adjusts the inputs. Exact formula set at build time.</li><li><span class="prop">Proposal:</span> hours stepper + three sliders; soreness as one overall level (per-body-area soreness not agreed).</li><li>Shown with the AI-coached bar; coached athletes see the same screen with their bar.</li><li>↕ Scrolls on small phones; Save stays pinned.</li></ul></div></figcaption>
     </figure>
 
     <figure>
@@ -47,7 +47,7 @@
         <div class="tabs"><span>Today</span><span>Training</span><span>Nutrition</span><span class="on">Recovery</span><span>Progress</span></div>
       </div>
       <figcaption><b><span class="id">R-02</span>Recovery — trends</b>
-        <div class="note"><ul><li>Shown with the human-coached bar. Their coach also sees these trends in the client profile (K-02).</li><li><span class="opn">Open:</span> what a coach can set for recovery (D7) — no coach controls drawn.</li></ul></div></figcaption>
+        <div class="note"><ul><li>Shown with the human-coached bar. Their coach also sees these trends in the client profile (K-02).</li><li><span class="rule">D31:</span> a coach can set a sleep target and a recovery note (K-24); the athlete sees them on Recovery (R-04). Trends include the sleep score (D18).</li></ul></div></figcaption>
     </figure>
 
     <figure>
@@ -128,7 +128,7 @@
         <div class="card"><b>−4.2 kg since you started</b><small>12 weeks</small></div>
       </div>
       <figcaption><b><span class="id">PH-04</span>Charts</b>
-        <div class="note"><ul><li><span class="rule">Rule D5:</span> free.</li><li><span class="prop">Proposal:</span> one chart with a metric picker. Pro-only metrics (e.g. recovery, macros) not decided — <span class="opn">Open:</span> does Pro add any charts?</li></ul></div></figcaption>
+        <div class="note"><ul><li><span class="rule">Rule D5:</span> free.</li><li>One chart with a metric picker.</li><li><span class="rule">D5, D32:</span> Pro users also get sleep score, soreness and fatigue in the picker; free users don't see them (Recovery is hidden for free).</li></ul></div></figcaption>
     </figure>
 
   </div>
@@ -150,11 +150,11 @@
         <div class="opt"><span class="ic"></span><span>Change equipment or gym</span></div>
         <div class="opt"><span class="ic"></span><span>New injury or limitation</span></div>
         <div class="opt"><span class="ic"></span><span>Change my goal</span></div>
-        <div class="card"><small>Preparing for a contest or recovering from an injury? These need a human coach.</small></div>
+        <div class="card"><small>AI coaching covers general fitness goals. Contest prep and injury rehab aren't supported.</small></div>
         <div class="tabs"><span>Today</span><span>Training</span><span>Nutrition</span><span>Recovery</span><span class="on">AI Coaching</span></div>
       </div>
       <figcaption><b><span class="id">AI-01</span>AI Coaching</b>
-        <div class="note"><ul><li><span class="rule">SPEC:</span> AI builds and adjusts plans from the approved library only; out-of-scope goals go to coaches.</li><li><span class="prop">Proposal:</span> structured "adjust" options instead of open chat.</li><li><span class="opn">Open:</span> where "need a human coach" sends people — there's no marketplace in v1.</li><li>Daily AI limit reached → "You've used today's AI adjustments; try again tomorrow".</li></ul></div></figcaption>
+        <div class="note"><ul><li><span class="rule">SPEC:</span> AI builds and adjusts plans from the approved library only.</li><li>Structured "adjust" options instead of open chat.</li><li><span class="rule">D22:</span> out-of-scope requests (e.g. "Change my goal" to contest prep) show "I can't help with that" (AI-04). No routing to coaches.</li><li>Daily AI limit reached: X-01.</li></ul></div></figcaption>
     </figure>
 
     <figure>
@@ -166,11 +166,11 @@
           <div class="sub" style="max-width:230px">You haven't allowed Arcwell's AI to use your data. Your workouts, food logs and recovery still work as normal.</div>
           <div class="btn primary" style="width:80%">Review AI permission</div>
         </div>
-        <div class="open"><b>Declining AI permission</b>What happens to an active trial or subscription.</div>
+        <div class="card"><small>Your Plus trial or subscription is still active. <u>Manage subscription in Play Store</u></small></div>
         <div class="tabs"><span>Today</span><span>Training</span><span>Nutrition</span><span>Recovery</span><span class="on">AI Coaching</span></div>
       </div>
       <figcaption><b><span class="id">AI-02</span>AI Coaching — permission declined</b>
-        <div class="note"><ul><li><span class="rule">Rule D8:</span> declining never blocks non-AI features.</li><li>"Review AI permission" opens F8-03 (the first-use step).</li></ul></div></figcaption>
+        <div class="note"><ul><li><span class="rule">Rule D8:</span> declining never blocks non-AI features.</li><li>"Review AI permission" opens F8-03 (the first-use step).</li><li><span class="rule">D20:</span> the AI Coaching tab stays, showing only this state; AI plans, AI meal plans and photo logging are hidden everywhere else. Billing continues until cancelled in Play Store (D19).</li></ul></div></figcaption>
     </figure>
 
   </div>

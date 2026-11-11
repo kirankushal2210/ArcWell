@@ -25,23 +25,24 @@
 
 <section class="flow">
   <h2>Training tab — landing by tier</h2>
-  <p class="arrowrow">The Training item in the bottom bar opens the athlete's current plan. How this relates to the menu's "Workouts" and "Programs" is not decided.</p>
+  <p class="arrowrow">The Training item in the bottom bar opens the athlete's current plan. Free users get starter workouts; Pro users follow a multi-week programme (D13). The menu's Workouts and Programs are in F17.</p>
   <div class="row">
 
     <figure>
       <div class="phone">
         <div class="status"><span>8:10</span><span>▮▮ ◔</span></div>
         <div class="topnav"><span style="font-weight:700;color:var(--ink);font-size:13px"><span class="burger">☰</span>&nbsp; Training</span><span></span></div>
-        <div class="hc" style="border-color:var(--ink);border-width:2px"><small>Your starter programme</small><b>Full body · 3 days · 45 min</b>Next: Day 2 — Full body B<br><span class="b">Start workout</span></div>
-        <div class="label">Starter programmes</div>
-        <div class="opt sel"><span class="ic"></span><span>Full body · 3 days<small>Gym · beginner-friendly</small></span></div>
-        <div class="opt"><span class="ic"></span><span>Upper / lower · 4 days<small>Gym</small></span></div>
-        <div class="opt"><span class="ic"></span><span>Home strength · 3 days<small>Dumbbells</small></span></div>
+        <div class="hc" style="border-color:var(--ink);border-width:2px"><small>Next workout</small><b>Full body B · 45 min</b>Last done: Full body A, Monday<br><span class="b">Start workout</span></div>
+        <div class="label">Your starter workouts</div>
+        <div class="opt"><span class="ic"></span><span>Full body A<small>Gym · 6 exercises</small></span></div>
+        <div class="opt sel"><span class="ic"></span><span>Full body B<small>Gym · 6 exercises</small></span></div>
+        <div class="opt"><span class="ic"></span><span>Full body C<small>Gym · 5 exercises</small></span></div>
+        <div class="card"><small>🔒 Multi-week programmes are part of Plus</small></div>
         <div class="card"><small>Want a plan built around you? <u>Try AI coaching free for a week</u></small></div>
         <div class="tabs"><span>Today</span><span class="on">Training</span><span>Nutrition</span></div>
       </div>
       <figcaption><b><span class="id">T-01</span>Training — free</b>
-        <div class="note"><ul><li><span class="rule">D5:</span> 2–3 free templates; switching between them allowed.</li><li><span class="rule">D6:</span> one-week trial offered as a quiet link.</li><li><span class="opn">Open:</span> whether free users can edit templates or build their own workouts.</li></ul></div></figcaption>
+        <div class="note"><ul><li><span class="rule">D5, D13, D27:</span> 2–3 free starter workouts (standalone templates), picked to match the equipment answer. Programmes are Pro.</li><li><span class="rule">D6:</span> one-week trial offered as a quiet link.</li><li><span class="rule">D26:</span> free users can't edit templates or build workouts; Pro can (TR-03).</li></ul></div></figcaption>
     </figure>
 
     <figure>
@@ -90,7 +91,7 @@
         <div class="result"><span>Goblet squat<small>Legs · dumbbell</small></span><span class="r">›</span></div>
       </div>
       <figcaption><b><span class="id">T-04</span>Exercise library</b>
-        <div class="note"><ul><li>☰ → Training → Exercises. Each row opens exercise detail (F4-08). Filters by muscle and equipment (library fields in SPEC).</li><li><span class="rule">D10:</span> full access for Pro. <span class="opn">Open:</span> free access.</li><li>Keyboard: results shrink above the keyboard.</li></ul></div></figcaption>
+        <div class="note"><ul><li>☰ → Training → Exercises. Each row opens exercise detail (F4-08). Filters by muscle and equipment (library fields in SPEC).</li><li><span class="rule">D10, D25:</span> free for everyone.</li><li>Keyboard: results shrink above the keyboard.</li></ul></div></figcaption>
     </figure>
 
   </div>
@@ -123,13 +124,13 @@
       <div class="phone">
         <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
         <div class="topnav"><span>← Account</span><span style="color:var(--ink);font-weight:700">Units</span><span></span></div>
-        <div class="label">Weight</div><div class="seg"><span class="on">kg</span><span class="unk" style="border:1px dashed var(--ink)">lb ?</span></div>
+        <div class="label">Weight</div><div class="seg"><span class="on">kg</span></div>
         <div class="label">Height and measurements</div><div class="seg"><span class="on">cm</span><span>ft / in</span></div>
         <div class="label">Food portions</div><div class="seg"><span class="on">Indian units first</span><span>Grams first</span></div>
-        <div class="open"><b>Pounds</b>Support lb for weights, or kg only?</div>
+        <div class="card"><small>Weights are in kg. Pounds are coming in a later version.</small></div>
       </div>
       <figcaption><b><span class="id">AC-08</span>Units</b>
-        <div class="note"><ul><li>cm and ft/in already appear in onboarding (F1-08).</li><li><span class="opn">Open:</span> lb support (raised at F4-05). <span class="prop">Proposal:</span> portion-unit preference.</li></ul></div></figcaption>
+        <div class="note"><ul><li>cm and ft/in already appear in onboarding (F1-08).</li><li><span class="rule">D45:</span> kg only in v1; lb in v1.1. Portion-unit preference included.</li></ul></div></figcaption>
     </figure>
 
     <figure>
@@ -155,13 +156,13 @@
           <div class="q">Your AI trial has started</div>
           <div class="sub" style="max-width:230px">One week of AI coaching. Here's what changed:</div>
           <div class="card" style="text-align:left;width:100%"><small>• New in the bottom bar: Recovery and AI Coaching<br>• Training now follows your AI plan<br>• Nutrition shows full macros and photo logging<br>• Your earlier workouts and logs are all still here</small></div>
-          <div class="open" style="text-align:left;width:100%"><b>Trial end</b>Billing and what happens after day 7.</div>
+          <div class="card" style="text-align:left;width:100%"><small>Free until 18 Nov. Then Google Play charges your plan unless you cancel. We'll remind you on day 5.</small></div>
         </div>
         <div class="pinned"><div class="btn primary">See my AI plan</div></div>
         <div class="tabs"><span>Today</span><span>Training</span><span>Nutrition</span><span>Recovery</span><span>AI Coaching</span></div>
       </div>
       <figcaption><b><span class="id">U-01</span>Upgrade — what changed</b>
-        <div class="note"><ul><li>After F8-05 builds the plan. Same "what changed" pattern as J-03 and L-03.</li><li><span class="rule">D2, D5a, D6:</span> AI bar, Recovery appears, one-week trial.</li></ul></div></figcaption>
+        <div class="note"><ul><li>After F8-05 builds the plan. Same "what changed" pattern as J-03 and L-03.</li><li><span class="rule">D2, D5a, D6:</span> AI bar, Recovery appears, one-week trial.</li><li><span class="rule">D17, D34:</span> trial end stated plainly; reminder TL-01; not paid → TL-02.</li></ul></div></figcaption>
     </figure>
 
   </div>

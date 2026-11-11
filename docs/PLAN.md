@@ -11,6 +11,13 @@ Rough estimates assume two builders using AI tools heavily. Total ≈ 18–24 we
 - [ ] Privacy policy + DPDP consent text (health data, AI, photos, coach access)
 - [ ] IP India trademark search for "Arcwell" (software and fitness classes)
 - [ ] Confirm Android package name before first Play upload (currently `com.arcwell.app`; permanent once published)
+- [ ] Coach Terms legal review (coaches handle client health data under DPDP)
+- [ ] Groq data terms: confirm the AI photo-deletion wording in F8-03
+- [ ] Standard gram weights for Indian portions (katori, phulka, piece), checked by a nutrition reviewer
+- [ ] Invite-link domain and web page (link preview + redirect)
+- [ ] Play Console prices for Arcwell Plus (monthly, yearly) and trial setup
+- [ ] Sleep-score formula (from hours and quality, no wearables)
+- [ ] Gym directory data source and licence
 
 ## Phase 0 — Setup (~1 week)
 
@@ -28,7 +35,9 @@ Everything design-related lives in [DESIGN.md](DESIGN.md); mockups in `docs/desi
 
 - [x] DESIGN.md: principles, brand, app structure per role, draft tokens, component list
 - [ ] Confirm working assumptions (DESIGN.md section 0)
-- [ ] Wireframes for core flows F1–F9
+- [x] Wireframes for all v1 flows F1–F18 (199 screens; decisions in DECISIONS.md D1–D45)
+- [ ] Founder review of the applied defaults D25–D45 and a screen-by-screen pass
+- [ ] Usability test of the core flows (onboarding, workout logging, food logging, check-in) with 3–5 people
 - [ ] Finalise tokens (incl. light theme) and build them in `app/src/theme/`
 - [ ] Build core components in `app/src/components/`
 - [ ] High-fidelity mockups for the 5–6 most important screens
@@ -53,7 +62,7 @@ Weekly check-ins (fixed form, coach-set day, photos, text reply); realtime chat 
 
 ## Phase 5 — Progress, recovery, transformations (2 weeks)
 
-Measurements, photos, trends; recovery logs (paid + coached only); coach profile; transformation consent flow with face blur, withdrawal, and export.
+Measurements, photos, trends; recovery logs with sleep score (paid + coached only) and coach sleep targets; Workouts, Programs, Muscle Analytics, Gyms directory; coach profile; transformation consent flow with face blur, withdrawal, and export.
 
 ## Phase 6 — Billing and entitlements (1–2 weeks)
 
@@ -61,7 +70,7 @@ RevenueCat + Google Play Billing with webhook → DB entitlements; Razorpay Subs
 
 ## Phase 7 — AI features (3 weeks)
 
-AI plan generation/adjustment from the library only, structured output + rule validation; AI meal plans; AI photo food logging (if a free vision model exists, else deferred); per-user daily caps, usage logging, routing out-of-scope goals to coaches.
+AI plan generation/adjustment from the library only, structured output + rule validation; AI meal plans; AI photo food logging (if a free vision model exists, else deferred); per-user daily caps, usage logging, "I can't help with that" for out-of-scope requests (no routing).
 
 ## Phase 8 — Hardening and closed beta (2–4 weeks)
 

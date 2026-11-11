@@ -45,7 +45,7 @@ Mockups and wireframes live in `docs/design/`.
 
 ## 3. App structure (information architecture)
 
-Confirmed rules come from [DECISIONS.md](DECISIONS.md) (IDs in brackets). Section names are working labels until D3 is decided.
+Confirmed rules come from [DECISIONS.md](DECISIONS.md) (IDs in brackets). Section names as drawn are the v1 names (D45).
 
 ### Athlete bottom bar, by tier
 
@@ -55,13 +55,16 @@ Confirmed rules come from [DECISIONS.md](DECISIONS.md) (IDs in brackets). Sectio
 | AI-coached (Pro) | Today · Training · Nutrition · Recovery · AI Coaching | D2 |
 | Human-coached (Pro) | Today · Training · Nutrition · Recovery · Progress — Progress is the combined Check-ins · Progress · Chat area | D2a, D11 |
 
-- **Side menu (☰)** for all athletes, supplementing the bottom bar (D9): Account · Notifications · Training (Exercises, Workouts, Programs, History, Set Videos, Muscle Analytics) · Gyms · Physique (Bodyweight, Measurements, Photos, Charts).
+- **Side menu (☰)** for all athletes, supplementing the bottom bar (D9, D14): Account · Notifications · Training (Exercises, Workouts, Programs, History, Muscle Analytics) · Gyms · Physique (Bodyweight, Measurements, Photos, Charts). No Set Videos.
+- **Free access per item** (D13, D25): Exercises ✓ · Workouts (templates only) · History ✓ · Gyms ✓ · Physique ✓ · Programs 🔒 Pro · Muscle Analytics 🔒 Pro.
+- **Workouts** are standalone sessions; **Programs** are multi-week plans (D13). **Gyms** is a read-only map / directory (D15).
+- **Coached Progress switch** is a timeline of past check-ins and coach feedback (D16).
 - **Physique tools** are free and live in the side menu for everyone (D5, D9).
 - **Pro access** covers AI subscribers and human-coached athletes; coached athletes need no AI subscription and never see AI coaching (D10).
-- **Recovery** = sleep / sleep score, soreness, fatigue; hidden for free users (D4, D5a).
-- **Open:** Today's exact contents (D2d); free access to Exercises, Workouts, History, Set Videos, Muscle Analytics, Gyms; what Set Videos, Muscle Analytics and Gyms do; Workouts vs Programs; contents of the coached Progress switch.
+- **Recovery** = sleep / sleep score (0–100 dial), soreness, fatigue; hidden for free users (D4, D5a, D18).
+- **Today** layouts N-01 to N-03 are final (D2d, D23).
 
-### Coach (proposal — coach navigation not yet reviewed)
+### Coach (final for v1, D23)
 
 | Tab | Contents |
 |---|---|
@@ -84,15 +87,17 @@ Confirmed rules come from [DECISIONS.md](DECISIONS.md) (IDs in brackets). Sectio
 | F7 | Chat (text, image, PDF) | Wireframed — [f6-f7-checkins-chat.html](design/wireframes/f6-f7-checkins-chat.html) |
 | F8 | Upgrade to paid AI tier (paywall) | Wireframed — [f8-f9-paywall-photos.html](design/wireframes/f8-f9-paywall-photos.html) |
 | F9 | Transformation photo consent (request → approve with blur → withdraw) | Wireframed — [f8-f9-paywall-photos.html](design/wireframes/f8-f9-paywall-photos.html) |
-
 | F10 | Bottom bars, side menu, Today by tier, notifications, account, privacy, export, delete, password reset | Wireframed — [f10-menu-today-account.html](design/wireframes/f10-menu-today-account.html) |
 | F11 | Recovery, Physique tools, AI Coaching | Wireframed — [f11-recovery-physique-ai.html](design/wireframes/f11-recovery-physique-ai.html) |
 | F12 | Coached Progress area, waiting for a plan, joining and leaving a coach | Wireframed — [f12-coached-area-switching.html](design/wireframes/f12-coached-area-switching.html) |
 | F13 | Coach clients, client profile, plan and meal plan builders, assigning, leads, business | Wireframed — [f13-coach-tools.html](design/wireframes/f13-coach-tools.html) |
 | F14 | Coach client-profile sections (nutrition, recovery, progress, check-ins, notes), coach sign-up, profile, settings | Wireframed — [f14-coach-profile-settings.html](design/wireframes/f14-coach-profile-settings.html) |
 | F15 | Training landing by tier, exercise library, profile, units, help, upgrade "what changed", reusable states | Wireframed — [f15-training-account-states.html](design/wireframes/f15-training-account-states.html) |
+| F16 | Missing states from the wireframe audit: AI limit and failure, edit or delete food, image and PDF viewers, notification permission, export states, athlete and coach empty states, meal plan templates, coach exercise library, force update, maintenance | Wireframed — [f16-states-empty-system.html](design/wireframes/f16-states-empty-system.html) |
+| F17 | Training menu (Workouts, Programs, Muscle Analytics, timed sets), Gyms, coached Progress timeline and past check-ins, coach recovery target, history access, coaching status, invite consent, AI off and out-of-scope, trial end | Wireframed — [f17-training-menu-gyms-progress.html](design/wireframes/f17-training-menu-gyms-progress.html) |
+| F18 | Coach recovery target, completing a client, client limit, billing lapse, deleting a coach account | Wireframed — [f18-coach-lifecycle.html](design/wireframes/f18-coach-lifecycle.html) |
 
-"Wireframed" means **drawn only**. No screen has been reviewed and approved by the founder or tested with users.
+"Wireframed" means **drawn**. All v1 flows are drawn (199 screens) and no open decisions remain on any screen: every decision is in DECISIONS.md (D1–D45; D25–D45 are defaults Claude applied, for founder review). No screen has been reviewed screen by screen or tested with users.
 
 ## 5. Design tokens (v0 — draft)
 
@@ -102,22 +107,24 @@ Dark theme (default):
 
 | Token | Value | Use |
 |---|---|---|
-| `bg` | `#0E1116` | App background |
-| `surface` | `#161B22` | Cards, sheets |
-| `surfaceRaised` | `#1F2630` | Inputs, pressed states |
-| `border` | `#2A323D` | Dividers, outlines |
+| `bg` | `#111316` | App background (dark charcoal) |
+| `surface` | `#191C21` | Cards, sheets |
+| `surfaceRaised` | `#22262D` | Inputs, pressed states |
+| `border` | `#2D323A` | Dividers, outlines |
 | `text` | `#F2F4F7` | Primary text |
 | `textMuted` | `#9AA4B2` | Secondary text |
-| `brand` | `#1FBF8F` | Primary actions, brand accent |
-| `onBrand` | `#04140E` | Text on brand buttons |
-| `training` | `#4C8DFF` | Training pillar |
+| `brand` | `#3D8BFF` | Primary actions, brand accent (electric blue) |
+| `onBrand` | `#04101F` | Text on brand buttons |
+| `accent` | `#22D3EE` | Highlights, charts, focus rings (cyan) |
+| `brandGradient` | `#3D8BFF → #22D3EE` | Used sparingly: hero cards and the paywall only |
+| `training` | `#22D3EE` | Training pillar (cyan, shares the accent) |
 | `nutrition` | `#F5A524` | Nutrition pillar |
 | `recovery` | `#8B7CFF` | Recovery pillar |
 | `success` | `#22C55E` | Completed, positive |
 | `warning` | `#F59E0B` | Needs attention |
 | `danger` | `#EF4444` | Destructive actions, errors only |
 
-Light theme: same roles; values to be defined in the design-system step. All text/background pairs must meet WCAG AA contrast (4.5:1 for body text).
+Visual direction per D24: dark charcoal, electric blue / cyan accents, minimal and premium. Values are draft; the main pairs pass WCAG AA (checked 2026-11-11: text 16.9:1, muted 7.4:1, brand on bg 5.6:1, text on brand 5.8:1). No streaks, XP or badges. Light theme: same roles; values to be defined in the design-system step. All text/background pairs must meet WCAG AA contrast (4.5:1 for body text).
 
 ### Typography
 
@@ -306,6 +313,55 @@ Tracked here as screens are designed (Wireframe → Mockup → Built). **✅ in 
 | S-02 Error and retry (pattern) | All | ✅ | — | — |
 | S-03 Form validation (pattern) | All | ✅ | — | — |
 | S-04 Permission denied (pattern) | All | ✅ | — | — |
+| X-01 AI daily limit reached | Athlete (AI) | ✅ | — | — |
+| X-02 AI plan couldn't be built | Athlete (AI) | ✅ | — | — |
+| X-03 Edit a logged food | Athlete | ✅ | — | — |
+| X-04 Removed — undo | Athlete | ✅ | — | — |
+| X-05 Image viewer | Athlete, Coach | ✅ | — | — |
+| X-06 PDF viewer | Athlete, Coach | ✅ | — | — |
+| X-07 Notification permission — before asking | All | ✅ | — | — |
+| X-08 Android notification dialog (system) | All | ✅ | — | — |
+| X-09 Export — preparing | All | ✅ | — | — |
+| X-10 Export — failed | All | ✅ | — | — |
+| E-01 Workout history — empty | Athlete | ✅ | — | — |
+| E-02 Notifications — empty | Athlete | ✅ | — | — |
+| E-03 Exercise library — no results | Athlete | ✅ | — | — |
+| E-04 Physique charts — no data | Athlete | ✅ | — | — |
+| E-05 Check-in inbox — empty | Coach | ✅ | — | — |
+| E-06 Messages — empty | Coach | ✅ | — | — |
+| E-07 Leads — empty | Coach | ✅ | — | — |
+| E-08 Transformations — empty | Coach | ✅ | — | — |
+| K-22 Plans — meal plan templates | Coach | ✅ | — | — |
+| K-23 Coach exercise library | Coach | ✅ | — | — |
+| S-05 Force update | All | ✅ | — | — |
+| S-06 Maintenance / service down | All | ✅ | — | — |
+| TR-01 Workouts — free | Athlete (free) | ✅ | — | — |
+| TR-02 Workouts — Pro | Athlete (Pro) | ✅ | — | — |
+| TR-03 Create workout | Athlete (Pro) | ✅ | — | — |
+| TR-04 Programs — Pro | Athlete (Pro) | ✅ | — | — |
+| TR-05 Programs — locked | Athlete (free) | ✅ | — | — |
+| TR-06 Muscle Analytics — Pro | Athlete (Pro) | ✅ | — | — |
+| TR-07 Muscle Analytics — locked | Athlete (free) | ✅ | — | — |
+| TR-08 Timed and bodyweight sets | Athlete | ✅ | — | — |
+| G-01 Gyms — map and list | Athlete | ✅ | — | — |
+| G-02 Gym detail | Athlete | ✅ | — | — |
+| CP-06 Past check-in — read-only | Athlete (coached) | ✅ | — | — |
+| R-04 Recovery — coached, with coach target | Athlete (coached) | ✅ | — | — |
+| AC-10 Coach access to earlier history | Athlete (coached) | ✅ | — | — |
+| CS-01 Coaching paused | Athlete (coached) | ✅ | — | — |
+| CS-02 Coaching ending | Athlete (coached) | ✅ | — | — |
+| F1-05b Consent — invite sign-up | Athlete (coached) | ✅ | — | — |
+| AI-03 Turn off AI — confirm | Athlete (AI) | ✅ | — | — |
+| AI-04 Out of scope | Athlete (AI) | ✅ | — | — |
+| TL-01 Trial ending reminder | Athlete (AI trial) | ✅ | — | — |
+| TL-02 Trial ended — not paid | Athlete (free) | ✅ | — | — |
+| K-24 Set sleep target and recovery note | Coach | ✅ | — | — |
+| K-25 Client limit reached | Coach | ✅ | — | — |
+| K-26 Invite page — coach is full | Athlete | ✅ | — | — |
+| K-27 Coach billing lapsed | Coach | ✅ | — | — |
+| K-28 Delete coach account | Coach | ✅ | — | — |
+| K-29 Coach account closed | Athlete (coached) | ✅ | — | — |
+| K-30 Complete a client — confirm | Coach | ✅ | — | — |
 
 ## 8. Accessibility and quality checklist
 
@@ -323,3 +379,4 @@ Tracked here as screens are designed (Wireframe → Mockup → Built). **✅ in 
 |---|---|
 | 2026-11-10 | DESIGN.md created; working assumptions in section 0 pending founder confirmation |
 | 2026-11-11 | Founder decisions D1–D12 recorded in [DECISIONS.md](DECISIONS.md); section 3 rewritten; F10–F13 drawn; existing screens updated |
+| 2026-11-11 | F14–F16 drawn. Founder Executive Defaults (D13–D24) and Claude-applied defaults (D25–D45) recorded; every open box resolved; F17–F18 drawn; tokens moved from green to electric blue / cyan (D24) |

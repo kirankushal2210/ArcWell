@@ -13,7 +13,7 @@ Source notes:
 
 ## Visual direction (summary)
 
-The strongest references for Arcwell are not fitness concept shots. They are shipped tools that treat data calmly: WHOOP's near-black canvas, where colour only ever means something; Oura's 2025 move from five tabs to three, with readiness, sleep and activity as quiet circles on a "Today" tab; MacroFactor's "adherence-neutral" nutrition charts, which never turn red when you miss a target; and Hevy's plain set table with a PREVIOUS column. Together they point to a near-black, low-chroma interface. Colour is used semantically: brand green for actions, and blue, amber and violet only to say "you are in Training, Nutrition or Recovery". Large tabular numerals carry the hierarchy, not gradients or illustration. This matches the `#0E1116` charcoal and pillar palette already drafted in DESIGN.md.
+The strongest references for Arcwell are not fitness concept shots. They are shipped tools that treat data calmly: WHOOP's near-black canvas, where colour only ever means something; Oura's 2025 move from five tabs to three, with readiness, sleep and activity as quiet circles on a "Today" tab; MacroFactor's "adherence-neutral" nutrition charts, which never turn red when you miss a target; and Hevy's plain set table with a PREVIOUS column. Together they point to a near-black, low-chroma interface. Colour is used semantically: electric blue for actions, and cyan, amber and violet only to say "you are in Training, Nutrition or Recovery". Large tabular numerals carry the hierarchy, not gradients or illustration. This matches the `#0E1116` charcoal and pillar palette already drafted in DESIGN.md.
 
 The coach side should borrow from work tools, not fitness apps. That means Linear's information-dense, triage-first inbox, and TrueCoach and Trainerize's habit of sorting clients by compliance and flagging who needs attention. Rows are compact (one line of status, one of context) and sorted by urgency, with nothing decorative. Across both roles the references support layered depth: an overview of three numbers, then a trend screen that answers one question, then a deep-dive screen for power users. They also support honest commerce: Strava's "honest paywall" timeline and reminder before the trial ends, not countdown timers and fake discounts. Most Dribbble fitness concepts lean on neon accents, 3D renders, streak flames and gradient cards. They are useful for single layouts but are the main source of the "patterns to avoid" list.
 
@@ -136,7 +136,7 @@ The coach side should borrow from work tools, not fitness apps. That means Linea
 
 1. Charcoal, not black: `#0E1116` with three soft surface steps, and colour only where it means something.
 2. Numbers are the hero. Big tabular Inter figures; labels small and muted beneath.
-3. One pillar, one colour. Blue, amber or violet tells you where you are; brand green tells you what to do.
+3. One pillar, one colour. Cyan, amber or violet tells you where you are; electric blue tells you what to do (D24).
 4. Three numbers first, one question per screen next, raw data only when asked.
 5. The bottom half is the work zone. Every primary action sits within thumb reach at 48dp or more.
 6. Trends over days: smoothed lines and muted dots, never a red "you failed" state.
