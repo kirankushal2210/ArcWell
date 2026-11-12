@@ -118,7 +118,9 @@ function DayPage({
               {Math.round(eaten.kcal).toLocaleString("en-IN")}
             </Text>
             <Text tone="muted">
-              kcal eaten · {n.coachName} is still setting your targets
+              {n.coached
+                ? `kcal eaten · ${n.coachName} is still setting your targets`
+                : "kcal eaten · no daily target set yet"}
             </Text>
           </>
         )}

@@ -18,19 +18,35 @@ import { NotJoined, useMe } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Group, GroupRow, Page, PageHeader } from "@/features/coach/parts";
 import { colors, radius, rhythm, space } from "@/theme";
+import { isoToday } from "@/features/athlete/athleteData";
 
 export default function Preview() {
   const { dayId } = useLocalSearchParams<{ dayId: string }>();
   const me = useMe();
-  const { active, setActive, sessions, meTier, coachName } = useCoachData();
+  const {
+    active,
+    setActive,
+    sessions,
+    meTier,
+    coachName,
+    settingsOf,
+    setAthleteSettings,
+  } = useCoachData();
   const insets = useSafeAreaInsets();
   const back = () =>
     router.canGoBack() ? router.back() : router.replace("/athlete/training");
   if (!me) return <NotJoined />;
   // A program day, or one of the athlete's own routines (F4-01).
   const routine = me.routines?.find((d) => d.id === dayId);
-  const day = me.program?.days.find((d) => d.id === dayId) ?? routine;
-  if (!day) return <PageHeader title="Workout" onBack={back} />;
+  const planned = me.program?.days.find((d) => d.id === dayId) ?? routine;
+  if (!planned) return <PageHeader title="Workout" onBack={back} />;
+  // An accepted tailoring for today (D70) replaces the exercises for this one session.
+  const dp = settingsOf(me.id).dayPlan;
+  const tailored =
+    dp?.date === isoToday() && dp.dayId === planned.id ? dp : null;
+  const day = tailored
+    ? { ...planned, exercises: tailored.exercises }
+    : planned;
   const history = sessions(me.id);
   const coached = meTier === "coached";
   const sets = day.exercises.reduce((n, e) => n + e.sets, 0);
@@ -86,6 +102,19 @@ export default function Preview() {
         }
       />
       <Page>
+        {tailored ? (
+          <View style={styles.tailored}>
+            <Text weight="semibold">Tailored for today: {tailored.reason}</Text>
+            <Text
+              variant="label"
+              weight="medium"
+              accessibilityRole="link"
+              onPress={() => setAthleteSettings(me.id, { dayPlan: undefined })}
+            >
+              Use the original plan
+            </Text>
+          </View>
+        ) : null}
         <Text tone="muted" numeric>
           About {estimateMinutes(day)} min · {day.exercises.length} exercises ·{" "}
           {sets} sets
@@ -152,6 +181,14 @@ export default function Preview() {
 }
 
 const styles = StyleSheet.create({
+  tailored: {
+    gap: space[1],
+    padding: space[3],
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.recovery,
+    backgroundColor: colors.surface,
+  },
   root: { flex: 1, backgroundColor: colors.bg },
   flex: { flex: 1, gap: space[1] / 2 },
   note: {

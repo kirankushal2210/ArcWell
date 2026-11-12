@@ -41,7 +41,12 @@ const LIBRARY: Exercise[] = [
     kit: ["gym"],
     loads: ["Knee", "Lower back", "Hip"],
   },
-  { name: "Leg press (machine)", pattern: "squat", kit: ["gym"], loads: ["Knee"] },
+  {
+    name: "Leg press (machine)",
+    pattern: "squat",
+    kit: ["gym"],
+    loads: ["Knee"],
+  },
   {
     name: "Goblet squat",
     pattern: "squat",
@@ -85,7 +90,12 @@ const LIBRARY: Exercise[] = [
     kit: ["bench", "gym"],
     loads: ["Knee", "Ankle"],
   },
-  { name: "Lying leg curl (machine)", pattern: "lunge", kit: ["gym"], loads: [] },
+  {
+    name: "Lying leg curl (machine)",
+    pattern: "lunge",
+    kit: ["gym"],
+    loads: [],
+  },
   {
     name: "Bench press (barbell)",
     pattern: "push_h",
@@ -122,14 +132,24 @@ const LIBRARY: Exercise[] = [
     kit: ["bodyweight"],
     loads: ["Shoulder", "Wrist / elbow", "Neck"],
   },
-  { name: "Seated cable row - bar grip", pattern: "pull_h", kit: ["gym"], loads: [] },
+  {
+    name: "Seated cable row - bar grip",
+    pattern: "pull_h",
+    kit: ["gym"],
+    loads: [],
+  },
   {
     name: "Dumbbell row",
     pattern: "pull_h",
     kit: ["dumbbells", "kettlebell"],
     loads: ["Lower back"],
   },
-  { name: "Bent over row (band)", pattern: "pull_h", kit: ["bands"], loads: [] },
+  {
+    name: "Bent over row (band)",
+    pattern: "pull_h",
+    kit: ["bands"],
+    loads: [],
+  },
   {
     name: "Inverted row",
     pattern: "pull_h",
@@ -425,3 +445,31 @@ export function buildWorkouts(a: Answers): Workout[] {
     };
   });
 }
+
+/**
+ * A same-pattern swap for an exercise that loads a sore area, or that needs equipment the athlete
+ * doesn't have today (used by "tailor today's workout"). Gym kit is assumed unless `noBarbell`.
+ */
+export function swapFor(
+  name: string,
+  opts: { avoid?: string; noBarbell?: boolean },
+): string | null {
+  const ex = LIBRARY.find((e) => e.name === name);
+  if (!ex) return null;
+  const hurts = (e: Exercise) =>
+    !!opts.avoid && e.loads.includes(opts.avoid as Area);
+  const barbell = (e: Exercise) => /barbell/i.test(e.name);
+  if (!hurts(ex) && !(opts.noBarbell && barbell(ex))) return null;
+  const alt = LIBRARY.find(
+    (e) =>
+      e.pattern === ex.pattern &&
+      e.name !== name &&
+      !hurts(e) &&
+      !(opts.noBarbell && barbell(e)),
+  );
+  return alt?.name ?? null;
+}
+
+/** Whether an exercise loads an area (for "my knee hurts" tailoring). */
+export const loadsArea = (name: string, area: string) =>
+  !!LIBRARY.find((e) => e.name === name)?.loads.includes(area as Area);

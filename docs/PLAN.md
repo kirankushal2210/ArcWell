@@ -60,7 +60,7 @@ The front end is finished on sample data before any backend wiring (Phases 1–8
 - [x] **FE-3 Training depth:** Programs (TR-04, TR-05), Muscle Analytics with weekly sets against the FE-2 ranges (TR-06, TR-07), estimated 1RM and strength charts, plate calculator, coach exercise library (K-23), free starter workouts (TR-01)
 - [x] **FE-4 Money states:** subscription details, payment problem, subscription ended (F8-06 to F8-08), trial timeline and reminders (F8-02, TL-01, TL-02), upgrade what changed (U-01)
 - [x] **FE-5 Extras:** water tracking, reminders, coach message to several clients, Gyms (G-01, G-02), first-run tips
-- [ ] **FE-6 AI, front end only (D70):** no models, no APIs, no AI code. Screens run on sample responses and the FE-2 rules, clearly marked as sample. Pro athletes only; coached athletes never see AI (D44).
+- [x] **FE-6 AI, front end only (D70):** no models, no APIs, no AI code. Screens run on sample responses and the FE-2 rules, clearly marked as sample. Pro athletes only; coached athletes never see AI (D44).
   - AI plan builder: build, review and accept a training plan; tailor it ("30 minutes today", "my knee hurts", "no barbell").
   - Nutrition assistant: meal plan generation and swaps, fit a meal into the day, eating out, Indian dishes; photo food logging with mock results (F5-09 to F5-11).
   - Recovery-aware day: after a poor night (for example 4 hours' sleep before a hard session) a suggestion on Today to cut that day's volume, with the reason. Nothing changes unless the athlete accepts; accepting tailors that day's workout only.

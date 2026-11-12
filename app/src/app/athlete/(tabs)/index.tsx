@@ -38,6 +38,7 @@ import {
   subscriptionInfo,
 } from "@/features/athlete/athleteData";
 import { Tip } from "@/features/athlete/Tip";
+import { TodaySuggestion } from "@/features/ai/TodaySuggestion";
 
 const dateLabel = () =>
   new Date().toLocaleDateString("en-IN", {
@@ -308,6 +309,8 @@ export default function Today() {
             ) : null}
           </Group>
         ) : null}
+
+        <TodaySuggestion />
 
         <PressableScale
           onPress={today ? openToday : () => router.push("/athlete/training")}

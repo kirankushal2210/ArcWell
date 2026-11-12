@@ -2,6 +2,7 @@
 // transformation photo approvals (F9) and how coaching ended (D21, D39, D42). Sample build: these
 // live on the client record on the phone; with the backend each becomes its own RLS-protected table.
 import type { PhotoPose } from "@/features/coach/checkins";
+import type { PlannedExercise } from "@/features/coach/plans";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 /** YYYY-MM-DD in the phone's own time zone (toISOString would use UTC). */
@@ -75,7 +76,23 @@ export type AthleteSettings = {
   reminders?: Reminders;
   /** First-run tips already dismissed. */
   tipsSeen?: string[];
+  /** Today's accepted tailoring (D70): applies to this date and workout only. */
+  dayPlan?: DayPlan;
+  /** The date a recovery suggestion was declined, so it isn't asked again that day. */
+  dayDeclined?: string;
+  /** AI questions asked today, for the daily cap (X-01). */
+  aiUsage?: { date: string; n: number };
 };
+
+export type DayPlan = {
+  date: string;
+  dayId: string;
+  exercises: PlannedExercise[];
+  reason: string;
+};
+
+/** Daily cap on AI questions (SPEC: paid AI users have a daily request cap). */
+export const AI_DAILY_LIMIT = 30;
 
 export type Reminders = {
   workout: { on: boolean; at: number };

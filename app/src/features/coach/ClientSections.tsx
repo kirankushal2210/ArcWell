@@ -40,6 +40,7 @@ import { PhotoSlot } from "@/features/coach/PhotoSlot";
 import { PlanRows, plansReady } from "@/features/coach/PlanRows";
 import type { Client } from "@/features/coach/sampleData";
 import { colors, fontFamilyFor, radius, space, textSizes } from "@/theme";
+import { dayAdjustment } from "@/features/science/rules";
 
 export type ClientTab = "overview" | "training" | "nutrition" | "recovery";
 
@@ -214,8 +215,22 @@ export function Overview({ c, go }: { c: Client; go: (s: ClientTab) => void }) {
       | "/coach/client/status/[id]"
       | "/coach/account/[id]",
   ) => router.push({ pathname, params: { id: c.id } });
+  // A plain low-recovery flag for the coach (D70): no AI for coached clients (D44); the coach decides.
+  const flag = dayAdjustment(today.sleep.minutes / 60, today.recovery.score);
   return (
     <>
+      {flag.kind !== "none" ? (
+        <View style={styles.flag}>
+          <Text weight="semibold">
+            {`${first} slept ${(today.sleep.minutes / 60).toFixed(1)} h · recovery ${today.recovery.score}%`}
+          </Text>
+          <Text variant="label" weight="regular" tone="muted">
+            {flag.kind === "halve"
+              ? "A much lighter session today may be wise. You could message them, or leave the plan as it is."
+              : "Maybe go a little lighter today. Your call."}
+          </Text>
+        </View>
+      ) : null}
       <View style={styles.tiles}>
         <StatTile
           label="Adherence"
@@ -833,6 +848,14 @@ export function Notes({ c }: { c: Client }) {
 }
 
 const styles = StyleSheet.create({
+  flag: {
+    gap: space[1],
+    padding: space[3],
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.recovery,
+    backgroundColor: colors.surface,
+  },
   root: { flex: 1, backgroundColor: colors.bg },
   pad: { padding: space[4] },
   flex: { flex: 1, gap: space[1] / 2 },
