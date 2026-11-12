@@ -219,9 +219,19 @@ type CoachData = {
   reply: (clientId: string, checkInId: string, text: string) => void;
   /** The athlete sends their weekly check-in (F6): it lands in the coach's inbox. */
   submitCheckIn: (clientId: string, form: CheckInForm) => void;
-  send: (clientId: string, text: string, image?: string) => void;
+  send: (
+    clientId: string,
+    text: string,
+    image?: string,
+    file?: { name: string; uri: string },
+  ) => void;
   /** The client writes to their coach (F7). */
-  sendFromClient: (clientId: string, text: string, image?: string) => void;
+  sendFromClient: (
+    clientId: string,
+    text: string,
+    image?: string,
+    file?: { name: string; uri: string },
+  ) => void;
   /** The client opened the chat. */
   markReadByClient: (clientId: string) => void;
   markRead: (clientId: string) => void;
@@ -1114,7 +1124,7 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
           ? undefined
           : c.attention,
       })),
-    send: (clientId, text, image) =>
+    send: (clientId, text, image, file) =>
       update(clientId, (c) => ({
         messages: [
           ...c.messages,
@@ -1122,13 +1132,14 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
             from: "coach",
             text,
             image,
+            file,
             time: nowTime(),
             at: new Date().toISOString(),
           },
         ],
         coachUnread: (c.coachUnread ?? 0) + 1,
       })),
-    sendFromClient: (clientId, text, image) =>
+    sendFromClient: (clientId, text, image, file) =>
       update(clientId, (c) => ({
         messages: [
           ...c.messages,
@@ -1136,6 +1147,7 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
             from: "client",
             text,
             image,
+            file,
             time: nowTime(),
             at: new Date().toISOString(),
           },

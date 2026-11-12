@@ -49,7 +49,7 @@ export default function AthleteChat() {
           "Feeling sore, should I rest?",
           "Eating out tonight, any tips?",
         ]}
-        onSend={(text, image) => sendFromClient(me.id, text, image)}
+        onSend={(text, image, file) => sendFromClient(me.id, text, image, file)}
       />
     </KeyboardAvoidingView>
   );

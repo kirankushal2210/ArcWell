@@ -5,7 +5,7 @@ import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { Camera, User } from "lucide-react-native";
 import { useState } from "react";
-import { Alert, StyleSheet, View } from "react-native";
+import { Alert, Linking, StyleSheet, View } from "react-native";
 
 import { ImageViewer } from "@/components/ImageViewer";
 
@@ -19,7 +19,11 @@ async function pick(camera: boolean): Promise<string | null> {
   if (!perm.granted) {
     Alert.alert(
       camera ? "Camera is off for Arcwell" : "Photos are off for Arcwell",
-      "You can turn access on in Settings. Photos are optional.",
+      "Photos are optional and everything else keeps working. To add one, turn access on in your phone's settings.",
+      [
+        { text: "Not now", style: "cancel" },
+        { text: "Open phone settings", onPress: () => Linking.openSettings() },
+      ],
     );
     return null;
   }

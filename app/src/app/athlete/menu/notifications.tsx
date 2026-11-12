@@ -11,6 +11,7 @@ import { NotJoined, useMe } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Eyebrow, Group, GroupRow } from "@/features/coach/parts";
 import { colors, radius, space } from "@/theme";
+import { NotifyBanner } from "@/features/system/NotifyAsk";
 
 export default function Notifications() {
   const me = useMe();
@@ -32,6 +33,7 @@ export default function Notifications() {
 
   return (
     <MenuPage title="Notifications" back={backTo("/athlete/menu")}>
+      <NotifyBanner />
       {items.length ? (
         <Group>
           {items.map((n, i) => (

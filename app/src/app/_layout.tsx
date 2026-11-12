@@ -6,7 +6,7 @@ import {
   Inter_700Bold,
   useFonts,
 } from "@expo-google-fonts/inter";
-import { Stack } from "expo-router";
+import { type ErrorBoundaryProps, Stack } from "expo-router";
 import { NavigationBar } from "expo-navigation-bar";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
@@ -18,12 +18,18 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { AuthProvider } from "@/features/auth/AuthProvider";
 import { CoachDataProvider } from "@/features/coach/CoachData";
+import { ScreenError } from "@/features/system/SystemStates";
 import { colors } from "@/theme";
 
 // Keep the splash up until Inter has loaded (D48: runtime fonts until dev builds exist).
 SplashScreen.preventAutoHideAsync();
 // Root background behind every screen and behind the edge-to-edge system bars (C3).
 SystemUI.setBackgroundColorAsync(colors.bg);
+
+/** S-02: any screen that throws shows this instead of a blank app; nothing logged is lost. */
+export function ErrorBoundary({ retry }: ErrorBoundaryProps) {
+  return <ScreenError onRetry={retry} />;
+}
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({

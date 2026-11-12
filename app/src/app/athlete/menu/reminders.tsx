@@ -19,6 +19,7 @@ import { NotJoined, useMe } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Group, GroupRow } from "@/features/coach/parts";
 import { clock } from "@/features/coach/plans";
+import { NotifyBanner } from "@/features/system/NotifyAsk";
 
 const STEP = 15;
 
@@ -63,6 +64,7 @@ export default function RemindersScreen() {
 
   return (
     <MenuPage title="Reminders" back={backTo("/athlete/menu")}>
+      <NotifyBanner />
       <Group>
         <ToggleRow
           first

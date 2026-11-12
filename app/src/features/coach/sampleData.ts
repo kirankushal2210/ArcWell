@@ -65,6 +65,8 @@ export type Message = {
   at?: string;
   /** Local photo URI (F7: image attachments). */
   image?: string;
+  /** A PDF attachment (F7-02); opens in the phone's viewer (X-06). */
+  file?: { name: string; uri: string };
 };
 
 export type Client = {

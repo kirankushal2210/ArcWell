@@ -2,9 +2,10 @@
 // messages, "Seen" under your last message once the other side has opened the chat, and quick
 // replies for the things people say most. Text and photos only; PDFs come with storage (Phase 4).
 import { Image } from "expo-image";
-import { ImagePlus, Send, X } from "lucide-react-native";
+import { FileText, Paperclip, Send, X } from "lucide-react-native";
 import { useRef, useState } from "react";
 import {
+  Linking,
   ScrollView,
   type ScrollViewInstance,
   StyleSheet,
@@ -27,6 +28,10 @@ import {
 import { dayText } from "./crm";
 import { choosePhoto } from "./PhotoSlot";
 import type { Message } from "./sampleData";
+import { OfflineBanner } from "@/features/system/SystemStates";
+import * as DocumentPicker from "expo-document-picker";
+import * as WebBrowser from "expo-web-browser";
+import { Sheet, SheetRow } from "@/features/athlete/Sheet";
 
 export function ChatThread({
   messages,
@@ -42,20 +47,36 @@ export function ChatThread({
   /** The other side has read everything you sent. */
   seen: boolean;
   quick: string[];
-  onSend: (text: string, image?: string) => void;
+  onSend: (
+    text: string,
+    image?: string,
+    file?: { name: string; uri: string },
+  ) => void;
 }) {
   const insets = useSafeAreaInsets();
   const scroll = useRef<ScrollViewInstance>(null);
   const [text, setText] = useState("");
   const [image, setImage] = useState<string | undefined>();
+  const [file, setFile] = useState<{ name: string; uri: string } | undefined>();
+  const [attach, setAttach] = useState(false);
+  const pickPdf = async () => {
+    setAttach(false);
+    const r = await DocumentPicker.getDocumentAsync({
+      type: "application/pdf",
+      copyToCacheDirectory: true,
+    }).catch(() => null);
+    const a = r && !r.canceled ? r.assets[0] : null;
+    if (a) setFile({ name: a.name, uri: a.uri });
+  };
   const [viewing, setViewing] = useState<string | null>(null);
   const lastMine = messages.map((m) => m.from).lastIndexOf(me);
   const submit = (t = text) => {
     const s = t.trim();
-    if (!s && !image) return;
-    onSend(s, image);
+    if (!s && !image && !file) return;
+    onSend(s, image, file);
     setText("");
     setImage(undefined);
+    setFile(undefined);
   };
 
   return (
@@ -69,6 +90,7 @@ export function ChatThread({
         }
         keyboardShouldPersistTaps="handled"
       >
+        <OfflineBanner what="Messages send when you're back online." />
         {messages.length === 0 ? (
           <Text tone="muted" style={styles.empty}>
             Say hello to {otherName}.
@@ -97,6 +119,34 @@ export function ChatThread({
                       style={styles.photo}
                       contentFit="cover"
                     />
+                  </PressableScale>
+                ) : null}
+                {m.file ? (
+                  <PressableScale
+                    onPress={() => {
+                      const uri = m.file?.uri;
+                      if (uri)
+                        WebBrowser.openBrowserAsync(uri).catch(() =>
+                          Linking.openURL(uri),
+                        );
+                    }}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Open ${m.file.name}`}
+                    style={styles.fileChip}
+                  >
+                    <FileText
+                      size={18}
+                      color={mine ? colors.onBrand : colors.text}
+                    />
+                    <Text
+                      variant="label"
+                      weight="medium"
+                      tone={mine ? "onBrand" : "default"}
+                      numberOfLines={1}
+                      style={styles.flex}
+                    >
+                      {m.file.name}
+                    </Text>
                   </PressableScale>
                 ) : null}
                 {m.text ? (
@@ -137,6 +187,25 @@ export function ChatThread({
           </PressableScale>
         ))}
       </ScrollView>
+      {file ? (
+        <View style={styles.preview}>
+          <FileText size={20} color={colors.text} />
+          <Text
+            variant="label"
+            weight="regular"
+            tone="muted"
+            style={styles.flex}
+            numberOfLines={1}
+          >
+            {file.name}
+          </Text>
+          <IconButton
+            icon={X}
+            accessibilityLabel="Remove file"
+            onPress={() => setFile(undefined)}
+          />
+        </View>
+      ) : null}
       {image ? (
         <View style={styles.preview}>
           <Image
@@ -166,9 +235,9 @@ export function ChatThread({
         ]}
       >
         <IconButton
-          icon={ImagePlus}
-          accessibilityLabel="Add a photo"
-          onPress={() => choosePhoto(setImage)}
+          icon={Paperclip}
+          accessibilityLabel="Attach a photo or PDF"
+          onPress={() => setAttach(true)}
         />
         <TextInput
           value={text}
@@ -183,16 +252,38 @@ export function ChatThread({
           icon={Send}
           variant="filled"
           accessibilityLabel="Send"
-          disabled={!text.trim() && !image}
+          disabled={!text.trim() && !image && !file}
           onPress={() => submit()}
         />
       </View>
       <ImageViewer uri={viewing} onClose={() => setViewing(null)} />
+      <Sheet visible={attach} onClose={() => setAttach(false)} title="Attach">
+        <SheetRow
+          label="Photo"
+          sub="Take one or choose from your library"
+          onPress={() => {
+            setAttach(false);
+            choosePhoto(setImage);
+          }}
+        />
+        <SheetRow
+          label="PDF"
+          sub="A diet chart, blood report or programme"
+          onPress={pickPdf}
+        />
+      </Sheet>
     </>
   );
 }
 
 const styles = StyleSheet.create({
+  fileChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space[2],
+    minHeight: 40,
+    maxWidth: 240,
+  },
   flex: { flex: 1 },
   thread: { padding: rhythm.gutter, gap: space[2] },
   empty: { textAlign: "center", paddingTop: space[8] },

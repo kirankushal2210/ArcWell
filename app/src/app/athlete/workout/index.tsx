@@ -67,6 +67,7 @@ import {
   space,
   textSizes,
 } from "@/theme";
+import { OfflineBanner } from "@/features/system/SystemStates";
 
 const REST_STEPS = [0, 30, 60, 90, 120, 180];
 
@@ -374,6 +375,7 @@ export default function Workout() {
         contentContainerStyle={styles.body}
         keyboardShouldPersistTaps="handled"
       >
+        <OfflineBanner what="Your workout is saved on this phone and syncs when you're back." />
         <Text
           variant="label"
           weight="regular"

@@ -18,11 +18,12 @@ import { PLUS_RESERVE, QuickLog } from "@/features/athlete/QuickLog";
 import { useMe } from "@/features/athlete/useMe";
 import { WorkoutBar } from "@/features/athlete/WorkoutBar";
 import { useCoachData } from "@/features/coach/CoachData";
+import { LoadingScreen } from "@/features/system/SystemStates";
 import { CoachTabBar } from "@/features/coach/parts";
 import { colors } from "@/theme";
 
 export default function AthleteTabs() {
-  const { meTier, leaveCoach } = useCoachData();
+  const { meTier, leaveCoach, hydrated } = useCoachData();
   const me = useMe();
   const coached = meTier === "coached";
   const ended = coached ? me?.endedBy : undefined;
@@ -36,6 +37,7 @@ export default function AthleteTabs() {
       params: { step: "left" },
     });
   }, [ended, leaveCoach]);
+  if (!hydrated) return <LoadingScreen />;
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
       <Tabs
