@@ -1,29 +1,14 @@
-import { StyleSheet, Text, View } from "react-native";
+// Start route: the welcome screen. Dev review screens stay at /dev/tokens and /dev/gallery.
+import { router } from "expo-router";
 
-// Placeholder home screen. Phase 1 replaces this with sign-in and the
-// role-based (athlete / coach) app shell.
+import { WelcomeScreen } from "@/features/welcome/WelcomeScreen";
+
 export default function Index() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Arcwell</Text>
-      <Text style={styles.subtitle}>Training · Nutrition · Recovery</Text>
-    </View>
+    <WelcomeScreen
+      // Get Started opens the role choice (D44), then athlete or coach onboarding. Sign-in arrives in Phase 5; until then it does nothing.
+      onGetStarted={() => router.push("/role")}
+      onSignIn={() => {}}
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "700",
-  },
-  subtitle: {
-    fontSize: 16,
-    opacity: 0.7,
-  },
-});

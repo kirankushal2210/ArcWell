@@ -31,17 +31,34 @@
     <figure>
       <div class="phone">
         <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
-        <div class="img" style="height:44%;margin-bottom:12px">Hero visual: Indian gym / coach + client</div>
-        <div class="q" style="font-size:19px">Training, nutrition and recovery, coached as one.</div>
-        <div class="sub">One app for your workouts, meals and progress — with your coach or on your own.</div>
+        <div style="text-align:center;font-weight:700;font-size:13px;margin-bottom:8px">▮ Arcwell</div>
+        <div class="wdev"><div class="img" style="height:100%;border-radius:14px">Phone showing a real screen<br>Training / Meals / Recovery (swipe)</div><div class="wmodes"><span class="on">Training</span><span>Meals</span><span>Recovery</span></div></div>
+        <div class="q" style="font-size:19px;text-align:center">Train. Eat. Recover.</div>
+        <div class="sub" style="text-align:center">One app for your workouts, Indian meals and sleep, on your own or with your coach.</div>
         <div class="pinned">
-          <div class="btn primary">I'm training</div>
-          <div class="btn">I'm a coach</div>
-          <div class="btn ghost">I already have an account · Sign in</div>
+          <div class="btn primary">Get Started →</div>
+          <div class="btn ghost">Already have an account? Sign in</div>
         </div>
       </div>
       <figcaption><b><span class="id">F1-02</span>Welcome</b>
-        <div class="note"><ul><li>Role is chosen first so sign-up copy and onboarding fit the person.</li><li>Athlete is the primary button: most installs come from coach invites and self-starters.</li></ul></div></figcaption>
+        <div class="note"><ul><li><span class="rule">D53:</span> redrawn from the founder's Bulky AI welcome reference. The hero is a phone-in-phone carousel of three real screens (training, meals, recovery), with the mode switcher inside the device where Bulky has its Scan Food switcher. No auto-advance.</li><li>No AI claim: everyone sees this screen, and coached athletes never see AI.</li><li>Recovery is shown because it's part of Arcwell, but free accounts don't get the tab (D2b).</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="wdev" style="opacity:.35"><div class="img" style="height:100%;border-radius:14px">Welcome, dimmed</div></div>
+        <div class="dimmed" style="z-index:1"></div>
+        <div style="position:absolute;left:0;right:0;bottom:0;z-index:5;background:#fff;border-top:2px solid var(--ink);border-radius:18px 18px 0 0;padding:8px 14px 14px">
+          <div style="width:34px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 10px"></div>
+          <div class="q" style="text-align:center">How will you use Arcwell?</div>
+          <div class="opt"><span class="ic"></span><span>I'm training<small>Your own workouts, meals and recovery</small></span></div>
+          <div class="opt"><span class="ic"></span><span>I'm a coach<small>Plans, check-ins and chat for your clients</small></span></div>
+          <div class="sub" style="text-align:center;margin:6px 0 0">One role per account. Invited by a coach? Open their link instead.</div>
+        </div>
+      </div>
+      <figcaption><b><span class="id">F1-02a</span>Choose your role (sheet)</b>
+        <div class="note"><ul><li><span class="rule">D53, D44:</span> Get Started opens this sheet, so the role is still chosen before sign-up without two buttons on the welcome.</li><li>Drag down or tap the dimmed area to close. Each row goes to sign-up (F1-03) with the role set; coaches then go to CO-02.</li></ul></div></figcaption>
     </figure>
 
     <figure>
@@ -105,170 +122,246 @@
 </section>
 
 <section class="flow">
-  <h2>F1 · Athlete onboarding</h2>
-  <p class="arrowrow">One question per screen · thin progress bar · Back always available · answers editable later in Profile</p>
+  <h2>F1 · Athlete onboarding · About you (D52)</h2>
+  <p class="arrowrow">Five sections on one progress bar: About you → Your goal → Training → Recovery → Nutrition → Your plan. One question per screen · Back always available · answers editable later in Profile (AC-07). Mockups: hifi-mockups/onboarding-flow.html.</p>
   <div class="row">
 
     <figure>
       <div class="phone">
         <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
-        <div class="topnav"><span>←</span><span>1 of 7</span></div>
-        <div class="bar"><i style="width:14%"></i></div>
-        <div class="q">What's your main goal?</div>
-        <div class="sub">Pick one. You can change it later.</div>
-        <div class="opt sel"><span class="ic"></span><span>Lose fat<small>Get leaner while keeping muscle</small></span></div>
-        <div class="opt"><span class="ic"></span><span>Build muscle<small>Gain size and strength</small></span></div>
-        <div class="opt"><span class="ic"></span><span>Get stronger<small>Lift more on key exercises</small></span></div>
-        <div class="opt"><span class="ic"></span><span>General fitness<small>Feel fitter and healthier</small></span></div>
-        <div class="pinned"><div class="btn primary">Continue</div></div>
+        <div class="topnav"><span>←</span><span class="secname">About you · 1/4</span></div><div class="bar"><i style="width:6%"></i></div><div class="q">Let's get to know you better</div><div class="sub">This helps us personalise your plan and targets.</div><div class="opt sel"><span class="ic"></span><span>Male</span></div><div class="opt"><span class="ic"></span><span>Female</span></div><div class="opt"><span class="ic"></span><span>Prefer not to say</span></div><div class="pinned"><div class="btn primary">Next</div><div class="btn ghost">Skip for now</div></div>
       </div>
-      <figcaption><b><span class="id">F1-06</span>Goal</b>
-        <div class="note"><ul><li>Single select: goal drives calorie target and programme type.</li><li>Outcome wording, not jargon ("cut", "bulk").</li></ul></div></figcaption>
+      <figcaption><b><span class="id">AO-01</span>Gender</b>
+        <div class="note"><ul><li><span class="rule">D44:</span> used only for the calorie estimate; "Prefer not to say" uses an average.</li><li>Skip for now = Prefer not to say.</li><li>Was part of F1-08.</li></ul></div></figcaption>
     </figure>
 
     <figure>
       <div class="phone">
         <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
-        <div class="topnav"><span>←</span><span>2 of 7</span></div>
-        <div class="bar"><i style="width:28%"></i></div>
-        <div class="q">How much training experience do you have?</div>
-        <div class="sub">&nbsp;</div>
-        <div class="opt"><span class="ic"></span><span>New to the gym<small>Less than 6 months, or returning after a long break</small></span></div>
-        <div class="opt sel"><span class="ic"></span><span>Some experience<small>6 months – 2 years of regular training</small></span></div>
-        <div class="opt"><span class="ic"></span><span>Experienced<small>2+ years, comfortable with most lifts</small></span></div>
-        <div class="pinned"><div class="btn primary">Continue</div></div>
+        <div class="topnav"><span>←</span><span class="secname">About you · 2/4</span></div><div class="bar"><i style="width:12%"></i></div><div class="q">How old are you?</div><div class="sub">Your age changes how many calories you burn.</div><div class="wruler"><b>27 <small>years</small></b><div class="ticks"></div></div><div class="pinned"><div class="btn primary">Next</div></div>
       </div>
-      <figcaption><b><span class="id">F1-07</span>Experience</b>
-        <div class="note"><ul><li>Described by time and comfort, not labels like "intermediate", so people self-rate accurately.</li></ul></div></figcaption>
+      <figcaption><b><span class="id">AO-02</span>Age</b>
+        <div class="note"><ul><li>Wheel picker (D53): drag or flick, or tap the number to type.</li><li>13–80 accepted; under 18 shows a note to train with an adult's guidance.</li><li>Was part of F1-08.</li></ul></div></figcaption>
     </figure>
 
     <figure>
       <div class="phone">
         <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
-        <div class="topnav"><span>←</span><span>3 of 7</span></div>
-        <div class="bar"><i style="width:42%"></i></div>
-        <div class="q">About you</div>
-        <div class="sub">Used to set your calorie and training targets.</div>
-        <div class="label">Age</div>
-        <div class="stepper"><span class="pm">−</span><span class="val">27 <small>yrs</small></span><span class="pm">+</span></div>
-        <div class="label">Height</div>
-        <div class="seg"><span class="on">cm</span><span>ft / in</span></div>
-        <div class="stepper"><span class="pm">−</span><span class="val">172 <small>cm</small></span><span class="pm">+</span></div>
-        <div class="label">Weight</div>
-        <div class="stepper"><span class="pm">−</span><span class="val">74.5 <small>kg</small></span><span class="pm">+</span></div>
-        <div class="label">Sex (for calorie calculation)</div>
-        <div class="seg"><span class="on">Male</span><span>Female</span><span>Prefer not to say</span></div>
-        <div class="pinned"><div class="btn primary">Continue</div></div>
+        <div class="topnav"><span>←</span><span class="secname">About you · 3/4</span></div><div class="bar"><i style="width:18%"></i></div><div class="q">What's your height?</div><div class="sub">We use this to calculate your calorie needs.</div><div class="seg"><span class="on">cm</span><span>ft / in</span></div><div class="wruler"><b>172 <small>cm</small></b><div class="ticks"></div></div><div class="pinned"><div class="btn primary">Next</div></div>
       </div>
-      <figcaption><b><span class="id">F1-08</span>Body stats</b>
-        <div class="note"><ul><li>↕ Scrolls on smaller phones; Continue stays pinned at the bottom.</li><li>Steppers with large ± (tap or type); cm by default, ft/in for those who think in feet.</li><li><span class="rule">D44:</span> sex is optional, used only for the calorie estimate. "Prefer not to say" uses an average.</li></ul></div></figcaption>
+      <figcaption><b><span class="id">AO-03</span>Height</b>
+        <div class="note"><ul><li>Snaps to 1 cm; ft / in for people who think in feet.</li><li>Light haptic tick on each major mark.</li><li>Was part of F1-08.</li></ul></div></figcaption>
     </figure>
 
     <figure>
       <div class="phone">
         <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
-        <div class="topnav"><span>←</span><span>4 of 7</span></div>
-        <div class="bar"><i style="width:57%"></i></div>
-        <div class="q">Any injuries or limitations?</div>
-        <div class="sub">We'll avoid exercises that could aggravate them. Select all that apply.</div>
-        <div class="chips">
-          <span class="chip">None</span><span class="chip sel">Lower back</span><span class="chip">Knee</span><span class="chip">Shoulder</span>
-          <span class="chip">Wrist / elbow</span><span class="chip">Neck</span><span class="chip">Ankle</span><span class="chip">Hip</span><span class="chip">Other</span>
-        </div>
-        <div class="field" style="height:56px"><small>Anything else? (optional)</small>e.g. slipped disc 2 years ago</div>
-        <div class="card"><small>Arcwell isn't a medical service. For pain or recent injuries, check with a doctor or physiotherapist first.</small></div>
-        <div class="pinned"><div class="btn primary">Continue</div></div>
+        <div class="topnav"><span>←</span><span class="secname">About you · 4/4</span></div><div class="bar"><i style="width:24%"></i></div><div class="q">What's your current weight?</div><div class="sub">This is your starting point.</div><div class="wruler"><b>74.5 <small>kg</small></b><div class="ticks"></div></div><div class="pinned"><div class="btn primary">Next</div></div>
       </div>
-      <figcaption><b><span class="id">F1-09</span>Injuries &amp; limitations</b>
-        <div class="note"><ul><li>"None" deselects others. Chips map to exercise exclusions in the library.</li><li>Safety note shown here, not buried in terms.</li></ul></div></figcaption>
+      <figcaption><b><span class="id">AO-04</span>Current weight</b>
+        <div class="note"><ul><li>Snaps to 0.1 kg; labels every kilogram.</li><li><span class="rule">D45:</span> kg only in v1.</li><li>Becomes the first entry on the weight chart. Was part of F1-08.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<section class="flow">
+  <h2>F1 · Athlete onboarding · Your goal</h2>
+  <p class="arrowrow">What you want and how you live: the rest of the calorie maths.</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>←</span><span class="secname">Your goal · 1/3</span></div><div class="bar"><i style="width:29%"></i></div><div class="q">What's your main goal?</div><div class="sub">We'll build your plan around this.</div><div class="opt sel"><span class="ic"></span><span>Lose fat<small>Get leaner, keep your muscle</small></span></div><div class="opt"><span class="ic"></span><span>Build muscle<small>Gain size with a small surplus</small></span></div><div class="opt"><span class="ic"></span><span>Get stronger<small>Lift more on the big lifts</small></span></div><div class="opt"><span class="ic"></span><span>Body recomposition<small>Lose fat and build muscle slowly</small></span></div><div class="opt"><span class="ic"></span><span>General fitness<small>Feel fitter and healthier</small></span></div><div class="pinned"><div class="btn primary">Next</div></div>
+      </div>
+      <figcaption><b><span class="id">AO-05</span>Main goal</b>
+        <div class="note"><ul><li>Single select: drives the calorie target and starter workouts.</li><li>Outcome wording, not jargon ("cut", "bulk"). Body recomposition is new (D52).</li><li>Asked before goal weight so that screen knows which way to point. Was F1-06.</li></ul></div></figcaption>
     </figure>
 
     <figure>
       <div class="phone">
         <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
-        <div class="topnav"><span>←</span><span>5 of 7</span></div>
-        <div class="bar"><i style="width:71%"></i></div>
-        <div class="q">How often can you train?</div>
-        <div class="label">Days per week</div>
-        <div class="chips"><span class="chip">2</span><span class="chip">3</span><span class="chip sel">4</span><span class="chip">5</span><span class="chip">6</span></div>
-        <div class="label">Preferred days (optional)</div>
-        <div class="chips"><span class="chip sel">M</span><span class="chip">T</span><span class="chip sel">W</span><span class="chip">T</span><span class="chip sel">F</span><span class="chip sel">S</span><span class="chip">S</span></div>
-        <div class="label">Time per session</div>
-        <div class="chips"><span class="chip">30 min</span><span class="chip sel">45 min</span><span class="chip">60 min</span><span class="chip">90 min</span></div>
-        <div class="pinned"><div class="btn primary">Continue</div></div>
+        <div class="topnav"><span>←</span><span class="secname">Your goal · 2/3</span></div><div class="bar"><i style="width:35%"></i></div><div class="q">What's your goal weight?</div><div class="sub">Where do you want to be?</div><div class="wruler"><b>70.0 <small>kg</small></b><span>4.5 kg to go · about 0.4 kg a week</span><div class="ticks"></div></div><div class="pinned"><div class="btn primary">Next</div><div class="btn ghost">Skip for now</div></div>
       </div>
-      <figcaption><b><span class="id">F1-10</span>Schedule</b>
-        <div class="note"><ul><li>Preferred days feed workout reminders. Optional to keep it fast.</li></ul></div></figcaption>
+      <figcaption><b><span class="id">AO-06</span>Goal weight</b>
+        <div class="note"><ul><li>New (D52). Starts at the current weight and moves the way the goal points.</li><li>Shows the gap and a safe pace (about 0.5% of body weight a week); never promises a date.</li><li>Optional: skipping keeps the goal without a target weight.</li></ul></div></figcaption>
     </figure>
 
     <figure>
       <div class="phone">
         <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
-        <div class="topnav"><span>←</span><span>6 of 7</span></div>
-        <div class="bar"><i style="width:85%"></i></div>
-        <div class="q">Where do you train?</div>
-        <div class="sub">&nbsp;</div>
-        <div class="opt sel"><span class="ic"></span><span>Gym<small>Machines, barbells, dumbbells</small></span></div>
-        <div class="opt"><span class="ic"></span><span>Home<small>Some equipment</small></span></div>
-        <div class="opt"><span class="ic"></span><span>No equipment<small>Bodyweight only</small></span></div>
-        <div class="label" style="opacity:.5">If Home: what do you have?</div>
-        <div class="chips" style="opacity:.5"><span class="chip">Dumbbells</span><span class="chip">Resistance bands</span><span class="chip">Pull-up bar</span><span class="chip">Bench</span><span class="chip">Kettlebell</span></div>
-        <div class="pinned"><div class="btn primary">Continue</div></div>
+        <div class="topnav"><span>←</span><span class="secname">Your goal · 3/3</span></div><div class="bar"><i style="width:41%"></i></div><div class="q">How active are you during the day?</div><div class="sub">Outside your workouts.</div><div class="opt"><span class="ic"></span><span>Mostly sitting<small>Desk job, little walking</small></span></div><div class="opt"><span class="ic"></span><span>Lightly active<small>Some walking, on your feet now and then</small></span></div><div class="opt sel"><span class="ic"></span><span>Moderately active<small>On your feet most of the day</small></span></div><div class="opt"><span class="ic"></span><span>Very active<small>Physical job or lots of walking</small></span></div><div class="opt"><span class="ic"></span><span>Extra active<small>Hard physical work every day</small></span></div><div class="pinned"><div class="btn primary">Next</div></div>
       </div>
-      <figcaption><b><span class="id">F1-11</span>Equipment</b>
-        <div class="note"><ul><li>↕ Scrolls on smaller phones; Continue stays pinned at the bottom.</li><li>Home reveals an equipment checklist (shown faded) so starter templates only use what they own.</li></ul></div></figcaption>
+      <figcaption><b><span class="id">AO-07</span>Activity level</b>
+        <div class="note"><ul><li>New (D52). Sets the activity multiplier for the calorie target.</li><li>Plain examples instead of activity-factor numbers.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<section class="flow">
+  <h2>F1 · Athlete onboarding · Training</h2>
+  <p class="arrowrow">Experience, place, schedule and limits: everything the starter workouts need.</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>←</span><span class="secname">Training · 1/5</span></div><div class="bar"><i style="width:47%"></i></div><div class="q">What's your gym experience?</div><div class="sub">This helps us pitch your workouts at the right level.</div><div class="opt"><span class="ic"></span><span>New to the gym<small>Under 6 months, or back after a long break</small></span></div><div class="opt sel"><span class="ic"></span><span>Some experience<small>6 months to 2 years of regular training</small></span></div><div class="opt"><span class="ic"></span><span>Experienced<small>2–5 years, comfortable with most lifts</small></span></div><div class="opt"><span class="ic"></span><span>Very experienced<small>5+ years, you plan your own training</small></span></div><div class="pinned"><div class="btn primary">Next</div></div>
+      </div>
+      <figcaption><b><span class="id">AO-08</span>Gym experience</b>
+        <div class="note"><ul><li>Described by time and comfort, not labels like "intermediate", so people self-rate accurately.</li><li>Sets starter workout difficulty and default rest times. Was F1-07 (now four levels).</li></ul></div></figcaption>
     </figure>
 
     <figure>
       <div class="phone">
         <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
-        <div class="topnav"><span>←</span><span>7 of 7</span></div>
-        <div class="bar"><i style="width:100%"></i></div>
-        <div class="q">How do you eat?</div>
-        <div class="sub">We'll only suggest foods that fit.</div>
-        <div class="opt sel"><span class="ic"></span><span>Vegetarian<small>Dairy, no meat or eggs</small></span></div>
-        <div class="opt"><span class="ic"></span><span>Eggetarian<small>Vegetarian plus eggs</small></span></div>
-        <div class="opt"><span class="ic"></span><span>Non-vegetarian</span></div>
-        <div class="opt"><span class="ic"></span><span>Vegan<small>No animal products</small></span></div>
-        <div class="opt"><span class="ic"></span><span>Jain<small>No root vegetables, meat or eggs</small></span></div>
-        <div class="pinned"><div class="btn primary">Finish</div></div>
+        <div class="topnav"><span>←</span><span class="secname">Training · 2/5</span></div><div class="bar"><i style="width:53%"></i></div><div class="q">Where do you train?</div><div class="sub">We'll only pick exercises you can do.</div><div class="opt"><span class="ic"></span><span>Gym<small>Machines, barbells, dumbbells</small></span></div><div class="opt sel"><span class="ic"></span><span>Home<small>Some equipment</small></span></div><div class="opt"><span class="ic"></span><span>No equipment<small>Bodyweight only</small></span></div><div class="label">What do you have at home?</div><div class="chips"><span class="chip sel">Dumbbells</span><span class="chip">Resistance bands</span><span class="chip sel">Pull-up bar</span><span class="chip">Bench</span><span class="chip">Kettlebell</span></div><div class="pinned"><div class="btn primary">Next</div></div>
       </div>
-      <figcaption><b><span class="id">F1-12</span>Diet type</b>
-        <div class="note"><ul><li>Button says "Finish", not "See my plan": a coached client has no plan yet.</li><li>Indian diet categories with one-line definitions (Jain and eggetarian are often misunderstood).</li><li><span class="rule">D45:</span> an allergies field is v1.1, so it isn't shown.</li></ul></div></figcaption>
+      <figcaption><b><span class="id">AO-09</span>Where you train</b>
+        <div class="note"><ul><li>Home reveals the kit list, so starter workouts only use what they own.</li><li>Gym and No equipment skip the list. Was F1-11.</li></ul></div></figcaption>
     </figure>
 
     <figure>
       <div class="phone">
         <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
-        <div class="q">You're set, Priya</div>
-        <div class="sub">Based on your answers</div>
-        <div class="card"><b>1,850 kcal a day</b><small>to lose about 0.4 kg a week</small></div>
-        <div class="label">Your starter workouts</div>
-        <div class="card" style="border-color:var(--ink);border-width:2px"><b>Full body A</b><small>45 min · gym · beginner-friendly</small></div>
-        <div class="card"><b>Full body B</b><small>45 min · gym</small></div>
-        <div class="card"><b>Full body C</b><small>45 min · gym</small></div>
-        <div class="pinned">
-          <div class="btn primary">Start Full body A</div>
-          <div class="btn ghost">Have a coach? Enter invite code</div>
-        </div>
+        <div class="topnav"><span>←</span><span class="secname">Training · 3/5</span></div><div class="bar"><i style="width:59%"></i></div><div class="q">How often can you train?</div><div class="sub">Be realistic: consistency beats ambition.</div><div class="label">Days per week</div><div class="scale"><span class="">2</span><span class="">3</span><span class="sel">4</span><span class="">5</span><span class="">6</span></div><div class="label">Which days suit you? (optional)</div><div class="chips"><span class="chip sel">M</span><span class="chip">T</span><span class="chip sel">W</span><span class="chip">T </span><span class="chip sel">F</span><span class="chip sel">S</span><span class="chip">S </span></div><div class="pinned"><div class="btn primary">Next</div></div>
       </div>
-      <figcaption><b><span class="id">F1-13a</span>Summary — free athlete</b>
-        <div class="note"><ul><li>Immediate value: a calorie target and workouts on day one.</li><li><span class="rule">D13, D27:</span> free users get 2–3 standalone starter workouts (templates), matched to the equipment answer. Multi-week Programs are Pro.</li><li><span class="rule">D44:</span> no trial offered during onboarding.</li><li>No paywall here (research: paywalls in onboarding hurt trust). AI tier is introduced later, at natural moments.</li><li><span class="rule">Rule D5:</span> free nutrition is calories only, so no protein target here.</li></ul></div></figcaption>
+      <figcaption><b><span class="id">AO-10</span>Training days</b>
+        <div class="note"><ul><li>Days per week sets the starter split; preferred days only drive reminders.</li><li>Picking more days than the number shows a gentle note, not an error. Was part of F1-10.</li></ul></div></figcaption>
     </figure>
 
     <figure>
       <div class="phone">
         <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
-        <div class="grow center">
-          <div class="avatar"></div>
-          <div class="q">You're connected with Coach Joseph</div>
-          <div class="sub" style="max-width:220px">Joseph will review your answers and assign your plan. We'll let you know when it's ready.</div>
-          <div class="card" style="text-align:left;width:100%"><b>While you wait</b><small>• Log today's weight<br>• Add your first progress photo<br>• Say hello in chat</small></div>
-        </div>
-        <div class="pinned"><div class="btn primary">Go to Today</div><div class="btn ghost">Message Joseph</div></div>
+        <div class="topnav"><span>←</span><span class="secname">Training · 4/5</span></div><div class="bar"><i style="width:65%"></i></div><div class="q">How long can you train?</div><div class="sub">Per session, warm-up included.</div><div class="scale"><span class="">30 min</span><span class="sel">45 min</span><span class="">60 min</span><span class="">90 min</span></div><div class="label">When do you usually train?</div><div class="opt sel"><span class="ic"></span><span>Morning<small>Before 10 am</small></span></div><div class="opt"><span class="ic"></span><span>Afternoon<small>10 am – 4 pm</small></span></div><div class="opt"><span class="ic"></span><span>Evening<small>After 4 pm</small></span></div><div class="pinned"><div class="btn primary">Next</div></div>
       </div>
-      <figcaption><b><span class="id">F1-13b</span>Summary — coached athlete</b>
-        <div class="note"><ul><li>No turnaround promise: coaches haven't committed to one. Waiting states: W-01, W-02 (f12).</li><li>No calorie target or AI shown — the coach sets targets.</li><li>"While you wait" tasks give the coach useful baseline data and avoid an empty first day.</li></ul></div></figcaption>
+      <figcaption><b><span class="id">AO-11</span>Session length and time</b>
+        <div class="note"><ul><li>Length caps starter workouts. Time of day is new (D52): it sets the reminder, one hour before by default.</li><li>Reminders can be turned off in Account. Was part of F1-10.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>←</span><span class="secname">Training · 5/5</span></div><div class="bar"><i style="width:71%"></i></div><div class="q">Any injuries or limitations?</div><div class="sub">We'll avoid exercises that could make them worse.</div><div class="chips"><span class="chip">None</span><span class="chip sel">Lower back</span><span class="chip">Knee</span><span class="chip sel">Shoulder</span><span class="chip">Wrist / elbow</span><span class="chip">Neck</span><span class="chip">Ankle</span><span class="chip">Hip</span><span class="chip">Other</span></div><div class="field" style="height:56px"><small>Anything else? (optional)</small>e.g. slipped disc 2 years ago</div><div class="card"><small>Arcwell isn't a medical service. For pain or a recent injury, check with a doctor or physiotherapist first.</small></div><div class="pinned"><div class="btn primary">Next</div><div class="btn ghost">No injuries, skip</div></div>
+      </div>
+      <figcaption><b><span class="id">AO-12</span>Injuries and limitations</b>
+        <div class="note"><ul><li>"None" deselects others. Chips map to exercise exclusions in the library.</li><li>Safety note shown here, not buried in terms. Was F1-09.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<section class="flow">
+  <h2>F1 · Athlete onboarding · Recovery</h2>
+  <p class="arrowrow">Three light questions, all skippable. Free athletes have no Recovery tab (D2b): answers still space out hard sessions and carry over to Recovery on Plus or with a coach.</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>←</span><span class="secname">Recovery · 1/3</span></div><div class="bar"><i style="width:76%"></i></div><div class="q">How much do you sleep?</div><div class="sub">On a normal night.</div><div class="wruler short"><b>7.0 <small>hours</small></b><div class="ticks"></div></div><div class="grid2"><div class="card"><small>Bedtime</small><b>11:30 pm</b></div><div class="card"><small>Wake up</small><b>6:30 am</b></div></div><div class="pinned"><div class="btn primary">Next</div><div class="btn ghost">Skip for now</div></div>
+      </div>
+      <figcaption><b><span class="id">AO-13</span>Sleep</b>
+        <div class="note"><ul><li>New (D52). Average sleep sets a starting sleep target; bed and wake times feed the wind-down reminder.</li><li>A coach can replace the target later (K-24).</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>←</span><span class="secname">Recovery · 2/3</span></div><div class="bar"><i style="width:82%"></i></div><div class="q">How well do you usually sleep?</div><div class="sub">Be honest; it changes how hard we push you.</div><div class="opt"><span class="ic"></span><span>Great<small>Wake up rested most days</small></span></div><div class="opt sel"><span class="ic"></span><span>Okay<small>Rested some days, tired others</small></span></div><div class="opt"><span class="ic"></span><span>Poor<small>Often wake up tired</small></span></div><div class="opt"><span class="ic"></span><span>Very poor<small>Trouble falling or staying asleep</small></span></div><div class="pinned"><div class="btn primary">Next</div><div class="btn ghost">Skip for now</div></div>
+      </div>
+      <figcaption><b><span class="id">AO-14</span>Sleep quality</b>
+        <div class="note"><ul><li>New (D52). Words, not stars.</li><li>Poor or Very poor adds a recovery tip on Today; never a diagnosis.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>←</span><span class="secname">Recovery · 3/3</span></div><div class="bar"><i style="width:88%"></i></div><div class="q">How do your days feel lately?</div><div class="sub">A quick baseline. You'll update it in check-ins.</div><div class="label">Stress</div><div class="scale"><span class="">1</span><span class="">2</span><span class="sel">3</span><span class="">4</span><span class="">5</span></div><div class="ends"><span>Calm</span><span>Very stressed</span></div><div class="label">Energy</div><div class="scale"><span class="">1</span><span class="">2</span><span class="">3</span><span class="sel">4</span><span class="">5</span></div><div class="ends"><span>Very low</span><span>Great</span></div><div class="label">Muscle soreness after training</div><div class="chips"><span class="chip">Rarely</span><span class="chip sel">Sometimes</span><span class="chip">Often</span></div><div class="pinned"><div class="btn primary">Next</div><div class="btn ghost">Skip for now</div></div>
+      </div>
+      <figcaption><b><span class="id">AO-15</span>Stress and energy</b>
+        <div class="note"><ul><li>New (D52). Two 1–5 scales with end labels; 48 dp targets.</li><li>High stress with low energy starts training one step easier for the first two weeks.</li><li>Same scales as the weekly check-in (F6), so the baseline compares directly.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<section class="flow">
+  <h2>F1 · Athlete onboarding · Nutrition</h2>
+  <p class="arrowrow">Diet type and meal rhythm. The last question ends with "Finish", because a coached client has no plan yet.</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>←</span><span class="secname">Nutrition · 1/2</span></div><div class="bar"><i style="width:94%"></i></div><div class="q">How do you eat?</div><div class="sub">We'll only suggest foods that fit.</div><div class="opt sel"><span class="ic"></span><span>Vegetarian<small>Dairy, no meat or eggs</small></span></div><div class="opt"><span class="ic"></span><span>Eggetarian<small>Vegetarian plus eggs</small></span></div><div class="opt"><span class="ic"></span><span>Non-vegetarian<small>Meat, fish and eggs</small></span></div><div class="opt"><span class="ic"></span><span>Vegan<small>No animal products</small></span></div><div class="opt"><span class="ic"></span><span>Jain<small>No root vegetables, meat or eggs</small></span></div><div class="pinned"><div class="btn primary">Next</div></div>
+      </div>
+      <figcaption><b><span class="id">AO-16</span>Diet type</b>
+        <div class="note"><ul><li>Indian diet categories with one-line definitions (Jain and eggetarian are often misunderstood).</li><li><span class="rule">D45:</span> an allergies field is v1.1, so it isn't shown. Was F1-12.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>←</span><span class="secname">Nutrition · 2/2</span></div><div class="bar"><i style="width:100%"></i></div><div class="q">How many times do you eat a day?</div><div class="sub">Meals and proper snacks. Your food log follows this.</div><div class="scale"><span class="">2</span><span class="">3</span><span class="sel">4</span><span class="">5+</span></div><div class="card"><b>Your food log</b><div class="kv"><span>Breakfast</span><span>8:00 am</span></div><div class="kv"><span>Lunch</span><span>1:30 pm</span></div><div class="kv"><span>Evening snack</span><span>5:30 pm</span></div><div class="kv"><span>Dinner</span><span>9:00 pm</span></div></div><div class="pinned"><div class="btn primary">Finish</div></div>
+      </div>
+      <figcaption><b><span class="id">AO-17</span>Meals per day</b>
+        <div class="note"><ul><li>New (D52). Splits the calorie target into meal slots on the food log.</li><li>Coaches see it too; it saves an intake question.</li><li>Button says "Finish", not "See my plan": a coached client has no plan yet.</li></ul></div></figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<section class="flow">
+  <h2>F1 · Athlete onboarding · Your plan</h2>
+  <p class="arrowrow">Free athletes: AO-18 → AO-19 → AO-20 → AO-21. Coached athletes skip to AO-21b (the coach sets targets and plans).</p>
+  <div class="row">
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="grow center"><div class="ring">logo</div><div class="q">Building your plan</div><div class="sub">Putting your answers together.</div><div class="bar" style="width:100%"><i style="width:68%"></i></div><div class="card" style="text-align:left;width:100%"><small>✓ Daily calorie target<br>✓ Starter workouts for your home kit<br>○ Rest days from your sleep and stress<br>○ Reminders on your training days</small></div></div>
+      </div>
+      <figcaption><b><span class="id">AO-18</span>Building your plan</b>
+        <div class="note"><ul><li>New (D52). Shown only while the server works out the plan; never padded with a fake delay.</li><li>Progress bar and ticking steps, never a spinner.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="ring">logo</div><div class="center"><div class="q">Your daily calorie target</div><div class="sub">Based on your answers, this gets you to 70.0 kg at a steady pace.</div><b style="font-size:30px">1,850</b><div class="sub">kcal a day</div></div><div class="grid3"><div class="card"><b>−0.4 kg</b><small>per week</small></div><div class="card"><b>4 a week</b><small>45 min workouts</small></div><div class="card"><b>7.5 h</b><small>sleep target</small></div></div><div class="sub" style="text-align:center">Adjusts as you log your weight.</div><div class="pinned"><div class="btn primary">Continue</div></div>
+      </div>
+      <figcaption><b><span class="id">AO-19</span>Calorie target</b>
+        <div class="note"><ul><li>The number rolls up once: the one big moment of onboarding. No confetti.</li><li><span class="rule">Rule D5:</span> free nutrition is calories only, so weekly pace, workouts and sleep replace the macro row. Plus and coached accounts see protein, carbs and fat.</li><li>Was the top half of F1-13a.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="q">Here's what your plan includes</div><div class="sub">Built from your answers to help you reach 70.0 kg.</div><div class="card"><b>Calorie tracking</b><small>1,850 kcal a day · Indian dishes, vegetarian</small></div><div class="card"><b>3 starter workouts</b><small>Full body A, B, C · 45 min · your home kit</small></div><div class="card"><b>Workout logging</b><small>Sets, reps and a rest timer</small></div><div class="card"><b>Progress tracking</b><small>Weight, measurements and private photos</small></div><div class="card"><b>Reminders</b><small>Mon, Wed, Fri, Sat at 6:00 am</small></div><div class="pinned"><div class="btn primary">Next</div></div>
+      </div>
+      <figcaption><b><span class="id">AO-20</span>Plan preview</b>
+        <div class="note"><ul><li>New (D52). Only what the free plan really includes; each row quotes their answers.</li><li><span class="rule">D44:</span> no AI items and no trial or paywall in onboarding.</li><li><span class="rule">D13, D27:</span> 2–3 starter workouts (templates), matched to the equipment answer.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="grow center"><div class="ring">logo ✓</div><div class="q">All set, let's go</div><div class="sub">Your plan is ready. Show up, log it, and we'll handle the maths.</div><div class="card" style="text-align:left;width:100%"><b>First up: Full body A</b><small>Today · 45 min · about 6 exercises</small></div></div><div class="pinned"><div class="btn primary">Go to Today</div><div class="btn ghost">Have a coach? Enter invite code</div></div>
+      </div>
+      <figcaption><b><span class="id">AO-21</span>All set</b>
+        <div class="note"><ul><li>Calm finish: one card pointing at today's first step. No emoji, no confetti.</li><li>Replaces the bottom half of F1-13a.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮ ◔</span></div>
+        <div class="grow center"><div class="avatar"></div><div class="q">You're connected with Coach Joseph</div><div class="sub">Joseph will review your answers and send your plan. We'll tell you when it's ready.</div><div class="card" style="text-align:left;width:100%"><b>While you wait</b><small>• Log today's weight<br>• Add your first progress photo<br>• Say hello in chat</small></div></div><div class="pinned"><div class="btn primary">Go to Today</div><div class="btn">Message Joseph</div></div>
+      </div>
+      <figcaption><b><span class="id">AO-21b</span>All set — coached athlete</b>
+        <div class="note"><ul><li>No turnaround promise: coaches haven't committed to one. Waiting states: W-01, W-02 (f12).</li><li>No calorie target or AI shown: the coach sets targets (D7).</li><li>"While you wait" tasks give the coach baseline data and avoid an empty first day. Was F1-13b.</li></ul></div></figcaption>
     </figure>
 
   </div>
@@ -276,7 +369,7 @@
 
 <section class="flow">
   <h2>F3 · Joining through a coach's invite link</h2>
-  <p class="arrowrow">Coach shares link on WhatsApp → client taps → Play Store (if not installed) → app opens on invite → sign up (role skipped) → consent → onboarding → F1-13b</p>
+  <p class="arrowrow">Coach shares link on WhatsApp → client taps → Play Store (if not installed) → app opens on invite → sign up (role skipped) → consent without AI (F1-05b) → onboarding AO-01 to AO-17 → AO-21b</p>
   <div class="row">
 
     <figure>
@@ -323,11 +416,11 @@
 </section>
 
 <section class="flow">
-  <h2>Resolved for v1 (2026-11-11)</h2>
+  <h2>Resolved for v1 (2026-11-11, IDs updated for D52 on 2026-11-12)</h2>
   <div class="note" style="max-width:820px"><ul>
-    <li><b>F1-08:</b> sex is optional, for calorie estimates only (D44).</li>
-    <li><b>F1-12:</b> allergies / foods-to-avoid field moved to v1.1 (D45).</li>
-    <li><b>F1-13a:</b> free users see calories only, no protein guidance (D5).</li>
+    <li><b>AO-01:</b> sex is optional, for calorie estimates only (D44).</li>
+    <li><b>AO-16:</b> allergies / foods-to-avoid field moved to v1.1 (D45).</li>
+    <li><b>AO-19:</b> free users see calories only, no protein guidance (D5).</li>
     <li><b>F3-01:</b> the invite web page needs a domain — a setup task in PLAN.md, not a design decision.</li>
   </ul></div>
 </section>

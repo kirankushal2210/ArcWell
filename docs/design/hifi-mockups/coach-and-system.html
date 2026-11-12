@@ -1,0 +1,979 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coach, menu, states and notifications</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Exact copies of ../theme-tokens.css and hifi.css for viewers that can't load linked files.
+     The <link>s below win wherever they load. Regenerate with build.py; never edit by hand. -->
+<style id="tokens-fallback">
+/* =============================================================================
+   Arcwell — theme tokens (monochrome light theme, D50)
+   Phase 1 of docs/design/hifi-execution-roadmap.md
+   Status: DRAFT, not approved or user-tested.
+
+   Source of truth, in order: docs/DECISIONS.md (D50 black-and-white palette,
+   which replaces the blue of D49; D46 Inter) → docs/DESIGN.md §5 → this file.
+   If a value here and DESIGN.md ever differ, DESIGN.md wins: change it there
+   first, then here. Earlier palettes are kept in DECISIONS.md D47 and D49.
+
+   Hard rules these tokens encode:
+   - Black and white first: black is the action colour; colour is reserved for
+     small pillar markers and status (success, warning, danger).
+   - Solid colours only. No gradients of any kind, no glows, no glassmorphism,
+     no backdrop blur (design-prompt.md negative list).
+   - Depth comes from surface steps (bg → surface → raised), never drop shadows.
+   - Red (danger) is for errors and destructive actions only, never a missed target.
+
+   Contrast ratios are WCAG 2.x relative-luminance ratios, computed 2026-11-11.
+   AA thresholds: 4.5:1 body text · 3:1 large text (≥ 18.66px bold / 24px) and
+   UI component boundaries.
+   ============================================================================= */
+
+:root {
+  color-scheme: light;
+
+  /* ===========================================================================
+     1. COLOUR — raw palette
+     Named by hue/role, not by use. Components never read these directly;
+     they read the semantic tokens in section 2.
+     ========================================================================= */
+
+  /* Neutral greys (no blue tint) */
+  --grey-0:   #FFFFFF;       /* cards, sheets, text on black */
+  --grey-25:  #F5F5F5;       /* app background */
+  --grey-100: #EBEBEB;       /* inputs, pressed, raised */
+  --grey-200: #E0E0E0;       /* dividers */
+  --grey-400: #A3A3A3;       /* disabled text (WCAG-exempt) */
+  --grey-500: #7A7A7A;       /* control outlines */
+  --grey-600: #5C5C5C;       /* muted text */
+  --charcoal-700: #333333;   /* black, pressed step */
+  --charcoal-900: #111111;   /* black: text and primary actions */
+
+  /* Pillar hues: small markers only */
+  --cyan-700: #0E7490;       /* training */
+  --amber-600: #C2570C;      /* nutrition */
+  --violet-600: #6D5BD0;     /* recovery (solid only, never in a gradient) */
+
+  /* Status hues */
+  --green-700: #127235;      /* success: status only, never a brand or surface colour */
+  --amber-700: #A34A06;      /* warning */
+  --red-700:   #C81E1E;      /* danger */
+
+  /* ===========================================================================
+     2. COLOUR — semantic roles (what components use)
+     ========================================================================= */
+
+  /* Backgrounds: three steps. Depth = stepping, not shadows.
+     White cards on the light-grey background; raised (inputs, pressed) one step darker. */
+  --color-bg:              var(--grey-25);   /* #F5F5F5 */
+  --color-surface:         var(--grey-0);    /* #FFFFFF */
+  --color-surface-raised:  var(--grey-100);  /* #EBEBEB */
+
+  /* Text
+     on bg / surface / raised:
+     text       #111111  17.32 / 18.88 / 15.84  AA ✓
+     text-muted #5C5C5C   6.13 /  6.69 /  5.61  AA ✓  */
+  --color-text:            var(--charcoal-900);
+  --color-text-muted:      var(--grey-600);
+  --color-text-disabled:   var(--grey-400);      /* 2.31 / 2.52 / 2.12: disabled controls only (WCAG-exempt) */
+
+  /* Primary action: black
+     on-brand #FFFFFF on brand: 18.88 AA ✓ · on brand-hover #333333: 12.63 AA ✓  */
+  --color-brand:           var(--charcoal-900);
+  --color-brand-hover:     var(--charcoal-700);
+  --color-on-brand:        var(--grey-0);
+
+  /* Accent: also black (selection, focus, active tab). Colour stays out of the UI chrome. */
+  --color-accent:          var(--charcoal-900);
+  --color-on-accent:       var(--grey-0);
+
+  /* Pillars: small dots only, never text or fills; bars, rings and charts are black (D50).
+     training  on bg / surface / raised: 4.91 / 5.36 / 4.49  (3:1 for markers ✓)
+     nutrition on bg / surface / raised: 4.13 / 4.50 / 3.78  (3:1 for markers ✓)
+     recovery  on bg / surface / raised: 4.75 / 5.18 / 4.34  (3:1 for markers ✓)  */
+  --color-training:        var(--cyan-700);
+  --color-nutrition:       var(--amber-600);
+  --color-recovery:        var(--violet-600);
+
+  /* Status
+     success on bg / surface / raised: 5.53 / 6.03 / 5.06  AA ✓
+     warning on bg / surface / raised: 5.44 / 5.93 / 4.98  AA ✓
+     danger  on bg / surface / raised: 5.26 / 5.74 / 4.81  AA ✓  */
+  --color-success:         var(--green-700);
+  --color-warning:         var(--amber-700);
+  --color-danger:          var(--red-700);
+
+  /* Lines
+     border        #E0E0E0  1.21 / 1.32 / 1.11: decorative dividers only
+     border-strong #7A7A7A  3.94 / 4.29 / 3.60: input, tick-box and secondary-button
+                                                 outlines (WCAG 1.4.11 needs 3:1) ✓  */
+  --color-border:          var(--grey-200);
+  --color-border-strong:   var(--grey-500);
+  --color-focus:           var(--charcoal-900);
+
+  /* Scrim behind modal bottom sheets and dialogs: dims, never blurs. */
+  --color-scrim:           rgb(17 17 17 / 0.4);
+
+  /* ===========================================================================
+     3. TYPOGRAPHY
+     Inter for everything, headings included (D46). Roboto is listed only as
+     the Android system fallback while Inter loads; it is not a second typeface.
+     rem-based so layouts scale with the user's text size (must survive 130%).
+     Root assumption: 1rem = 16px.
+     ========================================================================= */
+
+  --font-sans: "Inter", "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "Roboto Mono", Menlo, monospace;  /* spec/debug only, never in the app UI */
+
+  /* Tabular numerals on every number (kg, reps, kcal, timers). */
+  --font-numeric: "tnum" 1;
+
+  /* Weights */
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+
+  /* Size scale: DESIGN.md §5 sizes on the requested semantic names. */
+  --text-xs:   0.75rem;    /* 12px · caption */
+  --text-sm:   0.875rem;   /* 14px · label */
+  --text-base: 1rem;       /* 16px · body */
+  --text-lg:   1.125rem;   /* 18px · heading */
+  --text-xl:   1.375rem;   /* 22px · title */
+  --text-2xl:  2rem;       /* 32px · display */
+
+  /* Line heights, paired 1:1 with the sizes (tighter as type grows). */
+  --leading-xs:   1rem;      /* 16px */
+  --leading-sm:   1.25rem;   /* 20px */
+  --leading-base: 1.5rem;    /* 24px */
+  --leading-lg:   1.5rem;    /* 24px */
+  --leading-xl:   1.75rem;   /* 28px */
+  --leading-2xl:  2.5rem;    /* 40px */
+
+  /* Tracking: size-specific, from Inter's published dynamic metrics
+     (tracking = -0.0223 + 0.185 · e^(-0.1745 · px)), rounded. Never one value
+     for all sizes. Negative as type grows, ~0 at caption size. */
+  --tracking-xs:   0em;
+  --tracking-sm:   -0.006em;
+  --tracking-base: -0.011em;
+  --tracking-lg:   -0.014em;
+  --tracking-xl:   -0.018em;
+  --tracking-2xl:  -0.022em;
+  --tracking-caps: 0.06em;   /* uppercase eyebrows only (spec sheet) */
+
+  /* Semantic type roles (size / leading / weight / tracking as a set) */
+  --type-display-size:  var(--text-2xl);  --type-display-leading:  var(--leading-2xl);  --type-display-weight:  var(--weight-bold);     --type-display-tracking:  var(--tracking-2xl);
+  --type-title-size:    var(--text-xl);   --type-title-leading:    var(--leading-xl);   --type-title-weight:    var(--weight-semibold); --type-title-tracking:    var(--tracking-xl);
+  --type-heading-size:  var(--text-lg);   --type-heading-leading:  var(--leading-lg);   --type-heading-weight:  var(--weight-semibold); --type-heading-tracking:  var(--tracking-lg);
+  --type-body-size:     var(--text-base); --type-body-leading:     var(--leading-base); --type-body-weight:     var(--weight-regular);  --type-body-tracking:     var(--tracking-base);
+  --type-label-size:    var(--text-sm);   --type-label-leading:    var(--leading-sm);   --type-label-weight:    var(--weight-medium);   --type-label-tracking:    var(--tracking-sm);
+  --type-caption-size:  var(--text-xs);   --type-caption-leading:  var(--leading-xs);   --type-caption-weight:  var(--weight-regular);  --type-caption-tracking:  var(--tracking-xs);
+
+  /* ===========================================================================
+     4. SPACING
+     Rigid 4px grid. Only these steps exist: 4, 8, 12, 16, 24, 32, 48.
+     rem so spacing grows with text size.
+     ========================================================================= */
+
+  --space-0:  0;
+  --space-1:  0.25rem;   /*  4px */
+  --space-2:  0.5rem;    /*  8px */
+  --space-3:  0.75rem;   /* 12px */
+  --space-4:  1rem;      /* 16px */
+  --space-6:  1.5rem;    /* 24px */
+  --space-8:  2rem;      /* 32px */
+  --space-12: 3rem;      /* 48px */
+
+  /* Rhythm: grouped spacing, never one gap everywhere.
+     Tight inside a group, generous between unrelated groups. */
+  --gap-inline:        var(--space-2);   /*  8px: icon ↔ label, chip ↔ chip */
+  --gap-in-group:      var(--space-2);   /*  8px: rows within one group */
+  --pad-card:          var(--space-4);   /* 16px: card and sheet padding */
+  --gutter-screen:     var(--space-4);   /* 16px: screen side margins */
+  --gap-between-groups: var(--space-6);  /* 24px: unrelated groups */
+  --gap-section:       var(--space-8);   /* 32px: major sections */
+  --gap-section-break: var(--space-12);  /* 48px: top of a new page region */
+
+  /* Touch: Android, 48dp minimum (DESIGN.md §5). Kept in px: a fixed target,
+     not text-relative. */
+  --tap-min:           48px;
+  --control-height:    48px;   /* buttons, inputs */
+
+  /* ===========================================================================
+     5. RADII, BORDERS, ELEVATION
+     ========================================================================= */
+
+  /* Radii */
+  --radius-sm:   8px;      /* inputs, chips, set cells */
+  --radius-md:   12px;     /* cards, buttons */
+  --radius-lg:   20px;     /* bottom sheets, drawer edge */
+  --radius-full: 9999px;   /* pills, avatars, status chips */
+
+  /* Borders: solid hex, not rgba, so the line is identical on every surface step.
+     (#2D323A on #111316 is close to rgba(255,255,255,0.1) on the same background.) */
+  --border-width:        1px;
+  --border-divider:      var(--border-width) solid var(--color-border);
+  --border-control:      var(--border-width) solid var(--color-border-strong);
+  --border-focus:        var(--border-width) solid var(--color-focus);
+  --focus-ring-width:    2px;  /* 1px border + 1px ring, as in the spec sheet */
+  --focus-ring:          0 0 0 1px var(--color-focus);  /* outline ring, not a shadow */
+
+  /* Elevation: surface steps only. No drop shadows on structural elements. */
+  --elevation-0: var(--color-bg);              /* screen */
+  --elevation-1: var(--color-surface);         /* cards, bottom bar, sheets */
+  --elevation-2: var(--color-surface-raised);  /* inputs, pressed rows, selected tab pill */
+  --shadow-none: none;
+
+  /* ===========================================================================
+     6. MOTION (DESIGN.md §5)
+     With "Remove animations" / reduced motion, every duration drops to 0.
+     ========================================================================= */
+
+  --duration-micro: 120ms;   /* press feedback, tick fill, toggles */
+  --duration-std:   200ms;   /* number rolls, cards, tabs */
+  --duration-sheet: 280ms;   /* bottom sheets */
+  --duration-big:   600ms;   /* ONLY the workout summary (F4-12) */
+  --ease-standard:  cubic-bezier(0.2, 0, 0, 1);
+  --press-scale:    0.98;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-micro: 0ms;
+    --duration-std:   0ms;
+    --duration-sheet: 0ms;
+    --duration-big:   0ms;
+    --press-scale:    1;
+  }
+}
+</style>
+<style id="hifi-fallback">
+/* =============================================================================
+   Arcwell hi-fi mockups: shared components (black and white, D50).
+   Every value comes from ../theme-tokens.css. Draft, not approved or user-tested.
+   ============================================================================= */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--color-bg); }
+body {
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--text-base); line-height: var(--leading-base);
+  -webkit-font-smoothing: antialiased;
+}
+.num, .n { font-feature-settings: var(--font-numeric); }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+
+/* ---------- Board (the page the phones sit on) ---------- */
+.board { max-width: 1480px; padding: var(--space-12) var(--space-6); }
+.board-head { display: grid; gap: var(--space-2); max-width: 72ch; padding-bottom: var(--space-8); border-bottom: var(--border-divider); }
+.board-head h1 { font-size: var(--text-2xl); line-height: var(--leading-2xl); font-weight: var(--weight-bold); letter-spacing: var(--tracking-2xl); }
+.board-head p { color: var(--color-text-muted); }
+.board-nav { display: flex; flex-wrap: wrap; gap: var(--space-2); padding-top: var(--space-2); }
+.board-nav a { font-size: var(--text-sm); color: var(--color-brand); font-weight: var(--weight-semibold); text-decoration: none; min-height: var(--tap-min); display: inline-flex; align-items: center; padding-right: var(--space-3); }
+.group { padding-top: var(--space-12); display: grid; gap: var(--space-6); }
+.group-head { display: grid; gap: var(--space-1); max-width: 72ch; }
+.group-head .idx { font-size: var(--text-xs); color: var(--color-text-muted); font-feature-settings: var(--font-numeric); }
+.group-head h2 { font-size: var(--text-xl); line-height: var(--leading-xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-xl); }
+.group-head p { font-size: var(--text-sm); line-height: var(--leading-sm); color: var(--color-text-muted); }
+.frames { display: flex; flex-wrap: wrap; gap: var(--space-8) var(--space-6); align-items: flex-start; }
+figure { display: grid; gap: var(--space-3); }
+figcaption { display: grid; gap: var(--space-1); max-width: 360px; }
+figcaption b { font-size: var(--text-sm); line-height: var(--leading-sm); font-weight: var(--weight-semibold); }
+figcaption span { font-size: var(--text-xs); line-height: var(--leading-xs); color: var(--color-text-muted); }
+.anno { font-size: var(--text-xs); line-height: var(--leading-xs); color: var(--color-accent); font-feature-settings: var(--font-numeric); }
+
+/* ---------- Phone ---------- */
+.phone {
+  position: relative; width: 360px; height: 760px; overflow: hidden;
+  background: var(--color-bg); border: var(--border-divider); border-radius: var(--radius-lg);
+  display: flex; flex-direction: column;
+}
+.sb { height: 32px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 var(--space-4); font-size: var(--text-xs); font-weight: var(--weight-semibold); font-feature-settings: var(--font-numeric); }
+.sb .ic { display: flex; gap: var(--space-1); }
+.sb svg { width: 14px; height: 14px; }
+.navbar { height: 24px; flex: none; display: flex; align-items: center; justify-content: center; }
+.navbar i { width: 96px; height: 4px; border-radius: var(--radius-full); background: var(--color-text); display: block; opacity: .8; }
+.body { flex: 1; min-height: 0; overflow: hidden; padding: var(--space-2) var(--gutter-screen) var(--space-4); display: flex; flex-direction: column; gap: var(--gap-between-groups); }
+.body.tight { gap: var(--space-4); }
+.foot { flex: none; padding: var(--space-4) var(--gutter-screen); display: grid; gap: var(--space-2); }
+
+/* App bar */
+.appbar { display: flex; align-items: center; gap: var(--space-2); min-height: var(--tap-min); }
+.appbar .title { flex: 1; min-width: 0; font-size: var(--text-xl); line-height: var(--leading-xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-xl); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.appbar .title.sm { font-size: var(--text-lg); line-height: var(--leading-lg); letter-spacing: var(--tracking-lg); }
+.iconbtn { width: var(--tap-min); height: var(--tap-min); flex: none; display: grid; place-items: center; border-radius: var(--radius-md); color: var(--color-text); }
+.iconbtn.edge { margin-left: calc(-1 * var(--space-3)); }
+.iconbtn.end { margin-right: calc(-1 * var(--space-3)); }
+.iconbtn.outline { border: var(--border-control); }
+.iconbtn.fill { background: var(--color-surface); }
+.iconbtn svg { width: 24px; height: 24px; }
+
+/* Text */
+.display { font-size: var(--text-2xl); line-height: var(--leading-2xl); font-weight: var(--weight-bold); letter-spacing: var(--tracking-2xl); }
+.title { font-size: var(--text-xl); line-height: var(--leading-xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-xl); }
+.heading { font-size: var(--text-lg); line-height: var(--leading-lg); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-lg); }
+.label { font-size: var(--text-sm); line-height: var(--leading-sm); font-weight: var(--weight-medium); letter-spacing: var(--tracking-sm); }
+.caption { font-size: var(--text-xs); line-height: var(--leading-xs); }
+.muted { color: var(--color-text-muted); }
+.brand { color: var(--color-brand); }
+.accent { color: var(--color-accent); }
+.ok { color: var(--color-success); }
+.warn { color: var(--color-warning); }
+.bad { color: var(--color-danger); }
+.eyebrow { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-xs); line-height: var(--leading-xs); font-weight: var(--weight-medium); letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--color-text-muted); }
+.dot { width: 8px; height: 8px; border-radius: var(--radius-full); display: inline-block; flex: none; }
+.dot.t { background: var(--color-training); } .dot.nu { background: var(--color-nutrition); } .dot.r { background: var(--color-recovery); }
+.stack { display: grid; gap: var(--gap-in-group); }
+.stack-1 { display: grid; gap: var(--space-1); }
+.stack-4 { display: grid; gap: var(--space-4); }
+.row { display: flex; align-items: center; gap: var(--space-2); }
+.row.wrap { flex-wrap: wrap; }
+.between { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.grow { flex: 1; min-width: 0; }
+.right { text-align: right; }
+
+/* Buttons */
+.btn { min-height: var(--control-height); padding: 0 var(--space-4); border-radius: var(--radius-md); border: var(--border-width) solid transparent; display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); font-size: var(--text-base); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-base); white-space: nowrap; }
+.btn svg { width: 20px; height: 20px; }
+.btn.full { width: 100%; }
+.btn.primary { background: var(--color-brand); color: var(--color-on-brand); }
+.btn.secondary { border-color: var(--color-border-strong); color: var(--color-text); background: var(--color-surface); }
+.btn.ghost { color: var(--color-text-muted); }
+.btn.destructive { border-color: var(--color-danger); color: var(--color-danger); }
+.btn.google { border-color: var(--color-border-strong); background: var(--color-surface); color: var(--color-text); }
+.btn.sm { min-height: var(--tap-min); padding: 0 var(--space-3); font-size: var(--text-sm); }
+.link { color: var(--color-brand); font-weight: var(--weight-semibold); font-size: var(--text-sm); min-height: var(--tap-min); display: inline-flex; align-items: center; text-decoration: none; }
+
+/* Cards */
+.card { background: var(--color-surface); border-radius: var(--radius-md); padding: var(--pad-card); display: grid; gap: var(--gap-in-group); }
+.card.g4 { gap: var(--space-4); }
+.card.raised { background: var(--color-surface-raised); }
+.card.flush { padding: 0 var(--pad-card); gap: 0; }
+.card.sel { box-shadow: none; outline: var(--focus-ring-width) solid var(--color-accent); outline-offset: -2px; }
+
+/* Inputs */
+.field { display: grid; gap: var(--space-2); }
+.field .lbl { font-size: var(--text-sm); line-height: var(--leading-sm); font-weight: var(--weight-medium); }
+.input { min-height: var(--control-height); display: flex; align-items: center; gap: var(--space-2); padding: 0 var(--space-4); border-radius: var(--radius-sm); background: var(--color-surface-raised); border: var(--border-control); font-size: var(--text-base); }
+.input svg { width: 20px; height: 20px; color: var(--color-text-muted); flex: none; }
+.input .ph { color: var(--color-text-muted); }
+.input .unit { margin-left: auto; color: var(--color-text-muted); font-size: var(--text-sm); }
+.input.focus { border: var(--focus-ring-width) solid var(--color-focus); padding: 0 calc(var(--space-4) - 1px); }
+.input.error { border: var(--focus-ring-width) solid var(--color-danger); padding: 0 calc(var(--space-4) - 1px); }
+.msg { display: flex; gap: var(--space-1); align-items: center; font-size: var(--text-xs); line-height: var(--leading-xs); color: var(--color-danger); }
+.msg svg { width: 16px; height: 16px; flex: none; }
+.help { font-size: var(--text-xs); line-height: var(--leading-xs); color: var(--color-text-muted); }
+
+/* Option rows (onboarding choices) */
+.opt { min-height: 56px; display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--color-surface); border: var(--border-width) solid var(--color-border); }
+.opt .grow b { display: block; font-weight: var(--weight-medium); }
+.opt .grow span { font-size: var(--text-sm); line-height: var(--leading-sm); color: var(--color-text-muted); }
+.opt .radio { width: 20px; height: 20px; border-radius: var(--radius-full); border: 2px solid var(--color-border-strong); flex: none; }
+.opt.on { border: var(--focus-ring-width) solid var(--color-accent); padding: calc(var(--space-3) - 1px) calc(var(--space-4) - 1px); }
+.opt.on .radio { border: 6px solid var(--color-accent); }
+.progress { display: flex; gap: var(--space-1); }
+.progress i { height: 4px; flex: 1; border-radius: var(--radius-full); background: var(--color-surface-raised); display: block; }
+.progress i.on { background: var(--color-brand); }
+
+/* Chips */
+.chip { height: 32px; padding: 0 var(--space-3); border-radius: var(--radius-sm); border: var(--border-control); display: inline-flex; align-items: center; gap: var(--space-1); font-size: var(--text-sm); font-weight: var(--weight-medium); background: var(--color-surface); white-space: nowrap; font-feature-settings: var(--font-numeric); }
+.chip svg { width: 16px; height: 16px; }
+.chip.on { border-color: var(--color-accent); color: var(--color-accent); background: var(--color-surface-raised); }
+.chip-hit { min-height: var(--tap-min); display: inline-flex; align-items: center; }
+.status { height: 24px; padding: 0 var(--space-2); border-radius: var(--radius-full); background: var(--color-surface-raised); display: inline-flex; align-items: center; gap: var(--space-1); font-size: var(--text-xs); font-weight: var(--weight-semibold); white-space: nowrap; }
+.status::before { content: ""; width: 8px; height: 8px; border-radius: var(--radius-full); background: currentColor; }
+.status.active { color: var(--color-success); } .status.paused { color: var(--color-text-muted); }
+.status.leaving { color: var(--color-warning); } .status.completed { color: var(--color-brand); }
+.tag { font-size: var(--text-xs); line-height: var(--leading-xs); color: var(--color-text-muted); background: var(--color-surface-raised); border-radius: var(--radius-full); padding: var(--space-1) var(--space-2); white-space: nowrap; font-feature-settings: var(--font-numeric); }
+.tag.plus { color: var(--color-brand); }
+
+/* List rows */
+.lr { min-height: 56px; display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) 0; border-bottom: var(--border-divider); }
+.lr:last-child { border-bottom: 0; }
+.lr .t { flex: 1; min-width: 0; display: grid; gap: var(--space-1); }
+.lr .t b { font-weight: var(--weight-medium); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lr .t span { font-size: var(--text-sm); line-height: var(--leading-sm); color: var(--color-text-muted); font-feature-settings: var(--font-numeric); }
+.lr .r { font-size: var(--text-sm); color: var(--color-text-muted); white-space: nowrap; font-feature-settings: var(--font-numeric); text-align: right; display: grid; gap: var(--space-1); justify-items: end; }
+.lr > svg { width: 20px; height: 20px; color: var(--color-text-muted); flex: none; }
+.av { width: 40px; height: 40px; border-radius: var(--radius-full); background: var(--color-surface-raised); display: grid; place-items: center; font-size: var(--text-sm); font-weight: var(--weight-semibold); color: var(--color-text-muted); flex: none; }
+.av.sm { width: 32px; height: 32px; font-size: var(--text-xs); }
+.av.lg { width: 56px; height: 56px; font-size: var(--text-base); }
+.ico { width: 40px; height: 40px; border-radius: var(--radius-sm); background: var(--color-surface-raised); display: grid; place-items: center; flex: none; color: var(--color-text-muted); }
+.ico svg { width: 20px; height: 20px; }
+.thumb { width: 48px; height: 48px; border-radius: var(--radius-sm); flex: none; background: var(--color-surface-raised); object-fit: cover; }
+
+/* Bars and numbers */
+.bar { height: 8px; border-radius: var(--radius-full); background: var(--color-surface-raised); overflow: hidden; }
+/* Bars, rings and ticks are black (D50); colour stays in the small pillar dots. */
+.bar i { display: block; height: 100%; border-radius: var(--radius-full); background: var(--color-brand); }
+.bar.thin { height: 4px; }
+.big { font-size: var(--text-2xl); line-height: var(--leading-2xl); font-weight: var(--weight-bold); letter-spacing: var(--tracking-2xl); font-feature-settings: var(--font-numeric); }
+.big small, .mid small { font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--color-text-muted); margin-left: var(--space-1); letter-spacing: 0; }
+.mid { font-size: var(--text-xl); line-height: var(--leading-xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-xl); font-feature-settings: var(--font-numeric); }
+.macros { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3); }
+.macros > div { display: grid; gap: var(--space-1); }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-2); }
+.stat { background: var(--color-surface-raised); border-radius: var(--radius-sm); padding: var(--space-3); display: grid; gap: var(--space-1); }
+.stat .k { font-size: var(--text-xs); line-height: var(--leading-xs); color: var(--color-text-muted); }
+.stat .v { font-size: var(--text-lg); line-height: var(--leading-lg); font-weight: var(--weight-semibold); font-feature-settings: var(--font-numeric); }
+.stat .d { font-size: var(--text-xs); line-height: var(--leading-xs); color: var(--color-text-muted); font-feature-settings: var(--font-numeric); }
+.stat.surface { background: var(--color-surface); }
+
+/* Dial (sleep score, summary ring) */
+.dial { position: relative; width: 112px; height: 112px; flex: none; }
+.dial svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.dial .track { stroke: var(--color-surface-raised); }
+.dial .fill { stroke: var(--color-brand); }
+.dial .v { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
+.dial .v b { font-size: var(--text-2xl); line-height: var(--leading-2xl); font-weight: var(--weight-bold); font-feature-settings: var(--font-numeric); }
+.dial .v span { font-size: var(--text-xs); line-height: var(--leading-xs); color: var(--color-text-muted); }
+.dial.sm { width: 80px; height: 80px; }
+.dial.sm .v b { font-size: var(--text-xl); line-height: var(--leading-xl); }
+
+/* Charts */
+.chart { width: 100%; height: auto; display: block; }
+.chart .grid { stroke: var(--color-border); stroke-width: 1; }
+.chart .line { fill: none; stroke: var(--color-accent); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.chart .line.b { stroke: var(--color-brand); }
+.chart .pt { fill: var(--color-surface); stroke: var(--color-accent); stroke-width: 2; }
+.chart .last { fill: var(--color-accent); }
+.chart text { fill: var(--color-text-muted); font-size: 12px; font-family: var(--font-sans); font-feature-settings: var(--font-numeric); }
+.chart .colbar { fill: var(--color-brand); }
+.chart .colbar.dim { fill: var(--color-surface-raised); }
+
+/* Workout set rows */
+.sets { width: 100%; border-collapse: separate; border-spacing: 0 var(--space-1); }
+.sets th { font-size: var(--text-xs); font-weight: var(--weight-medium); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: var(--tracking-caps); text-align: left; padding: 0 var(--space-1) var(--space-1); }
+.sets td { height: 48px; padding: 0 var(--space-1); font-feature-settings: var(--font-numeric); }
+.sets td.set { width: 32px; color: var(--color-text-muted); font-size: var(--text-sm); font-weight: var(--weight-semibold); }
+.sets td.prev { color: var(--color-text-muted); font-size: var(--text-sm); }
+.cell { min-width: 56px; height: 40px; border-radius: var(--radius-sm); background: var(--color-surface-raised); display: inline-flex; align-items: center; justify-content: center; font-weight: var(--weight-semibold); padding: 0 var(--space-2); }
+.cell.cur { outline: var(--focus-ring-width) solid var(--color-accent); outline-offset: -2px; background: var(--color-surface); }
+.tick { width: 48px; height: 40px; border-radius: var(--radius-sm); border: var(--border-control); display: inline-flex; align-items: center; justify-content: center; color: var(--color-text-muted); }
+.tick svg { width: 20px; height: 20px; }
+.done .cell { background: transparent; color: var(--color-text-muted); }
+.done .tick { background: var(--color-brand); border-color: var(--color-brand); color: var(--color-on-brand); }
+
+/* Stepper */
+.stepper { display: flex; align-items: center; justify-content: space-between; padding: var(--space-1); border-radius: var(--radius-md); background: var(--color-surface-raised); }
+.stepper .iconbtn { background: var(--color-surface); }
+.stepper .v { font-size: var(--text-2xl); line-height: var(--leading-2xl); font-weight: var(--weight-bold); font-feature-settings: var(--font-numeric); }
+.stepper .v small { font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--color-text-muted); margin-left: var(--space-1); }
+
+/* Bottom nav (M3) */
+.bnav { flex: none; height: 72px; display: flex; background: var(--color-surface); border-top: var(--border-divider); }
+.bnav a { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); color: var(--color-text-muted); font-size: var(--text-xs); font-weight: var(--weight-medium); text-decoration: none; }
+.bnav a .pill { width: 56px; height: 32px; border-radius: var(--radius-full); display: grid; place-items: center; }
+.bnav a svg { width: 24px; height: 24px; }
+.bnav a.on { color: var(--color-text); font-weight: var(--weight-semibold); }
+.bnav a.on .pill { background: var(--color-surface-raised); color: var(--color-accent); }
+.bnav a span:last-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; padding: 0 var(--space-1); }
+
+/* Sheets, scrim, drawer */
+.scrim { position: absolute; inset: 0; background: var(--color-scrim); }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--color-surface); border-radius: var(--radius-lg) var(--radius-lg) 0 0; padding: var(--space-3) var(--gutter-screen) var(--space-6); display: grid; gap: var(--space-4); }
+.grab { width: 32px; height: 4px; border-radius: var(--radius-full); background: var(--color-border-strong); justify-self: center; }
+.drawer { position: absolute; top: 0; bottom: 0; left: 0; width: 296px; background: var(--color-surface); border-radius: 0 var(--radius-lg) var(--radius-lg) 0; padding: var(--space-8) var(--space-3) var(--space-4); display: grid; align-content: start; gap: var(--space-1); }
+.mi { min-height: var(--tap-min); display: flex; align-items: center; gap: var(--space-3); padding: 0 var(--space-3); border-radius: var(--radius-sm); font-size: var(--text-sm); font-weight: var(--weight-medium); }
+.mi svg { width: 20px; height: 20px; color: var(--color-text-muted); flex: none; }
+.mi .end { margin-left: auto; color: var(--color-text-muted); font-size: var(--text-xs); }
+.mi.sub { padding-left: calc(var(--space-12) - var(--space-1)); font-weight: var(--weight-regular); }
+.mi.on { background: var(--color-surface-raised); }
+.mi-head { font-size: var(--text-xs); line-height: var(--leading-xs); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: var(--tracking-caps); padding: var(--space-3) var(--space-3) var(--space-1); font-weight: var(--weight-medium); }
+
+/* Feedback */
+.banner { display: flex; gap: var(--space-2); align-items: center; background: var(--color-surface-raised); border-radius: var(--radius-sm); padding: var(--space-2) var(--space-3); font-size: var(--text-sm); line-height: var(--leading-sm); color: var(--color-text-muted); }
+.banner svg { width: 16px; height: 16px; flex: none; }
+.banner.warn svg { color: var(--color-warning); }
+.err { display: flex; gap: var(--space-3); align-items: flex-start; background: var(--color-surface); border-radius: var(--radius-md); padding: var(--space-3) var(--space-3) var(--space-1); font-size: var(--text-sm); line-height: var(--leading-sm); }
+.err > svg { width: 20px; height: 20px; color: var(--color-danger); flex: none; }
+.empty { display: grid; gap: var(--space-4); padding: var(--space-6) 0; }
+.empty .tile { width: 56px; height: 56px; border-radius: var(--radius-md); background: var(--color-surface-raised); display: grid; place-items: center; color: var(--color-text-muted); }
+.empty .tile svg { width: 24px; height: 24px; }
+.sk { background: var(--color-surface-raised); border-radius: var(--radius-sm); }
+.sk.card { border-radius: var(--radius-md); }
+.minibar { display: flex; align-items: center; gap: var(--space-3); background: var(--color-text); color: var(--color-bg); border-radius: var(--radius-md); padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4); }
+.minibar svg { width: 20px; height: 20px; }
+.minibar .iconbtn { color: var(--color-bg); }
+
+/* Chat */
+.bub { max-width: 80%; padding: var(--space-2) var(--space-3); border-radius: var(--radius-md); background: var(--color-surface); font-size: var(--text-sm); line-height: var(--leading-sm); display: grid; gap: var(--space-1); }
+.bub.me { margin-left: auto; background: var(--color-brand); color: var(--color-on-brand); }
+.bub small { font-size: var(--text-xs); color: var(--color-text-muted); text-align: right; font-feature-settings: var(--font-numeric); }
+.bub.me small { color: var(--color-on-brand); opacity: .85; }
+.att { display: flex; gap: var(--space-3); align-items: center; padding: var(--space-2) var(--space-3); border-radius: var(--radius-md); background: var(--color-surface); max-width: 80%; font-size: var(--text-sm); }
+.att svg { width: 20px; height: 20px; color: var(--color-danger); }
+.composer { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-2) var(--space-2) var(--space-1); background: var(--color-surface); border-top: var(--border-divider); flex: none; }
+.composer .input { flex: 1; }
+
+/* Photos */
+.ph { background: var(--color-surface-raised); border-radius: var(--radius-sm); overflow: hidden; position: relative; }
+.ph img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ph .lbl { position: absolute; left: var(--space-2); bottom: var(--space-2); font-size: var(--text-xs); font-weight: var(--weight-semibold); background: var(--color-surface); color: var(--color-text); border-radius: var(--radius-full); padding: 0 var(--space-2); }
+.camera { flex: 1; background: var(--color-text); border-radius: var(--radius-lg); position: relative; overflow: hidden; }
+.camera img { width: 100%; height: 100%; object-fit: cover; opacity: .9; }
+.reticle { position: absolute; inset: 15% 12%; border: 2px solid var(--color-surface); border-radius: var(--radius-lg); }
+
+/* Notifications */
+.notif { background: var(--color-surface); border-radius: var(--radius-lg); padding: var(--space-3) var(--space-4); display: flex; gap: var(--space-3); width: 360px; border: var(--border-divider); }
+.notif .app { width: 32px; height: 32px; border-radius: var(--radius-full); background: var(--color-brand); color: var(--color-on-brand); display: grid; place-items: center; flex: none; font-size: var(--text-sm); font-weight: var(--weight-bold); }
+.notif .t { display: grid; gap: var(--space-1); flex: 1; min-width: 0; }
+.notif .t .top { display: flex; gap: var(--space-1); font-size: var(--text-xs); color: var(--color-text-muted); }
+.notif .t b { font-size: var(--text-sm); line-height: var(--leading-sm); font-weight: var(--weight-semibold); }
+.notif .t span { font-size: var(--text-sm); line-height: var(--leading-sm); color: var(--color-text-muted); }
+.notif-list { display: grid; gap: var(--space-3); }
+.lock { background: var(--color-text); border-radius: var(--radius-lg); width: 360px; height: 760px; padding: var(--space-12) var(--space-3) var(--space-4); display: grid; align-content: start; gap: var(--space-2); }
+.lock .clock { color: var(--color-bg); font-size: 64px; line-height: 72px; font-weight: var(--weight-semibold); font-feature-settings: var(--font-numeric); padding: 0 var(--space-3); }
+.lock .date { color: var(--color-bg); font-size: var(--text-sm); padding: 0 var(--space-3) var(--space-6); opacity: .85; }
+.lock .notif { width: auto; border: 0; }
+
+/* Swatches (system page) */
+.sw-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--space-4); max-width: 1100px; }
+.sw { display: grid; gap: var(--space-2); }
+.sw i { display: block; height: 72px; border-radius: var(--radius-md); border: var(--border-divider); }
+.sw b { font-size: var(--text-sm); font-weight: var(--weight-semibold); }
+.sw span { font-size: var(--text-xs); color: var(--color-text-muted); font-feature-settings: var(--font-numeric); }
+.sys { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: var(--space-6); max-width: 1100px; }
+.sys .card { gap: var(--space-3); }
+.typerow { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-4); padding: var(--space-3) 0; border-bottom: var(--border-divider); }
+.typerow:last-child { border-bottom: 0; }
+/* Placeholder for Google's "G" mark (use the official asset in the build, per Google's sign-in branding rules). */
+.gmark { width: 20px; height: 20px; border-radius: var(--radius-full); border: 2px solid var(--color-brand); color: var(--color-brand); font-size: var(--text-xs); font-weight: var(--weight-bold); display: grid; place-items: center; line-height: 1; }
+.logo { display: block; width: auto; }
+
+/* ---------- Onboarding flow page (onboarding-flow.html): larger frames, extra parts ---------- */
+.board.xl { max-width: 1720px; }
+.board.xl .frames { gap: var(--space-12) var(--space-8); }
+.board.xl .phone { zoom: 1.3; }
+.board.xl figure { max-width: calc(360px * 1.3); }
+.board.xl figcaption span { font-size: var(--text-sm); line-height: var(--leading-sm); }
+.flowline { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); font-size: var(--text-sm); color: var(--color-text-muted); }
+.flowline b { color: var(--color-text); font-weight: var(--weight-semibold); }
+.flowline svg { width: 16px; height: 16px; }
+.notes { display: grid; gap: var(--space-1); padding-left: var(--space-4); margin: 0; font-size: var(--text-sm); line-height: var(--leading-sm); color: var(--color-text-muted); }
+.stepbar { display: grid; gap: var(--space-2); }
+.stepbar .between { min-height: var(--tap-min); }
+.stepbar .count { font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--color-text-muted); font-feature-settings: var(--font-numeric); }
+.sw { width: 44px; height: 24px; border-radius: var(--radius-full); background: var(--color-border-strong); position: relative; flex: none; }
+.sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: var(--radius-full); background: var(--color-surface); }
+.sw.on { background: var(--color-accent); }
+.sw.on::after { left: 23px; }
+.sw.locked { opacity: .55; }
+.consent { display: flex; gap: var(--space-3); align-items: flex-start; padding: var(--space-3) 0; border-bottom: var(--border-divider); }
+.consent:last-child { border-bottom: 0; }
+.consent .grow { display: grid; gap: var(--space-1); }
+.consent .grow b { font-size: var(--text-sm); font-weight: var(--weight-semibold); }
+.consent .grow span { font-size: var(--text-xs); line-height: var(--leading-xs); color: var(--color-text-muted); }
+.seg { display: inline-flex; padding: 2px; border-radius: var(--radius-sm); background: var(--color-surface-raised); }
+.seg span { min-height: 32px; padding: 0 var(--space-3); display: inline-flex; align-items: center; border-radius: calc(var(--radius-sm) - 2px); font-size: var(--text-xs); font-weight: var(--weight-medium); color: var(--color-text-muted); }
+.seg span.on { background: var(--color-surface); color: var(--color-text); }
+.daydots { display: grid; grid-template-columns: repeat(7, 1fr); gap: var(--space-1); }
+.daydots span { aspect-ratio: 1; border-radius: var(--radius-full); border: var(--border-control); display: grid; place-items: center; font-size: var(--text-sm); font-weight: var(--weight-medium); }
+.daydots span.on { background: var(--color-accent); border-color: var(--color-accent); color: var(--color-on-accent); }
+.chip.solid.on { background: var(--color-accent); color: var(--color-on-accent); }
+.faded { opacity: .45; }
+.safety { display: flex; gap: var(--space-2); align-items: flex-start; padding: var(--space-3); border-radius: var(--radius-sm); background: var(--color-surface-raised); font-size: var(--text-xs); line-height: var(--leading-xs); color: var(--color-text-muted); }
+.safety svg { width: 16px; height: 16px; flex: none; color: var(--color-text); }
+.textarea { min-height: 72px; padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm); background: var(--color-surface-raised); border: var(--border-control); font-size: var(--text-sm); color: var(--color-text-muted); }
+.wo { display: flex; align-items: center; gap: var(--space-3); min-height: 56px; }
+.wo .grow { display: grid; gap: 2px; }
+.wo .grow b { font-size: var(--text-base); font-weight: var(--weight-medium); }
+.wo .grow span { font-size: var(--text-xs); color: var(--color-text-muted); }
+.wo > svg { width: 20px; height: 20px; color: var(--color-text-muted); }
+.todo { display: flex; align-items: center; gap: var(--space-3); min-height: var(--tap-min); font-size: var(--text-sm); }
+.todo .ring { width: 20px; height: 20px; border-radius: var(--radius-full); border: 2px solid var(--color-border-strong); flex: none; }
+.hero { border-radius: var(--radius-md); background: var(--color-text); color: var(--color-on-brand); display: grid; place-items: center; overflow: hidden; }
+.hero img { filter: invert(1); opacity: .95; }
+.kbd { flex: none; height: 220px; background: var(--color-surface-raised); border-top: var(--border-divider); display: grid; grid-template-rows: repeat(4, 1fr); gap: var(--space-2); padding: var(--space-2); }
+.kbd div { display: flex; gap: var(--space-1); justify-content: center; }
+.kbd i { flex: 1; max-width: 30px; border-radius: 4px; background: var(--color-surface); display: block; }
+.kbd i.w { max-width: 160px; }
+.wa { background: var(--color-surface); border-radius: var(--radius-md); padding: var(--space-3); display: grid; gap: var(--space-2); font-size: var(--text-sm); max-width: 86%; }
+.wa .prev { border-radius: var(--radius-sm); background: var(--color-surface-raised); padding: var(--space-3); display: grid; gap: var(--space-1); }
+.board.xl figcaption { max-width: calc(360px * 1.3); }
+
+/* ---------- Onboarding v2 (reference-style flow, D52) ---------- */
+.timepair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+.timepair div { background: var(--color-surface); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); display: grid; gap: 2px; }
+.timepair span { font-size: var(--text-xs); color: var(--color-text-muted); display: inline-flex; align-items: center; gap: var(--space-1); }
+.timepair span svg { width: 14px; height: 14px; }
+.timepair b { font-size: var(--text-lg); font-weight: var(--weight-semibold); font-feature-settings: var(--font-numeric); }
+.center { text-align: center; justify-items: center; }
+.tiles3 { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--color-surface); border-radius: var(--radius-md); }
+.tiles3 > div { display: grid; justify-items: center; gap: 2px; padding: var(--space-3) var(--space-2); text-align: center; }
+.tiles3 > div + div { border-left: var(--border-divider); }
+.tiles3 svg { width: 18px; height: 18px; }
+.tiles3 b { font-size: var(--text-base); font-feature-settings: var(--font-numeric); }
+.tiles3 span { font-size: var(--text-xs); color: var(--color-text-muted); }
+.build { display: grid; gap: var(--space-3); }
+.build div { display: flex; align-items: center; gap: var(--space-3); font-size: var(--text-sm); }
+.build .ck { width: 22px; height: 22px; border-radius: var(--radius-full); display: grid; place-items: center; flex: none; border: 2px solid var(--color-border-strong); }
+.build .done .ck { background: var(--color-text); border-color: var(--color-text); color: var(--color-on-brand); }
+.build .ck svg { width: 12px; height: 12px; stroke-width: 3; }
+.build .now { font-weight: var(--weight-semibold); }
+.build .todo-s { color: var(--color-text-muted); }
+.loadbar { height: 6px; border-radius: var(--radius-full); background: var(--color-surface-raised); overflow: hidden; }
+.loadbar i { display: block; height: 100%; background: var(--color-brand); border-radius: var(--radius-full); }
+.photo-add { width: 96px; height: 96px; border-radius: var(--radius-full); border: 2px dashed var(--color-border-strong); display: grid; place-items: center; color: var(--color-text-muted); justify-self: start; position: relative; }
+.photo-add svg { width: 28px; height: 28px; }
+.qr { width: 132px; height: 132px; border-radius: var(--radius-sm); background: var(--color-surface); padding: var(--space-2); display: grid; grid-template-columns: repeat(11, 1fr); gap: 1px; }
+.qr i { background: var(--color-text); display: block; border-radius: 1px; }
+.qr i.o { background: transparent; }
+.share4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-2); }
+.share4 div { display: grid; justify-items: center; gap: var(--space-1); font-size: var(--text-xs); color: var(--color-text-muted); }
+.share4 span { width: 48px; height: 48px; border-radius: var(--radius-full); background: var(--color-surface); display: grid; place-items: center; color: var(--color-text); }
+.share4 svg { width: 20px; height: 20px; }
+.kv { display: flex; justify-content: space-between; gap: var(--space-3); padding: var(--space-2) 0; font-size: var(--text-sm); border-bottom: var(--border-divider); }
+.kv:last-child { border-bottom: 0; }
+.kv span:first-child { color: var(--color-text-muted); }
+.kv span:last-child { font-weight: var(--weight-medium); text-align: right; }
+.kv span:last-child { display: inline-flex; align-items: center; gap: var(--space-1); justify-content: flex-end; }
+.kv svg { width: 16px; height: 16px; }
+.qr { grid-template-columns: repeat(21, 1fr); gap: 0; width: 140px; height: 140px; }
+.qr i { border-radius: 0; }
+.photo-add { flex: none; }
+
+
+/* ---------- Onboarding, Apple setup-flow style (D53) ----------
+   Centred glyph + large title, grouped inset lists with checkmarks, wheel pickers,
+   segmented controls, pill-like primary button with a plain-text secondary.
+   Still flat: no glass, no shadows, no gradients (D50 rules stand). */
+.obar { display: grid; grid-template-columns: var(--tap-min) 1fr var(--tap-min); align-items: center; min-height: var(--tap-min); }
+.obar .segs { justify-self: center; width: 128px; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: var(--space-1); }
+.obar .segs i { height: 4px; border-radius: var(--radius-full); background: var(--color-surface-raised); display: block; overflow: hidden; position: relative; }
+.obar .segs i b { position: absolute; inset: 0 auto 0 0; background: var(--color-brand); border-radius: var(--radius-full); }
+.qh { display: grid; justify-items: center; text-align: center; gap: var(--space-2); padding: var(--space-2) var(--space-2) 0; }
+.qh .glyph { width: 52px; height: 52px; color: var(--color-text); stroke-width: 1.6; margin-bottom: var(--space-1); }
+.qh .eyebrow { justify-content: center; }
+.qh h2 { font-size: var(--text-2xl); line-height: var(--leading-2xl); font-weight: var(--weight-bold); letter-spacing: var(--tracking-2xl); text-wrap: balance; }
+.qh p { font-size: var(--text-base); line-height: var(--leading-base); color: var(--color-text-muted); text-wrap: pretty; max-width: 30ch; }
+.glist { background: var(--color-surface); border-radius: var(--radius-md); overflow: hidden; }
+.sel { position: relative; min-height: 52px; display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); background: var(--color-surface); border-radius: var(--radius-md); }
+.glist .sel { border-radius: 0; background: transparent; }
+.glist .sel + .sel::before { content: ""; position: absolute; top: 0; right: 0; left: var(--space-4); height: var(--border-width); background: var(--color-border); }
+.glist .sel.has-ic + .sel::before, .glist .sel.has-ic + .sel.has-ic::before { left: calc(var(--space-4) + 22px + var(--space-3)); }
+.sel.tall { min-height: 60px; }
+.sel > svg { width: 22px; height: 22px; flex: none; color: var(--color-text); stroke-width: 1.75; }
+.sel .grow { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.sel .grow b { font-size: var(--text-base); line-height: var(--leading-base); font-weight: var(--weight-medium); }
+.sel .grow span { font-size: var(--text-sm); line-height: var(--leading-sm); color: var(--color-text-muted); }
+.sel .ck { width: 22px; height: 22px; flex: none; display: grid; place-items: center; color: var(--color-text); }
+.sel .ck svg { width: 20px; height: 20px; stroke-width: 2.75; transition: opacity var(--duration-micro) ease-out, transform var(--duration-micro) ease-out; }
+.sel:not(.on) .ck svg { opacity: 0; transform: scale(.6); }
+.sel.pressed, .sel:active { background: var(--color-surface-raised); }
+.sel.faded { opacity: .45; }
+.chip.tok { height: 36px; border-radius: var(--radius-full); border: 0; background: var(--color-surface); padding: 0 var(--space-4); font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--color-text); }
+.chip.tok svg { display: none; }
+.chip.tok.on { background: var(--color-accent); color: var(--color-on-accent); }
+.chip.tok.on svg { display: inline; }
+.chip.tok:active { transform: scale(.97); }
+.skip { justify-self: center; font-size: var(--text-base); font-weight: var(--weight-medium); color: var(--color-text); min-height: var(--tap-min); display: inline-flex; align-items: center; text-decoration: none; }
+.skip.none { visibility: hidden; }
+.btn { transition: transform var(--duration-micro) ease-out, opacity var(--duration-micro) ease-out; }
+.btn:active { transform: scale(.97); }
+.btn[aria-disabled="true"] { opacity: .35; }
+.btn.primary.full { min-height: 52px; font-size: var(--text-base); }
+/* Wheel picker (replaces the D52 ruler) */
+.pick { display: grid; justify-items: center; gap: var(--space-3); padding-top: var(--space-2); }
+.pick .delta { display: inline-flex; align-items: center; gap: var(--space-1); font-size: var(--text-sm); color: var(--color-text-muted); font-feature-settings: var(--font-numeric); }
+.pick .delta svg { width: 16px; height: 16px; flex: none; }
+.wheel { position: relative; width: 100%; height: 220px; overflow: hidden; touch-action: none; user-select: none; cursor: grab; }
+.wheel .band { position: absolute; left: 0; right: 0; top: 50%; height: 44px; transform: translateY(-50%); border-radius: var(--radius-sm); background: var(--color-surface-raised); }
+.wheel .unit { position: absolute; top: 50%; left: calc(50% + 48px); transform: translateY(-50%); font-size: var(--text-base); font-weight: var(--weight-medium); color: var(--color-text-muted); }
+.wheel .items { position: absolute; left: 0; right: 0; top: 50%; perspective: 600px; }
+.wheel .it { position: absolute; left: 0; right: 0; height: 44px; margin-top: -22px; display: grid; place-items: center; font-size: var(--text-xl); font-weight: var(--weight-semibold); font-feature-settings: var(--font-numeric); color: var(--color-text); will-change: transform, opacity; }
+.seg.ios { display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr; padding: 2px; border-radius: var(--radius-sm); background: var(--color-surface-raised); min-width: 160px; }
+.seg.ios span { min-height: 32px; display: grid; place-items: center; border-radius: calc(var(--radius-sm) - 2px); font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--color-text); padding: 0 var(--space-3); border: var(--border-width) solid transparent; }
+.seg.ios span.on { background: var(--color-surface); border-color: var(--color-border); font-weight: var(--weight-semibold); }
+.seg.ios span.faded { color: var(--color-text-disabled); }
+.scale5 { display: grid; grid-template-columns: repeat(5, 1fr); padding: 2px; gap: 2px; border-radius: var(--radius-sm); background: var(--color-surface-raised); }
+.scale5 span { min-height: 44px; border-radius: calc(var(--radius-sm) - 2px); display: grid; place-items: center; font-weight: var(--weight-semibold); font-feature-settings: var(--font-numeric); border: var(--border-width) solid transparent; }
+.scale5 span.on { background: var(--color-surface); border-color: var(--color-border); }
+.scale5-l { display: flex; justify-content: space-between; font-size: var(--text-xs); color: var(--color-text-muted); }
+/* Hero rings and finish screens */
+.ring-hero { position: relative; width: 184px; height: 184px; justify-self: center; align-self: center; flex: none; }
+.ring-hero svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring-hero .track { stroke: var(--color-surface-raised); }
+.ring-hero .fill { stroke: var(--color-brand); }
+.ring-hero .v { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
+.ring-hero .v b { font-size: var(--text-2xl); line-height: var(--leading-2xl); font-weight: var(--weight-bold); letter-spacing: var(--tracking-2xl); font-feature-settings: var(--font-numeric); }
+.ring-hero .v span { font-size: var(--text-sm); color: var(--color-text-muted); }
+.medal { width: 96px; height: 96px; border-radius: var(--radius-full); background: var(--color-surface); display: grid; place-items: center; position: relative; justify-self: center; align-self: center; flex: none; }
+.medal .badge { position: absolute; right: -2px; bottom: 2px; width: 32px; height: 32px; border-radius: var(--radius-full); background: var(--color-text); color: var(--color-on-brand); display: grid; place-items: center; border: 3px solid var(--color-bg); }
+.medal .badge svg { width: 16px; height: 16px; stroke-width: 3; }
+/* "What's new"-style feature list */
+.feat { display: flex; align-items: flex-start; gap: var(--space-4); padding: var(--space-2) 0; }
+.feat > svg { width: 28px; height: 28px; flex: none; stroke-width: 1.6; margin-top: 2px; }
+.feat .grow { display: grid; gap: 2px; }
+.feat .grow b { font-size: var(--text-base); line-height: var(--leading-base); font-weight: var(--weight-semibold); }
+.feat .grow span { font-size: var(--text-sm); line-height: var(--leading-sm); color: var(--color-text-muted); }
+.glist .kv { padding: var(--space-3) var(--space-4); margin: 0; font-size: var(--text-base); }
+@media (prefers-reduced-motion: reduce) { .btn, .sel .ck svg { transition: none; } .btn:active, .chip.tok:active { transform: none; } }/* Welcome hero (F1-02, D53): a phone-in-phone showing real screens at half scale */
+.hero-dev { position: relative; flex: none; align-self: center; width: 196px; height: 344px; border-radius: 32px; background: var(--color-text); padding: 6px; }
+.hero-dev .scr { position: relative; width: 100%; height: 100%; border-radius: 26px; overflow: hidden; background: var(--color-bg); }
+.hero-dev .cam { position: absolute; z-index: 3; top: 8px; left: 50%; width: 8px; height: 8px; margin-left: -4px; border-radius: var(--radius-full); background: var(--color-text); }
+.hero-dev .pages { position: absolute; top: 0; left: 0; height: 100%; display: flex; will-change: transform; touch-action: pan-y; }
+.hero-dev .pg { flex: none; width: 184px; height: 332px; overflow: hidden; }
+.hero-dev .pg > .inner { width: 360px; height: 650px; transform: scale(.5111); transform-origin: top left; padding: var(--space-12) var(--gutter-screen) 0; display: flex; flex-direction: column; gap: var(--space-4); }
+.hero-dev .modes { position: absolute; z-index: 2; left: 8px; right: 8px; bottom: 10px; display: grid; grid-template-columns: repeat(3, 1fr); padding: 2px; border-radius: var(--radius-full); background: var(--color-surface); border: var(--border-width) solid var(--color-border); }
+.hero-dev .modes span { position: relative; z-index: 1; min-height: 26px; display: grid; place-items: center; font-size: 9px; font-weight: var(--weight-semibold); color: var(--color-text-muted); border-radius: var(--radius-full); }
+.hero-dev .modes span.on { color: var(--color-on-brand); }
+.hero-dev .modes .mthumb { position: absolute; z-index: 0; top: 2px; bottom: 2px; left: 2px; width: calc((100% - 4px) / 3); border-radius: var(--radius-full); background: var(--color-text); will-change: transform; }
+.welcome-head { display: flex; align-items: center; justify-content: center; gap: var(--space-2); padding-top: var(--space-1); }
+.welcome-copy { display: grid; gap: var(--space-2); text-align: center; justify-items: center; }
+.welcome-copy h1 { font-size: var(--text-2xl); line-height: var(--leading-2xl); font-weight: var(--weight-bold); letter-spacing: var(--tracking-2xl); }
+.welcome-copy p { color: var(--color-text-muted); max-width: 30ch; text-wrap: pretty; }
+.btn.go { justify-content: space-between; padding: 0 var(--space-4) 0 var(--space-6); }
+.btn.go::before { content: ""; width: 20px; }
+.signin-row { justify-self: center; display: inline-flex; align-items: center; gap: var(--space-1); min-height: var(--tap-min); font-size: var(--text-sm); color: var(--color-text-muted); }
+.signin-row a { color: var(--color-text); font-weight: var(--weight-semibold); text-decoration: none; }
+.setrow { display: grid; grid-template-columns: 40px 1fr 1fr 32px; align-items: center; min-height: 52px; padding: 0 var(--space-4); font-feature-settings: var(--font-numeric); }
+.setrow + .setrow { border-top: var(--border-width) solid var(--color-border); }
+.setrow .n { color: var(--color-text-muted); font-size: var(--text-sm); }
+.setrow b { font-weight: var(--weight-semibold); }
+.setrow .tick { width: 28px; height: 28px; border-radius: var(--radius-full); display: grid; place-items: center; border: 2px solid var(--color-border-strong); }
+.setrow .tick.done { background: var(--color-text); border-color: var(--color-text); color: var(--color-on-brand); }
+.setrow .tick svg { width: 16px; height: 16px; stroke-width: 3; }
+.setrow.cur { background: var(--color-surface-raised); }
+.pillrow { display: inline-flex; align-items: center; gap: var(--space-2); align-self: flex-start; min-height: 36px; padding: 0 var(--space-4); border-radius: var(--radius-full); background: var(--color-surface); font-weight: var(--weight-semibold); font-feature-settings: var(--font-numeric); }
+.pillrow svg { width: 18px; height: 18px; }
+.kcalbar { height: 10px; border-radius: var(--radius-full); background: var(--color-surface-raised); overflow: hidden; }
+.kcalbar i { display: block; height: 100%; border-radius: var(--radius-full); background: var(--color-brand); }
+/* Role sheet (F1-02a) */
+.scrim { position: absolute; inset: 0; z-index: 5; background: var(--color-scrim); }
+.rsheet { position: absolute; left: 0; right: 0; bottom: 0; z-index: 6; background: var(--color-bg); border-radius: var(--radius-lg) var(--radius-lg) 0 0; padding: var(--space-2) var(--gutter-screen) var(--space-8); display: grid; gap: var(--space-4); will-change: transform; touch-action: none; }
+.rsheet .grab { justify-self: center; width: 36px; height: 5px; border-radius: var(--radius-full); background: var(--color-border-strong); }
+.rsheet h2 { font-size: var(--text-xl); line-height: var(--leading-xl); font-weight: var(--weight-bold); letter-spacing: var(--tracking-xl); text-align: center; }
+.rsheet .sel > .chev { width: 20px; height: 20px; color: var(--color-text-muted); }
+.qh, .glist, .pick, .wheel, .scale5, .feat, .ring-hero, .medal, .hero-dev, .welcome-copy { flex-shrink: 0; }
+.qh .glyph { width: 44px; height: 44px; }
+.skip.top { position: absolute; z-index: 4; top: 32px; right: var(--space-2); min-height: var(--tap-min); padding: 0 var(--space-3); font-size: var(--text-base); }
+.body:has(> .qh) { gap: var(--space-4); }
+.glist .sel { padding-top: var(--space-2); padding-bottom: var(--space-2); }
+.qr { width: 112px; height: 112px; }
+.feat { padding: var(--space-1) 0; }
+.dense .kv { padding-top: 6px; padding-bottom: 6px; }
+/* Interactive prototype (onboarding-prototype.html) */
+.proto-wrap { display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: var(--space-12); align-items: start; }
+.phone.proto { user-select: none; -webkit-user-select: none; position: sticky; top: var(--space-6); }
+.stage { position: relative; flex: 1; min-height: 0; overflow: hidden; }
+.pscreen { position: absolute; inset: 0; display: flex; flex-direction: column; background: var(--color-bg); will-change: transform; }
+.pscreen[hidden] { display: none; }
+.pscreen::after { content: ""; position: absolute; inset: 0; background: var(--color-text); opacity: var(--dim, 0); pointer-events: none; }
+.pscreen .body { overflow-y: auto; scrollbar-width: none; }
+.pscreen .skip.top { top: 0; }
+.ptoast { position: absolute; z-index: 9; left: 50%; bottom: 96px; transform: translate(-50%, 8px); opacity: 0; pointer-events: none; background: var(--color-text); color: var(--color-on-brand); border-radius: var(--radius-full); padding: var(--space-2) var(--space-4); font-size: var(--text-sm); white-space: nowrap; transition: opacity var(--duration-std) ease-out, transform var(--duration-std) ease-out; }
+.ptoast.show { opacity: 1; transform: translate(-50%, 0); }
+.proto-notes { display: grid; gap: var(--space-4); max-width: 72ch; }
+.slowmo { display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--tap-min); font-size: var(--text-sm); }
+.slowmo input { width: 20px; height: 20px; accent-color: var(--color-text); }
+.spec { border-collapse: collapse; font-size: var(--text-sm); line-height: var(--leading-sm); }
+.spec th, .spec td { text-align: left; vertical-align: top; padding: var(--space-2) var(--space-3) var(--space-2) 0; border-bottom: var(--border-divider); }
+.spec thead th { color: var(--color-text-muted); font-weight: var(--weight-medium); }
+.spec tbody th { font-weight: var(--weight-semibold); white-space: nowrap; }
+.spec td:last-child { color: var(--color-text-muted); font-feature-settings: var(--font-numeric); }
+@media (max-width: 860px) { .proto-wrap { grid-template-columns: 1fr; } .phone.proto { position: relative; top: 0; justify-self: center; } }
+.skip.top { top: calc(32px + var(--space-2)); }
+.pscreen .skip.top { top: var(--space-2); }
+</style>
+<link rel="stylesheet" href="../theme-tokens.css">
+<link rel="stylesheet" href="hifi.css">
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+<main class="board">
+  <header class="board-head">
+    <span class="eyebrow">Arcwell · hi-fi mockups · black and white (D50)</span>
+    <h1>Coach, menu, states and notifications</h1>
+    <p>The coach workspace, the athlete side menu and account, empty/loading/error states, and the six push notifications (prompt sections 14–17).</p>
+    <p class="caption muted">Draft, not approved or user-tested. Android, 360 × 760 dp frames. Every value comes from theme-tokens.css. The logo is the pull-up mark (D51); photos are placeholder tiles.</p>
+    <nav class="board-nav"><a href="index.html">1–8 · System, entry, athlete core</a><a href="athlete-plus-coached.html">9–13 · Plus, recovery, progress, coached</a><a href="onboarding-flow.html">Athlete onboarding · every screen</a><a href="coach-onboarding.html">Coach onboarding · every screen</a><a href="onboarding-prototype.html">Onboarding prototype · interactive</a></nav>
+  </header>
+
+  <section class="group">
+    <div class="group-head"><span class="idx">14</span><h2>Coach workspace</h2><p>Same app, coach interface. Bar: Clients · Check-ins · Plans · Messages · Business (D23). No AI anywhere.</p></div>
+    <div class="frames">
+    <figure>
+      <div class="phone" role="img" aria-label="K-01 Clients">
+        <div class="sb"><span>9:41</span><span class="ic"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></span></div>
+        <div class="body"><div class="appbar"><button class="iconbtn edge" aria-label="Open menu"><i data-lucide="menu"></i></button><span class="title">Clients</span><button class="iconbtn" aria-label="search"><i data-lucide="search"></i></button><button class="iconbtn end" aria-label="user-plus"><i data-lucide="user-plus"></i></button></div>
+        <div class="row wrap"><span class="chip on"><i data-lucide="check"></i>Needs attention · 4</span><span class="chip">Active · 28</span><span class="chip">Paused · 3</span></div>
+        <div class="card flush"><div class="lr"><span class="av">PS</span><div class="t"><b>Priya Sharma</b><span>Check-in overdue · 2 days</span></div><span class="r"><span class="label num" style="color:var(--color-text)">92%</span><span class="status active">Active</span></span></div><div class="lr"><span class="av">RV</span><div class="t"><b>Rahul Verma</b><span>Low adherence this week</span></div><span class="r"><span class="label num" style="color:var(--color-text)">48%</span><span class="status active">Active</span></span></div><div class="lr"><span class="av">VS</span><div class="t"><b>Venkatalakshmi Subramanian</b><span>Leaving 30 Nov</span></div><span class="r"><span class="label num" style="color:var(--color-text)">81%</span><span class="status leaving">Leaving</span></span></div><div class="lr"><span class="av">AM</span><div class="t"><b>Arjun Mehta</b><span>Paused until 1 Dec</span></div><span class="r"><span class="label num" style="color:var(--color-text)">—</span><span class="status paused">Paused</span></span></div><div class="lr"><span class="av">KS</span><div class="t"><b>Karan Singh</b><span>On track</span></div><span class="r"><span class="label num" style="color:var(--color-text)">96%</span><span class="status active">Active</span></span></div></div></div>
+        
+        <nav class="bnav"><a class="on"><span class="pill"><i data-lucide="users"></i></span><span>Clients</span></a><a class=""><span class="pill"><i data-lucide="clipboard-check"></i></span><span>Check-ins</span></a><a class=""><span class="pill"><i data-lucide="list-checks"></i></span><span>Plans</span></a><a class=""><span class="pill"><i data-lucide="message-circle"></i></span><span>Messages</span></a><a class=""><span class="pill"><i data-lucide="briefcase"></i></span><span>Business</span></a></nav>
+        <div class="navbar"><i></i></div>
+        
+      </div>
+      <figcaption><b>K-01 · Clients</b><span>Adherence and overdue check-ins at a glance. Status chips pair a dot with a word (D39).</span></figcaption>
+    </figure>
+    <figure>
+      <div class="phone" role="img" aria-label="F6-07 Check-in inbox">
+        <div class="sb"><span>9:41</span><span class="ic"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></span></div>
+        <div class="body tight"><div class="appbar"><button class="iconbtn edge" aria-label="Open menu"><i data-lucide="menu"></i></button><span class="title">Check-ins</span><button class="iconbtn end" aria-label="calendar"><i data-lucide="calendar"></i></button></div>
+        <p class="muted" style="margin-top:calc(-1 * var(--space-4))">Week of 9 Nov</p>
+        <div class="row wrap"><span class="chip on"><i data-lucide="check"></i>To review · 9</span><span class="chip">Overdue · 3</span><span class="chip">Reviewed · 24</span></div>
+        <div class="card flush"><div class="lr"><span class="av">PS</span><div class="t"><b>Priya Sharma</b><span>−0.6 kg · 4/4 workouts · 1 question</span></div><span class="r">2 h ago</span><i data-lucide="chevron-right"></i></div><div class="lr"><span class="av">RV</span><div class="t"><b>Rahul Verma</b><span>+0.2 kg · 2/4 workouts · "knee sore"</span></div><span class="r">5 h ago</span><i data-lucide="chevron-right"></i></div><div class="lr"><span class="av">AI</span><div class="t"><b>Ananya Iyer</b><span>−0.4 kg · 3/3 workouts</span></div><span class="r">Yesterday</span><i data-lucide="chevron-right"></i></div></div>
+        <div class="stack"><span class="eyebrow">Overdue</span><div class="card"><div class="between"><div class="row" style="gap:var(--space-3)"><span class="av">KS</span><div class="stack-1"><span class="label">Karan Singh</span><span class="caption muted">Due Sunday · 2 days late</span></div></div><button class="btn sm secondary">Send reminder</button></div></div></div></div>
+        
+        <nav class="bnav"><a class=""><span class="pill"><i data-lucide="users"></i></span><span>Clients</span></a><a class="on"><span class="pill"><i data-lucide="clipboard-check"></i></span><span>Check-ins</span></a><a class=""><span class="pill"><i data-lucide="list-checks"></i></span><span>Plans</span></a><a class=""><span class="pill"><i data-lucide="message-circle"></i></span><span>Messages</span></a><a class=""><span class="pill"><i data-lucide="briefcase"></i></span><span>Business</span></a></nav>
+        <div class="navbar"><i></i></div>
+        
+      </div>
+      <figcaption><b>F6-07 · Check-in inbox</b><span>Triage: to review (oldest first), overdue with Send reminder, reviewed.</span></figcaption>
+    </figure>
+    <figure>
+      <div class="phone" role="img" aria-label="F6-08 Check-in review">
+        <div class="sb"><span>9:41</span><span class="ic"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></span></div>
+        <div class="body"><div class="appbar"><button class="iconbtn edge" aria-label="Back to inbox"><i data-lucide="arrow-left"></i></button><span class="label grow">Inbox</span><span class="label num muted">1 of 9</span><button class="iconbtn end" aria-label="Next client"><i data-lucide="chevron-right"></i></button></div>
+        <div class="stack-1"><span class="heading">Priya Sharma · Week 3</span><span class="caption muted">Fat loss · 3 weeks with you · submitted 2 h ago</span></div>
+        <div class="card flush"><div class="lr" style="min-height:32px;padding:var(--space-2) 0"><span class="caption muted grow"></span><span class="caption muted" style="width:56px;text-align:right">Last wk</span><span class="caption muted" style="width:56px;text-align:right">This wk</span><span class="caption muted" style="width:48px;text-align:right">Δ</span></div><div class="lr" style="min-height:40px;padding:var(--space-2) 0"><span class="label grow" style="font-weight:400">Weight (avg)</span><span class="label num muted" style="width:56px;text-align:right">74.4</span><span class="label num" style="width:56px;text-align:right">73.8</span><span class="label num muted" style="width:48px;text-align:right">−0.6</span></div><div class="lr" style="min-height:40px;padding:var(--space-2) 0"><span class="label grow" style="font-weight:400">Waist</span><span class="label num muted" style="width:56px;text-align:right">84.0</span><span class="label num" style="width:56px;text-align:right">83.0</span><span class="label num muted" style="width:48px;text-align:right">−1.0</span></div><div class="lr" style="min-height:40px;padding:var(--space-2) 0"><span class="label grow" style="font-weight:400">Workouts</span><span class="label num muted" style="width:56px;text-align:right">4/4</span><span class="label num" style="width:56px;text-align:right">4/4</span><span class="label num muted" style="width:48px;text-align:right">—</span></div><div class="lr" style="min-height:40px;padding:var(--space-2) 0"><span class="label grow" style="font-weight:400">Avg kcal</span><span class="label num muted" style="width:56px;text-align:right">1,880</span><span class="label num" style="width:56px;text-align:right">1,910</span><span class="label num muted" style="width:48px;text-align:right">+30</span></div><div class="lr" style="min-height:40px;padding:var(--space-2) 0"><span class="label grow" style="font-weight:400">Avg sleep</span><span class="label num muted" style="width:56px;text-align:right">6.5 h</span><span class="label num" style="width:56px;text-align:right">6.8 h</span><span class="label num muted" style="width:48px;text-align:right">+0.3</span></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2)"><div class="ph" style="height:96px;display:grid;place-items:center;color:var(--color-text-muted)"><i data-lucide="user"></i><span class="lbl">Week 2</span></div><div class="ph" style="height:96px;display:grid;place-items:center;color:var(--color-text-muted)"><i data-lucide="user"></i><span class="lbl">Week 3</span></div></div>
+        <div class="card"><span class="caption muted">Energy 4 · Hunger 3 · Stress 2 · Digestion 4</span><span class="label" style="font-weight:400">"Weekend wedding — overate on Saturday"</span></div></div>
+        <div class="foot"><button class="btn primary full">Write feedback</button></div>
+        
+        <div class="navbar"><i></i></div>
+        
+      </div>
+      <figcaption><b>F6-08 · Check-in review</b><span>One scrolling screen; numbers come from logs, so the coach copies nothing into Excel. '1 of 9 ›' goes to the next client.</span></figcaption>
+    </figure>
+    <figure>
+      <div class="phone" role="img" aria-label="K-05 Plans · templates">
+        <div class="sb"><span>9:41</span><span class="ic"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></span></div>
+        <div class="body"><div class="appbar"><button class="iconbtn edge" aria-label="Open menu"><i data-lucide="menu"></i></button><span class="title">Plans</span><button class="iconbtn end" aria-label="search"><i data-lucide="search"></i></button></div>
+        <div class="row wrap"><span class="chip on"><i data-lucide="check"></i>Training · 6</span><span class="chip">Meals · 4</span></div>
+        <div class="card flush"><div class="lr"><span class="ico"><i data-lucide="list-checks"></i></span><div class="t"><b>Fat loss · 4 days</b><span>Upper/lower · assigned to 9 clients</span></div><i data-lucide="chevron-right"></i></div><div class="lr"><span class="ico"><i data-lucide="list-checks"></i></span><div class="t"><b>Muscle gain · 5 days</b><span>Push/pull/legs · 7 clients</span></div><i data-lucide="chevron-right"></i></div><div class="lr"><span class="ico"><i data-lucide="list-checks"></i></span><div class="t"><b>Beginner full body · 3 days</b><span>12 clients</span></div><i data-lucide="chevron-right"></i></div><div class="lr"><span class="ico"><i data-lucide="list-checks"></i></span><div class="t"><b>Post-partum return · 3 days</b><span>2 clients</span></div><i data-lucide="chevron-right"></i></div></div></div>
+        <div class="foot"><button class="btn primary full"><i data-lucide="plus"></i>New template</button></div>
+        <nav class="bnav"><a class=""><span class="pill"><i data-lucide="users"></i></span><span>Clients</span></a><a class=""><span class="pill"><i data-lucide="clipboard-check"></i></span><span>Check-ins</span></a><a class="on"><span class="pill"><i data-lucide="list-checks"></i></span><span>Plans</span></a><a class=""><span class="pill"><i data-lucide="message-circle"></i></span><span>Messages</span></a><a class=""><span class="pill"><i data-lucide="briefcase"></i></span><span>Business</span></a></nav>
+        <div class="navbar"><i></i></div>
+        
+      </div>
+      <figcaption><b>K-05 · Plans · templates</b><span>Reusable templates; assign to a client, then customise.</span></figcaption>
+    </figure>
+    <figure>
+      <div class="phone" role="img" aria-label="K-06 Plan builder">
+        <div class="sb"><span>9:41</span><span class="ic"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></span></div>
+        <div class="body"><div class="appbar"><button class="iconbtn edge" aria-label="Back"><i data-lucide="arrow-left"></i></button><span class="title sm">Fat loss · 4 days</span><button class="iconbtn end" aria-label="ellipsis-vertical"><i data-lucide="ellipsis-vertical"></i></button></div>
+        <div class="row wrap"><span class="chip">Day 1 · Upper</span><span class="chip on"><i data-lucide="check"></i>Day 2 · Lower</span><span class="chip">Day 3</span><span class="chip">Day 4</span></div>
+        <div class="card flush"><div class="lr"><span class="ico"><i data-lucide="grip-vertical"></i></span><div class="t"><b>Back squat</b><span>4 × 6–8 · rest 2:30</span></div><button class="iconbtn end" aria-label="Edit Back squat"><i data-lucide="pencil"></i></button></div><div class="lr"><span class="ico"><i data-lucide="grip-vertical"></i></span><div class="t"><b>Romanian deadlift</b><span>3 × 8–10 · rest 2:00</span></div><button class="iconbtn end" aria-label="Edit Romanian deadlift"><i data-lucide="pencil"></i></button></div><div class="lr"><span class="ico"><i data-lucide="grip-vertical"></i></span><div class="t"><b>Walking lunge</b><span>3 × 12 each · rest 1:30</span></div><button class="iconbtn end" aria-label="Edit Walking lunge"><i data-lucide="pencil"></i></button></div><div class="lr"><span class="ico"><i data-lucide="grip-vertical"></i></span><div class="t"><b>Leg curl</b><span>3 × 12 · rest 1:00</span></div><button class="iconbtn end" aria-label="Edit Leg curl"><i data-lucide="pencil"></i></button></div></div>
+        <button class="btn secondary full"><i data-lucide="plus"></i>Add exercise</button></div>
+        <div class="foot"><button class="btn primary full">Assign to client</button></div>
+        
+        <div class="navbar"><i></i></div>
+        
+      </div>
+      <figcaption><b>K-06 · Plan builder</b><span>Day by day; every exercise comes from the shared library.</span></figcaption>
+    </figure>
+    <figure>
+      <div class="phone" role="img" aria-label="K-10 · K-14 Business · invite and leads">
+        <div class="sb"><span>9:41</span><span class="ic"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></span></div>
+        <div class="body"><div class="appbar"><button class="iconbtn edge" aria-label="Open menu"><i data-lucide="menu"></i></button><span class="title">Business</span></div>
+        <div class="card g4"><span class="eyebrow">Your invite link</span><div class="input"><span class="grow" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">arcwell.app/c/anjali-kapoor</span></div>
+          <div class="row"><button class="btn secondary grow"><i data-lucide="copy"></i>Copy</button><button class="btn primary grow"><i data-lucide="share-2"></i>Share</button></div>
+          <span class="caption muted num">28 of 40 client spots used</span><div class="bar b"><i style="width:70%"></i></div></div>
+        <div class="stack"><div class="between"><span class="heading">Leads</span><a class="link">Add lead</a></div>
+          <div class="card flush"><div class="lr"><span class="av">NR</span><div class="t"><b>Neha Rao</b><span>Instagram · asked about pricing</span></div><span class="r">New</span></div>
+          <div class="lr"><span class="av">SG</span><div class="t"><b>Siddharth Gupta</b><span>Referral · call on Friday</span></div><span class="r">Follow up</span></div></div></div></div>
+        
+        <nav class="bnav"><a class=""><span class="pill"><i data-lucide="users"></i></span><span>Clients</span></a><a class=""><span class="pill"><i data-lucide="clipboard-check"></i></span><span>Check-ins</span></a><a class=""><span class="pill"><i data-lucide="list-checks"></i></span><span>Plans</span></a><a class=""><span class="pill"><i data-lucide="message-circle"></i></span><span>Messages</span></a><a class="on"><span class="pill"><i data-lucide="briefcase"></i></span><span>Business</span></a></nav>
+        <div class="navbar"><i></i></div>
+        
+      </div>
+      <figcaption><b>K-10 · K-14 · Business · invite and leads</b><span>Invite link auto-links client to coach. Basic leads list; leads are contacted outside the app (D45).</span></figcaption>
+    </figure></div>
+  </section>
+  <section class="group">
+    <div class="group-head"><span class="idx">15</span><h2>Side menu and account</h2><p>Drawer for athletes; account holds everything about the person and their data.</p></div>
+    <div class="frames">
+    <figure>
+      <div class="phone" role="img" aria-label="N-04 Side menu">
+        <div class="sb"><span>9:41</span><span class="ic"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></span></div>
+        <div class="body"><div class="appbar"><button class="iconbtn edge" aria-label="Open menu"><i data-lucide="menu"></i></button><span class="title">Today</span><button class="iconbtn end" aria-label="bell"><i data-lucide="bell"></i></button></div><div class="sk card" style="height:180px"></div></div>
+        
+        
+        <div class="navbar"><i></i></div>
+        <div class="scrim"></div><div class="drawer">
+          <div class="row" style="gap:var(--space-3);padding:0 var(--space-3) var(--space-4)"><span class="av">PS</span><div class="stack-1"><b class="label">Priya Sharma</b><span class="caption muted">Arcwell Plus</span></div></div>
+          <div class="mi"><i data-lucide="user"></i>Account</div><div class="mi"><i data-lucide="bell"></i>Notifications<span class="end num">2</span></div>
+          <div class="mi-head">Training</div>
+          <div class="mi"><i data-lucide="dumbbell"></i>Exercises</div><div class="mi on"><i data-lucide="list"></i>Workouts</div><div class="mi"><i data-lucide="calendar-range"></i>Programs</div><div class="mi"><i data-lucide="history"></i>History</div><div class="mi"><i data-lucide="chart-bar"></i>Muscle analytics</div>
+          <div class="mi-head">More</div>
+          <div class="mi"><i data-lucide="map-pin"></i>Gyms</div><div class="mi"><i data-lucide="scale"></i>Physique</div>
+        </div>
+      </div>
+      <figcaption><b>N-04 · Side menu</b><span>Shared side menu for all athletes (D9). No Set Videos (D14).</span></figcaption>
+    </figure>
+    <figure>
+      <div class="phone" role="img" aria-label="AC-01 Account">
+        <div class="sb"><span>9:41</span><span class="ic"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></span></div>
+        <div class="body tight"><div class="appbar"><button class="iconbtn edge" aria-label="Back"><i data-lucide="arrow-left"></i></button><span class="title sm">Account</span></div>
+        <div class="card"><div class="row" style="gap:var(--space-3)"><span class="av lg">PS</span><div class="stack-1 grow"><span class="heading">Priya Sharma</span><span class="caption muted">priya.sharma@gmail.com</span></div></div></div>
+        <div class="card flush"><div class="lr"><span class="ico"><i data-lucide="sparkles"></i></span><div class="t"><b>Arcwell Plus</b><span>Yearly · renews 14 Nov 2027</span></div><i data-lucide="chevron-right"></i></div><div class="lr"><span class="ico"><i data-lucide="target"></i></span><div class="t"><b>Goals</b><span>Build muscle · 2,300 kcal</span></div><i data-lucide="chevron-right"></i></div><div class="lr"><span class="ico"><i data-lucide="alarm-clock"></i></span><div class="t"><b>Reminders</b><span>Workout 18:00</span></div><i data-lucide="chevron-right"></i></div><div class="lr"><span class="ico"><i data-lucide="bell"></i></span><div class="t"><b>Notifications</b><span>5 of 6 on</span></div><i data-lucide="chevron-right"></i></div></div>
+        <div class="card flush"><div class="lr"><span class="ico"><i data-lucide="download"></i></span><div class="t"><b>Export my data</b></div><i data-lucide="chevron-right"></i></div><div class="lr"><span class="ico"><i data-lucide="trash-2"></i></span><div class="t"><b>Delete account</b></div><i data-lucide="chevron-right"></i></div></div>
+        <button class="btn ghost full" style="justify-content:flex-start;padding:0"><i data-lucide="log-out"></i>Sign out</button></div>
+        
+        
+        <div class="navbar"><i></i></div>
+        
+      </div>
+      <figcaption><b>AC-01 · Account</b><span>Subscription, goals, reminders, notifications, data export and deletion (SPEC).</span></figcaption>
+    </figure></div>
+  </section>
+  <section class="group">
+    <div class="group-head"><span class="idx">16</span><h2>Empty, loading and error</h2><p>Every list has all three (DESIGN.md §8).</p></div>
+    <div class="frames">
+    <figure>
+      <div class="phone" role="img" aria-label="S-01 Loading">
+        <div class="sb"><span>9:41</span><span class="ic"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></span></div>
+        <div class="body"><div class="appbar"><button class="iconbtn edge" aria-label="Open menu"><i data-lucide="menu"></i></button><span class="title">Nutrition</span><button class="iconbtn end" aria-label="search"><i data-lucide="search"></i></button></div>
+        <div class="sk card" style="height:112px"></div><div class="sk" style="height:20px;width:40%"></div>
+        <div class="sk card" style="height:56px"></div><div class="sk card" style="height:56px"></div><div class="sk card" style="height:56px"></div></div>
+        
+        <nav class="bnav"><a class=""><span class="pill"><i data-lucide="house"></i></span><span>Today</span></a><a class=""><span class="pill"><i data-lucide="dumbbell"></i></span><span>Training</span></a><a class="on"><span class="pill"><i data-lucide="utensils"></i></span><span>Nutrition</span></a></nav>
+        <div class="navbar"><i></i></div>
+        
+      </div>
+      <figcaption><b>S-01 · Loading</b><span>Skeleton in the shape of the content. Pulses 1.4 s; still with reduced motion.</span></figcaption>
+    </figure>
+    <figure>
+      <div class="phone" role="img" aria-label="E-02 Empty">
+        <div class="sb"><span>9:41</span><span class="ic"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></span></div>
+        <div class="body"><div class="appbar"><button class="iconbtn edge" aria-label="Back"><i data-lucide="arrow-left"></i></button><span class="title sm">History</span></div>
+        <div class="card"><div class="empty"><div class="tile"><i data-lucide="dumbbell"></i></div>
+          <div class="stack-1"><h3 class="heading">No workouts yet</h3><p class="label muted" style="font-weight:400">Finished workouts show up here, grouped by week.</p></div>
+          <button class="btn primary full">Start today's workout</button></div></div></div>
+        
+        
+        <div class="navbar"><i></i></div>
+        
+      </div>
+      <figcaption><b>E-02 · Empty</b><span>Left-aligned (C6), one clear action. Lucide icon, no illustration.</span></figcaption>
+    </figure>
+    <figure>
+      <div class="phone" role="img" aria-label="S-02 Error">
+        <div class="sb"><span>9:41</span><span class="ic"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></span></div>
+        <div class="body"><div class="appbar"><button class="iconbtn edge" aria-label="Open menu"><i data-lucide="menu"></i></button><span class="title">Nutrition</span><button class="iconbtn end" aria-label="search"><i data-lucide="search"></i></button></div>
+        <div class="err"><i data-lucide="circle-alert"></i><div class="stack-1 grow"><span>Couldn't load your food log. Your entries are safe.</span><a class="link">Try again</a></div></div>
+        <div class="banner"><i data-lucide="cloud-off"></i>You're offline. New entries are saved on your phone.</div></div>
+        
+        <nav class="bnav"><a class=""><span class="pill"><i data-lucide="house"></i></span><span>Today</span></a><a class=""><span class="pill"><i data-lucide="dumbbell"></i></span><span>Training</span></a><a class="on"><span class="pill"><i data-lucide="utensils"></i></span><span>Nutrition</span></a></nav>
+        <div class="navbar"><i></i></div>
+        
+      </div>
+      <figcaption><b>S-02 · Error</b><span>Says what failed and that data is safe; retry is a 48 dp target.</span></figcaption>
+    </figure></div>
+  </section>
+  <section class="group">
+    <div class="group-head"><span class="idx">17</span><h2>Push notifications</h2><p>Six notifications, plain and specific. No streak nags, no guilt.</p></div>
+    <div class="frames"><figure><div class="lock" role="img" aria-label="Lock screen with Arcwell notifications"><span class="clock">9:41</span><span class="date">Thursday, 12 November</span>
+      <div class="notif"><span class="app">A</span><div class="t"><span class="top"><span>Arcwell</span><span>·</span><span class="num">18:00</span></span><b>Today: Push day · 45 min</b><span>6 exercises. Tap to start.</span></div></div><div class="notif"><span class="app">A</span><div class="t"><span class="top"><span>Coach Anjali</span><span>·</span><span class="num">now</span></span><b>New message from Coach Anjali</b><span>"Here's this week. Squat moves to 52.5 kg."</span></div></div><div class="notif"><span class="app">A</span><div class="t"><span class="top"><span>Arcwell</span><span>·</span><span class="num">8:00</span></span><b>Your weekly check-in is due today</b><span>Takes about 3 minutes.</span></div></div></div>
+      <figcaption><b>Lock screen</b><span>Three of the six, as an athlete would see them.</span></figcaption></figure><figure><div class="notif-list"><div class="stack-1"><span class="caption muted">New message</span><div class="notif"><span class="app">A</span><div class="t"><span class="top"><span>Coach Anjali</span><span>·</span><span class="num">now</span></span><b>New message from Coach Anjali</b><span>"Here's this week. Squat moves to 52.5 kg."</span></div></div></div><div class="stack-1"><span class="caption muted">Check-in due</span><div class="notif"><span class="app">A</span><div class="t"><span class="top"><span>Arcwell</span><span>·</span><span class="num">8:00</span></span><b>Your weekly check-in is due today</b><span>Takes about 3 minutes.</span></div></div></div><div class="stack-1"><span class="caption muted">Check-in submitted</span><div class="notif"><span class="app">A</span><div class="t"><span class="top"><span>Arcwell · coach</span><span>·</span><span class="num">2 h</span></span><b>Priya submitted her check-in</b><span>−0.6 kg · 4/4 workouts · 1 question</span></div></div></div><div class="stack-1"><span class="caption muted">Plan assigned</span><div class="notif"><span class="app">A</span><div class="t"><span class="top"><span>Arcwell</span><span>·</span><span class="num">Mon</span></span><b>Your coach assigned a new plan</b><span>Fat loss · 4 days starts Monday.</span></div></div></div><div class="stack-1"><span class="caption muted">Workout reminder</span><div class="notif"><span class="app">A</span><div class="t"><span class="top"><span>Arcwell</span><span>·</span><span class="num">18:00</span></span><b>Today: Push day · 45 min</b><span>6 exercises. Tap to start.</span></div></div></div><div class="stack-1"><span class="caption muted">Coach feedback</span><div class="notif"><span class="app">A</span><div class="t"><span class="top"><span>Coach Anjali</span><span>·</span><span class="num">Sun</span></span><b>Your coach replied to your check-in</b><span>"Great week. Add 2.5 kg to bench."</span></div></div></div></div><figcaption><b>All six v1 notifications</b><span>The only notifications in v1 (SPEC). Coach-only: "check-in submitted".</span></figcaption></figure></div>
+  </section>
+</main>
+<script>window.lucide && lucide.createIcons();</script>
+</body>
+</html>

@@ -1,0 +1,240 @@
+/* =============================================================================
+   Arcwell — theme tokens (monochrome light theme, D50)
+   Phase 1 of docs/design/hifi-execution-roadmap.md
+   Status: DRAFT, not approved or user-tested.
+
+   Source of truth, in order: docs/DECISIONS.md (D50 black-and-white palette,
+   which replaces the blue of D49; D46 Inter) → docs/DESIGN.md §5 → this file.
+   If a value here and DESIGN.md ever differ, DESIGN.md wins: change it there
+   first, then here. Earlier palettes are kept in DECISIONS.md D47 and D49.
+
+   Hard rules these tokens encode:
+   - Black and white first: black is the action colour; colour is reserved for
+     small pillar markers and status (success, warning, danger).
+   - Solid colours only. No gradients of any kind, no glows, no glassmorphism,
+     no backdrop blur (design-prompt.md negative list).
+   - Depth comes from surface steps (bg → surface → raised), never drop shadows.
+   - Red (danger) is for errors and destructive actions only, never a missed target.
+
+   Contrast ratios are WCAG 2.x relative-luminance ratios, computed 2026-11-11.
+   AA thresholds: 4.5:1 body text · 3:1 large text (≥ 18.66px bold / 24px) and
+   UI component boundaries.
+   ============================================================================= */
+
+:root {
+  color-scheme: light;
+
+  /* ===========================================================================
+     1. COLOUR — raw palette
+     Named by hue/role, not by use. Components never read these directly;
+     they read the semantic tokens in section 2.
+     ========================================================================= */
+
+  /* Neutral greys (no blue tint) */
+  --grey-0:   #FFFFFF;       /* cards, sheets, text on black */
+  --grey-25:  #F5F5F5;       /* app background */
+  --grey-100: #EBEBEB;       /* inputs, pressed, raised */
+  --grey-200: #E0E0E0;       /* dividers */
+  --grey-400: #A3A3A3;       /* disabled text (WCAG-exempt) */
+  --grey-500: #7A7A7A;       /* control outlines */
+  --grey-600: #5C5C5C;       /* muted text */
+  --charcoal-700: #333333;   /* black, pressed step */
+  --charcoal-900: #111111;   /* black: text and primary actions */
+
+  /* Pillar hues: small markers only */
+  --cyan-700: #0E7490;       /* training */
+  --amber-600: #C2570C;      /* nutrition */
+  --violet-600: #6D5BD0;     /* recovery (solid only, never in a gradient) */
+
+  /* Status hues */
+  --green-700: #127235;      /* success: status only, never a brand or surface colour */
+  --amber-700: #A34A06;      /* warning */
+  --red-700:   #C81E1E;      /* danger */
+
+  /* ===========================================================================
+     2. COLOUR — semantic roles (what components use)
+     ========================================================================= */
+
+  /* Backgrounds: three steps. Depth = stepping, not shadows.
+     White cards on the light-grey background; raised (inputs, pressed) one step darker. */
+  --color-bg:              var(--grey-25);   /* #F5F5F5 */
+  --color-surface:         var(--grey-0);    /* #FFFFFF */
+  --color-surface-raised:  var(--grey-100);  /* #EBEBEB */
+
+  /* Text
+     on bg / surface / raised:
+     text       #111111  17.32 / 18.88 / 15.84  AA ✓
+     text-muted #5C5C5C   6.13 /  6.69 /  5.61  AA ✓  */
+  --color-text:            var(--charcoal-900);
+  --color-text-muted:      var(--grey-600);
+  --color-text-disabled:   var(--grey-400);      /* 2.31 / 2.52 / 2.12: disabled controls only (WCAG-exempt) */
+
+  /* Primary action: black
+     on-brand #FFFFFF on brand: 18.88 AA ✓ · on brand-hover #333333: 12.63 AA ✓  */
+  --color-brand:           var(--charcoal-900);
+  --color-brand-hover:     var(--charcoal-700);
+  --color-on-brand:        var(--grey-0);
+
+  /* Accent: also black (selection, focus, active tab). Colour stays out of the UI chrome. */
+  --color-accent:          var(--charcoal-900);
+  --color-on-accent:       var(--grey-0);
+
+  /* Pillars: small dots only, never text or fills; bars, rings and charts are black (D50).
+     training  on bg / surface / raised: 4.91 / 5.36 / 4.49  (3:1 for markers ✓)
+     nutrition on bg / surface / raised: 4.13 / 4.50 / 3.78  (3:1 for markers ✓)
+     recovery  on bg / surface / raised: 4.75 / 5.18 / 4.34  (3:1 for markers ✓)  */
+  --color-training:        var(--cyan-700);
+  --color-nutrition:       var(--amber-600);
+  --color-recovery:        var(--violet-600);
+
+  /* Status
+     success on bg / surface / raised: 5.53 / 6.03 / 5.06  AA ✓
+     warning on bg / surface / raised: 5.44 / 5.93 / 4.98  AA ✓
+     danger  on bg / surface / raised: 5.26 / 5.74 / 4.81  AA ✓  */
+  --color-success:         var(--green-700);
+  --color-warning:         var(--amber-700);
+  --color-danger:          var(--red-700);
+
+  /* Lines
+     border        #E0E0E0  1.21 / 1.32 / 1.11: decorative dividers only
+     border-strong #7A7A7A  3.94 / 4.29 / 3.60: input, tick-box and secondary-button
+                                                 outlines (WCAG 1.4.11 needs 3:1) ✓  */
+  --color-border:          var(--grey-200);
+  --color-border-strong:   var(--grey-500);
+  --color-focus:           var(--charcoal-900);
+
+  /* Scrim behind modal bottom sheets and dialogs: dims, never blurs. */
+  --color-scrim:           rgb(17 17 17 / 0.4);
+
+  /* ===========================================================================
+     3. TYPOGRAPHY
+     Inter for everything, headings included (D46). Roboto is listed only as
+     the Android system fallback while Inter loads; it is not a second typeface.
+     rem-based so layouts scale with the user's text size (must survive 130%).
+     Root assumption: 1rem = 16px.
+     ========================================================================= */
+
+  --font-sans: "Inter", "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "Roboto Mono", Menlo, monospace;  /* spec/debug only, never in the app UI */
+
+  /* Tabular numerals on every number (kg, reps, kcal, timers). */
+  --font-numeric: "tnum" 1;
+
+  /* Weights */
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+
+  /* Size scale: DESIGN.md §5 sizes on the requested semantic names. */
+  --text-xs:   0.75rem;    /* 12px · caption */
+  --text-sm:   0.875rem;   /* 14px · label */
+  --text-base: 1rem;       /* 16px · body */
+  --text-lg:   1.125rem;   /* 18px · heading */
+  --text-xl:   1.375rem;   /* 22px · title */
+  --text-2xl:  2rem;       /* 32px · display */
+
+  /* Line heights, paired 1:1 with the sizes (tighter as type grows). */
+  --leading-xs:   1rem;      /* 16px */
+  --leading-sm:   1.25rem;   /* 20px */
+  --leading-base: 1.5rem;    /* 24px */
+  --leading-lg:   1.5rem;    /* 24px */
+  --leading-xl:   1.75rem;   /* 28px */
+  --leading-2xl:  2.5rem;    /* 40px */
+
+  /* Tracking: size-specific, from Inter's published dynamic metrics
+     (tracking = -0.0223 + 0.185 · e^(-0.1745 · px)), rounded. Never one value
+     for all sizes. Negative as type grows, ~0 at caption size. */
+  --tracking-xs:   0em;
+  --tracking-sm:   -0.006em;
+  --tracking-base: -0.011em;
+  --tracking-lg:   -0.014em;
+  --tracking-xl:   -0.018em;
+  --tracking-2xl:  -0.022em;
+  --tracking-caps: 0.06em;   /* uppercase eyebrows only (spec sheet) */
+
+  /* Semantic type roles (size / leading / weight / tracking as a set) */
+  --type-display-size:  var(--text-2xl);  --type-display-leading:  var(--leading-2xl);  --type-display-weight:  var(--weight-bold);     --type-display-tracking:  var(--tracking-2xl);
+  --type-title-size:    var(--text-xl);   --type-title-leading:    var(--leading-xl);   --type-title-weight:    var(--weight-semibold); --type-title-tracking:    var(--tracking-xl);
+  --type-heading-size:  var(--text-lg);   --type-heading-leading:  var(--leading-lg);   --type-heading-weight:  var(--weight-semibold); --type-heading-tracking:  var(--tracking-lg);
+  --type-body-size:     var(--text-base); --type-body-leading:     var(--leading-base); --type-body-weight:     var(--weight-regular);  --type-body-tracking:     var(--tracking-base);
+  --type-label-size:    var(--text-sm);   --type-label-leading:    var(--leading-sm);   --type-label-weight:    var(--weight-medium);   --type-label-tracking:    var(--tracking-sm);
+  --type-caption-size:  var(--text-xs);   --type-caption-leading:  var(--leading-xs);   --type-caption-weight:  var(--weight-regular);  --type-caption-tracking:  var(--tracking-xs);
+
+  /* ===========================================================================
+     4. SPACING
+     Rigid 4px grid. Only these steps exist: 4, 8, 12, 16, 24, 32, 48.
+     rem so spacing grows with text size.
+     ========================================================================= */
+
+  --space-0:  0;
+  --space-1:  0.25rem;   /*  4px */
+  --space-2:  0.5rem;    /*  8px */
+  --space-3:  0.75rem;   /* 12px */
+  --space-4:  1rem;      /* 16px */
+  --space-6:  1.5rem;    /* 24px */
+  --space-8:  2rem;      /* 32px */
+  --space-12: 3rem;      /* 48px */
+
+  /* Rhythm: grouped spacing, never one gap everywhere.
+     Tight inside a group, generous between unrelated groups. */
+  --gap-inline:        var(--space-2);   /*  8px: icon ↔ label, chip ↔ chip */
+  --gap-in-group:      var(--space-2);   /*  8px: rows within one group */
+  --pad-card:          var(--space-4);   /* 16px: card and sheet padding */
+  --gutter-screen:     var(--space-4);   /* 16px: screen side margins */
+  --gap-between-groups: var(--space-6);  /* 24px: unrelated groups */
+  --gap-section:       var(--space-8);   /* 32px: major sections */
+  --gap-section-break: var(--space-12);  /* 48px: top of a new page region */
+
+  /* Touch: Android, 48dp minimum (DESIGN.md §5). Kept in px: a fixed target,
+     not text-relative. */
+  --tap-min:           48px;
+  --control-height:    48px;   /* buttons, inputs */
+
+  /* ===========================================================================
+     5. RADII, BORDERS, ELEVATION
+     ========================================================================= */
+
+  /* Radii */
+  --radius-sm:   8px;      /* inputs, chips, set cells */
+  --radius-md:   12px;     /* cards, buttons */
+  --radius-lg:   20px;     /* bottom sheets, drawer edge */
+  --radius-full: 9999px;   /* pills, avatars, status chips */
+
+  /* Borders: solid hex, not rgba, so the line is identical on every surface step.
+     (#2D323A on #111316 is close to rgba(255,255,255,0.1) on the same background.) */
+  --border-width:        1px;
+  --border-divider:      var(--border-width) solid var(--color-border);
+  --border-control:      var(--border-width) solid var(--color-border-strong);
+  --border-focus:        var(--border-width) solid var(--color-focus);
+  --focus-ring-width:    2px;  /* 1px border + 1px ring, as in the spec sheet */
+  --focus-ring:          0 0 0 1px var(--color-focus);  /* outline ring, not a shadow */
+
+  /* Elevation: surface steps only. No drop shadows on structural elements. */
+  --elevation-0: var(--color-bg);              /* screen */
+  --elevation-1: var(--color-surface);         /* cards, bottom bar, sheets */
+  --elevation-2: var(--color-surface-raised);  /* inputs, pressed rows, selected tab pill */
+  --shadow-none: none;
+
+  /* ===========================================================================
+     6. MOTION (DESIGN.md §5)
+     With "Remove animations" / reduced motion, every duration drops to 0.
+     ========================================================================= */
+
+  --duration-micro: 120ms;   /* press feedback, tick fill, toggles */
+  --duration-std:   200ms;   /* number rolls, cards, tabs */
+  --duration-sheet: 280ms;   /* bottom sheets */
+  --duration-big:   600ms;   /* ONLY the workout summary (F4-12) */
+  --ease-standard:  cubic-bezier(0.2, 0, 0, 1);
+  --press-scale:    0.98;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-micro: 0ms;
+    --duration-std:   0ms;
+    --duration-sheet: 0ms;
+    --duration-big:   0ms;
+    --press-scale:    1;
+  }
+}

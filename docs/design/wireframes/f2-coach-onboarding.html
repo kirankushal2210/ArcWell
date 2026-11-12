@@ -49,13 +49,13 @@
 <body>
 <header>
   <h1>Arcwell — Wireframes: F2 Coach onboarding</h1>
-  <p>Goal: a coach goes from download to their first client joined in under 10 minutes, without needing a call or a tutorial. Only the profile is required; services, templates and invites can be done now or later from a setup checklist. Coaches are the paying customer, so this flow sells the time Arcwell saves them versus WhatsApp and Excel.</p>
+  <p>Redrawn for onboarding v2 (D52) on 2026-11-12: IDs are now CO-xx, matching the mockups in hifi-mockups/coach-onboarding.html (old F2 IDs are noted on each screen and mapped in DESIGN.md §7). Goal: a coach goes from download to their first client joined in under 10 minutes, without needing a call or a tutorial. Only the profile is required; services, templates and invites can be done now or later from a setup checklist. Coaches are the paying customer, so this flow sells the time Arcwell saves them versus WhatsApp and Excel.</p>
   <div class="legend"><span class="l-primary">Primary action / selected</span><span>Secondary / editable</span><span class="l-note">Decision or open question</span></div>
 </header>
 
 <section class="flow">
   <h2>F2 · Set up the coaching business</h2>
-  <p class="arrowrow">Welcome → "I'm a coach" → sign up (F1-03) → what you get → coach agreement → profile → about you → services → first template → invite clients</p>
+  <p class="arrowrow">Welcome → "I'm a coach" → coach sign-up (CO-01, drawn as K-19 in f14) → what you get → coach agreement → your coaching → profile → specialisations → about you → services → first template → invite clients → ready to coach</p>
   <div class="row">
 
     <figure>
@@ -69,8 +69,8 @@
         <div class="vp"><span><b>Free for your clients</b><small>They download Arcwell and join with your link</small></span></div>
         <div class="pinned"><div class="btn primary">Set up my coaching</div><div class="tiny">Takes about 5 minutes</div></div>
       </div>
-      <figcaption><b><span class="id">F2-01</span>What you get</b>
-        <div class="note"><ul><li>Shown right after a coach signs up. Four benefits mapped to the coach's real pain points (from brand-assessment.md).</li><li>"Free for your clients" removes the main objection to switching.</li></ul></div></figcaption>
+      <figcaption><b><span class="id">CO-02</span>What you get</b>
+        <div class="note"><ul><li>Was F2-01.</li><li>Shown right after a coach signs up. Four benefits mapped to the coach's real pain points (from brand-assessment.md).</li><li>"Free for your clients" removes the main objection to switching.</li></ul></div></figcaption>
     </figure>
 
     <figure>
@@ -84,33 +84,82 @@
         <div class="toggle"><div><b>I agree to the Coach Terms and Privacy Policy</b></div><div class="sw"></div></div>
         <div class="pinned"><div class="btn primary">Continue</div></div>
       </div>
-      <figcaption><b><span class="id">F2-02</span>Coach agreement</b>
-        <div class="note"><ul><li>Coaches process clients' health data, so DPDP responsibilities are stated plainly — not buried in terms.</li><li>Replaces the athlete consent screen (F1-05) for coaches. Needs legal review of the Coach Terms.</li></ul></div></figcaption>
+      <figcaption><b><span class="id">CO-03</span>Coach agreement</b>
+        <div class="note"><ul><li>Was F2-02.</li><li>Coaches process clients' health data, so DPDP responsibilities are stated plainly — not buried in terms.</li><li>Replaces the athlete consent screen (F1-05) for coaches. Needs legal review of the Coach Terms.</li></ul></div></figcaption>
     </figure>
 
     <figure>
       <div class="phone">
+        <div class="status"><span>21:01</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>←</span><span>Your coaching · 1/2</span></div>
+        <div class="bar"><i style="width:14%"></i></div>
+        <div class="q">How do you coach?</div>
+        <div class="sub">We'll set things up the way you work.</div>
+        <div class="opt"><span class="ic"></span><span>In person<small>At a gym or studio</small></span></div>
+        <div class="opt"><span class="ic"></span><span>Online<small>Clients anywhere, over chat and calls</small></span></div>
+        <div class="opt sel"><span class="ic"></span><span>Both<small>A mix of gym-floor and online clients</small></span></div>
+        <div class="pinned"><div class="btn primary">Next</div></div>
+      </div>
+      <figcaption><b><span class="id">CO-04</span>How you coach</b>
+        <div class="note"><ul><li>New (D52). Tunes the setup checklist: in-person coaches get the QR code first.</li><li>Not shown to clients.</li></ul></div></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>21:01</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>←</span><span>Your coaching · 2/2</span></div>
+        <div class="bar"><i style="width:29%"></i></div>
+        <div class="q">How many clients do you coach right now?</div>
+        <div class="sub">Roughly is fine.</div>
+        <div class="opt"><span class="ic"></span><span>Just starting<small>No paying clients yet</small></span></div>
+        <div class="opt"><span class="ic"></span><span>1–10 clients</span></div>
+        <div class="opt sel"><span class="ic"></span><span>11–30 clients</span></div>
+        <div class="opt"><span class="ic"></span><span>31–60 clients</span></div>
+        <div class="opt"><span class="ic"></span><span>More than 60</span></div>
+        <div class="pinned"><div class="btn primary">Next</div></div>
+      </div>
+      <figcaption><b><span class="id">CO-05</span>Clients today</b>
+        <div class="note"><ul><li>New (D52). Sizes the suggested coach plan and the client-limit message (D40); no price shown here.</li><li>Ranges, not an exact number, so nobody has to count.</li></ul></div></figcaption>
+    </figure>
+
+
+    <figure>
+      <div class="phone">
         <div class="status"><span>21:02</span><span>▮▮ ◔</span></div>
-        <div class="topnav"><span>←</span><span>1 of 4</span></div>
-        <div class="bar"><i style="width:25%"></i></div>
+        <div class="topnav"><span>←</span><span>Profile · 1/3</span></div>
+        <div class="bar"><i style="width:43%"></i></div>
         <div class="q">Your coach profile</div>
         <div class="sub">This is what clients see when they join you.</div>
         <div class="photo">+ Add<br>photo</div>
         <div class="field"><small>Name clients see</small><b>Coach Joseph</b></div>
         <div class="field"><small>City</small><b>Bengaluru</b></div>
-        <div class="label">You specialise in (pick up to 3)</div>
-        <div class="chips"><span class="chip sel">Fat loss</span><span class="chip sel">Strength</span><span class="chip">Muscle gain</span><span class="chip">Women's fitness</span><span class="chip">Beginners</span><span class="chip">Contest prep</span><span class="chip">Home workouts</span><span class="chip">PCOS</span><span class="chip">Endurance</span></div>
         <div class="pinned"><div class="btn primary">Next</div></div>
       </div>
-      <figcaption><b><span class="id">F2-03</span>Profile basics</b>
-        <div class="note"><ul><li>↕ Scrolls on smaller phones; Next stays pinned. Keyboard keeps the active field visible.</li><li>The only required step: name, photo and specialisations power the invite landing page (F3-02).</li><li>Display name is free text so "Coach Joseph" or a brand name ("Fit with Joseph") both work.</li></ul></div></figcaption>
+      <figcaption><b><span class="id">CO-06</span>Profile basics</b>
+        <div class="note"><ul><li>Was the top half of F2-03; specialisations moved to CO-07.</li><li>Keyboard keeps the active field visible.</li><li>The only required step: name, photo and city (with CO-07) power the invite landing page (F3-02).</li><li>Display name is free text so "Coach Joseph" or a brand name ("Fit with Joseph") both work.</li></ul></div></figcaption>
     </figure>
 
     <figure>
       <div class="phone">
+        <div class="status"><span>21:02</span><span>▮▮ ◔</span></div>
+        <div class="topnav"><span>←</span><span>Profile · 2/3</span></div>
+        <div class="bar"><i style="width:57%"></i></div>
+        <div class="q">What do you specialise in?</div>
+        <div class="sub">Pick up to 3. Clients see these first.</div>
+        <div class="chips"><span class="chip sel">Fat loss</span><span class="chip sel">Strength</span><span class="chip">Muscle gain</span><span class="chip">Women's fitness</span><span class="chip sel">Beginners</span><span class="chip">Contest prep</span><span class="chip">Home workouts</span><span class="chip">PCOS</span><span class="chip">Endurance</span><span class="chip">Mobility</span></div>
+        <div class="tiny">3 of 3 picked</div>
+        <div class="pinned"><div class="btn primary">Next</div></div>
+      </div>
+      <figcaption><b><span class="id">CO-07</span>Specialisations</b>
+        <div class="note"><ul><li>Was the bottom half of F2-03, now its own screen (D52).</li><li>Shown on the profile and the invite page. A fourth tap shows "Pick up to 3"; it doesn't silently drop one.</li></ul></div></figcaption>
+    </figure>
+
+
+    <figure>
+      <div class="phone">
         <div class="status"><span>21:03</span><span>▮▮ ◔</span></div>
-        <div class="topnav"><span>←</span><span>2 of 4</span></div>
-        <div class="bar"><i style="width:50%"></i></div>
+        <div class="topnav"><span>←</span><span>Profile · 3/3</span></div>
+        <div class="bar"><i style="width:71%"></i></div>
         <div class="q">About you</div>
         <div class="sub">Optional — you can add this later.</div>
         <div class="field" style="height:64px"><small>Short bio</small>I help busy professionals lose fat and get strong with simple, sustainable plans.</div>
@@ -119,15 +168,15 @@
         <div class="field"><small>Certifications (optional)</small>e.g. ACE-CPT, K11</div>
         <div class="pinned"><div class="btn primary">Next</div><div class="btn ghost">Skip for now</div></div>
       </div>
-      <figcaption><b><span class="id">F2-04</span>About you</b>
-        <div class="note"><ul><li>Certifications are optional and not verified in v1 (agreed). Shown as "self-reported" on the profile.</li><li>Instagram handle links back to where coaches get clients.</li></ul></div></figcaption>
+      <figcaption><b><span class="id">CO-08</span>About you</b>
+        <div class="note"><ul><li>Was F2-04.</li><li>Certifications are optional and not verified in v1 (agreed). Shown as "self-reported" on the profile.</li><li>Instagram handle links back to where coaches get clients.</li></ul></div></figcaption>
     </figure>
 
     <figure>
       <div class="phone">
         <div class="status"><span>21:04</span><span>▮▮ ◔</span></div>
-        <div class="topnav"><span>←</span><span>3 of 4</span></div>
-        <div class="bar"><i style="width:75%"></i></div>
+        <div class="topnav"><span>←</span><span>Services · 1/1</span></div>
+        <div class="bar"><i style="width:86%"></i></div>
         <div class="q">Your coaching services</div>
         <div class="sub">Shown on your profile. Payments stay between you and your clients.</div>
         <div class="pkg"><div class="ph"><span>12-week fat loss</span><span>₹12,000</span></div><small>Training + meal plan · weekly check-ins · chat</small></div>
@@ -135,24 +184,24 @@
         <div class="pkg add">+ Add a service</div>
         <div class="pinned"><div class="btn primary">Next</div><div class="btn ghost">Skip for now</div></div>
       </div>
-      <figcaption><b><span class="id">F2-05</span>Services</b>
-        <div class="note"><ul><li>Display only — Arcwell doesn't take client payments (agreed: coaches bill clients themselves).</li><li>Price is optional; some coaches prefer "Price on request".</li></ul></div></figcaption>
+      <figcaption><b><span class="id">CO-09</span>Services</b>
+        <div class="note"><ul><li>Was F2-05.</li><li>Display only — Arcwell doesn't take client payments (agreed: coaches bill clients themselves).</li><li>Price is optional; some coaches prefer "Price on request".</li></ul></div></figcaption>
     </figure>
 
     <figure>
       <div class="phone">
         <div class="status"><span>21:05</span><span>▮▮ ◔</span></div>
-        <div class="topnav"><span>←</span><span>4 of 4</span></div>
+        <div class="topnav"><span>←</span><span>Templates · 1/1</span></div>
         <div class="bar"><i style="width:100%"></i></div>
         <div class="q">Create your first training template</div>
         <div class="sub">Reuse it for every client and adjust per person.</div>
         <div class="opt sel"><span class="ic"></span><span>Start from an Arcwell template<small>Push / pull / legs, upper / lower, full body — edit freely</small></span></div>
         <div class="opt"><span class="ic"></span><span>Build from scratch<small>Opens the plan builder</small></span></div>
-        <div class="opt"><span class="ic"></span><span>Copy from my spreadsheet<small>Paste exercises, sets and reps — we'll match them to the library</small></span></div>
+        <div class="opt" style="opacity:.45"><span class="ic"></span><span>Copy from my spreadsheet<small>Coming later</small></span></div>
         <div class="pinned"><div class="btn primary">Continue</div><div class="btn ghost">Skip — I'll do this later</div></div>
       </div>
-      <figcaption><b><span class="id">F2-06</span>First template</b>
-        <div class="note"><ul><li>Starting from a template is fastest; the plan builder itself is designed separately.</li><li><span class="rule">D45:</span> "Copy from my spreadsheet" is v1.1.</li></ul></div></figcaption>
+      <figcaption><b><span class="id">CO-10</span>First template</b>
+        <div class="note"><ul><li>Was F2-06.</li><li>Starting from a template is fastest; the plan builder itself is designed separately.</li><li><span class="rule">D45:</span> "Copy from my spreadsheet" is v1.1, so it is shown faded with "Coming later".</li></ul></div></figcaption>
     </figure>
 
     <figure>
@@ -167,9 +216,30 @@
         <div class="tiny">Show this QR code to in-person clients</div>
         <div class="pinned"><div class="btn primary">Done</div></div>
       </div>
-      <figcaption><b><span class="id">F2-07</span>Invite clients</b>
-        <div class="note"><ul><li>One personal link for all clients, shared where coaches already talk to them (WhatsApp first).</li><li>Editable pre-written message lowers effort; QR for gym-floor clients.</li><li>Link can be reset if it leaks (Business → Invite link).</li></ul></div></figcaption>
+      <figcaption><b><span class="id">CO-11</span>Invite clients</b>
+        <div class="note"><ul><li>Was F2-07.</li><li>One personal link for all clients, shared where coaches already talk to them (WhatsApp first).</li><li>Editable pre-written message lowers effort; QR for gym-floor clients.</li><li>Link can be reset if it leaks (Business → Invite link).</li></ul></div></figcaption>
     </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>21:09</span><span>▮▮ ◔</span></div>
+        <div class="grow center">
+          <div class="ring">logo ✓</div>
+          <div class="q">You're ready to coach</div>
+          <div class="sub">Your profile is live and your link is ready to share.</div>
+          <div class="card" style="text-align:left;width:100%">
+            <div class="kv"><span>Profile</span><span>✓ Done</span></div>
+            <div class="kv"><span>Services</span><span>2 added</span></div>
+            <div class="kv"><span>Training template</span><span>Full body · edit later</span></div>
+            <div class="kv"><span>Meal plan template</span><span>To do</span></div>
+          </div>
+        </div>
+        <div class="pinned"><div class="btn primary">Go to Clients</div></div>
+      </div>
+      <figcaption><b><span class="id">CO-12</span>Ready to coach</b>
+        <div class="note"><ul><li>New (D52): the same calm finish as the athlete flow (AO-21). No confetti.</li><li>Skipped steps become the Clients-tab checklist (CO-13).</li></ul></div></figcaption>
+    </figure>
+
 
   </div>
 </section>
@@ -193,8 +263,8 @@
         <div class="grow center"><div class="sub" style="max-width:220px">No clients yet. When someone joins with your link, they'll appear here.</div></div>
         <div class="tabs"><span class="on">Clients</span><span>Check-ins</span><span>Plans</span><span>Messages</span><span>Business</span></div>
       </div>
-      <figcaption><b><span class="id">F2-08</span>Clients — empty with setup checklist</b>
-        <div class="note"><ul><li>Skipped steps aren't lost: they become a checklist on the Clients tab until done or dismissed.</li><li>Turns the empty state into a to-do list instead of a dead end.</li></ul></div></figcaption>
+      <figcaption><b><span class="id">CO-13</span>Clients — empty with setup checklist</b>
+        <div class="note"><ul><li>Was F2-08.</li><li>Skipped steps aren't lost: they become a checklist on the Clients tab until done or dismissed.</li><li>Turns the empty state into a to-do list instead of a dead end.</li></ul></div></figcaption>
     </figure>
 
     <figure>
@@ -202,16 +272,14 @@
         <div class="status"><span>9:15</span><span>▮▮ ◔</span></div>
         <div class="toast"><b>Priya Sharma joined you</b><small>Assign her plan to get started</small></div>
         <div class="topnav" style="margin-top:44px"><span style="font-weight:700;color:var(--ink);font-size:13px">Clients</span><span>+ Invite</span></div>
-        <div class="filters"><span class="on">Needs attention · 2</span><span>Active · 0</span><span>All · 2</span></div>
+        <div class="filters"><span class="on">New · 2</span><span>Active · 0</span><span>All · 2</span></div>
         <div class="seclab">Needs a plan</div>
         <div class="inrow"><span class="av"></span><span class="t"><b>Priya Sharma <span class="pill">New</span></b><small>Fat loss · joined 10 min ago · onboarding done</small></span><span class="r">Assign ›</span></div>
         <div class="inrow"><span class="av"></span><span class="t"><b>Rahul Verma <span class="pill">New</span></b><small>Strength · joined yesterday · onboarding done</small></span><span class="r">Assign ›</span></div>
-        <div class="seclab">Invited, not joined yet</div>
-        <div class="inrow"><span class="av"></span><span class="t"><b>3 people opened your link</b><small>but haven't finished signing up</small></span><span class="r"></span></div>
         <div class="tabs"><span class="on">Clients</span><span>Check-ins</span><span>Plans</span><span>Messages</span><span>Business</span></div>
       </div>
-      <figcaption><b><span class="id">F2-09</span>Clients — first clients join</b>
-        <div class="note"><ul><li>New clients sit at the top under "Needs a plan" until the coach assigns one — the coach's first job.</li><li>Shows link opens that didn't convert, so the coach can follow up on WhatsApp (count only; no personal data before sign-up).</li><li>Full client list with adherence is designed with the coach dashboard later.</li></ul></div></figcaption>
+      <figcaption><b><span class="id">CO-14</span>Clients — first clients join</b>
+        <div class="note"><ul><li>Was F2-09.</li><li>New clients sit at the top under "Needs a plan" until the coach assigns one — the coach's first job.</li><li><span class="rule">D45:</span> invite-link open counts are v1.1, so the "opened your link" row is no longer drawn.</li><li>Full client list with adherence is designed with the coach dashboard later.</li></ul></div></figcaption>
     </figure>
 
     <figure>
@@ -220,13 +288,14 @@
         <div class="topnav"><span>← Clients</span><span>···</span></div>
         <div style="display:flex;gap:10px;align-items:center;margin-bottom:6px"><div class="avatar" style="width:44px;height:44px;margin:0"></div><div><div class="q" style="margin:0;font-size:14px">Priya Sharma</div><div class="sub" style="margin:0">26 · Pune · joined today</div></div></div>
         <div class="seclab">Onboarding answers</div>
-        <div class="ans"><span>Goal</span><b>Lose fat</b></div>
+        <div class="ans"><span>Goal</span><b>Lose fat · to 63 kg</b></div>
+        <div class="ans"><span>Body</span><b>162 cm · 68.0 kg · female</b></div>
+        <div class="ans"><span>Activity</span><b>Mostly sitting</b></div>
         <div class="ans"><span>Experience</span><b>6 months – 2 years</b></div>
-        <div class="ans"><span>Height · weight</span><b>162 cm · 68.0 kg</b></div>
+        <div class="ans"><span>Training</span><b>Gym · 4 × 45 min · mornings</b></div>
         <div class="ans"><span>Injuries</span><b>Lower back</b></div>
-        <div class="ans"><span>Schedule</span><b>4 days · 45 min</b></div>
-        <div class="ans"><span>Equipment</span><b>Gym</b></div>
-        <div class="ans"><span>Diet</span><b>Vegetarian</b></div>
+        <div class="ans"><span>Sleep</span><b>6.5 h · okay · stress 4/5</b></div>
+        <div class="ans"><span>Diet</span><b>Vegetarian · 3 meals</b></div>
         <div class="pinned">
           <div class="btn primary">Assign training plan</div>
           <div class="btn">Assign meal plan and targets</div>
@@ -234,20 +303,20 @@
           <div class="btn ghost">Set check-in day · Message Priya</div>
         </div>
       </div>
-      <figcaption><b><span class="id">F2-10</span>New client — assign plan</b>
-        <div class="note"><ul><li><span class="rule">Rule D7:</span> the coach's guidance replaces the client's active training, nutrition and recovery guidance; history is kept (D7c).</li><li>Everything the coach usually collects on a WhatsApp intake form, already answered.</li><li>Three setup actions in order: training plan, meal plan + targets, check-in day. When done, the client moves to Active and their "While you wait" screen (F1-13b) updates.</li><li><span class="rule">D44:</span> no custom coach intake questions in v1 (v1.1).</li></ul></div></figcaption>
+      <figcaption><b><span class="id">CO-15</span>New client — assign plan</b>
+        <div class="note"><ul><li>Was F2-10. Answers now include the D52 questions: goal weight, activity, training time, sleep, stress and meals per day.</li><li><span class="rule">Rule D7:</span> the coach's guidance replaces the client's active training, nutrition and recovery guidance; history is kept (D7c).</li><li>Everything the coach usually collects on a WhatsApp intake form, already answered.</li><li>Three setup actions in order: training plan, meal plan + targets, check-in day. When done, the client moves to Active and their "While you wait" screen (AO-21b) updates.</li><li><span class="rule">D44:</span> no custom coach intake questions in v1 (v1.1).</li></ul></div></figcaption>
     </figure>
 
   </div>
 </section>
 
 <section class="flow">
-  <h2>Resolved for v1 (2026-11-11)</h2>
+  <h2>Resolved for v1 (2026-11-11, IDs updated for D52 on 2026-11-12)</h2>
   <div class="note" style="max-width:820px"><ul>
-    <li><b>F2-02:</b> Coach Terms need legal review — tracked in PLAN.md.</li>
-    <li><b>F2-06:</b> "Copy from my spreadsheet" moved to v1.1 (D45).</li>
-    <li><b>F2-09:</b> invite-link open counts moved to v1.1 (D45).</li>
-    <li><b>F2-10:</b> no custom intake questions in v1; the coach sees the standard onboarding answers (D44). Recovery guidance is a sleep target plus a note (D31, K-24).</li>
+    <li><b>CO-03:</b> Coach Terms need legal review — tracked in PLAN.md.</li>
+    <li><b>CO-10:</b> "Copy from my spreadsheet" moved to v1.1 (D45).</li>
+    <li><b>CO-14:</b> invite-link open counts moved to v1.1 (D45).</li>
+    <li><b>CO-15:</b> no custom intake questions in v1; the coach sees the standard onboarding answers (D44). Recovery guidance is a sleep target plus a note (D31, K-24).</li>
     <li><b>Previously not designed:</b> plan builder, meal plan builder, dashboard and Business tab are now drawn (F13, F14, F16).</li>
   </ul></div>
 </section>

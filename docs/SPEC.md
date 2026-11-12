@@ -24,7 +24,7 @@ Market: India first. Android only at launch. Compliance: India DPDP Act.
 
 ## v1 scope
 
-**Athlete app** (decisions D1–D45 in [DECISIONS.md](DECISIONS.md)):
+**Athlete app** (decisions D1–D52 in [DECISIONS.md](DECISIONS.md)):
 
 - Bottom bar — free: Today · Training · Nutrition. AI-coached: Today · Training · Nutrition · Recovery · AI Coaching. Human-coached: Today · Training · Nutrition · Recovery · Progress, where Progress is the combined Check-ins · Progress · Chat area.
 - Side menu (☰) for all athletes: Account · Notifications · Training (Exercises, Workouts, Programs, History, Muscle Analytics) · Gyms · Physique (Bodyweight, Measurements, Photos, Charts). Workouts are standalone sessions (free: templates only; Pro: create your own); Programs are multi-week plans (Pro); Muscle Analytics shows weekly sets per muscle group (Pro); Gyms is a read-only map / directory (free). No Set Videos (no video in v1).
@@ -33,9 +33,15 @@ Market: India first. Android only at launch. Compliance: India DPDP Act.
 
 - Training: Hevy-style workout logging; small exercise library of common gym equipment; demo media from a commercially licensed source.
 - Nutrition: IFCT 2017 + curated Indian dishes, Indian portions (katori, roti, piece); coach meal plans as fixed meals with exact foods and quantities.
-- Onboarding: goal, experience, age/height/weight, injuries/limitations, training days and session length, equipment access (gym/home/none), diet type (veg, non-veg, eggetarian, vegan, Jain).
+- Onboarding (D52), one question per screen in five sections:
+  - About you: gender (optional, for the calorie estimate), age, height, current weight.
+  - Your goal: main goal (lose fat, build muscle, get stronger, body recomposition, general fitness), goal weight (optional), daily activity level.
+  - Training: experience, where you train (gym / home with equipment list / none), days per week and preferred days, session length and usual time of day, injuries/limitations.
+  - Recovery (all optional): usual sleep hours with bed and wake times, sleep quality, stress, energy and soreness.
+  - Nutrition: diet type (veg, non-veg, eggetarian, vegan, Jain), meals per day.
+  - Free athletes then see a calorie target (calories only), a preview of what the free plan includes, and their first workout. Coached athletes skip these; their coach sets targets and plans. No AI, trial or paywall anywhere in onboarding.
 
-**Coach workspace** (same app, different interface by role): client list with adherence and overdue check-ins; client profiles; plan builder with reusable templates; weekly check-ins (fixed form, coach picks the day per client, text reply); instant chat with image/PDF attachments; client lifecycle (active, paused, leaving, completed); basic leads; coach profile with transformation photos.
+**Coach workspace** (same app, different interface by role): coach onboarding (what you get, coach agreement, how you coach and roughly how many clients, profile and specialisations, optional bio, services, first template, invite link, then a setup checklist on Clients); client list with adherence and overdue check-ins; client profiles; plan builder with reusable templates; weekly check-ins (fixed form, coach picks the day per client, text reply); instant chat with image/PDF attachments; client lifecycle (active, paused, leaving, completed); basic leads; coach profile with transformation photos.
 
 **AI (paid athletes only):** plans built and adjusted only from the approved exercise library and validated by server-side programming rules; AI meal plans; AI photo food logging. Out-of-scope requests (contest prep, injury rehab) show "I can't help with that"; they are not routed anywhere. Turning off AI permission hides AI features but doesn't cancel billing; cancellation and refunds are handled in Google Play.
 
