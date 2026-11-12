@@ -331,7 +331,9 @@ export default function Today() {
             <Text variant="label" weight="regular" tone="muted" numeric>
               {me.protocol
                 ? `In bed by ${clock(me.protocol.bed)} · ${me.protocol.sleepH} h`
-                : "Set a bedtime in Recovery"}
+                : meTier === "free"
+                  ? "Part of Arcwell Plus"
+                  : "Set a bedtime in Recovery"}
             </Text>
           </PressableScale>
           {rings.length ? (
