@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { ImageViewer } from "@/components/ImageViewer";
 import { IconButton, PressableScale, Text } from "@/components/primitives";
 import {
   colors,
@@ -47,6 +48,7 @@ export function ChatThread({
   const scroll = useRef<ScrollViewInstance>(null);
   const [text, setText] = useState("");
   const [image, setImage] = useState<string | undefined>();
+  const [viewing, setViewing] = useState<string | null>(null);
   const lastMine = messages.map((m) => m.from).lastIndexOf(me);
   const submit = (t = text) => {
     const s = t.trim();
@@ -85,12 +87,17 @@ export function ChatThread({
               ) : null}
               <View style={[styles.bubble, mine ? styles.mine : styles.theirs]}>
                 {m.image ? (
-                  <Image
-                    source={{ uri: m.image }}
-                    style={styles.photo}
-                    contentFit="cover"
-                    accessibilityLabel="Photo"
-                  />
+                  <PressableScale
+                    onPress={() => setViewing(m.image ?? null)}
+                    accessibilityRole="imagebutton"
+                    accessibilityLabel="Open photo"
+                  >
+                    <Image
+                      source={{ uri: m.image }}
+                      style={styles.photo}
+                      contentFit="cover"
+                    />
+                  </PressableScale>
                 ) : null}
                 {m.text ? (
                   <Text tone={mine ? "onBrand" : "default"}>{m.text}</Text>
@@ -180,6 +187,7 @@ export function ChatThread({
           onPress={() => submit()}
         />
       </View>
+      <ImageViewer uri={viewing} onClose={() => setViewing(null)} />
     </>
   );
 }

@@ -4,6 +4,7 @@
 // - end-ai (J-02): subscriptions are managed in Google Play; Arcwell only checks the status and never
 //   cancels (D7a, D19). Joining waits until Play reports the subscription as cancelled.
 // - joined (J-03): what changed.
+// - already (F3-03): a coached athlete opened another invite; one coach at a time.
 // - left (L-03, and K-29 when the coach closed their account): what changed after coaching ends.
 // The bottom bar follows D57 and D68 (four tabs; AI from Today and the + menu), which postdate the
 // wireframes' bar wording.
@@ -92,6 +93,35 @@ export default function Switch() {
       </MenuPage>
     );
 
+  if (step === "already")
+    return (
+      <MenuPage
+        title="You already have a coach"
+        back={home}
+        footer={
+          <ConfirmButtons
+            label={`Leave ${coachName} first`}
+            onConfirm={() => router.replace("/athlete/menu/leave")}
+            cancel={`Stay with ${first}`}
+            onCancel={home}
+          />
+        }
+      >
+        <InfoCard>
+          {`Arcwell works with one coach at a time. To join someone new, leave ${first} first, then open the new invite again.`}
+        </InfoCard>
+        <InfoCard title="When you leave">
+          <Bullets
+            items={[
+              "You keep all your workouts, logs and history",
+              `${first}'s plan stays in Training, read-only`,
+              "Your new coach sees your data from the day you join, unless you share earlier history",
+            ]}
+          />
+        </InfoCard>
+      </MenuPage>
+    );
+
   if (step === "end-ai")
     return (
       <MenuPage
@@ -165,25 +195,36 @@ export default function Switch() {
     <MenuPage
       title={
         closed
-          ? `${who} has closed their Arcwell account`
+          ? "Coaching has ended"
           : end?.reason === "completed"
-            ? `Your coaching with ${whoFirst} is complete`
-            : `You've left ${who}`
+            ? "Coaching complete"
+            : `You've left ${whoFirst}`
+      }
+      sub={
+        closed
+          ? `${who} closed their Arcwell account`
+          : end?.reason === "completed"
+            ? `${who} marked your coaching complete`
+            : undefined
       }
       back={home}
       footer={
-        <ConfirmButtons
-          label="Go to Training"
-          onConfirm={() => {
-            home();
-            router.push("/athlete/training");
-          }}
-          cancel="See AI coaching"
-          onCancel={() => {
-            home();
-            router.push("/athlete/ai");
-          }}
-        />
+        closed ? (
+          <Button label="Continue" fullWidth onPress={home} />
+        ) : (
+          <ConfirmButtons
+            label="Go to Training"
+            onConfirm={() => {
+              home();
+              router.push("/athlete/training");
+            }}
+            cancel="See AI coaching"
+            onCancel={() => {
+              home();
+              router.push("/athlete/ai");
+            }}
+          />
+        )
       }
     >
       <InfoCard>

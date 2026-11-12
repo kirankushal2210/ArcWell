@@ -25,7 +25,7 @@ Rough estimates assume two builders using AI tools heavily. Total ≈ 18–24 we
 - [x] Supabase local config, migrations/tests/seed structure, pgTAP smoke test
 - [x] AI provider interface (Groq first), secrets template
 - [x] Lint, typecheck, CI (app, database tests, Edge Functions typecheck)
-- [ ] Create GitHub repo and push
+- [x] Create GitHub repo and push
 - [ ] Create staging Supabase project and link it
 - [ ] EAS project + Android preview build profile
 
@@ -43,6 +43,16 @@ Everything design-related lives in [DESIGN.md](DESIGN.md); mockups in `docs/desi
 - [ ] High-fidelity mockups for the 5–6 most important screens
 
 After this, every phase starts by designing its screens with these components before writing code.
+
+## Front-end completion (founder decision, 2026-11-13)
+
+The front end is finished on sample data before any backend wiring (Phases 1–8 below then connect these screens to Supabase). Audit on 2026-11-13: about 160 of the 199 inventory screens built. Remaining work, in order:
+
+- [x] **FE-1 Coached loop:** Progress area (Check-ins · Progress · Chat, CP-01 to CP-06), image viewer (X-05), coach completes or closes → athlete moves to Free (K-29, K-30), switch-coach invite (F3-03), client limit and coach full (K-25, K-26), coach billing lapsed (K-27)
+- [ ] **FE-2 Training depth:** Programs (TR-04, TR-05), Muscle Analytics (TR-06, TR-07), estimated 1RM and strength charts, plate calculator, coach exercise library (K-23), free starter workouts (TR-01)
+- [ ] **FE-3 Money and AI states:** subscription details, payment problem, subscription ended (F8-06 to F8-08), trial timeline and reminders (F8-02, TL-01, TL-02), upgrade what changed (U-01), AI off, out of scope, daily limit, failure (AI-02, AI-04, X-01, X-02), photo food logging with mock results (F5-09 to F5-11)
+- [ ] **FE-4 Extras:** water tracking, reminders, coach message to several clients, Gyms (G-01, G-02), first-run tips
+- [ ] **FE-5 System and QA:** loading, error, offline, permission denied, force update, maintenance, notification pre-ask (S-01 to S-06, X-07, F4-09, F7-03), PDF attach and viewer UI (F7-02, X-06), then the full QA walk (Phase 14 of the frontend execution prompt)
 
 ## Phase 1 — Foundations (2–3 weeks)
 

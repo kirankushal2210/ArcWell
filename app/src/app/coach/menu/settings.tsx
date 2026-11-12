@@ -17,7 +17,10 @@ import {
 } from "@/features/coach/parts";
 import { colors, space } from "@/theme";
 
-const NOTIFY: { key: keyof CoachSettings; label: string; sub: string }[] = [
+/** The on/off settings (billing and the client limit are set elsewhere). */
+type ToggleKey = Exclude<keyof CoachSettings, "billing" | "clientLimit">;
+
+const NOTIFY: { key: ToggleKey; label: string; sub: string }[] = [
   {
     key: "checkIns",
     label: "Check-ins",
@@ -40,14 +43,9 @@ export default function SettingsScreen() {
   const { settings, saveSettings } = useCoachData();
   const back = () =>
     router.canGoBack() ? router.back() : router.replace("/coach/menu");
-  const toggle = (k: keyof CoachSettings) =>
+  const toggle = (k: ToggleKey) =>
     saveSettings({ ...settings, [k]: !settings[k] });
-  const row = (
-    k: keyof CoachSettings,
-    label: string,
-    sub: string,
-    first: boolean,
-  ) => (
+  const row = (k: ToggleKey, label: string, sub: string, first: boolean) => (
     <GroupRow key={k} first={first}>
       <View style={styles.flex}>
         <Text weight="medium">{label}</Text>
@@ -56,7 +54,7 @@ export default function SettingsScreen() {
         </Text>
       </View>
       <Switch
-        value={settings[k]}
+        value={!!settings[k]}
         onValueChange={() => toggle(k)}
         trackColor={{ true: colors.brand, false: colors.surfaceRaised }}
         thumbColor={colors.surface}
@@ -107,24 +105,7 @@ export default function SettingsScreen() {
           icon={Trash2}
           variant="ghost"
           fullWidth
-          onPress={() =>
-            Alert.alert(
-              "Delete your coach account?",
-              "Every client is unlinked at once. They keep their history and your plans read-only. Your templates, leads and notes are deleted and can't be recovered.",
-              [
-                { text: "Cancel", style: "cancel" },
-                {
-                  text: "Delete",
-                  style: "destructive",
-                  onPress: () =>
-                    Alert.alert(
-                      "Not in this build",
-                      "Account deletion switches on with accounts (PLAN Phase 6).",
-                    ),
-                },
-              ],
-            )
-          }
+          onPress={() => router.push("/coach/menu/delete-account")}
         />
       </Page>
     </View>

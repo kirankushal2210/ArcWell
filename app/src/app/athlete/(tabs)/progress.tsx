@@ -1,101 +1,262 @@
-// Progress for a coached athlete: bodyweight against the goal the coach set, a quick weigh-in, and
-// check-ins with the coach's replies (check-in form arrives in Phase 4).
+// Progress for a coached athlete (CP-01 to CP-06): Check-ins · Progress · Chat as section tabs
+// (D61). Check-ins shows the week's check-in (due, sent and waiting, or replied) and every past one
+// with the coach's reply, each opening read-only. Progress is bodyweight against the coach's goal
+// with a quick weigh-in and the way into Physique. Chat previews the latest messages and opens the
+// full conversation, so the tab bar never covers the message box. Each section docks its action.
+import { router } from "expo-router";
+import {
+  Camera,
+  ChartLine,
+  MessageCircle,
+  Ruler,
+  Scale,
+} from "lucide-react-native";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
-import { Button, NumberStepper, Text } from "@/components/primitives";
-import { athleteMenuAction } from "@/features/athlete/MenuParts";
-import { AthletePage, NotJoined, useMe } from "@/features/athlete/useMe";
+import { Avatar, Text } from "@/components/primitives";
+import { SectionTabs } from "@/components/SectionTabs";
+import { athleteMenuAction, NavRow } from "@/features/athlete/MenuParts";
+import {
+  AthleteDock,
+  AthletePage,
+  NotJoined,
+  useMe,
+} from "@/features/athlete/useMe";
+import { dueText, sentThisWeek } from "@/features/coach/checkins";
 import { useCoachData } from "@/features/coach/CoachData";
 import {
   Eyebrow,
+  Group,
+  GroupRow,
   PageHeader,
   StatTile,
   WeightChart,
 } from "@/features/coach/parts";
 import { colors, radius, space } from "@/theme";
 
+type Tab = "checkins" | "progress" | "chat";
+const TABS: { key: Tab; label: string }[] = [
+  { key: "checkins", label: "Check-ins" },
+  { key: "progress", label: "Progress" },
+  { key: "chat", label: "Chat" },
+];
+
 export default function Progress() {
   const me = useMe();
-  const { coachName, logWeight } = useCoachData();
-  const last = me?.weights[me.weights.length - 1] ?? 70;
-  const [kg, setKg] = useState(last);
-  const [saved, setSaved] = useState(false);
+  const { coachName, settingsOf } = useCoachData();
+  const [tab, setTab] = useState<Tab>("checkins");
   if (!me) return <NotJoined />;
-  const start = me.weights[0];
+  const first = coachName.replace(/^Coach\s+/, "");
+  const last = me.weights[me.weights.length - 1] ?? 70;
+  const start = me.weights[0] ?? last;
+  const k = me.checkIns[0];
+  const sent = sentThisWeek(me);
+  const paused = me.status === "paused";
+  const photosOff = !settingsOf(me.id).photos;
+
+  const checkins = (
+    <AthletePage key="c" dock>
+      <View style={styles.card}>
+        <Text variant="title">
+          {paused
+            ? "Check-ins are paused"
+            : !me.checkIns.length
+              ? "Send your starting point"
+              : sent
+                ? k?.reviewed
+                  ? `${first} replied`
+                  : "Check-in sent"
+                : "This week's check-in"}
+        </Text>
+        <Text tone="muted">
+          {paused
+            ? `${first} paused check-ins${me.statusUntil ? ` until ${me.statusUntil}` : ""}. Your plan and chat still work.`
+            : !me.checkIns.length
+              ? "Photos and weight, so you can see how far you come."
+              : sent
+                ? k?.reviewed
+                  ? (k.reply ?? "")
+                  : `${first} will look at it and reply here.`
+                : `${dueText(me)} · weight, waist, six quick scores and how the week went.`}
+        </Text>
+        {!paused && !sent && photosOff ? (
+          <Text variant="label" weight="regular" tone="muted">
+            Photos are off, so this check-in goes without them. Turn them on in
+            Privacy any time.
+          </Text>
+        ) : null}
+      </View>
+      {me.checkIns.length ? (
+        <>
+          <Eyebrow>Your check-ins</Eyebrow>
+          <Group>
+            {me.checkIns.map((c, i) => (
+              <NavRow
+                key={c.id}
+                first={i === 0}
+                label={c.week === 0 ? "Starting point" : `Week ${c.week}`}
+                sub={
+                  c.reviewed && c.reply
+                    ? `${first}: ${c.reply}`
+                    : "Waiting for a reply"
+                }
+                value={c.submitted}
+                onPress={() =>
+                  router.push({
+                    pathname: "/athlete/check-in/[id]",
+                    params: { id: c.id },
+                  })
+                }
+              />
+            ))}
+          </Group>
+        </>
+      ) : null}
+    </AthletePage>
+  );
+
+  const progress = (
+    <AthletePage key="p" dock>
+      <View style={styles.tiles}>
+        <StatTile
+          label="Now"
+          value={`${last.toFixed(1)} kg`}
+          sub={`started ${start.toFixed(1)}`}
+        />
+        <StatTile
+          label="Goal"
+          value={`${me.targetKg.toFixed(1)} kg`}
+          sub={`${Math.abs(last - me.targetKg).toFixed(1)} kg to go`}
+        />
+      </View>
+      {me.weights.length > 1 ? (
+        <View style={styles.card}>
+          <Text weight="semibold">Bodyweight</Text>
+          <WeightChart values={me.weights} target={me.targetKg} />
+          <Text variant="caption" tone="muted">
+            Dashed line is the goal {first} set with you.
+          </Text>
+        </View>
+      ) : null}
+      <Eyebrow>Physique</Eyebrow>
+      <Group>
+        <NavRow
+          first
+          icon={Scale}
+          label="Bodyweight"
+          onPress={() => router.push("/athlete/physique/bodyweight")}
+        />
+        <NavRow
+          icon={Ruler}
+          label="Measurements"
+          onPress={() => router.push("/athlete/physique/measurements")}
+        />
+        <NavRow
+          icon={Camera}
+          label="Photos"
+          onPress={() => router.push("/athlete/physique/photos")}
+        />
+        <NavRow
+          icon={ChartLine}
+          label="Charts"
+          onPress={() => router.push("/athlete/physique/charts")}
+        />
+      </Group>
+    </AthletePage>
+  );
+
+  const recent = me.messages.slice(-4);
+  const chat = (
+    <AthletePage key="m" dock>
+      {recent.length ? (
+        <Group>
+          {recent.map((m, i) => (
+            <GroupRow key={i} first={i === 0}>
+              {m.from === "coach" ? (
+                <Avatar name={first} />
+              ) : (
+                <Avatar name={me.name} />
+              )}
+              <View style={styles.flex}>
+                <Text variant="label" tone="muted">
+                  {m.from === "coach" ? coachName : "You"} · {m.time}
+                </Text>
+                <Text numberOfLines={3}>
+                  {m.text || (m.image ? "Photo" : "")}
+                </Text>
+              </View>
+            </GroupRow>
+          ))}
+        </Group>
+      ) : (
+        <View style={styles.empty}>
+          <MessageCircle size={32} strokeWidth={1.6} color={colors.text} />
+          <Text variant="title" style={styles.center}>
+            Ask {first} anything
+          </Text>
+          <Text tone="muted" style={styles.center}>
+            Swaps, soreness, eating out: {first} replies here.
+          </Text>
+        </View>
+      )}
+    </AthletePage>
+  );
 
   return (
     <View style={styles.root}>
-      <PageHeader title="Progress" actions={[athleteMenuAction]} />
-      <AthletePage>
-        <View style={styles.tiles}>
-          <StatTile
-            label="Now"
-            value={`${last.toFixed(1)} kg`}
-            sub={`started ${start.toFixed(1)}`}
+      <PageHeader
+        title="Progress"
+        sub={`With ${coachName}`}
+        actions={[athleteMenuAction]}
+      />
+      <SectionTabs
+        tabs={TABS}
+        value={tab}
+        onChange={setTab}
+        pages={[checkins, progress, chat]}
+      />
+      {tab === "checkins" ? (
+        paused || (sent && k?.reviewed === false) ? null : (
+          <AthleteDock
+            label={
+              sent
+                ? "See your check-in"
+                : !me.checkIns.length
+                  ? "Send your starting point"
+                  : "Check in"
+            }
+            icon={Camera}
+            onPress={() => router.push("/athlete/weekly-check-in")}
           />
-          <StatTile
-            label="Goal"
-            value={`${me.targetKg.toFixed(1)} kg`}
-            sub={`${Math.abs(last - me.targetKg).toFixed(1)} kg to go`}
-          />
-        </View>
-        {me.weights.length > 1 ? (
-          <View style={styles.card}>
-            <Text weight="semibold">Bodyweight</Text>
-            <WeightChart values={me.weights} target={me.targetKg} />
-          </View>
-        ) : null}
-
-        <Eyebrow>Weigh in</Eyebrow>
-        <View style={styles.card}>
-          <View style={styles.row}>
-            <Text style={styles.flex}>This morning</Text>
-            <NumberStepper
-              value={kg}
-              onChange={(v) => {
-                setKg(v);
-                setSaved(false);
-              }}
-              step={0.1}
-              decimals={1}
-              min={30}
-              max={250}
-              unit="kg"
-              accessibilityLabel="Bodyweight"
-            />
-          </View>
-          <Button
-            label={saved ? "Saved" : "Save weight"}
-            variant={saved ? "secondary" : "primary"}
-            disabled={saved}
-            fullWidth
-            onPress={() => {
-              logWeight(me.id, kg);
-              setSaved(true);
-            }}
-          />
-        </View>
-
-        <Eyebrow>Check-ins</Eyebrow>
-        <Text tone="muted">
-          Your first weekly check-in is due {me.checkInDay}. {coachName}&apos;s
-          replies show here.
-        </Text>
-      </AthletePage>
+        )
+      ) : tab === "progress" ? (
+        <AthleteDock
+          label="Log weight"
+          icon={Scale}
+          onPress={() => router.push("/athlete/physique/bodyweight")}
+        />
+      ) : (
+        <AthleteDock
+          label={`Message ${first}`}
+          icon={MessageCircle}
+          onPress={() => router.push("/athlete/chat")}
+        />
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
-  flex: { flex: 1 },
+  flex: { flex: 1, gap: space[1] / 2 },
+  center: { textAlign: "center" },
   tiles: { flexDirection: "row", gap: space[2] },
-  row: { flexDirection: "row", alignItems: "center", gap: space[3] },
   card: {
-    gap: space[3],
-    padding: space[4],
+    gap: space[2],
+    padding: space[3],
     borderRadius: radius.lg,
     backgroundColor: colors.surface,
   },
+  empty: { alignItems: "center", gap: space[2], paddingVertical: space[6] },
 });

@@ -158,6 +158,8 @@ export type Client = {
   athleteSettings?: AthleteSettings;
   /** Transformation photo requests and approvals (F9). */
   transformations?: Transformation[];
+  /** How the coach ended coaching, so the athlete's app can follow (K-29, K-30). */
+  endedBy?: "completed" | "closed";
   /** Set once coaching has ended: the plan stays, read-only (D21). */
   formerCoach?: CoachingEnd;
 };

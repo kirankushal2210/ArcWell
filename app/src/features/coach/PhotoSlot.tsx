@@ -4,7 +4,10 @@
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { Camera, User } from "lucide-react-native";
+import { useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
+
+import { ImageViewer } from "@/components/ImageViewer";
 
 import { PressableScale, Text } from "@/components/primitives";
 import { colors, radius, space } from "@/theme";
@@ -47,7 +50,7 @@ export function choosePhoto(onPicked: (uri: string) => void) {
   ]);
 }
 
-/** A 3:4 frame: the photo, or an outline with a label. Tap to add when `onPress` is given. */
+/** A 3:4 frame: the photo, or an outline with a label. Tap to add when `onPress` is given; otherwise a photo opens full screen (X-05). */
 export function PhotoSlot({
   uri,
   label,
@@ -57,6 +60,7 @@ export function PhotoSlot({
   label: string;
   onPress?: () => void;
 }) {
+  const [viewing, setViewing] = useState(false);
   const body = uri ? (
     <Image
       source={{ uri }}
@@ -75,7 +79,16 @@ export function PhotoSlot({
   );
   return (
     <View style={styles.slot}>
-      {onPress ? (
+      {!onPress && uri ? (
+        <PressableScale
+          onPress={() => setViewing(true)}
+          accessibilityRole="imagebutton"
+          accessibilityLabel={`Open ${label} photo`}
+          style={styles.frame}
+        >
+          {body}
+        </PressableScale>
+      ) : onPress ? (
         <PressableScale
           onPress={onPress}
           accessibilityRole="button"
@@ -92,6 +105,13 @@ export function PhotoSlot({
       <Text variant="caption" weight="semibold" style={styles.center}>
         {label}
       </Text>
+      {uri && !onPress ? (
+        <ImageViewer
+          uri={viewing ? uri : null}
+          label={label}
+          onClose={() => setViewing(false)}
+        />
+      ) : null}
     </View>
   );
 }

@@ -31,10 +31,11 @@ import {
   space,
   textSizes,
 } from "@/theme";
+import { useBillingGate } from "@/features/coach/limits";
 
 const DIETS = ["Vegetarian", "Eggetarian", "Non-vegetarian", "Jain"] as const;
 
-export default function MealTemplate() {
+function MealTemplateEditor() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { templates, saveTemplate, deleteTemplate, duplicateTemplate } =
     useCoachData();
@@ -192,3 +193,9 @@ const styles = StyleSheet.create({
     paddingTop: space[2],
   },
 });
+
+/** Locked while the coach's billing is lapsed (K-27). */
+export default function MealTemplate() {
+  const gate = useBillingGate();
+  return gate ?? <MealTemplateEditor />;
+}

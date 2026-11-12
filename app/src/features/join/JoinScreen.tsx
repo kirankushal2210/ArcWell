@@ -1,6 +1,6 @@
 // Joining on a coach's personal invite (D56): the client sees what their coach planned, checks the
 // details the coach entered, gives their own consent (DPDP) and starts. No onboarding questions.
-import { router } from "expo-router";
+import { Redirect, router } from "expo-router";
 import { Check, KeyRound } from "lucide-react-native";
 import { useState } from "react";
 import {
@@ -35,7 +35,7 @@ import {
   textSizes,
 } from "@/theme";
 
-export function JoinScreen({ code: initial }: { code?: string }) {
+function JoinForm({ code: initial }: { code?: string }) {
   const { findInvite, claimInvite, coachName } = useCoachData();
   const auth = useAuth();
   const insets = useSafeAreaInsets();
@@ -258,3 +258,18 @@ const styles = StyleSheet.create({
     gap: space[2],
   },
 });
+
+/** A coached athlete opening an invite sees how switching coach works first (F3-03). */
+export function JoinScreen({ code }: { code?: string }) {
+  const { meTier } = useCoachData();
+  if (meTier === "coached")
+    return (
+      <Redirect
+        href={{
+          pathname: "/athlete/switch/[step]",
+          params: { step: "already" },
+        }}
+      />
+    );
+  return <JoinForm code={code} />;
+}

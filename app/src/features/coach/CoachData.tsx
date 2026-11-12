@@ -263,8 +263,17 @@ type CoachData = {
     id: string,
     patch: Partial<Transformation>,
   ) => void;
-  /** The athlete leaves their coach (L-02): they move to Free with their history, the plan read-only. */
-  leaveCoach: (withdrawPhotos: boolean) => void;
+  /**
+   * Coaching ends for the athlete on this phone: they leave (L-02), the coach completes them (K-30)
+   * or the coach closes their account (K-28). They move to Free with their history, the plan
+   * read-only (D21, D42).
+   */
+  leaveCoach: (
+    withdrawPhotos: boolean,
+    reason?: "left" | "completed" | "closed",
+  ) => void;
+  /** The coach deletes their account (K-28): every client is unlinked; templates, leads and transformations go. */
+  closeCoachAccount: () => void;
   /** A self-guided Pro athlete joins a coach after ending AI in Play (J-01 to J-03). */
   joinCoachFromPro: () => void;
 };
@@ -1114,6 +1123,7 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
     markRead: (clientId) => update(clientId, () => ({ unread: 0 })),
     setStatus: (clientId, status) =>
       update(clientId, (c) => ({
+        endedBy: status === "completed" ? "completed" : undefined,
         status,
         line:
           status === "paused"
@@ -1208,7 +1218,7 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
           t.id === id ? { ...t, ...patch } : t,
         ),
       })),
-    leaveCoach: (withdrawPhotos) => {
+    leaveCoach: (withdrawPhotos, reason = "left") => {
       const c = clients.find((x) => x.id === meId);
       if (!c) return;
       // The athlete's own copy under a new id: the coach's access ends (D21) and nothing is
@@ -1231,7 +1241,7 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
         status: "completed",
         coachUnread: 0,
         transformations,
-        formerCoach: { coachName, reason: "left", at },
+        formerCoach: { coachName, reason, at },
       });
       setHistory((h) => ({ ...h, [id]: h[c.id] ?? [] }));
       setFoodLogs((f) => ({ ...f, [id]: f[c.id] ?? [] }));
@@ -1242,7 +1252,7 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
             ? {
                 ...x,
                 status: "completed",
-                line: `Left on ${today()}`,
+                line: reason === "left" ? `Left on ${today()}` : x.line,
                 transformations,
               }
             : x,
@@ -1250,6 +1260,23 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       );
       setMeId(id);
       setMeTier("free");
+    },
+    closeCoachAccount: () => {
+      setClients((all) =>
+        all.map((c) =>
+          c.pending
+            ? c
+            : {
+                ...c,
+                status: "completed",
+                endedBy: "closed",
+                line: "Coach account closed",
+                transformations: [],
+              },
+        ),
+      );
+      setTemplates([]);
+      setLeads([]);
     },
     joinCoachFromPro: () => {
       if (!self) return;

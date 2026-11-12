@@ -1,7 +1,9 @@
 // Athlete tabs. Self-guided (D57): Today · Training · Nutrition · Recovery. Coached (sitemap): the
 // same four plus Progress. The glass + button sits at the bottom right beside the tab bar (D67); the
 // AI coach is reached from it and from Today, and coached athletes never see AI (D44).
+import { router } from "expo-router";
 import { Tabs } from "expo-router/tabs";
+import { useEffect } from "react";
 import {
   Dumbbell,
   House,
@@ -13,14 +15,27 @@ import {
 import { View } from "react-native";
 
 import { PLUS_RESERVE, QuickLog } from "@/features/athlete/QuickLog";
+import { useMe } from "@/features/athlete/useMe";
 import { WorkoutBar } from "@/features/athlete/WorkoutBar";
 import { useCoachData } from "@/features/coach/CoachData";
 import { CoachTabBar } from "@/features/coach/parts";
 import { colors } from "@/theme";
 
 export default function AthleteTabs() {
-  const { meTier } = useCoachData();
+  const { meTier, leaveCoach } = useCoachData();
+  const me = useMe();
   const coached = meTier === "coached";
+  const ended = coached ? me?.endedBy : undefined;
+  // The coach completed this client (K-30) or closed their account (K-28): coaching ends here too,
+  // and the athlete sees what changed once (L-03, K-29). Photos go with a closed coach account.
+  useEffect(() => {
+    if (!ended) return;
+    leaveCoach(ended === "closed", ended);
+    router.push({
+      pathname: "/athlete/switch/[step]",
+      params: { step: "left" },
+    });
+  }, [ended, leaveCoach]);
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
       <Tabs

@@ -25,6 +25,7 @@ import {
 } from "@/features/coach/parts";
 import { sampleCoach } from "@/features/coach/sampleData";
 import { colors, radius, space } from "@/theme";
+import { BillingBanner } from "@/features/coach/limits";
 
 type Filter =
   "attention" | "active" | "paused" | "leaving" | "completed" | "all";
@@ -99,6 +100,7 @@ export default function ClientsTab() {
         ]}
       />
       <Page clearDock>
+        <BillingBanner />
         {!setupHidden && done < setup.length ? (
           <View style={styles.setup}>
             <View style={styles.between}>

@@ -24,12 +24,7 @@ import {
   slotLabel,
 } from "@/features/athlete/foods";
 import { useCoachData } from "@/features/coach/CoachData";
-import {
-  accountOf,
-  dayInline,
-  inr,
-  renewsOn,
-} from "@/features/coach/crm";
+import { accountOf, dayInline, inr, renewsOn } from "@/features/coach/crm";
 import { PaidTag } from "@/features/coach/CrmParts";
 import {
   Bars,
