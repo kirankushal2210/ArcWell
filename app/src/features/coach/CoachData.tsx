@@ -188,6 +188,10 @@ type CoachData = {
   addFoodLogs: (clientId: string, logs: FoodLog[]) => void;
   updateFoodLog: (clientId: string, log: FoodLog) => void;
   deleteFoodLog: (clientId: string, logId: string) => void;
+  /** The food just removed, for "Removed · Undo" (X-04). */
+  removedFood: { clientId: string; log: FoodLog } | null;
+  undoRemoveFood: () => void;
+  clearRemovedFood: () => void;
   /** Foods the athlete made (F5-08): private to them and visible to their coach in logs. */
   myFoods: Food[];
   addMyFood: (f: Food) => void;
@@ -388,6 +392,10 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
   const [hydrated, setHydrated] = useState(false);
   const [customExercises, setCustom] = useState<Exercise[]>([]);
   const [foodLogs, setFoodLogs] = useState<Record<string, FoodLog[]>>({});
+  const [removedFood, setRemovedFood] = useState<{
+    clientId: string;
+    log: FoodLog;
+  } | null>(null);
   const [myFoods, setMyFoods] = useState<Food[]>([]);
   const [hideUpgrade, setHideUpgrade] = useState(false);
   const [recovery, setRecovery] = useState<Record<string, RecoveryStore>>({});
@@ -647,11 +655,25 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
         ...all,
         [id]: (all[id] ?? []).map((l) => (l.id === log.id ? log : l)),
       })),
-    deleteFoodLog: (id, logId) =>
+    removedFood,
+    undoRemoveFood: () => {
+      if (!removedFood) return;
+      const { clientId, log } = removedFood;
+      setFoodLogs((all) => ({
+        ...all,
+        [clientId]: [...(all[clientId] ?? []), log],
+      }));
+      setRemovedFood(null);
+    },
+    clearRemovedFood: () => setRemovedFood(null),
+    deleteFoodLog: (id, logId) => {
+      const log = (foodLogs[id] ?? []).find((l) => l.id === logId);
+      if (log) setRemovedFood({ clientId: id, log });
       setFoodLogs((all) => ({
         ...all,
         [id]: (all[id] ?? []).filter((l) => l.id !== logId),
-      })),
+      }));
+    },
     myFoods,
     addMyFood: (f) =>
       setMyFoods((all) => [...all.filter((x) => x.id !== f.id), f]),

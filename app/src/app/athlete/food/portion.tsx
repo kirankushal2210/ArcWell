@@ -5,7 +5,7 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { ChevronDown, Trash2 } from "lucide-react-native";
 import { useState } from "react";
-import { Alert, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Button, PressableScale, Text } from "@/components/primitives";
@@ -101,18 +101,11 @@ export default function Portion() {
                 {
                   icon: Trash2,
                   label: "Delete from log",
-                  onPress: () =>
-                    Alert.alert(`Remove ${food.name}?`, undefined, [
-                      { text: "Cancel", style: "cancel" },
-                      {
-                        text: "Remove",
-                        style: "destructive",
-                        onPress: () => {
-                          n.remove(log.id);
-                          back();
-                        },
-                      },
-                    ]),
+                  onPress: () => {
+                    // Removed at once with Undo on the day (X-04), not a confirm dialog.
+                    n.remove(log.id);
+                    back();
+                  },
                 },
               ]
             : []

@@ -34,6 +34,7 @@ import { Bars, PageHeader, Pills } from "@/features/coach/parts";
 import { colors, radius, space } from "@/theme";
 import { WhyThis } from "@/features/science/WhyThis";
 import { WaterCard } from "@/features/athlete/Water";
+import { UndoDock } from "@/features/athlete/UndoDock";
 
 function Bar({ value, target }: { value: number; target: number }) {
   const pct = target > 0 ? Math.min(1, value / target) : 0;
@@ -363,6 +364,7 @@ const TABS: { key: NutritionTab; label: string }[] = [
 /** Nutrition (D61): Day · Meal plan · Trends as section tabs, sharing one date. */
 export default function Nutrition() {
   const n = useNutrition();
+  const { removedFood } = useCoachData();
   const [today] = useState(todayKey);
   const [date, setDate] = useState(today);
   const [tab, setTab] = useState<NutritionTab>("day");
@@ -429,7 +431,9 @@ export default function Nutrition() {
           <TrendsPage key="t" date={date} />,
         ]}
       />
-      {tab === "trends" ? null : (
+      {removedFood?.clientId === n.me?.id ? (
+        <UndoDock />
+      ) : tab === "trends" ? null : (
         <AthleteDock
           label={`Log ${slotLabel(slot).toLowerCase()}`}
           icon={Plus}
