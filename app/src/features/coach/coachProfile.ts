@@ -42,6 +42,8 @@ export type CoachSettings = {
   clientLimit?: number;
   /** First-run tips already dismissed. */
   tipsSeen?: string[];
+  /** One data export at a time (K-21, X-09). */
+  export?: { status: "preparing" | "failed"; requestedAt: string };
 };
 
 export const defaultCoachProfile = (): CoachProfile => ({

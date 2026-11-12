@@ -3,7 +3,7 @@
 // read-only (SPEC: relationships, D42).
 import { router } from "expo-router";
 import { Download, Trash2 } from "lucide-react-native";
-import { Alert, StyleSheet, Switch, View } from "react-native";
+import { StyleSheet, Switch, View } from "react-native";
 
 import { Button, Text } from "@/components/primitives";
 import { useCoachData } from "@/features/coach/CoachData";
@@ -18,7 +18,10 @@ import {
 import { colors, space } from "@/theme";
 
 /** The on/off settings (billing and the client limit are set elsewhere). */
-type ToggleKey = Exclude<keyof CoachSettings, "billing" | "clientLimit">;
+type ToggleKey = Exclude<
+  keyof CoachSettings,
+  "billing" | "clientLimit" | "tipsSeen" | "export"
+>;
 
 const NOTIFY: { key: ToggleKey; label: string; sub: string }[] = [
   {
@@ -93,12 +96,7 @@ export default function SettingsScreen() {
           icon={Download}
           variant="secondary"
           fullWidth
-          onPress={() =>
-            Alert.alert(
-              "Export my data",
-              "You'll get a file with your profile, templates, leads and client accounts by email. This switches on with accounts.",
-            )
-          }
+          onPress={() => router.push("/coach/menu/export")}
         />
         <Button
           label="Delete coach account"
