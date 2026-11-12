@@ -15,6 +15,7 @@ import { Alert, StyleSheet, View } from "react-native";
 
 import { Avatar, Button, PressableScale, Text } from "@/components/primitives";
 import { slotNow, todayKey, useNutrition } from "@/features/athlete/FoodParts";
+import { athleteMenuAction } from "@/features/athlete/MenuParts";
 import { useTodayWorkout } from "@/features/athlete/QuickLog";
 import { todayDate } from "@/features/athlete/recovery";
 import { Ring, useRecovery } from "@/features/athlete/RecoveryParts";
@@ -41,13 +42,17 @@ const dateLabel = () =>
 export default function Today() {
   const me = useMe();
   const n = useNutrition();
-  const { coachName, meTier, resetSample } = useCoachData();
+  const { coachName, meTier, resetSample, settingsOf } = useCoachData();
   const auth = useAuth();
   const r = useRecovery();
   const tw = useTodayWorkout();
   if (!me) return <NotJoined />;
 
   const first = me.name.split(" ")[0];
+  const coachFirst = coachName.replace(/^Coach\s+/, "");
+  const waitingPhotos = (me.transformations ?? []).find(
+    (t) => t.status === "waiting",
+  );
   const today = tw.day;
   const doneToday = tw.done;
   const lastCoach =
@@ -129,8 +134,8 @@ export default function Today() {
       <PageHeader
         title={meTier === "coached" ? `Hi ${first}` : "Today"}
         sub={dateLabel()}
-        actions={
-          meTier === "coached"
+        actions={[
+          ...(meTier === "coached" || !settingsOf(me.id).ai
             ? []
             : [
                 {
@@ -141,10 +146,52 @@ export default function Today() {
                       : "AI coach",
                   onPress: () => router.push("/athlete/ai"),
                 },
-              ]
-        }
+              ]),
+          athleteMenuAction,
+        ]}
       />
       <AthletePage dock>
+        {meTier === "coached" &&
+        (me.status === "paused" || me.status === "leaving") ? (
+          <View style={styles.banner}>
+            <Text weight="semibold">
+              {me.status === "paused"
+                ? `Coaching paused${me.statusUntil ? ` until ${me.statusUntil}` : ""}`
+                : `Coaching with ${coachFirst} ends${me.statusUntil ? ` on ${me.statusUntil}` : " soon"}`}
+            </Text>
+            <Text variant="label" weight="regular" tone="muted">
+              {me.statusNote ? `${me.statusNote} ` : ""}
+              {me.status === "paused"
+                ? "Check-ins and reminders are paused. Your plan and chat still work."
+                : "Everything works as normal until then. Afterwards you move to the free plan and keep the plan, read-only."}
+            </Text>
+          </View>
+        ) : null}
+        {waitingPhotos ? (
+          <Group>
+            <GroupRow first>
+              <View style={styles.flex}>
+                <Text weight="medium">
+                  {`${coachFirst} would like to share your progress`}
+                </Text>
+                <Text variant="label" weight="regular" tone="muted">
+                  You decide. Nothing is shared unless you approve.
+                </Text>
+              </View>
+              <Button
+                label="Review"
+                size="sm"
+                variant="secondary"
+                onPress={() =>
+                  router.push({
+                    pathname: "/athlete/photos/review/[id]",
+                    params: { id: waitingPhotos.id },
+                  })
+                }
+              />
+            </GroupRow>
+          </Group>
+        ) : null}
         {meTier === "coached" ? (
           <Group>
             <GroupRow
@@ -176,28 +223,30 @@ export default function Today() {
                 <MessageCircle size={20} color={colors.textMuted} />
               )}
             </GroupRow>
-            <GroupRow>
-              <View style={styles.iconBox}>
-                <Camera size={18} color={colors.text} />
-              </View>
-              <View style={styles.flex}>
-                <Text weight="medium">{checkIn.title}</Text>
-                <Text
-                  variant="label"
-                  weight="regular"
-                  tone="muted"
-                  numberOfLines={2}
-                >
-                  {checkIn.sub}
-                </Text>
-              </View>
-              <Button
-                label={checkIn.sent ? "Open" : "Check in"}
-                size="sm"
-                variant="secondary"
-                onPress={() => router.push("/athlete/weekly-check-in")}
-              />
-            </GroupRow>
+            {me.status === "paused" ? null : (
+              <GroupRow>
+                <View style={styles.iconBox}>
+                  <Camera size={18} color={colors.text} />
+                </View>
+                <View style={styles.flex}>
+                  <Text weight="medium">{checkIn.title}</Text>
+                  <Text
+                    variant="label"
+                    weight="regular"
+                    tone="muted"
+                    numberOfLines={2}
+                  >
+                    {checkIn.sub}
+                  </Text>
+                </View>
+                <Button
+                  label={checkIn.sent ? "Open" : "Check in"}
+                  size="sm"
+                  variant="secondary"
+                  onPress={() => router.push("/athlete/weekly-check-in")}
+                />
+              </GroupRow>
+            )}
             {me.enhanced?.requestedAt &&
             !me.enhanced.consentAt &&
             !me.enhanced.declinedAt ? (
@@ -483,6 +532,14 @@ const styles = StyleSheet.create({
     backgroundColor: colors.brand,
     alignItems: "center",
     justifyContent: "center",
+  },
+  banner: {
+    gap: space[1],
+    padding: space[3],
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.borderStrong,
+    backgroundColor: colors.surface,
   },
   iconBox: {
     width: 40,

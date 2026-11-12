@@ -82,10 +82,7 @@ export function Page({
   return (
     <ScrollView
       style={styles.flex}
-      contentContainerStyle={[
-        styles.page,
-        clearDock && styles.pageDock,
-      ]}
+      contentContainerStyle={[styles.page, clearDock && styles.pageDock]}
       showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"
     >

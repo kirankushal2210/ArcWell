@@ -2,6 +2,14 @@
 // It sits at the root of the app, standing in for the server: what the coach plans here is what the
 // coached athlete sees after joining (D56), and what the athlete logs shows up on the coach's side.
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import {
+  type AthleteSettings,
+  defaultSettings,
+  isoToday,
+  type MeasureKey,
+  type Transformation,
+} from "@/features/athlete/athleteData";
 import {
   createContext,
   type ReactNode,
@@ -26,7 +34,7 @@ import {
 } from "@/features/athlete/library";
 import type { ActiveWorkout, Session } from "@/features/athlete/training";
 
-import { buildCheckIn, type CheckInForm } from "./checkins";
+import { buildCheckIn, type CheckInForm, type PhotoPose } from "./checkins";
 import { withInstagram } from "./instagram";
 import { type Enhanced, emptyEnhanced, sampleEnhanced } from "./enhanced";
 import {
@@ -223,6 +231,42 @@ type CoachData = {
   removeClient: (clientId: string) => void;
   remind: (clientId: string) => void;
   reminded: string[];
+
+  // ---------- Athlete side menu (D9) ----------
+  /** Change a weigh-in's value (PH-01). */
+  editWeighIn: (clientId: string, id: string, kg: number) => void;
+  /** Today's measurements (PH-02); also moves the "now" values the coach sees. */
+  addMeasurements: (
+    clientId: string,
+    values: Partial<Record<MeasureKey, number>>,
+  ) => void;
+  addProgressPhoto: (clientId: string, pose: PhotoPose, uri: string) => void;
+  /** Settings and consents (AC-02, AC-08, N-06, X-09). */
+  settingsOf: (clientId: string) => AthleteSettings;
+  setAthleteSettings: (
+    clientId: string,
+    patch: Partial<AthleteSettings>,
+  ) => void;
+  /** "Share my history from before I joined" (AC-10, D37). */
+  setHistoryAccess: (clientId: string, on: boolean) => void;
+  /** Paused until / leaving on, and a short note the client sees on Today (CS-01, CS-02). */
+  setStatusDetails: (clientId: string, until: string, note: string) => void;
+  /** Edit profile (AC-07): name, goal, diet and injuries; shared with the coach. */
+  updateProfile: (
+    clientId: string,
+    patch: Partial<Pick<Client, "name" | "goal" | "basics" | "profile">>,
+  ) => void;
+  /** Transformation photos (F9): the coach requests, the athlete decides. */
+  requestTransformation: (clientId: string, t: Transformation) => void;
+  updateTransformation: (
+    clientId: string,
+    id: string,
+    patch: Partial<Transformation>,
+  ) => void;
+  /** The athlete leaves their coach (L-02): they move to Free with their history, the plan read-only. */
+  leaveCoach: (withdrawPhotos: boolean) => void;
+  /** A self-guided Pro athlete joins a coach after ending AI in Play (J-01 to J-03). */
+  joinCoachFromPro: () => void;
 };
 
 const Ctx = createContext<CoachData | null>(null);
@@ -994,6 +1038,10 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
     logWeight: (id, kg) =>
       update(id, (c) => ({
         weights: [...c.weights, kg],
+        weighIns: [
+          ...(c.weighIns ?? []).filter((w) => w.date !== isoToday()),
+          { id: `w${Date.now().toString(36)}`, date: isoToday(), kg },
+        ],
         measurements: c.measurements.map((m) =>
           m.label === "Weight" ? { ...m, now: kg } : m,
         ),
@@ -1082,6 +1130,152 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
     removeClient: (clientId) =>
       setClients((all) => all.filter((c) => c.id !== clientId)),
     remind: (clientId) => setReminded((r) => [...r, clientId]),
+
+    editWeighIn: (clientId, id, kg) =>
+      update(clientId, (c) => ({
+        weighIns: (c.weighIns ?? []).map((w) =>
+          w.id === id ? { ...w, kg } : w,
+        ),
+      })),
+    addMeasurements: (clientId, values) =>
+      update(clientId, (c) => {
+        const keys = Object.keys(values) as MeasureKey[];
+        const measurements = c.measurements.map((m) =>
+          values[m.label as MeasureKey] !== undefined
+            ? { ...m, now: values[m.label as MeasureKey] as number }
+            : m,
+        );
+        for (const k of keys)
+          if (!measurements.some((m) => m.label === k))
+            measurements.push({
+              label: k,
+              start: values[k] as number,
+              now: values[k] as number,
+              unit: "cm",
+            });
+        return {
+          measurements,
+          measureLog: [
+            ...(c.measureLog ?? []).filter((e) => e.date !== isoToday()),
+            { date: isoToday(), values },
+          ],
+        };
+      }),
+    addProgressPhoto: (clientId, pose, uri) =>
+      update(clientId, (c) => ({
+        progressPhotos: [
+          ...(c.progressPhotos ?? []),
+          { id: `p${Date.now().toString(36)}`, date: isoToday(), pose, uri },
+        ],
+      })),
+    settingsOf: (clientId) => {
+      const c =
+        self && self.id === clientId
+          ? self
+          : clients.find((x) => x.id === clientId);
+      return { ...defaultSettings(), ...c?.athleteSettings };
+    },
+    setAthleteSettings: (clientId, patch) =>
+      update(clientId, (c) => ({
+        athleteSettings: {
+          ...defaultSettings(),
+          ...c.athleteSettings,
+          ...patch,
+        },
+      })),
+    setHistoryAccess: (clientId, on) =>
+      update(clientId, (c) => ({
+        historyFrom: on ? "2000-01-01" : undefined,
+        athleteSettings: {
+          ...defaultSettings(),
+          ...c.athleteSettings,
+          historyChangedAt: isoToday(),
+        },
+      })),
+    updateProfile: (clientId, patch) => update(clientId, () => patch),
+    setStatusDetails: (clientId, until, note) =>
+      update(clientId, () => ({
+        statusUntil: until.trim() || undefined,
+        statusNote: note.trim() || undefined,
+      })),
+    requestTransformation: (clientId, t) =>
+      update(clientId, (c) => ({
+        transformations: [t, ...(c.transformations ?? [])],
+      })),
+    updateTransformation: (clientId, id, patch) =>
+      update(clientId, (c) => ({
+        transformations: (c.transformations ?? []).map((t) =>
+          t.id === id ? { ...t, ...patch } : t,
+        ),
+      })),
+    leaveCoach: (withdrawPhotos) => {
+      const c = clients.find((x) => x.id === meId);
+      if (!c) return;
+      // The athlete's own copy under a new id: the coach's access ends (D21) and nothing is
+      // deleted (D7c). Workouts, food and recovery move with them.
+      const id = `${c.id}-own`;
+      const at = isoToday();
+      const transformations = (c.transformations ?? []).map((t) =>
+        withdrawPhotos && t.status === "approved"
+          ? {
+              ...t,
+              status: "withdrawn" as const,
+              withdrawnAt: at,
+              onProfile: false,
+            }
+          : t,
+      );
+      setSelf({
+        ...c,
+        id,
+        status: "completed",
+        coachUnread: 0,
+        transformations,
+        formerCoach: { coachName, reason: "left", at },
+      });
+      setHistory((h) => ({ ...h, [id]: h[c.id] ?? [] }));
+      setFoodLogs((f) => ({ ...f, [id]: f[c.id] ?? [] }));
+      setRecovery((r) => (r[c.id] ? { ...r, [id]: r[c.id] } : r));
+      setClients((all) =>
+        all.map((x) =>
+          x.id === c.id
+            ? {
+                ...x,
+                status: "completed",
+                line: `Left on ${today()}`,
+                transformations,
+              }
+            : x,
+        ),
+      );
+      setMeId(id);
+      setMeTier("free");
+    },
+    joinCoachFromPro: () => {
+      if (!self) return;
+      const c: Client = {
+        ...self,
+        id: `c${Date.now().toString(36)}`,
+        isNew: true,
+        status: "active",
+        joined: "today",
+        weeksWithYou: 0,
+        line: "Joined today · needs a plan",
+        attention: "New client: build their plan",
+        program: undefined,
+        nutritionPlan: undefined,
+        formerCoach: undefined,
+        checkIns: [],
+        messages: [],
+        unread: 0,
+      };
+      setHistory((h) => ({ ...h, [c.id]: h[self.id] ?? [] }));
+      setFoodLogs((f) => ({ ...f, [c.id]: f[self.id] ?? [] }));
+      setSelf(null);
+      setClients((all) => [c, ...all]);
+      setMeId(c.id);
+      setMeTier("coached");
+    },
   };
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

@@ -4,6 +4,7 @@
 // removed instead.
 import { router, useLocalSearchParams } from "expo-router";
 import { Check } from "lucide-react-native";
+import { useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
 
 import {
@@ -11,6 +12,7 @@ import {
   type ClientStatus,
   PressableScale,
   Text,
+  TextField,
 } from "@/components/primitives";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Page, PageHeader } from "@/features/coach/parts";
@@ -41,8 +43,10 @@ const OPTIONS: { value: ClientStatus; label: string; what: string }[] = [
 
 export default function ClientStatusScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { client, setStatus, removeClient } = useCoachData();
+  const { client, setStatus, setStatusDetails, removeClient } = useCoachData();
   const c = client(id);
+  const [until, setUntil] = useState(c?.statusUntil ?? "");
+  const [note, setNote] = useState(c?.statusNote ?? "");
   const back = () =>
     router.canGoBack() ? router.back() : router.replace("/coach");
   if (!c) return <PageHeader title="Client not found" onBack={back} />;
@@ -141,6 +145,42 @@ export default function ClientStatusScreen() {
             );
           })
         )}
+        {!c.pending && (c.status === "paused" || c.status === "leaving") ? (
+          <>
+            <TextField
+              label={
+                c.status === "paused"
+                  ? "Paused until (optional)"
+                  : "Coaching ends on"
+              }
+              placeholder="For example: 30 Nov"
+              value={until}
+              onChangeText={setUntil}
+            />
+            <TextField
+              label={`Note to ${first} (optional)`}
+              placeholder={
+                c.status === "paused"
+                  ? "For example: Check-ins paused while you travel."
+                  : "For example: Let's finish this cycle strong."
+              }
+              value={note}
+              onChangeText={setNote}
+            />
+            <Button
+              label="Save"
+              variant="secondary"
+              fullWidth
+              onPress={() => {
+                setStatusDetails(c.id, until, note);
+                back();
+              }}
+            />
+            <Text variant="caption" tone="muted">
+              {first} sees this on Today.
+            </Text>
+          </>
+        ) : null}
         {c.status === "completed" ? (
           <Text variant="caption" tone="muted">
             To coach {first} again, send them a new invite with Add a client.

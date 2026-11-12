@@ -1,0 +1,206 @@
+// Coaching changes, one route per step:
+// - join (J-01): a self-guided athlete joins a coach. Coach guidance replaces the AI plan; nothing is
+//   deleted (D7, D7c). AI subscribers are sent to end their subscription first.
+// - end-ai (J-02): subscriptions are managed in Google Play; Arcwell only checks the status and never
+//   cancels (D7a, D19). Joining waits until Play reports the subscription as cancelled.
+// - joined (J-03): what changed.
+// - left (L-03, and K-29 when the coach closed their account): what changed after coaching ends.
+// The bottom bar follows D57 and D68 (four tabs; AI from Today and the + menu), which postdate the
+// wireframes' bar wording.
+import { router, useLocalSearchParams } from "expo-router";
+import { useState } from "react";
+import { StyleSheet, View } from "react-native";
+
+import { Avatar, Button, Text } from "@/components/primitives";
+import {
+  backTo,
+  Bullets,
+  ConfirmButtons,
+  InfoCard,
+  MenuPage,
+} from "@/features/athlete/MenuParts";
+import { useMe } from "@/features/athlete/useMe";
+import { useCoachData } from "@/features/coach/CoachData";
+import { KeyValues } from "@/features/coach/parts";
+import { space } from "@/theme";
+
+const home = () => {
+  if (router.canDismiss()) router.dismissAll();
+  router.replace("/athlete");
+};
+
+export default function Switch() {
+  const { step } = useLocalSearchParams<{ step: string }>();
+  const me = useMe();
+  const { meTier, coach, coachName, joinCoachFromPro } = useCoachData();
+  const [cancelled, setCancelled] = useState(false);
+  const first = coachName.replace(/^Coach\s+/, "");
+
+  if (step === "join")
+    return (
+      <MenuPage
+        title={`Join ${coachName}?`}
+        back={backTo("/athlete/menu/account")}
+        footer={
+          <ConfirmButtons
+            label="Continue"
+            onConfirm={() => {
+              if (meTier === "pro")
+                return router.push({
+                  pathname: "/athlete/switch/[step]",
+                  params: { step: "end-ai" },
+                });
+              joinCoachFromPro();
+              router.replace({
+                pathname: "/athlete/switch/[step]",
+                params: { step: "joined" },
+              });
+            }}
+            cancel={meTier === "pro" ? "Not now, keep my AI plan" : "Not now"}
+            onCancel={backTo("/athlete/menu/account")}
+          />
+        }
+      >
+        <View style={styles.hero}>
+          <Avatar name={first} size={48} />
+          <View style={styles.flex}>
+            <Text variant="title">{coach.name}</Text>
+            <Text variant="label" weight="regular" tone="muted">
+              {[coach.city, coach.specialisations.join(", ")]
+                .filter(Boolean)
+                .join(" · ")}
+            </Text>
+          </View>
+        </View>
+        <InfoCard title="What changes">
+          <Bullets
+            items={[
+              `${first}'s training, nutrition and recovery guidance replaces your ${meTier === "pro" ? "AI plan" : "plan"}`,
+              ...(meTier === "pro"
+                ? ["The AI coach disappears from Today and the + menu"]
+                : []),
+              "Your workouts, logs and history stay",
+            ]}
+          />
+        </InfoCard>
+        {meTier === "pro" ? (
+          <InfoCard title="Your Arcwell AI subscription">
+            You&apos;ll be asked to end it in the next step so you aren&apos;t
+            charged for AI you can&apos;t use.
+          </InfoCard>
+        ) : null}
+      </MenuPage>
+    );
+
+  if (step === "end-ai")
+    return (
+      <MenuPage
+        title="End your AI subscription"
+        sub="Arcwell Plus · managed in Google Play"
+        back={backTo("/athlete/menu/account")}
+        footer={
+          <ConfirmButtons
+            label={
+              cancelled
+                ? "I've cancelled, continue"
+                : "Manage subscription in Play Store"
+            }
+            onConfirm={() => {
+              if (!cancelled) return setCancelled(true);
+              joinCoachFromPro();
+              router.replace({
+                pathname: "/athlete/switch/[step]",
+                params: { step: "joined" },
+              });
+            }}
+            cancel="Not now"
+            onCancel={backTo("/athlete/menu/account")}
+          />
+        }
+      >
+        <InfoCard>
+          {`Subscriptions and refunds are handled by Google Play. Cancel there, then come back to finish joining ${first}. During the trial, cancelling means no charge at all.`}
+        </InfoCard>
+        <KeyValues
+          rows={[
+            [
+              "Subscription status",
+              cancelled ? "Cancelled" : "Active · checking…",
+            ],
+          ]}
+        />
+        <Text variant="caption" tone="muted">
+          Sample build: tapping the Play Store button marks it cancelled. The
+          real app reads the status from Google Play and waits for it.
+        </Text>
+      </MenuPage>
+    );
+
+  if (step === "joined")
+    return (
+      <MenuPage
+        title={`You're now coached by ${first}`}
+        back={home}
+        footer={<Button label="Got it" fullWidth onPress={home} />}
+      >
+        <Text tone="muted">Here&apos;s what changed:</Text>
+        <InfoCard>
+          <Bullets
+            items={[
+              `A Progress tab joins your bar: check-ins and chat with ${first}`,
+              `Training, Nutrition and Recovery follow ${first}'s guidance once your plan is ready`,
+              "Your past workouts are in ☰ → Training → History",
+            ]}
+          />
+        </InfoCard>
+      </MenuPage>
+    );
+
+  // left (L-03) and closed (K-29)
+  const end = me?.formerCoach;
+  const who = end?.coachName ?? coachName;
+  const whoFirst = who.replace(/^Coach\s+/, "");
+  const closed = end?.reason === "closed";
+  return (
+    <MenuPage
+      title={
+        closed
+          ? `${who} has closed their Arcwell account`
+          : end?.reason === "completed"
+            ? `Your coaching with ${whoFirst} is complete`
+            : `You've left ${who}`
+      }
+      back={home}
+      footer={
+        <ConfirmButtons
+          label="Go to Training"
+          onConfirm={() => {
+            home();
+            router.push("/athlete/training");
+          }}
+          cancel="See AI coaching"
+          onCancel={() => {
+            home();
+            router.push("/athlete/ai");
+          }}
+        />
+      }
+    >
+      <InfoCard>
+        <Bullets
+          items={[
+            "You keep all your workouts, logs and history",
+            `${whoFirst}'s plan is still in Training, read-only`,
+            "You're on the free plan: Recovery is locked and your recovery history is kept",
+            "Want AI coaching? You can start a one-week trial",
+          ]}
+        />
+      </InfoCard>
+    </MenuPage>
+  );
+}
+
+const styles = StyleSheet.create({
+  hero: { flexDirection: "row", alignItems: "center", gap: space[3] },
+  flex: { flex: 1, gap: space[1] / 2 },
+});

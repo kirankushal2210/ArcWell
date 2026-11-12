@@ -26,6 +26,7 @@ import {
   slotLabel,
   sumMacros,
 } from "@/features/athlete/foods";
+import { athleteMenuAction } from "@/features/athlete/MenuParts";
 import { MealPlanBody } from "@/features/athlete/MealPlanBody";
 import { AthleteDock, AthletePage, NotJoined } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
@@ -347,6 +348,7 @@ export default function Nutrition() {
       <PageHeader
         title="Nutrition"
         sub={n.coached && n.plan ? `Targets from ${n.coachName}` : undefined}
+        actions={[athleteMenuAction]}
       />
       <View style={styles.dates}>
         <IconButton

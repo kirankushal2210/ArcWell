@@ -2,12 +2,7 @@
 // Enhanced for competitive clients, as section tabs (D61). Tap a template to edit it (K-06), the
 // person icon to give it to clients, or New to build one. Each client gets their own copy (D56).
 import { router } from "expo-router";
-import {
-  ListChecks,
-  Plus,
-  UserPlus,
-  Utensils,
-} from "lucide-react-native";
+import { ListChecks, Plus, UserPlus, Utensils } from "lucide-react-native";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 

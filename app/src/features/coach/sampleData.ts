@@ -2,6 +2,14 @@
 // accounts or database yet (PLAN.md Phases 1–2). Screens read this through CoachDataProvider so the
 // real queries can replace it later without changing the screens.
 import type { ClientStatus } from "@/components/primitives";
+import type {
+  AthleteSettings,
+  CoachingEnd,
+  MeasureEntry,
+  ProgressPhoto,
+  Transformation,
+  WeighIn,
+} from "@/features/athlete/athleteData";
 
 import type { ClientAccount, LeadSource } from "./crm";
 import type { Enhanced } from "./enhanced";
@@ -135,10 +143,23 @@ export type Client = {
   competitive?: boolean;
   /** Enhanced-athlete record, only after the client's own consent (D64). */
   enhanced?: Enhanced;
-  /** Earliest date the client shared history from (YYYY-MM-DD); absent = join date (SPEC). */
+  /** Set when the client shares history from before they joined (AC-10, D37); absent = join date (SPEC). The athlete's one switch shares everything earlier. */
   historyFrom?: string;
   /** Where the client came from, when they joined from a lead. */
   source?: LeadSource;
+  /** Paused until, or leaving on (as the coach typed it, e.g. "20 Nov"), with a short note the client sees (CS-01, CS-02, D39). */
+  statusUntil?: string;
+  statusNote?: string;
+  /** Physique (D9): dated weigh-ins, measurements and progress photos. */
+  weighIns?: WeighIn[];
+  measureLog?: MeasureEntry[];
+  progressPhotos?: ProgressPhoto[];
+  /** The athlete's own account settings and consents (AC-02, AC-08, N-06). */
+  athleteSettings?: AthleteSettings;
+  /** Transformation photo requests and approvals (F9). */
+  transformations?: Transformation[];
+  /** Set once coaching has ended: the plan stays, read-only (D21). */
+  formerCoach?: CoachingEnd;
 };
 
 export type Template = {

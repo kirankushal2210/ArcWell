@@ -5,6 +5,7 @@ import {
   ChevronRight,
   CircleHelp,
   CreditCard,
+  Images,
   LogOut,
   type LucideIcon,
   Settings,
@@ -19,6 +20,7 @@ import { Group, GroupRow, Page, PageHeader } from "@/features/coach/parts";
 import { colors, radius, space } from "@/theme";
 
 type Href =
+  | "/coach/transformations"
   | "/coach/menu/profile"
   | "/coach/menu/billing"
   | "/coach/menu/settings"
@@ -29,6 +31,12 @@ const ITEMS: { icon: LucideIcon; label: string; sub: string; href: Href }[] = [
     label: "Coach profile",
     sub: "What clients see on your invite page",
     href: "/coach/menu/profile",
+  },
+  {
+    icon: Images,
+    label: "Transformations",
+    sub: "Before-and-after photos clients approved",
+    href: "/coach/transformations",
   },
   {
     icon: CreditCard,

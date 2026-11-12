@@ -4,6 +4,7 @@ import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { Button, NumberStepper, Text } from "@/components/primitives";
+import { athleteMenuAction } from "@/features/athlete/MenuParts";
 import { AthletePage, NotJoined, useMe } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
 import {
@@ -25,7 +26,7 @@ export default function Progress() {
 
   return (
     <View style={styles.root}>
-      <PageHeader title="Progress" />
+      <PageHeader title="Progress" actions={[athleteMenuAction]} />
       <AthletePage>
         <View style={styles.tiles}>
           <StatTile

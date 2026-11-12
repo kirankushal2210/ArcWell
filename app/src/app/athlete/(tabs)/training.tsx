@@ -24,6 +24,7 @@ import {
 import { recentNames } from "@/features/athlete/ExercisePicker";
 import { ExerciseList } from "@/features/athlete/ExerciseList";
 import { HistoryWeeks } from "@/features/athlete/HistoryWeeks";
+import { athleteMenuAction } from "@/features/athlete/MenuParts";
 import { MyRoutines } from "@/features/athlete/MyRoutines";
 import { useTodayWorkout } from "@/features/athlete/QuickLog";
 import {
@@ -204,7 +205,7 @@ function PlanPage() {
 
       <View style={styles.between}>
         <Eyebrow>{`Your program · ${program.days.length} workouts`}</Eyebrow>
-        {coached ? null : (
+        {coached || me.formerCoach ? null : (
           <PressableScale
             onPress={() =>
               router.push({
@@ -221,6 +222,11 @@ function PlanPage() {
           </PressableScale>
         )}
       </View>
+      {me.formerCoach ? (
+        <Text variant="caption" tone="muted">
+          {`From ${me.formerCoach.coachName}, read-only. Follow it as it is, or start your own routines below.`}
+        </Text>
+      ) : null}
       <Group>
         {program.days.map((d, i) => {
           const days = schedule
@@ -294,9 +300,10 @@ export default function Training() {
         title="Training"
         sub={
           program && pw
-            ? `${program.name} · ${pw.done ? "complete" : `week ${pw.week} of ${pw.weeks}`} · ${meTier === "coached" ? `by ${coachName}` : "from your answers"}`
+            ? `${program.name} · ${pw.done ? "complete" : `week ${pw.week} of ${pw.weeks}`} · ${meTier === "coached" ? `by ${coachName}` : me.formerCoach ? `from ${me.formerCoach.coachName}, read-only` : "from your answers"}`
             : undefined
         }
+        actions={[athleteMenuAction]}
       />
       <SectionTabs
         tabs={TABS}

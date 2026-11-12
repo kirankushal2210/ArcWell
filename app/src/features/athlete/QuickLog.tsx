@@ -63,7 +63,7 @@ type Tile = {
 
 export function QuickLog() {
   const me = useMe();
-  const { meTier, active, setActive, logWeight } = useCoachData();
+  const { meTier, active, setActive, logWeight, settingsOf } = useCoachData();
   const insets = useSafeAreaInsets();
   const today = useTodayWorkout();
   const [open, setOpen] = useState(false);
@@ -117,21 +117,23 @@ export function QuickLog() {
       fill: colors.recovery,
       onPress: () => go("/athlete/recovery/check-in"),
     });
-  tiles.push(
-    coached
-      ? {
-          label: "Weekly check-in",
-          icon: Camera,
-          fill: colors.surfaceRaised,
-          onPress: () => go("/athlete/weekly-check-in"),
-        }
-      : {
-          label: meTier === "free" ? "AI coach · try free" : "Ask AI coach",
-          icon: Sparkles,
-          fill: colors.surfaceRaised,
-          onPress: () => go("/athlete/ai"),
-        },
-  );
+  const aiOff = !coached && !settingsOf(me.id).ai;
+  if (!aiOff)
+    tiles.push(
+      coached
+        ? {
+            label: "Weekly check-in",
+            icon: Camera,
+            fill: colors.surfaceRaised,
+            onPress: () => go("/athlete/weekly-check-in"),
+          }
+        : {
+            label: meTier === "free" ? "AI coach · try free" : "Ask AI coach",
+            icon: Sparkles,
+            fill: colors.surfaceRaised,
+            onPress: () => go("/athlete/ai"),
+          },
+    );
 
   return (
     <>
