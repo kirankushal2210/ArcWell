@@ -28,7 +28,7 @@ Market: India first. Android only at launch. Compliance: India DPDP Act.
 
 - Bottom bar — free: Today · Training · Nutrition. AI-coached: Today · Training · Nutrition · Recovery · AI Coaching. Human-coached: Today · Training · Nutrition · Recovery · Progress, where Progress is the combined Check-ins · Progress · Chat area.
 - Side menu (☰) for all athletes: Account · Notifications · Training (Exercises, Workouts, Programs, History, Muscle Analytics) · Gyms · Physique (Bodyweight, Measurements, Photos, Charts). Workouts are standalone sessions (free: templates only; Pro: create your own); Programs are multi-week plans (Pro); Muscle Analytics shows weekly sets per muscle group (Pro); Gyms is a read-only map / directory (free). No Set Videos (no video in v1).
-- Recovery: sleep / sleep score (0–100), soreness, fatigue only. No stretching or mobility routines. Coaches can set a sleep target and a recovery note.
+- Recovery: Sleep · Recovery · Strain (D60). Sleep performance against sleep needed, a 0–100 recovery score (from a connected device, else a morning check-in, else onboarding answers), strain 0–21 from training load, a stress level, a health monitor with a device, a sleep planner and suggested recovery protocols. Devices through Android Health Connect. Coaches can set a sleep target and a recovery note.
 - Coached athletes see their past check-ins and coach feedback in a Progress timeline.
 
 - Training: Hevy-style workout logging; an exercise library of about 440 common exercises with primary muscle, equipment and exercise type (weight and reps, bodyweight, weighted or assisted bodyweight, duration, distance, carries), custom exercises, and the athlete's own routines beside their program (D58); demo media from a commercially licensed source.
@@ -37,7 +37,7 @@ Market: India first. Android only at launch. Compliance: India DPDP Act.
   - About you: gender (optional, for the calorie estimate), age, height, current weight.
   - Your goal: main goal (lose fat, build muscle, get stronger, body recomposition, general fitness), goal weight (optional), daily activity level.
   - Training: experience, where you train (gym / home with equipment list / none), days per week and preferred days, session length and usual time of day, injuries/limitations.
-  - Recovery (all optional): usual sleep hours with bed and wake times, sleep quality, stress, energy and soreness.
+  - Recovery (all optional): usual sleep hours with bed and wake times, sleep quality, stress, energy and soreness, and whether they wear a tracker (WHOOP, Fitbit, Oura, Garmin, Samsung, Pixel or other), connected through Health Connect after sign-up (D60).
   - Nutrition: diet type (veg, non-veg, eggetarian, vegan, Jain), meals per day.
   - Clients who join on a coach's personal invite skip these questions: the coach entered their details after a call and built their plans first. They give their own consent, confirm the details and land on Today with training, nutrition and recovery ready (D56).
   - Self-guided athletes then see their plan is ready (training preference, daily calorie target, sleep target, with one short celebration), save it by signing up (Google or email, plus consent), and reach the AI plan paywall with a 7-day trial; "Continue with the free plan" stays one tap away (D57). Coached athletes skip these; their coach sets targets and plans, and they never see AI or the paywall.
@@ -48,7 +48,7 @@ Market: India first. Android only at launch. Compliance: India DPDP Act.
 
 **Notifications:** new message, check-in due, check-in submitted (coach), plan assigned, daily workout reminder, coach feedback.
 
-**Out of v1:** iOS, marketplace/discovery, certificate checks (certifications are optional and self-reported), equipment-photo workouts, research-backed AI chat, wearables, barcode scanning, phone OTP login, coaching teams, coach web dashboard, admin app, video of any kind (attachments or set videos), full offline mode, lb units. v1.1 candidates are listed in DECISIONS.md (D45).
+**Out of v1:** iOS, marketplace/discovery, certificate checks (certifications are optional and self-reported), equipment-photo workouts, research-backed AI chat, direct wearable APIs beyond Health Connect (D60), barcode scanning, phone OTP login, coaching teams, coach web dashboard, admin app, video of any kind (attachments or set videos), full offline mode, lb units. v1.1 candidates are listed in DECISIONS.md (D45).
 
 ## Key rules
 

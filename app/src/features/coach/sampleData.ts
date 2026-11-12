@@ -88,7 +88,13 @@ export type Client = {
   protocol?: RecoveryProtocol;
   invite?: { token: string; code: string; claimed: boolean };
   /** Self-guided athletes: the onboarding answers that shape swaps (equipment, home kit, injuries). */
-  profile?: { equipment?: string; homeKit?: string[]; injuries?: string[] };
+  profile?: {
+    equipment?: string;
+    homeKit?: string[];
+    injuries?: string[];
+    /** Tracker named in onboarding (AO-15b), connected later in Recovery (D60). */
+    device?: string;
+  };
   /** When the current training program started, for "Week 3 of 8" (ISO date). */
   programStart?: string;
   /** The athlete's own routines, outside the program: extra sessions they plan themselves. */

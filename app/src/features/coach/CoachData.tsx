@@ -13,6 +13,13 @@ import {
 import type { ClientStatus } from "@/components/primitives";
 import type { Food, FoodLog } from "@/features/athlete/foods";
 import {
+  type DayActivity,
+  type DeviceBrand,
+  emptyRecovery,
+  type RecoveryStore,
+  type WellnessLog,
+} from "@/features/athlete/recovery";
+import {
   type Exercise,
   migrateNames,
   registerCustomExercises,
@@ -118,6 +125,14 @@ type CoachData = {
   /** Free athletes can dismiss the Arcwell Plus card on Nutrition (F5-02). */
   hideUpgrade: boolean;
   setHideUpgrade: (v: boolean) => void;
+  /** Recovery per athlete (D60): device link, morning check-ins, activities, protocols done. */
+  recoveryOf: (clientId: string) => RecoveryStore;
+  saveWellness: (clientId: string, log: WellnessLog) => void;
+  connectDevice: (clientId: string, brand: DeviceBrand) => void;
+  disconnectDevice: (clientId: string) => void;
+  addActivity: (clientId: string, a: DayActivity) => void;
+  removeActivity: (clientId: string, id: string) => void;
+  toggleProtocol: (clientId: string, date: string, protocolId: string) => void;
   /** Someone joining through the coach's general link (not a personal invite) is onboarding. */
   joiningCoach: boolean;
   setJoiningCoach: (v: boolean) => void;
@@ -155,6 +170,7 @@ type Saved = {
   foodLogs?: Record<string, FoodLog[]>;
   myFoods?: Food[];
   hideUpgrade?: boolean;
+  recovery?: Record<string, RecoveryStore>;
 };
 
 /** Saved self plans from before exact foods: rebuild the example day with foods (sample data only). */
@@ -211,6 +227,9 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
   const [foodLogs, setFoodLogs] = useState<Record<string, FoodLog[]>>({});
   const [myFoods, setMyFoods] = useState<Food[]>([]);
   const [hideUpgrade, setHideUpgrade] = useState(false);
+  const [recovery, setRecovery] = useState<Record<string, RecoveryStore>>({});
+  const editRecovery = (id: string, fn: (r: RecoveryStore) => RecoveryStore) =>
+    setRecovery((all) => ({ ...all, [id]: fn(all[id] ?? emptyRecovery()) }));
   // Plain helpers (set labels, workout set-up) look custom exercises up by name.
   registerCustomExercises(customExercises);
 
@@ -232,6 +251,7 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
         if (s.foodLogs) setFoodLogs(s.foodLogs);
         if (s.myFoods) setMyFoods(s.myFoods);
         if (s.hideUpgrade) setHideUpgrade(true);
+        if (s.recovery) setRecovery(s.recovery);
       })
       .catch(() => {})
       .finally(() => setHydrated(true));
@@ -249,6 +269,7 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       foodLogs,
       myFoods,
       hideUpgrade,
+      recovery,
     };
     AsyncStorage.setItem(STORE_KEY, JSON.stringify(saved)).catch(() => {});
   }, [
@@ -263,6 +284,7 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
     foodLogs,
     myFoods,
     hideUpgrade,
+    recovery,
   ]);
   const update = (id: string, patch: (c: Client) => Partial<Client>) => {
     if (self && id === self.id) {
@@ -294,6 +316,7 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       setFoodLogs({});
       setMyFoods([]);
       setHideUpgrade(false);
+      setRecovery({});
       AsyncStorage.removeItem(STORE_KEY).catch(() => {});
     },
     meTier,
@@ -326,6 +349,51 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       setMyFoods((all) => [...all.filter((x) => x.id !== f.id), f]),
     hideUpgrade,
     setHideUpgrade,
+    recoveryOf: (id) => recovery[id] ?? emptyRecovery(),
+    saveWellness: (id, log) => {
+      editRecovery(id, (r) => ({
+        ...r,
+        logs: [...r.logs.filter((l) => l.date !== log.date), log],
+      }));
+      // The coach's client profile reads nightly sleep from here too.
+      update(id, (c) => ({
+        recovery: {
+          ...c.recovery,
+          nights: [
+            ...c.recovery.nights,
+            { day: today().slice(0, 3), hours: log.sleepH },
+          ].slice(-7),
+          quality: log.quality,
+          stress: log.stress,
+          energy: log.energy,
+          soreness: log.soreness,
+        },
+      }));
+    },
+    connectDevice: (id, brand) =>
+      editRecovery(id, (r) => ({
+        ...r,
+        device: { brand, connectedAt: new Date().toISOString() },
+      })),
+    disconnectDevice: (id) =>
+      editRecovery(id, (r) => ({ ...r, device: undefined })),
+    addActivity: (id, a) =>
+      editRecovery(id, (r) => ({ ...r, activities: [...r.activities, a] })),
+    removeActivity: (id, aid) =>
+      editRecovery(id, (r) => ({
+        ...r,
+        activities: r.activities.filter((a) => a.id !== aid),
+      })),
+    toggleProtocol: (id, date, pid) =>
+      editRecovery(id, (r) => {
+        const k = `${date}:${pid}`;
+        return {
+          ...r,
+          done: r.done.includes(k)
+            ? r.done.filter((x) => x !== k)
+            : [...r.done, k],
+        };
+      }),
     customExercises,
     addCustomExercise: (e) =>
       setCustom((all) => [

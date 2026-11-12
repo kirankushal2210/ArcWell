@@ -140,13 +140,20 @@ export function selfClient(a: Answers, plan: SelfPlan): Client {
       proteinG: plan.nutrition.protein,
       days: [],
     },
+    // Recovery baseline from the onboarding answers: the score until a check-in or a device (D60).
     recovery: {
       sleepTargetH: plan.protocol.sleepH,
       nights: [],
-      quality: 3,
-      stress: 3,
-      energy: 3,
-      soreness: 3,
+      quality:
+        { great: 5, okay: 3, poor: 2, very_poor: 1 }[
+          String(a.sleepQuality ?? "okay")
+        ] ?? 3,
+      stress: Number(a.stress ?? 3),
+      energy: Number(a.energy ?? 3),
+      soreness:
+        { Rarely: 1, Sometimes: 3, Often: 4 }[
+          ((a.soreness as string[] | undefined) ?? [])[0] ?? "Sometimes"
+        ] ?? 3,
     },
     measurements: [{ label: "Weight", start: weight, now: weight, unit: "kg" }],
     photoWeeks: [],
@@ -162,6 +169,7 @@ export function selfClient(a: Answers, plan: SelfPlan): Client {
       equipment: a.equipment as string | undefined,
       homeKit: a.homeKit as string[] | undefined,
       injuries: a.injuries as string[] | undefined,
+      device: a.device as string | undefined,
     },
   };
 }
@@ -208,13 +216,20 @@ export function newClientFromAnswers(a: Answers): Client {
     targetKg: target,
     training: { weekDone: 0, weekPlanned: 0, logs: [] },
     nutrition: { targetKcal: 0, proteinG: 0, days: [] },
+    // Recovery baseline from the onboarding answers: the score until a check-in or a device (D60).
     recovery: {
       sleepTargetH: plan.protocol.sleepH,
       nights: [],
-      quality: 3,
-      stress: 3,
-      energy: 3,
-      soreness: 3,
+      quality:
+        { great: 5, okay: 3, poor: 2, very_poor: 1 }[
+          String(a.sleepQuality ?? "okay")
+        ] ?? 3,
+      stress: Number(a.stress ?? 3),
+      energy: Number(a.energy ?? 3),
+      soreness:
+        { Rarely: 1, Sometimes: 3, Often: 4 }[
+          ((a.soreness as string[] | undefined) ?? [])[0] ?? "Sometimes"
+        ] ?? 3,
     },
     measurements: [{ label: "Weight", start: weight, now: weight, unit: "kg" }],
     photoWeeks: [],
@@ -226,6 +241,7 @@ export function newClientFromAnswers(a: Answers): Client {
       equipment: a.equipment as string | undefined,
       homeKit: a.homeKit as string[] | undefined,
       injuries: a.injuries as string[] | undefined,
+      device: a.device as string | undefined,
     },
   };
 }

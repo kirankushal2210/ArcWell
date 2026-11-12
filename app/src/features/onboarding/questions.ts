@@ -46,6 +46,7 @@ import {
   UserRound,
   Utensils,
   Venus,
+  Watch,
 } from "lucide-react-native";
 
 import type { ColorRole } from "@/theme";
@@ -643,6 +644,35 @@ export const questions: Question[] = [
         label: "Muscle soreness after training",
         options: ["Rarely", "Sometimes", "Often"],
         exclusive: "*",
+      },
+    ],
+  },
+  {
+    id: "AO-15b",
+    section: "recovery",
+    glyph: Watch,
+    title: "Do you wear a sleep or fitness tracker?",
+    sub: "Arcwell can read your sleep and heart data from it for a more accurate recovery score. You'll connect it after you sign up.",
+    skippable: true,
+    fields: [
+      {
+        kind: "single",
+        key: "device",
+        options: [
+          { value: "whoop", label: "WHOOP", icon: Watch },
+          { value: "fitbit", label: "Fitbit", icon: Watch },
+          { value: "oura", label: "Oura Ring", icon: CircleDashed },
+          { value: "garmin", label: "Garmin", icon: Watch },
+          { value: "samsung", label: "Samsung Galaxy Watch", icon: Watch },
+          { value: "pixel", label: "Pixel Watch", icon: Watch },
+          { value: "other", label: "Another watch or ring", icon: Watch },
+          {
+            value: "none",
+            label: "No tracker",
+            sub: "Recovery comes from a 20-second morning check-in",
+            icon: Sun,
+          },
+        ],
       },
     ],
   },
