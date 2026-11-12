@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phase 1 Artboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Exact copy of theme-tokens.css, for viewers that cannot load linked files. The <link> below wins wherever it loads; re-copy if the tokens change. -->
+<style id="tokens-fallback">
+/* =============================================================================
+   Arcwell — theme tokens (dark theme)
+   Phase 1 of docs/design/hifi-execution-roadmap.md
+   Status: DRAFT, not approved by the founder.
+
+   Source of truth, in order: docs/DECISIONS.md (D24 visual direction, D46 Inter)
+   → docs/DESIGN.md §5 → docs/design/spec-sheet.html. Every colour value below is
+   copied from DESIGN.md §5 / the spec sheet; none is new. If a value here and
+   DESIGN.md ever differ, DESIGN.md wins: change it there first, then here.
+
+   Hard rules these tokens encode:
+   - Solid colours only. No gradients of any kind, no glows, no glassmorphism,
+     no backdrop blur (D24, design-prompt.md negative list).
+   - Depth comes from surface steps (bg → surface → raised), never drop shadows.
+   - No pure #000000 anywhere except the scrim (a void behind modal sheets).
+   - Red (danger) is for errors and destructive actions only, never a missed target.
+
+   Contrast ratios are WCAG 2.x relative-luminance ratios, computed 2026-11-11.
+   AA thresholds: 4.5:1 body text · 3:1 large text (≥ 18.66px bold / 24px) and
+   UI component boundaries.
+   ============================================================================= */
+
+:root {
+  color-scheme: dark;
+
+  /* ===========================================================================
+     1. COLOUR — raw palette
+     Named by hue/role, not by use. Components never read these directly;
+     they read the semantic tokens in section 2.
+     ========================================================================= */
+
+  /* Charcoal scale (backgrounds and lines) */
+  --charcoal-900: #111316;   /* app background */
+  --charcoal-800: #191C21;   /* cards, sheets */
+  --charcoal-700: #22262D;   /* inputs, pressed, raised */
+  --charcoal-600: #2D323A;   /* dividers */
+  --charcoal-400: #6B7482;   /* control outlines */
+
+  /* Foreground greys */
+  --grey-50:  #F2F4F7;       /* soft white, primary text */
+  --grey-300: #9AA4B2;       /* muted text */
+  --grey-500: #5F6670;       /* disabled text (WCAG-exempt) */
+
+  /* Electric blue and cyan */
+  --blue-500: #3D8BFF;       /* electric blue */
+  --blue-400: #5A9CFF;       /* electric blue, hover/pressed step */
+  --blue-950: #04101F;       /* near-black navy, text on blue and cyan */
+  --cyan-400: #22D3EE;       /* cyan */
+
+  /* Pillar hues */
+  --amber-400: #F5A524;      /* nutrition */
+  --violet-400: #8B7CFF;     /* recovery (solid only, never in a gradient) */
+
+  /* Status hues */
+  --green-500: #22C55E;      /* success: status only, never a brand or surface colour */
+  --amber-500: #F59E0B;      /* warning */
+  --red-500:   #EF4444;      /* danger */
+
+  /* Void */
+  --void: #000000;           /* only allowed use of pure black: the scrim below */
+
+  /* ===========================================================================
+     2. COLOUR — semantic roles (what components use)
+     ========================================================================= */
+
+  /* Backgrounds: three steps. Depth = stepping up, not shadows. */
+  --color-bg:              var(--charcoal-900);  /* #111316 */
+  --color-surface:         var(--charcoal-800);  /* #191C21 */
+  --color-surface-raised:  var(--charcoal-700);  /* #22262D */
+
+  /* Text
+     on bg / surface / raised:
+     text       #F2F4F7  16.89 / 15.50 / 13.78  AA ✓
+     text-muted #9AA4B2   7.38 /  6.77 /  6.02  AA ✓  */
+  --color-text:            var(--grey-50);
+  --color-text-muted:      var(--grey-300);
+  --color-text-disabled:   var(--grey-500);      /* 3.21 / 2.95 / 2.62: disabled controls only (WCAG-exempt) */
+
+  /* Primary action: electric blue
+     brand on bg / surface / raised: 5.61 / 5.15 / 4.58  AA ✓ (as text or icon)
+     on-brand #04101F on brand: 5.76 AA ✓ · on brand-hover: 6.95 AA ✓  */
+  --color-brand:           var(--blue-500);
+  --color-brand-hover:     var(--blue-400);
+  --color-on-brand:        var(--blue-950);
+
+  /* Second accent: cyan (focus, selection, chart lines, Training pillar)
+     accent on bg / surface / raised: 10.30 / 9.45 / 8.40  AA ✓
+     on-accent #04101F on cyan: 10.57 AA ✓  */
+  --color-accent:          var(--cyan-400);
+  --color-on-accent:       var(--blue-950);
+
+  /* Pillars: small markers (dots, eyebrows, chart series), not card fills.
+     training  = accent (see above)
+     nutrition on bg / surface / raised: 9.12 / 8.37 / 7.44  AA ✓
+     recovery  on bg / surface / raised: 5.69 / 5.23 / 4.65  AA ✓  */
+  --color-training:        var(--cyan-400);
+  --color-nutrition:       var(--amber-400);
+  --color-recovery:        var(--violet-400);
+
+  /* Status
+     success on bg / surface / raised: 8.17 / 7.50 / 6.66  AA ✓
+     warning on bg / surface / raised: 8.66 / 7.95 / 7.07  AA ✓
+     danger  on bg / surface / raised: 4.94 / 4.54 / 4.03
+       → danger TEXT on bg and surface only. On raised it passes 3:1, so it's
+         OK for icons, outlines and large text there, but not for body text.  */
+  --color-success:         var(--green-500);
+  --color-warning:         var(--amber-500);
+  --color-danger:          var(--red-500);
+
+  /* Lines
+     border        #2D323A  1.44 / 1.32 / 1.18: decorative dividers only
+     border-strong #6B7482  3.94 / 3.62 / 3.21: input, tick-box and secondary-button
+                                                 outlines (WCAG 1.4.11 needs 3:1) ✓  */
+  --color-border:          var(--charcoal-600);
+  --color-border-strong:   var(--charcoal-400);
+  --color-focus:           var(--cyan-400);
+
+  /* Scrim behind modal bottom sheets and dialogs: dims, never blurs. */
+  --color-scrim:           rgb(0 0 0 / 0.6);      /* DESIGN.md §5, D47 */
+
+  /* ===========================================================================
+     3. TYPOGRAPHY
+     Inter for everything, headings included (D46). Roboto is listed only as
+     the Android system fallback while Inter loads; it is not a second typeface.
+     rem-based so layouts scale with the user's text size (must survive 130%).
+     Root assumption: 1rem = 16px.
+     ========================================================================= */
+
+  --font-sans: "Inter", "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "Roboto Mono", Menlo, monospace;  /* spec/debug only, never in the app UI */
+
+  /* Tabular numerals on every number (kg, reps, kcal, timers). */
+  --font-numeric: "tnum" 1;
+
+  /* Weights */
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+
+  /* Size scale: DESIGN.md §5 sizes on the requested semantic names. */
+  --text-xs:   0.75rem;    /* 12px · caption */
+  --text-sm:   0.875rem;   /* 14px · label */
+  --text-base: 1rem;       /* 16px · body */
+  --text-lg:   1.125rem;   /* 18px · heading */
+  --text-xl:   1.375rem;   /* 22px · title */
+  --text-2xl:  2rem;       /* 32px · display */
+
+  /* Line heights, paired 1:1 with the sizes (tighter as type grows). */
+  --leading-xs:   1rem;      /* 16px */
+  --leading-sm:   1.25rem;   /* 20px */
+  --leading-base: 1.5rem;    /* 24px */
+  --leading-lg:   1.5rem;    /* 24px */
+  --leading-xl:   1.75rem;   /* 28px */
+  --leading-2xl:  2.5rem;    /* 40px */
+
+  /* Tracking: size-specific, from Inter's published dynamic metrics
+     (tracking = -0.0223 + 0.185 · e^(-0.1745 · px)), rounded. Never one value
+     for all sizes. Negative as type grows, ~0 at caption size. */
+  --tracking-xs:   0em;
+  --tracking-sm:   -0.006em;
+  --tracking-base: -0.011em;
+  --tracking-lg:   -0.014em;
+  --tracking-xl:   -0.018em;
+  --tracking-2xl:  -0.022em;
+  --tracking-caps: 0.06em;   /* uppercase eyebrows only (spec sheet) */
+
+  /* Semantic type roles (size / leading / weight / tracking as a set) */
+  --type-display-size:  var(--text-2xl);  --type-display-leading:  var(--leading-2xl);  --type-display-weight:  var(--weight-bold);     --type-display-tracking:  var(--tracking-2xl);
+  --type-title-size:    var(--text-xl);   --type-title-leading:    var(--leading-xl);   --type-title-weight:    var(--weight-semibold); --type-title-tracking:    var(--tracking-xl);
+  --type-heading-size:  var(--text-lg);   --type-heading-leading:  var(--leading-lg);   --type-heading-weight:  var(--weight-semibold); --type-heading-tracking:  var(--tracking-lg);
+  --type-body-size:     var(--text-base); --type-body-leading:     var(--leading-base); --type-body-weight:     var(--weight-regular);  --type-body-tracking:     var(--tracking-base);
+  --type-label-size:    var(--text-sm);   --type-label-leading:    var(--leading-sm);   --type-label-weight:    var(--weight-medium);   --type-label-tracking:    var(--tracking-sm);
+  --type-caption-size:  var(--text-xs);   --type-caption-leading:  var(--leading-xs);   --type-caption-weight:  var(--weight-regular);  --type-caption-tracking:  var(--tracking-xs);
+
+  /* ===========================================================================
+     4. SPACING
+     Rigid 4px grid. Only these steps exist: 4, 8, 12, 16, 24, 32, 48.
+     rem so spacing grows with text size.
+     ========================================================================= */
+
+  --space-0:  0;
+  --space-1:  0.25rem;   /*  4px */
+  --space-2:  0.5rem;    /*  8px */
+  --space-3:  0.75rem;   /* 12px */
+  --space-4:  1rem;      /* 16px */
+  --space-6:  1.5rem;    /* 24px */
+  --space-8:  2rem;      /* 32px */
+  --space-12: 3rem;      /* 48px */
+
+  /* Rhythm: grouped spacing, never one gap everywhere.
+     Tight inside a group, generous between unrelated groups. */
+  --gap-inline:        var(--space-2);   /*  8px: icon ↔ label, chip ↔ chip */
+  --gap-in-group:      var(--space-2);   /*  8px: rows within one group */
+  --pad-card:          var(--space-4);   /* 16px: card and sheet padding */
+  --gutter-screen:     var(--space-4);   /* 16px: screen side margins */
+  --gap-between-groups: var(--space-6);  /* 24px: unrelated groups */
+  --gap-section:       var(--space-8);   /* 32px: major sections */
+  --gap-section-break: var(--space-12);  /* 48px: top of a new page region */
+
+  /* Touch: Android, 48dp minimum (DESIGN.md §5). Kept in px: a fixed target,
+     not text-relative. */
+  --tap-min:           48px;
+  --control-height:    48px;   /* buttons, inputs */
+
+  /* ===========================================================================
+     5. RADII, BORDERS, ELEVATION
+     ========================================================================= */
+
+  /* Radii */
+  --radius-sm:   8px;      /* inputs, chips, set cells */
+  --radius-md:   12px;     /* cards, buttons */
+  --radius-lg:   20px;     /* bottom sheets, drawer edge */
+  --radius-full: 9999px;   /* pills, avatars, status chips */
+
+  /* Borders: solid hex, not rgba, so the line is identical on every surface step.
+     (#2D323A on #111316 is close to rgba(255,255,255,0.1) on the same background.) */
+  --border-width:        1px;
+  --border-divider:      var(--border-width) solid var(--color-border);
+  --border-control:      var(--border-width) solid var(--color-border-strong);
+  --border-focus:        var(--border-width) solid var(--color-focus);
+  --focus-ring-width:    2px;  /* 1px border + 1px ring, as in the spec sheet */
+  --focus-ring:          0 0 0 1px var(--color-focus);  /* outline ring, not a shadow */
+
+  /* Elevation: surface steps only. No drop shadows on structural elements. */
+  --elevation-0: var(--color-bg);              /* screen */
+  --elevation-1: var(--color-surface);         /* cards, bottom bar, sheets */
+  --elevation-2: var(--color-surface-raised);  /* inputs, pressed rows, selected tab pill */
+  --shadow-none: none;
+
+  /* ===========================================================================
+     6. MOTION (DESIGN.md §5)
+     With "Remove animations" / reduced motion, every duration drops to 0.
+     ========================================================================= */
+
+  --duration-micro: 120ms;   /* press feedback, tick fill, toggles */
+  --duration-std:   200ms;   /* number rolls, cards, tabs */
+  --duration-sheet: 280ms;   /* bottom sheets */
+  --duration-big:   600ms;   /* ONLY the workout summary (F4-12) */
+  --ease-standard:  cubic-bezier(0.2, 0, 0, 1);
+  --press-scale:    0.98;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-micro: 0ms;
+    --duration-std:   0ms;
+    --duration-sheet: 0ms;
+    --duration-big:   0ms;
+    --press-scale:    1;
+  }
+}
+</style>
+<link rel="stylesheet" href="theme-tokens.css">
+<style>
+  /* Artboard chrome only. Every colour, size, gap and radius comes from theme-tokens.css. */
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    /* Fallbacks equal the D47 values, so the board stays dark even if theme-tokens.css fails to load. */
+    background: var(--color-bg, #111316);
+    color: var(--color-text, #F2F4F7);
+    text-align: left;
+    font-family: var(--font-sans);
+    font-size: var(--type-body-size);
+    line-height: var(--type-body-leading);
+    -webkit-font-smoothing: antialiased;
+  }
+  .num { font-feature-settings: var(--font-numeric); }
+
+  .board { max-width: 1120px; padding: var(--space-12) var(--gutter-screen) var(--space-12); }
+  @media (min-width: 720px) { .board { padding-inline: var(--space-12); } }
+
+  /* Board header */
+  .board-head { display: grid; gap: var(--space-2); padding-bottom: var(--space-8); border-bottom: var(--border-divider); }
+  .eyebrow { font-size: var(--text-xs); line-height: var(--leading-xs); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--color-text-muted); }
+  .board-head h1 { font-size: var(--type-display-size); line-height: var(--type-display-leading); font-weight: var(--type-display-weight); letter-spacing: var(--type-display-tracking); }
+  .board-head p { color: var(--color-text-muted); max-width: 60ch; }
+
+  /* Sections: tight inside, generous between */
+  .section { display: grid; gap: var(--space-6); padding-top: var(--space-12); }
+  @media (min-width: 900px) { .section { grid-template-columns: 220px 1fr; gap: var(--space-8); } }
+  .section-label { display: grid; gap: var(--space-1); align-content: start; }
+  .section-label .idx { font-size: var(--text-xs); line-height: var(--leading-xs); color: var(--color-text-muted); }
+  .section-label h2 { font-size: var(--type-title-size); line-height: var(--type-title-leading); font-weight: var(--type-title-weight); letter-spacing: var(--type-title-tracking); }
+  .section-label p { font-size: var(--text-sm); line-height: var(--leading-sm); color: var(--color-text-muted); margin-top: var(--space-1); }
+
+  .meta { font-size: var(--text-xs); line-height: var(--leading-xs); color: var(--color-text-muted); font-feature-settings: var(--font-numeric); }
+  .meta b { color: var(--color-text); font-weight: var(--weight-medium); }
+
+  /* 1 · Swatches */
+  .swatches { display: grid; gap: var(--space-4); grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  @media (min-width: 720px) { .swatches { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .swatch { display: grid; gap: var(--space-3); align-content: start; }
+  .chip {
+    aspect-ratio: 4 / 3; border-radius: var(--radius-md); border: var(--border-divider);
+    padding: var(--space-3); display: flex; align-items: flex-end; justify-content: flex-start;
+    font-size: var(--text-sm); line-height: var(--leading-sm); font-weight: var(--weight-medium);
+  }
+  .swatch .name { font-size: var(--text-sm); line-height: var(--leading-sm); font-weight: var(--weight-semibold); }
+  .swatch-text { display: grid; gap: var(--space-1); }
+  .support { display: grid; gap: var(--space-2); margin-top: var(--space-4); }
+  .support-row { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+  .mini { display: inline-flex; align-items: center; gap: var(--space-2); padding: var(--space-1) var(--space-3) var(--space-1) var(--space-1); border: var(--border-divider); border-radius: var(--radius-full); font-size: var(--text-xs); line-height: var(--leading-xs); color: var(--color-text-muted); }
+  .mini i { width: 20px; height: 20px; border-radius: var(--radius-full); display: block; }
+
+  /* 2 · Type */
+  .type-list { display: grid; }
+  .type-row { display: grid; gap: var(--space-1); padding-block: var(--space-4); border-bottom: var(--border-divider); }
+  .type-row:first-child { padding-top: 0; }
+  @media (min-width: 720px) { .type-row { grid-template-columns: 1fr 260px; align-items: baseline; gap: var(--space-6); } }
+  .t-display { font-size: var(--type-display-size); line-height: var(--type-display-leading); font-weight: var(--type-display-weight); letter-spacing: var(--type-display-tracking); }
+  .t-title   { font-size: var(--type-title-size);   line-height: var(--type-title-leading);   font-weight: var(--type-title-weight);   letter-spacing: var(--type-title-tracking); }
+  .t-heading { font-size: var(--type-heading-size); line-height: var(--type-heading-leading); font-weight: var(--type-heading-weight); letter-spacing: var(--type-heading-tracking); }
+  .t-body    { font-size: var(--type-body-size);    line-height: var(--type-body-leading);    font-weight: var(--type-body-weight);    letter-spacing: var(--type-body-tracking); }
+  .t-label   { font-size: var(--type-label-size);   line-height: var(--type-label-leading);   font-weight: var(--type-label-weight);   letter-spacing: var(--type-label-tracking); }
+  .t-caption { font-size: var(--type-caption-size); line-height: var(--type-caption-leading); font-weight: var(--type-caption-weight); letter-spacing: var(--type-caption-tracking); color: var(--color-text-muted); }
+
+  /* 3 · Base elements */
+  .elements { display: grid; gap: var(--space-8); }
+  .el-group { display: grid; gap: var(--space-3); }
+  .el-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+  .btn {
+    min-height: var(--control-height); min-width: var(--tap-min);
+    padding-inline: var(--space-6); border-radius: var(--radius-md);
+    display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+    font: inherit; font-size: var(--type-label-size); line-height: var(--type-label-leading); font-weight: var(--weight-semibold);
+    border: var(--border-width) solid transparent; cursor: pointer;
+    transition: transform var(--duration-micro) var(--ease-standard), background-color var(--duration-micro) var(--ease-standard);
+  }
+  .btn:active { transform: scale(var(--press-scale)); }
+  .btn:focus-visible { outline: var(--focus-ring-width) solid var(--color-focus); outline-offset: 2px; }
+  .btn-primary { background: var(--color-brand); color: var(--color-on-brand); }
+  .btn-primary:hover, .btn-primary.is-hover { background: var(--color-brand-hover); }
+  .btn-secondary { background: transparent; color: var(--color-text); border-color: var(--color-border-strong); }
+  .btn-secondary:hover, .btn-secondary.is-hover { background: var(--color-surface-raised); }
+  .btn[disabled] { background: var(--color-surface-raised); color: var(--color-text-disabled); border-color: transparent; cursor: not-allowed; }
+  .btn svg { width: 20px; height: 20px; flex: none; }
+
+  .measure { position: relative; display: inline-flex; padding-right: var(--space-8); }
+  .measure::after {
+    content: "48"; position: absolute; right: 0; top: 0; bottom: 0; width: var(--space-6);
+    border-block: var(--border-width) solid var(--color-accent); border-right: var(--border-width) solid var(--color-accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: var(--text-xs); color: var(--color-accent); font-feature-settings: var(--font-numeric);
+  }
+
+  .fields { display: grid; gap: var(--space-6); grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr)); }
+  .field { display: grid; gap: var(--space-2); }
+  .field label { font-size: var(--type-label-size); line-height: var(--type-label-leading); font-weight: var(--type-label-weight); }
+  .input-wrap { position: relative; display: flex; align-items: center; }
+  .input {
+    width: 100%; min-height: var(--control-height);
+    padding: 0 var(--space-4); padding-right: var(--space-12);
+    background: var(--color-surface-raised); color: var(--color-text);
+    border: var(--border-control); border-radius: var(--radius-sm);
+    font: inherit; font-size: var(--type-body-size); font-feature-settings: var(--font-numeric);
+  }
+  .input::placeholder { color: var(--color-text-muted); }
+  .input:focus, .input.is-focus { outline: none; border-color: var(--color-focus); box-shadow: var(--focus-ring); }
+  .unit { position: absolute; right: var(--space-4); color: var(--color-text-muted); font-size: var(--text-sm); pointer-events: none; }
+  .hint { font-size: var(--type-caption-size); line-height: var(--type-caption-leading); color: var(--color-text-muted); }
+  .hint.err { color: var(--color-danger); }
+  .input.is-error { border-color: var(--color-danger); }
+
+  /* 4 · Coach check-in card, shown in a 360 dp phone column */
+  .stage { display: grid; gap: var(--space-6); align-items: start; }
+  @media (min-width: 900px) { .stage { grid-template-columns: 360px 1fr; gap: var(--space-8); } }
+  .phone { background: var(--color-bg); border: var(--border-divider); border-radius: var(--radius-lg); padding: var(--gutter-screen); max-width: 360px; width: 100%; }
+  .screen-title { display: grid; gap: var(--space-1); padding-bottom: var(--space-4); }
+  .screen-title h3 { font-size: var(--type-title-size); line-height: var(--type-title-leading); font-weight: var(--type-title-weight); letter-spacing: var(--type-title-tracking); }
+
+  .card { background: var(--color-surface); border-radius: var(--radius-md); padding: var(--pad-card); display: grid; gap: var(--gap-between-groups); }
+  .card-head { display: flex; align-items: flex-start; gap: var(--space-3); }
+  .avatar { width: 40px; height: 40px; border-radius: var(--radius-full); background: var(--color-surface-raised); color: var(--color-text); display: grid; place-items: center; font-size: var(--text-sm); font-weight: var(--weight-semibold); flex: none; }
+  .who { display: grid; gap: var(--space-1); flex: 1; min-width: 0; }
+  .who .name { font-size: var(--type-heading-size); line-height: var(--type-heading-leading); font-weight: var(--type-heading-weight); letter-spacing: var(--type-heading-tracking); }
+  .who .sub { font-size: var(--type-caption-size); line-height: var(--type-caption-leading); color: var(--color-text-muted); }
+  .tag { font-size: var(--text-xs); line-height: var(--leading-xs); font-weight: var(--weight-medium); color: var(--color-accent); border: var(--border-width) solid var(--color-accent); border-radius: var(--radius-full); padding: 0 var(--space-2); white-space: nowrap; }
+
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-2); }
+  .stat { background: var(--color-surface-raised); border-radius: var(--radius-sm); padding: var(--space-3); display: grid; gap: var(--space-1); }
+  .stat .k { font-size: var(--text-xs); line-height: var(--leading-xs); color: var(--color-text-muted); }
+  .stat .v { font-size: var(--type-heading-size); line-height: var(--type-heading-leading); font-weight: var(--weight-semibold); font-feature-settings: var(--font-numeric); letter-spacing: var(--tracking-lg); }
+  .stat .d { font-size: var(--text-xs); line-height: var(--leading-xs); color: var(--color-text-muted); font-feature-settings: var(--font-numeric); }
+
+  .note { display: grid; gap: var(--space-1); border-left: 2px solid var(--color-brand); padding-left: var(--space-3); }
+  .note .k { font-size: var(--text-xs); line-height: var(--leading-xs); color: var(--color-text-muted); }
+  .note .v { font-size: var(--type-body-size); line-height: var(--type-body-leading); }
+
+  .scores { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-4); font-size: var(--text-sm); line-height: var(--leading-sm); color: var(--color-text-muted); font-feature-settings: var(--font-numeric); }
+  .scores b { color: var(--color-text); font-weight: var(--weight-semibold); }
+  .card-group { display: grid; gap: var(--gap-in-group); }
+
+  .actions { display: grid; grid-template-columns: 1fr auto; gap: var(--space-2); }
+
+  .anno { display: grid; gap: var(--space-4); }
+  .anno ol { display: grid; gap: var(--space-3); padding-left: var(--space-6); color: var(--color-text-muted); font-size: var(--text-sm); line-height: var(--leading-sm); }
+  .anno ol b { color: var(--color-text); font-weight: var(--weight-semibold); }
+
+  .foot { margin-top: var(--space-12); padding-top: var(--space-6); border-top: var(--border-divider); }
+</style>
+</head>
+<body>
+<main class="board">
+
+  <header class="board-head">
+    <span class="eyebrow">Arcwell · Phase 1 · Design system artboard</span>
+    <h1>Tokens, type and base elements</h1>
+    <p>A static board for review. Every value is read from <code>theme-tokens.css</code> (DESIGN.md §5, D24, D46, D47). Nothing here is app code.</p>
+  </header>
+
+  <!-- 1 · Colour -->
+  <section class="section" aria-labelledby="s1">
+    <div class="section-label">
+      <span class="idx">01</span>
+      <h2 id="s1">Colour</h2>
+      <p>Three charcoal steps carry all depth. No shadows, glass or gradients.</p>
+    </div>
+    <div>
+      <div class="swatches">
+        <div class="swatch">
+          <div class="chip" style="background:var(--color-bg)">Aa</div>
+          <div class="swatch-text">
+            <span class="name">Background</span>
+            <span class="meta"><b>#111316</b> · --color-bg · text 16.9:1</span>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background:var(--color-surface)">Aa</div>
+          <div class="swatch-text">
+            <span class="name">Surface</span>
+            <span class="meta"><b>#191C21</b> · --color-surface · text 15.5:1</span>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background:var(--color-surface-raised)">Aa</div>
+          <div class="swatch-text">
+            <span class="name">Raised</span>
+            <span class="meta"><b>#22262D</b> · --color-surface-raised · text 13.8:1</span>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background:var(--color-brand); color:var(--color-on-brand); border-color:transparent">Aa</div>
+          <div class="swatch-text">
+            <span class="name">Electric blue</span>
+            <span class="meta"><b>#3D8BFF</b> · --color-brand · on-brand text 5.8:1</span>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background:var(--color-success); color:var(--color-bg); border-color:transparent">Aa</div>
+          <div class="swatch-text">
+            <span class="name">Success</span>
+            <span class="meta"><b>#22C55E</b> · --color-success · 8.2:1 on bg</span>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background:var(--color-danger); color:var(--color-bg); border-color:transparent">Aa</div>
+          <div class="swatch-text">
+            <span class="name">Danger</span>
+            <span class="meta"><b>#EF4444</b> · --color-danger · 4.9:1 on bg</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="support">
+        <span class="meta">Supporting roles</span>
+        <div class="support-row">
+          <span class="mini"><i style="background:var(--color-text)"></i><span class="num">#F2F4F7 text</span></span>
+          <span class="mini"><i style="background:var(--color-text-muted)"></i><span class="num">#9AA4B2 muted</span></span>
+          <span class="mini"><i style="background:var(--color-accent)"></i><span class="num">#22D3EE cyan</span></span>
+          <span class="mini"><i style="background:var(--color-warning)"></i><span class="num">#F59E0B warning</span></span>
+          <span class="mini"><i style="background:var(--color-border-strong)"></i><span class="num">#6B7482 outline</span></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 · Type -->
+  <section class="section" aria-labelledby="s2">
+    <div class="section-label">
+      <span class="idx">02</span>
+      <h2 id="s2">Typography</h2>
+      <p>Inter only, with tabular numerals. Tracking tightens as size grows.</p>
+    </div>
+    <div class="type-list">
+      <div class="type-row"><span class="t-display num">73.8 kg this week</span><span class="meta"><b>--text-2xl</b> · 32 / 40 · Bold · display · −0.022em</span></div>
+      <div class="type-row"><span class="t-title">Check-ins</span><span class="meta"><b>--text-xl</b> · 22 / 28 · Semibold · title · −0.018em</span></div>
+      <div class="type-row"><span class="t-heading">Priya Sharma · Week 3</span><span class="meta"><b>--text-lg</b> · 18 / 24 · Semibold · heading · −0.014em</span></div>
+      <div class="type-row"><span class="t-body">Weekend wedding — overate on Saturday, back on plan Sunday.</span><span class="meta"><b>--text-base</b> · 16 / 24 · Regular · body · −0.011em</span></div>
+      <div class="type-row"><span class="t-label">Send feedback</span><span class="meta"><b>--text-sm</b> · 14 / 20 · Medium · label · −0.006em</span></div>
+      <div class="type-row"><span class="t-caption">Submitted 2 h ago · 3 weeks with you</span><span class="meta"><b>--text-xs</b> · 12 / 16 · Regular · caption · 0</span></div>
+    </div>
+  </section>
+
+  <!-- 3 · Base elements -->
+  <section class="section" aria-labelledby="s3">
+    <div class="section-label">
+      <span class="idx">03</span>
+      <h2 id="s3">Base elements</h2>
+      <p>Every control is 48 dp tall, above Apple's 44 pt minimum.</p>
+    </div>
+    <div class="elements">
+      <div class="el-group">
+        <span class="meta">Primary · default, hover, disabled</span>
+        <div class="el-row">
+          <span class="measure"><button class="btn btn-primary" type="button">Send feedback</button></span>
+          <button class="btn btn-primary is-hover" type="button">Send feedback</button>
+          <button class="btn btn-primary" type="button" disabled>Send feedback</button>
+        </div>
+      </div>
+      <div class="el-group">
+        <span class="meta">Secondary · default, hover</span>
+        <div class="el-row">
+          <button class="btn btn-secondary" type="button">Send reminder</button>
+          <button class="btn btn-secondary is-hover" type="button">Send reminder</button>
+          <button class="btn btn-secondary" type="button" aria-label="Next client">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="fields">
+        <div class="field">
+          <label for="f1">Body weight</label>
+          <div class="input-wrap"><input id="f1" class="input" placeholder="e.g. 73.8" inputmode="decimal"><span class="unit">kg</span></div>
+          <span class="hint">Default</span>
+        </div>
+        <div class="field">
+          <label for="f2">Body weight</label>
+          <div class="input-wrap"><input id="f2" class="input is-focus" value="73.8" inputmode="decimal"><span class="unit">kg</span></div>
+          <span class="hint">Focused · cyan outline</span>
+        </div>
+        <div class="field">
+          <label for="f3">Body weight</label>
+          <div class="input-wrap"><input id="f3" class="input is-error" value="7380" inputmode="decimal" aria-describedby="f3e"><span class="unit">kg</span></div>
+          <span class="hint err" id="f3e">Enter a weight between 25 and 300 kg</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 · Sample card -->
+  <section class="section" aria-labelledby="s4">
+    <div class="section-label">
+      <span class="idx">04</span>
+      <h2 id="s4">Coach check-in card</h2>
+      <p>The tokens together, at real phone width (360 dp). Content from F6-07 and F6-08.</p>
+    </div>
+    <div class="stage">
+      <div class="phone">
+        <div class="screen-title">
+          <span class="eyebrow">Week of 4 Nov</span>
+          <h3>Check-ins</h3>
+        </div>
+
+        <article class="card" aria-label="Priya Sharma check-in">
+          <div class="card-head">
+            <div class="avatar" aria-hidden="true">PS</div>
+            <div class="who">
+              <span class="name">Priya Sharma</span>
+              <span class="sub">Week 3 · Fat loss · submitted 2 h ago</span>
+            </div>
+            <span class="tag">To review</span>
+          </div>
+
+          <div class="stats">
+            <div class="stat"><span class="k">Weight</span><span class="v">73.8</span><span class="d">−0.6 kg</span></div>
+            <div class="stat"><span class="k">Workouts</span><span class="v">4/4</span><span class="d" aria-label="No change">—</span></div>
+            <div class="stat"><span class="k">Avg kcal</span><span class="v">1,910</span><span class="d">+30</span></div>
+          </div>
+
+          <div class="card-group">
+            <div class="note">
+              <span class="k">Struggles / questions</span>
+              <span class="v">Weekend wedding — overate on Saturday</span>
+            </div>
+            <div class="scores">
+              <span>Energy <b>4</b></span><span>Hunger <b>3</b></span><span>Stress <b>2</b></span><span>Digestion <b>4</b></span>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-primary" type="button">Review check-in</button>
+            <button class="btn btn-secondary" type="button" aria-label="Next client">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+          </div>
+        </article>
+      </div>
+
+      <div class="anno">
+        <span class="meta">How it is built</span>
+        <ol>
+          <li><b>Depth by step, not shadow.</b> The screen is bg, the card is surface, the stat tiles and button outline sit one step up on raised.</li>
+          <li><b>Spacing has rhythm.</b> 4 between a label and its value, 8 between tiles and inside a group, 16 card padding, 24 between the card's groups.</li>
+          <li><b>Blue means "act".</b> Electric blue appears only on the primary button and the question's rule. Cyan marks status ("To review").</li>
+          <li><b>Numbers are neutral.</b> Changes such as −0.6 kg stay muted grey. A loss is not automatically good, and a missed target is never red.</li>
+          <li><b>Left-aligned throughout.</b> Name, stats and question all start on the same 16 dp edge.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span class="meta">Draft for founder review · 2026-11-11 · wordmark not yet chosen, so no logo appears on this board.</span>
+  </footer>
+
+</main>
+</body>
+</html>

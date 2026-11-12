@@ -216,7 +216,7 @@ Each card gives the four things a prompt must specify (platform comes from the d
 
 ### Card 11 — Onboarding question
 
-- **Wireframes:** F1-06 to F1-12.
+- **Wireframes:** AO-01 to AO-17.
 - **Screen type:** one question per screen.
 - **User goal:** answer quickly and see progress.
 - **Tone:** welcoming, brief.
@@ -240,7 +240,7 @@ Coach screens are a work tool: denser than the athlete app, triage-first, nothin
 
 ### Card 13 — Client list
 
-- **Wireframes:** K-01, K-25, F2-08.
+- **Wireframes:** K-01, K-25, CO-13.
 - **Screen type:** triage list.
 - **User goal:** see who needs attention today and why.
 - **Tone:** efficient, calm density.

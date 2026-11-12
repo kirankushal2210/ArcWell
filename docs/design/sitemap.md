@@ -14,23 +14,31 @@ flowchart TD
   Consent --> AOnb[Athlete onboarding] --> Tier{Tier}
   Consent --> COnb[Coach onboarding] --> CShell[Coach tabs]
   Auth -- Yes --> Tier
-  Tier -- Free --> FBar[Today · Training · Nutrition]
-  Tier -- AI-coached --> ABar[Today · Training · Nutrition · Recovery · AI Coaching]
+  Tier -- Free --> FBar[Today · Training · Nutrition · Recovery locked + AI button]
+  Tier -- AI-coached --> ABar[Today · Training · Nutrition · Recovery + AI button]
   Tier -- Human-coached --> HBar[Today · Training · Nutrition · Recovery · Progress]
   FBar & ABar & HBar --> Menu[☰ Side menu]
 ```
 
+**D57 (self-guided athletes):** sign-up moves after the plan. Welcome → I'm training → onboarding questions → plan ready → save your plan (sign up + consent) → AI plan paywall (or Continue free) → app. Coaches and invited clients still sign up first.
+
 ## 1. Entry and account (shared)
 
-- Splash · Welcome · Sign up / Sign in (Google, email) · Email verification · Forgot password → reset link sent
+- Splash · Welcome (three-page hero: training, meals, recovery; D53) · Get Started → role sheet (F1-02a) · Sign up / Sign in (Google, email) · Email verification · Forgot password → reset link sent
 - Invite landing (from a coach's link) · coach is full (K-26) · Already coached (switch coach) · AI subscriber joining a coach (cancellation in Google Play, D7a, D19)
 - Consent — health data, **AI permission step 1** (D8), photos (optional, D12) · invite sign-ups skip the AI step (F1-05b, D44)
-- One role per account; role chosen before sign-up (D44)
+- One role per account; role chosen before sign-up, in the Get Started sheet (D44, D53)
 
 ## 2. Athlete onboarding
 
-1. Goal · 2. Experience · 3. Age, height, weight, sex (optional, D44) · 4. Injuries / limitations · 5. Training days and session length · 6. Equipment · 7. Diet type
-8. Summary → [F] calorie target + starter workouts (calories only, D5, D27) · [C] connected to coach, waiting for plan (no turnaround promise)
+Onboarding v2 (D52): five sections on one progress bar. Screen IDs AO-xx (wireframes f1-f3, mockups hifi-mockups/onboarding-flow.html).
+
+1. About you: gender (optional, D44) · age · height · current weight (AO-01 to AO-04)
+2. Your goal: main goal · goal weight (optional) · activity level (AO-05 to AO-07)
+3. Training: experience · where you train + home kit · days per week and preferred days · session length and time of day · injuries / limitations (AO-08 to AO-12)
+4. Recovery (all skippable): sleep hours and times · sleep quality · stress, energy and soreness (AO-13 to AO-15)
+5. Nutrition: diet type · meals per day (AO-16, AO-17)
+6. Your plan → [F] building your plan → calorie target (calories only, D5) → plan preview (no AI, D44) → all set with starter workouts (D27) (AO-18 to AO-21) · [C] connected to coach, waiting for plan, no turnaround promise (AO-21b)
 
 ## 3. Athlete app
 
@@ -38,8 +46,8 @@ flowchart TD
 
 | Tier | Bottom bar |
 |---|---|
-| Free | Today · Training · Nutrition |
-| AI-coached (Pro) | Today · Training · Nutrition · Recovery · AI Coaching |
+| Free | Today · Training · Nutrition · Recovery (locked) + AI button (opens the trial offer) (D57) |
+| AI-coached (Pro) | Today · Training · Nutrition · Recovery + floating AI button (D57, replaces the AI Coaching tab of D2) |
 | Human-coached (Pro) | Today · Training · Nutrition · Recovery · Progress |
 
 ### Today
@@ -86,12 +94,15 @@ flowchart TD
 
 ## 4. Coach onboarding
 
-1. What you get, and Coach agreement (F2-01, F2-02)
-2. Coach profile basics (name, photo, specialisations, bio)
-3. Services / packages (text, shown on profile)
-4. Create first plan template (or skip)
-5. Share invite link (copy / WhatsApp / Instagram)
-6. Clients list with setup checklist, first clients, assign plan (F2-08 to F2-10). Coach plan info (beta: free) is in Plan and billing (K-13).
+Same style as athlete onboarding (D52). Screen IDs CO-xx (wireframes f2, mockups hifi-mockups/coach-onboarding.html).
+
+1. Coach sign-up (CO-01, drawn as K-19), what you get and coach agreement (CO-02, CO-03)
+2. Your coaching: how you coach · roughly how many clients (CO-04, CO-05)
+3. Profile: name, photo, city · specialisations (up to 3) · bio, Instagram, years, certifications (optional) (CO-06 to CO-08)
+4. Services / packages (text, shown on profile) (CO-09)
+5. Create first plan template, or skip (CO-10)
+6. Share invite link: copy / WhatsApp / Instagram / QR (CO-11) → ready to coach (CO-12)
+7. Clients list with setup checklist, first clients, assign plan (CO-13 to CO-15). Coach plan info (beta: free) is in Plan and billing (K-13).
 
 ## 5. Coach app
 

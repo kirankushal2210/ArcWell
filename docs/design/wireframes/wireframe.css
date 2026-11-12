@@ -194,3 +194,29 @@
 /* When a screen has a bottom bar, the pinned button sits just above it */
 .phone:has(> .tabs) .pinned { bottom: 46px; }
 .phone:has(> .tabs) { padding-bottom: 50px; }
+
+/* Onboarding v2 (D52): ruler picker and small helpers */
+.wruler { text-align: center; margin: 10px 0 6px; }
+.wruler > b { display: block; font-size: 26px; line-height: 1.1; }
+.wruler > b small { font-size: 11px; color: var(--muted); font-weight: 500; }
+.wruler > span { display: block; font-size: 10px; color: var(--muted); margin-top: 2px; }
+.wruler .ticks { position: relative; height: 130px; width: 34%; margin: 8px auto 0;
+  background: repeating-linear-gradient(to bottom, var(--line) 0 1.5px, transparent 1.5px 9px); }
+.wruler .ticks::after { content: ""; position: absolute; left: -70%; right: -70%; top: 50%; height: 2px; background: var(--ink); }
+.wruler .ticks::before { content: ""; position: absolute; left: 50%; top: 50%; width: 12px; height: 12px; border-radius: 50%; background: var(--ink); transform: translate(-50%, -50%); z-index: 1; }
+.wruler.short .ticks { height: 70px; }
+.secname { font-size: 10px; color: var(--muted); }
+.ring { width: 84px; height: 84px; border-radius: 50%; border: 2px solid var(--ink); display: grid; place-items: center; font-size: 9px; color: var(--muted); margin: 0 auto 8px; }
+.scale { display: flex; gap: 4px; margin-bottom: 8px; }
+.scale span { flex: 1; text-align: center; border: 1.5px solid var(--line); border-radius: 7px; padding: 5px 0; font-size: 11px; font-weight: 600; }
+.scale .sel { background: var(--ink); border-color: var(--ink); color: #fff; }
+.ends { display: flex; justify-content: space-between; font-size: 8.5px; color: var(--muted); margin: -4px 0 8px; }
+/* D53: pickers are wheels; the welcome hero is a phone-in-phone */
+.wruler .ticks { width: 100%; height: 96px; background: repeating-linear-gradient(to bottom, transparent 0 15px, var(--fill) 15px 17px); }
+.wruler.short .ticks { height: 60px; }
+.wruler .ticks::after { left: 0; right: 0; height: 28px; transform: translateY(-50%); background: var(--fill); border-radius: 7px; }
+.wruler .ticks::before { display: none; }
+.wdev { position: relative; height: 40%; margin: 0 auto 10px; width: 62%; border: 4px solid var(--ink); border-radius: 22px; padding: 4px; }
+.wmodes { position: absolute; left: 8px; right: 8px; bottom: 8px; display: flex; border: 1.5px solid var(--ink); border-radius: 999px; background: #fff; font-size: 8.5px; }
+.wmodes span { flex: 1; text-align: center; padding: 3px 0; border-radius: 999px; }
+.wmodes .on { background: var(--ink); color: #fff; }

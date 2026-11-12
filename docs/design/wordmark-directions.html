@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arcwell Wordmark Directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#111316; --surface:#191C21; --raised:#22262D; --border:#2D323A; --borderStrong:#6B7482;
+    --text:#F2F4F7; --muted:#9AA4B2; --brand:#3D8BFF; --accent:#22D3EE; --warning:#F59E0B;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:16px/1.5 Inter, system-ui, sans-serif; }
+  header, section { max-width:1240px; margin:0 auto; padding:0 16px; }
+  header { padding-top:40px; }
+  h1 { font-size:32px; line-height:40px; font-weight:700; margin:0 0 8px; }
+  header p { color:var(--muted); font-size:14px; margin:0 0 4px; max-width:820px; }
+  .status { display:inline-block; margin-top:12px; font-size:12px; font-weight:600; color:var(--warning); border:1px solid var(--warning); border-radius:999px; padding:2px 10px; }
+  section { padding-top:48px; }
+  h2 { font-size:22px; line-height:28px; font-weight:600; margin:0 0 4px; }
+  .lead { color:var(--muted); font-size:14px; margin:0 0 16px; max-width:820px; }
+  .hero { background:var(--surface); border-radius:20px; min-height:220px; display:flex; align-items:center; justify-content:center; padding:32px 16px; }
+  .grid { display:grid; gap:16px; grid-template-columns:repeat(auto-fill,minmax(min(220px,100%),1fr)); margin-top:16px; }
+  .cell { background:var(--surface); border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:12px; }
+  .cell .stage { min-height:96px; display:flex; align-items:center; justify-content:center; border-radius:8px; }
+  .cell small { color:var(--muted); font-size:12px; }
+  .stage.bg { background:var(--bg); }
+  .stage.light { background:#F2F4F7; }
+  .stage.photo { background:#4A4F57; }
+
+  /* Lockups */
+  .lock { display:inline-flex; align-items:center; white-space:nowrap; color:var(--text); }
+  .lock svg { flex:none; display:block; }
+
+  /* A: Ring */
+  .wa { font-weight:600; letter-spacing:-0.02em; }
+  /* B: Arch */
+  .wb { font-weight:600; letter-spacing:0.18em; text-transform:uppercase; }
+  /* C: Open c */
+  .wc { font-weight:700; letter-spacing:-0.03em; }
+  .wc .c { display:inline-block; width:0.54em; height:1em; vertical-align:-0.2em; }
+  .wc .c svg { width:100%; height:100%; overflow:visible; }
+
+  /* App icons */
+  .icon { border-radius:50%; background:var(--bg); display:flex; align-items:center; justify-content:center; border:1px solid var(--border); }
+  .icon.sq { border-radius:22%; }
+  .row { display:flex; gap:16px; align-items:center; flex-wrap:wrap; justify-content:center; }
+
+  .why { display:grid; gap:16px; grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr)); margin-top:16px; }
+  .why div { background:var(--surface); border-radius:12px; padding:16px; font-size:14px; }
+  .why b { display:block; margin-bottom:4px; }
+  .why p { margin:0; color:var(--muted); }
+  footer { max-width:1240px; margin:64px auto 40px; padding:0 16px; color:var(--muted); font-size:12px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Arcwell wordmark directions</h1>
+  <p>Three directions for the founder to choose from (handoff step 2). Every one uses Inter (D46), solid colours only (D24: no gradients, no glows) and the spec-sheet tokens. Each is shown large, at app-bar size, as an app icon, in one colour for photo exports (D45), and on light.</p>
+  <p>The type is set in Inter here. The chosen direction would then be drawn as outlined paths with its spacing tuned by hand.</p>
+  <span class="status">Draft, not approved</span>
+</header>
+
+<!-- Reusable symbols -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- A: 270° ring, gap at top-right; reads as the progress ring from the workout summary -->
+    <symbol id="ring" viewBox="0 0 48 48">
+      <path d="M24 6 A18 18 0 1 0 42 24" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+    </symbol>
+    <!-- B: arch monogram, an A built from one load-bearing arch, with a horizon line as the crossbar -->
+    <symbol id="arch" viewBox="0 0 48 48">
+      <path d="M11 41 V24 A13 13 0 0 1 37 24 V41" fill="none" stroke="var(--arch, currentColor)" stroke-width="6" stroke-linecap="round"/>
+      <path d="M17 30 H31" fill="none" stroke="var(--bar, currentColor)" stroke-width="5" stroke-linecap="round"/>
+    </symbol>
+    <!-- C: the c of the name, drawn as an open arc -->
+    <symbol id="carc" viewBox="0 0 54 100">
+      <path d="M43.1 35.8 A22 22 0 1 0 43.1 69.6" fill="none" stroke="currentColor" stroke-width="12" stroke-linecap="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- ============ A ============ -->
+<section>
+  <h2>A · Ring</h2>
+  <p class="lead">A three-quarter ring next to a lowercase wordmark. The ring is the progress ring from the workout summary (the one 600 ms "big moment"), so the logo and the app's best moment share one shape. The open quarter means "still in progress", which fits consistency over intensity. The ring alone becomes the app icon.</p>
+  <div class="hero">
+    <span class="lock wa" style="font-size:clamp(36px,9vw,72px);gap:0.25em"><svg style="width:1.05em;height:1.05em;color:var(--accent)"><use href="#ring"/></svg>arcwell</span>
+  </div>
+  <div class="grid">
+    <div class="cell"><div class="stage bg"><span class="lock wa" style="font-size:20px;gap:8px"><svg width="22" height="22" style="color:var(--accent)"><use href="#ring"/></svg>arcwell</span></div><small>App bar, 20 px</small></div>
+    <div class="cell"><div class="stage bg row">
+      <div class="icon" style="width:96px;height:96px"><svg width="52" height="52" style="color:var(--accent)"><use href="#ring"/></svg></div>
+      <div class="icon sq" style="width:48px;height:48px"><svg width="28" height="28" style="color:var(--accent)"><use href="#ring"/></svg></div>
+    </div><small>App icon: adaptive circle and squircle; 48 dp</small></div>
+    <div class="cell"><div class="stage photo"><span class="lock wa" style="font-size:22px;gap:8px;color:#fff"><svg width="24" height="24" style="color:#fff"><use href="#ring"/></svg>arcwell</span></div><small>One colour, on a photo export</small></div>
+    <div class="cell"><div class="stage light"><span class="lock wa" style="font-size:24px;gap:8px;color:#111316"><svg width="26" height="26" style="color:#1F6FE5"><use href="#ring"/></svg>arcwell</span></div><small>On light (ring in a darker blue for contrast)</small></div>
+  </div>
+</section>
+
+<!-- ============ B ============ -->
+<section>
+  <h2>B · Arch</h2>
+  <p class="lead">An "A" monogram drawn as one arch, with a short cyan horizon line as the crossbar, next to a wide-spaced capital wordmark. An arch is the strongest load-bearing shape, so it says "built properly, built to last": the serious-coach side of the brand. It looks the most architectural and premium of the three, and the least like a fitness app.</p>
+  <div class="hero">
+    <span class="lock wb" style="font-size:clamp(22px,5vw,52px);gap:0.45em;--arch:var(--brand);--bar:var(--accent)"><svg style="width:1.55em;height:1.55em"><use href="#arch"/></svg>Arcwell</span>
+  </div>
+  <div class="grid">
+    <div class="cell"><div class="stage bg"><span class="lock wb" style="font-size:15px;gap:10px;--arch:var(--brand);--bar:var(--accent)"><svg width="24" height="24"><use href="#arch"/></svg>Arcwell</span></div><small>App bar, 15 px caps</small></div>
+    <div class="cell"><div class="stage bg row" style="--arch:var(--brand);--bar:var(--accent)">
+      <div class="icon" style="width:96px;height:96px"><svg width="54" height="54"><use href="#arch"/></svg></div>
+      <div class="icon sq" style="width:48px;height:48px"><svg width="30" height="30"><use href="#arch"/></svg></div>
+    </div><small>App icon: adaptive circle and squircle; 48 dp</small></div>
+    <div class="cell"><div class="stage photo"><span class="lock wb" style="font-size:16px;gap:10px;color:#fff"><svg width="26" height="26" style="color:#fff"><use href="#arch"/></svg>Arcwell</span></div><small>One colour, on a photo export</small></div>
+    <div class="cell"><div class="stage light"><span class="lock wb" style="font-size:17px;gap:10px;color:#111316;--arch:#1F6FE5;--bar:#0E7490"><svg width="28" height="28"><use href="#arch"/></svg>Arcwell</span></div><small>On light (darker blue and cyan)</small></div>
+  </div>
+</section>
+
+<!-- ============ C ============ -->
+<section>
+  <h2>C · Open c</h2>
+  <p class="lead">No separate symbol. The "c" in the name is redrawn as an open cyan arc, so the arc lives inside the word itself. It's the quietest and most typographic option, close to how Linear and Oura sign themselves. For the app icon, the arc sits alone on charcoal. Risk: at small sizes it reads as an ordinary "c", which is fine but less distinctive.</p>
+  <div class="hero">
+    <span class="lock wc" style="font-size:clamp(44px,11vw,84px)">ar<span class="c" style="color:var(--accent)"><svg viewBox="0 0 54 100"><use href="#carc"/></svg></span>well</span>
+  </div>
+  <div class="grid">
+    <div class="cell"><div class="stage bg"><span class="lock wc" style="font-size:22px">ar<span class="c" style="color:var(--accent)"><svg viewBox="0 0 54 100"><use href="#carc"/></svg></span>well</span></div><small>App bar, 22 px</small></div>
+    <div class="cell"><div class="stage bg row">
+      <div class="icon" style="width:96px;height:96px"><svg width="52" height="52" viewBox="0 24 58 58" style="color:var(--accent)"><path d="M43.1 35.8 A22 22 0 1 0 43.1 69.6" fill="none" stroke="currentColor" stroke-width="12" stroke-linecap="round"/></svg></div>
+      <div class="icon sq" style="width:48px;height:48px"><svg width="26" height="26" viewBox="0 24 58 58" style="color:var(--accent)"><path d="M43.1 35.8 A22 22 0 1 0 43.1 69.6" fill="none" stroke="currentColor" stroke-width="12" stroke-linecap="round"/></svg></div>
+    </div><small>App icon: adaptive circle and squircle; 48 dp</small></div>
+    <div class="cell"><div class="stage photo"><span class="lock wc" style="font-size:24px;color:#fff">ar<span class="c"><svg viewBox="0 0 54 100"><use href="#carc"/></svg></span>well</span></div><small>One colour, on a photo export</small></div>
+    <div class="cell"><div class="stage light"><span class="lock wc" style="font-size:26px;color:#111316">ar<span class="c" style="color:#0E7490"><svg viewBox="0 0 54 100"><use href="#carc"/></svg></span>well</span></div><small>On light (darker cyan)</small></div>
+  </div>
+</section>
+
+<section>
+  <h2>How they compare</h2>
+  <div class="why">
+    <div><b>A · Ring</b><p>Most "app-like" and the easiest to recognise as an icon. Ties straight into the product's ring and dial visuals (workout summary, sleep score). Risk: rings are common in fitness and health apps.</p></div>
+    <div><b>B · Arch</b><p>Most distinctive, and the strongest fit for "serious coach's tool". Uses both brand colours. Risk: the caps wordmark is formal, and the monogram needs care so it doesn't read as an "n".</p></div>
+    <div><b>C · Open c</b><p>Most restrained and the most "premium software". One mark everywhere, no separate symbol. Risk: weakest as a stand-alone app icon.</p></div>
+  </div>
+</section>
+
+<footer>Arcwell wordmark directions · draft 2026-11-11 · not approved · tokens from docs/design/spec-sheet.html</footer>
+</body>
+</html>

@@ -100,32 +100,47 @@ Confirmed rules come from [DECISIONS.md](DECISIONS.md) (IDs in brackets). Sectio
 
 "Wireframed" means **drawn**. All v1 flows are drawn (199 screens) and no open decisions remain on any screen: every decision is in DECISIONS.md (D1–D45; D25–D45 are defaults Claude applied, for founder review). No screen has been reviewed screen by screen or tested with users.
 
+### Onboarding mockups (hi-fi, D52 and D53)
+
+Draft, not approved or user-tested. Rendered at 3× from [onboarding-flow.html](design/hifi-mockups/onboarding-flow.html); the full set of athlete and coach screens and the clickable prototype are in `design/hifi-mockups/`.
+
+**AO-01 to AO-05:** gender, age, height, current weight, main goal
+
+![Onboarding screens AO-01 to AO-05](../app/design/onboarding-AO-01-05.png)
+
+**AO-06 to AO-10:** goal weight, activity level, gym experience, where you train, training days
+
+![Onboarding screens AO-06 to AO-10](../app/design/onboarding-AO-06-10.png)
+
 ## 5. Design tokens (v0 — draft)
 
 ### Colour
 
-Dark theme (default):
+Monochrome light theme (D50, replaces the blue of D49 on 2026-11-11; earlier palettes in DECISIONS.md D47 and D49):
 
 | Token | Value | Use |
 |---|---|---|
-| `bg` | `#111316` | App background (dark charcoal) |
-| `surface` | `#191C21` | Cards, sheets |
-| `surfaceRaised` | `#22262D` | Inputs, pressed states |
-| `border` | `#2D323A` | Dividers only (1.4:1) |
-| `borderStrong` | `#6B7482` | Input, tick-box and secondary-button outlines (3:1+ on every surface) |
-| `text` | `#F2F4F7` | Primary text |
-| `textMuted` | `#9AA4B2` | Secondary text |
-| `brand` | `#3D8BFF` | Primary actions, brand accent (electric blue) |
-| `onBrand` | `#04101F` | Text on brand buttons |
-| `accent` | `#22D3EE` | Highlights, charts, focus rings (cyan) |
-| `training` | `#22D3EE` | Training pillar (cyan, shares the accent) |
-| `nutrition` | `#F5A524` | Nutrition pillar |
-| `recovery` | `#8B7CFF` | Recovery pillar |
-| `success` | `#22C55E` | Completed, positive |
-| `warning` | `#F59E0B` | Needs attention |
-| `danger` | `#EF4444` | Destructive actions, errors only |
+| `bg` | `#F5F5F5` | App background (light grey) |
+| `surface` | `#FFFFFF` | Cards, sheets |
+| `surfaceRaised` | `#EBEBEB` | Inputs, pressed states |
+| `border` | `#E0E0E0` | Dividers only |
+| `borderStrong` | `#7A7A7A` | Input, tick-box and secondary-button outlines (3:1+ on every surface) |
+| `text` | `#111111` | Primary text |
+| `textMuted` | `#5C5C5C` | Secondary text |
+| `textDisabled` | `#A3A3A3` | Disabled controls only (WCAG-exempt) |
+| `brand` | `#111111` | Primary actions (black buttons) |
+| `brandHover` | `#333333` | Hover / pressed step |
+| `onBrand` | `#FFFFFF` | Text on black buttons |
+| `accent` / `focus` | `#111111` | Selection, focus, active tab |
+| `training` | `#0E7490` | Training pillar marker |
+| `nutrition` | `#C2570C` | Nutrition pillar marker |
+| `recovery` | `#6D5BD0` | Recovery pillar marker |
+| `success` | `#127235` | Completed, positive |
+| `warning` | `#A34A06` | Needs attention |
+| `danger` | `#C81E1E` | Destructive actions, errors only |
+| `scrim` | `rgb(17 17 17 / 0.4)` | Dims the screen behind modal sheets and dialogs |
 
-Visual direction per D24: dark charcoal, electric blue / cyan accents, minimal and premium. Solid colours only: no gradients and no glows (design-prompt.md negative list). Values are draft; the main pairs pass WCAG AA (checked 2026-11-11: text 16.9:1, muted 7.4:1, brand on bg 5.6:1, text on brand 5.8:1). No streaks, XP or badges. Light theme: same roles; values to be defined in the design-system step. All text/background pairs must meet WCAG AA contrast (4.5:1 for body text).
+Black and white first: black is the only action colour; colour is kept for small pillar dots (never text) and status; progress bars, rings, ticks and charts are black. Solid colours only: no gradients, no glows, no shadows. Every text pair passes WCAG AA (checked 2026-11-11: text 17.3:1, muted 6.1:1, white on black 18.9:1). No streaks, XP or badges.
 
 ### Typography
 
@@ -144,9 +159,9 @@ Visual direction per D24: dark charcoal, electric blue / cyan accents, minimal a
 
 | Component | Notes | Status |
 |---|---|---|
-| Button (primary, secondary, ghost, destructive) | 48dp min height | In spec sheet · not built |
-| Text input, number stepper | Number stepper for kg/reps with big ± targets | In spec sheet · not built |
-| Card, list row, section header | | In spec sheet · not built |
+| Button (primary, secondary, ghost, destructive) | 48dp min height | In spec sheet · built in `app/src/components/` (Phase 2; draft, not approved or user-tested) |
+| Text input, number stepper | Number stepper for kg/reps with big ± targets | In spec sheet · built in `app/src/components/` (Phase 2; draft, not approved or user-tested) |
+| Card, list row, section header | | In spec sheet · built in `app/src/components/` (Phase 2; draft, not approved or user-tested) |
 | Tab bar (athlete, coach variants) | | In spec sheet · not built |
 | Set row | Previous value, weight, reps, done tick; the heart of logging | In spec sheet · not built |
 | Rest timer | Bottom sheet, haptic at end | In spec sheet · not built |
@@ -154,43 +169,77 @@ Visual direction per D24: dark charcoal, electric blue / cyan accents, minimal a
 | Food result row, portion picker | Indian portions | In spec sheet · not built |
 | Chat bubble, attachment tile | Images, PDFs | In spec sheet · not built |
 | Check-in form fields, photo slot | | Not in spec sheet yet |
-| Empty state, error state, skeleton loader | Every list has all three | In spec sheet · not built |
+| Empty state, error state, skeleton loader | Every list has all three | In spec sheet · built in `app/src/components/` (Phase 2; draft, not approved or user-tested) |
 | Paywall / locked-feature card | Shown only at upgrade moments | In spec sheet · not built |
-| Avatar, status chip (active, paused, leaving, completed) | | In spec sheet · not built |
+| Avatar, status chip (active, paused, leaving, completed) | | In spec sheet · built in `app/src/components/` (Phase 2; draft, not approved or user-tested) |
 
 ## 7. Screen inventory
 
 Tracked here as screens are designed (Wireframe → Mockup → Built). **✅ in the Wireframe column means drawn only** — not reviewed by the founder, not tested with users.
 
+**Onboarding IDs changed on 2026-11-12 (D52).** Athlete onboarding is now AO-xx and coach onboarding CO-xx, the same IDs in wireframes and mockups. Old IDs in earlier decisions map like this:
+
+| Old | New | Old | New |
+|---|---|---|---|
+| F1-06 Goal | AO-05 | F2-01 What you get | CO-02 |
+| F1-07 Experience | AO-08 | F2-02 Coach agreement | CO-03 |
+| F1-08 Body stats | AO-01 to AO-04 | F2-03 Profile basics | CO-06, CO-07 |
+| F1-09 Injuries | AO-12 | F2-04 About you | CO-08 |
+| F1-10 Schedule | AO-10, AO-11 | F2-05 Services | CO-09 |
+| F1-11 Equipment | AO-09 | F2-06 First template | CO-10 |
+| F1-12 Diet type | AO-16 | F2-07 Invite clients | CO-11 |
+| F1-13a Summary — free | AO-18 to AO-21 | F2-08 to F2-10 | CO-13 to CO-15 |
+| F1-13b Summary — coached | AO-21b | K-19 Coach sign-up | CO-01 (same screen) |
+
+New with D52: AO-02, AO-06, AO-07, AO-13 to AO-15, AO-17, AO-18, AO-20, CO-04, CO-05, CO-07, CO-12. "✅ draft" in the Mockup column means a hi-fi mockup exists in `design/hifi-mockups/`, not approved or user-tested.
+
 | Screen | Role | Wireframe | Mockup | Built |
 |---|---|---|---|---|
-| F1-01 Splash | All | ✅ | — | — |
-| F1-02 Welcome (role choice) | All | ✅ | — | — |
-| F1-03 Sign up | All | ✅ | — | — |
-| F1-04 Sign in | All | ✅ | — | — |
-| F1-05 Consent | All | ✅ | — | — |
-| F1-06 Goal | Athlete | ✅ | — | — |
-| F1-07 Experience | Athlete | ✅ | — | — |
-| F1-08 Body stats | Athlete | ✅ | — | — |
-| F1-09 Injuries and limitations | Athlete | ✅ | — | — |
-| F1-10 Schedule | Athlete | ✅ | — | — |
-| F1-11 Equipment | Athlete | ✅ | — | — |
-| F1-12 Diet type | Athlete | ✅ | — | — |
-| F1-13a Summary — free | Athlete (free) | ✅ | — | — |
-| F1-13b Summary — coached | Athlete (coached) | ✅ | — | — |
-| F2-01 Coach — what you get | Coach | ✅ | — | — |
-| F2-02 Coach agreement | Coach | ✅ | — | — |
-| F2-03 Coach profile basics | Coach | ✅ | — | — |
-| F2-04 About you | Coach | ✅ | — | — |
-| F2-05 Services | Coach | ✅ | — | — |
-| F2-06 First template | Coach | ✅ | — | — |
-| F2-07 Invite clients | Coach | ✅ | — | — |
-| F2-08 Clients — empty with setup checklist | Coach | ✅ | — | — |
-| F2-09 Clients — first clients join | Coach | ✅ | — | — |
-| F2-10 New client — assign plan | Coach | ✅ | — | — |
-| F3-01 Invite shared (WhatsApp) | Coach → client | ✅ | — | — |
-| F3-02 Invite landing | Athlete | ✅ | — | — |
-| F3-03 Already coached (switch coach) | Athlete | ✅ | — | — |
+| F1-01 Splash | All | ✅ | ✅ draft | — |
+| F1-02 Welcome | All | ✅ | ✅ draft | — |
+| F1-02a Choose your role (sheet) | All | ✅ | ✅ draft | — |
+| F1-03 Sign up | All | ✅ | ✅ draft | — |
+| F1-04 Sign in | All | ✅ | ✅ draft | — |
+| F1-05 Consent | All | ✅ | ✅ draft | — |
+| AO-01 Gender | Athlete | ✅ | ✅ draft | — |
+| AO-02 Age | Athlete | ✅ | ✅ draft | — |
+| AO-03 Height | Athlete | ✅ | ✅ draft | — |
+| AO-04 Current weight | Athlete | ✅ | ✅ draft | — |
+| AO-05 Main goal | Athlete | ✅ | ✅ draft | — |
+| AO-06 Goal weight | Athlete | ✅ | ✅ draft | — |
+| AO-07 Activity level | Athlete | ✅ | ✅ draft | — |
+| AO-08 Gym experience | Athlete | ✅ | ✅ draft | — |
+| AO-09 Where you train | Athlete | ✅ | ✅ draft | — |
+| AO-10 Training days | Athlete | ✅ | ✅ draft | — |
+| AO-11 Session length and time | Athlete | ✅ | ✅ draft | — |
+| AO-12 Injuries and limitations | Athlete | ✅ | ✅ draft | — |
+| AO-13 Sleep | Athlete | ✅ | ✅ draft | — |
+| AO-14 Sleep quality | Athlete | ✅ | ✅ draft | — |
+| AO-15 Stress and energy | Athlete | ✅ | ✅ draft | — |
+| AO-16 Diet type | Athlete | ✅ | ✅ draft | — |
+| AO-17 Meals per day | Athlete | ✅ | ✅ draft | — |
+| AO-18 Building your plan | Athlete (free) | ✅ | ✅ draft | — |
+| AO-19 Calorie target | Athlete (free) | ✅ | ✅ draft | — |
+| AO-20 Plan preview | Athlete (free) | ✅ | ✅ draft | — |
+| AO-21 All set — free | Athlete (free) | ✅ | ✅ draft | — |
+| AO-21b All set — coached | Athlete (coached) | ✅ | ✅ draft | — |
+| CO-02 Coach — what you get | Coach | ✅ | ✅ draft | — |
+| CO-03 Coach agreement | Coach | ✅ | ✅ draft | — |
+| CO-04 How you coach | Coach | ✅ | ✅ draft | — |
+| CO-05 Clients today | Coach | ✅ | ✅ draft | — |
+| CO-06 Coach profile basics | Coach | ✅ | ✅ draft | — |
+| CO-07 Specialisations | Coach | ✅ | ✅ draft | — |
+| CO-08 About you | Coach | ✅ | ✅ draft | — |
+| CO-09 Services | Coach | ✅ | ✅ draft | — |
+| CO-10 First template | Coach | ✅ | ✅ draft | — |
+| CO-11 Invite clients | Coach | ✅ | ✅ draft | — |
+| CO-12 Ready to coach | Coach | ✅ | ✅ draft | — |
+| CO-13 Clients — empty with setup checklist | Coach | ✅ | ✅ draft | — |
+| CO-14 Clients — first clients join | Coach | ✅ | ✅ draft | — |
+| CO-15 New client — assign plan | Coach | ✅ | ✅ draft | — |
+| F3-01 Invite shared (WhatsApp) | Coach → client | ✅ | ✅ draft | — |
+| F3-02 Invite landing | Athlete | ✅ | ✅ draft | — |
+| F3-03 Already coached (switch coach) | Athlete | ✅ | ✅ draft | — |
 | F4-01 Today — workout entry point | Athlete | ✅ | — | — |
 | F4-02 Workout preview | Athlete | ✅ | — | — |
 | F4-03 Active workout — set logging | Athlete | ✅ | — | — |
@@ -299,7 +348,7 @@ Tracked here as screens are designed (Wireframe → Mockup → Built). **✅ in 
 | K-16 Client profile — progress | Coach | ✅ | — | — |
 | K-17 Client profile — check-ins | Coach | ✅ | — | — |
 | K-18 Client profile — private notes | Coach | ✅ | — | — |
-| K-19 Coach sign-up | Coach | ✅ | — | — |
+| K-19 Coach sign-up (CO-01 in the coach onboarding mockups) | Coach | ✅ | ✅ draft | — |
 | K-20 Edit coach profile | Coach | ✅ | — | — |
 | K-21 Coach settings | Coach | ✅ | — | — |
 | T-01 Training — free | Athlete (free) | ✅ | — | — |
@@ -351,7 +400,7 @@ Tracked here as screens are designed (Wireframe → Mockup → Built). **✅ in 
 | AC-10 Coach access to earlier history | Athlete (coached) | ✅ | — | — |
 | CS-01 Coaching paused | Athlete (coached) | ✅ | — | — |
 | CS-02 Coaching ending | Athlete (coached) | ✅ | — | — |
-| F1-05b Consent — invite sign-up | Athlete (coached) | ✅ | — | — |
+| F1-05b Consent — invite sign-up | Athlete (coached) | ✅ | ✅ draft | — |
 | AI-03 Turn off AI — confirm | Athlete (AI) | ✅ | — | — |
 | AI-04 Out of scope | Athlete (AI) | ✅ | — | — |
 | TL-01 Trial ending reminder | Athlete (AI trial) | ✅ | — | — |
@@ -382,3 +431,10 @@ Tracked here as screens are designed (Wireframe → Mockup → Built). **✅ in 
 | 2026-11-11 | Founder decisions D1–D12 recorded in [DECISIONS.md](DECISIONS.md); section 3 rewritten; F10–F13 drawn; existing screens updated |
 | 2026-11-11 | F14–F16 drawn. Founder Executive Defaults (D13–D24) and Claude-applied defaults (D25–D45) recorded; every open box resolved; F17–F18 drawn; tokens moved from green to electric blue / cyan (D24) |
 | 2026-11-11 | design-prompt.md rewritten per the "Designing UI without the slop" guide: shared design language, negative list, one prompt per screen with references, variations and a critique pass. Gradient token removed. Icons: Lucide. Heading font: founder kept Inter for everything (D46) |
+| 2026-11-11 | Tokens written to [design/theme-tokens.css](design/theme-tokens.css). Founder kept the decided values over the brief's example values and approved the `scrim` token (D47) |
+| 2026-11-11 | Founder chose to build the frontend directly from the wireframes, skipping hi-fi mockups (D48). Master directive in [frontend/EXECUTION-PROMPT.md](frontend/EXECUTION-PROMPT.md) |
+| 2026-11-11 | Founder switched the app to a light theme (D49); §5 colours replaced, contrast re-checked |
+| 2026-11-11 | Founder switched to a black-and-white palette from a reference screenshot (D50); blue removed, colour kept for pillar markers and status |
+| 2026-11-11 | Founder chose the pull-up silhouette as the logo (D51); app icon, adaptive icon, splash, onboarding header and hi-fi mockups updated |
+| 2026-11-12 | Onboarding v2 drawn from a founder reference flow (D52): athlete flow in five sections with training and recovery questions, plus coach onboarding in the same style |
+| 2026-11-12 | Onboarding restyled in Apple setup-flow style with an interactive prototype (D53); welcome redrawn from the Bulky AI welcome reference with a training · meals · recovery hero and a Get Started role sheet (F1-02a) |
