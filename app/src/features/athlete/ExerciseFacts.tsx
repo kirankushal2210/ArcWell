@@ -28,9 +28,12 @@ function Chip({ label }: { label: string }) {
 export function ExerciseFacts({
   e,
   history,
+  showHistory = true,
 }: {
   e: Exercise;
   history: Session[];
+  /** Coaches browsing the library have no history of their own. */
+  showHistory?: boolean;
 }) {
   const logs = history
     .map((s) => ({
@@ -94,8 +97,8 @@ export function ExerciseFacts({
         {e.custom ? <Chip label="Your exercise" /> : null}
       </View>
 
-      <Eyebrow>Your history</Eyebrow>
-      {best || last ? (
+      {!showHistory ? null : <Eyebrow>Your history</Eyebrow>}
+      {!showHistory ? null : best || last ? (
         <View style={styles.card}>
           {best ? (
             <Text weight="semibold" numeric>

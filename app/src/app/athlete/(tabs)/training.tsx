@@ -37,6 +37,7 @@ import { useCoachData } from "@/features/coach/CoachData";
 import { Eyebrow, Group, GroupRow, PageHeader } from "@/features/coach/parts";
 import { todayIndex, WEEKDAYS, weekSchedule } from "@/features/coach/plans";
 import { colors, radius, space } from "@/theme";
+import { timesPerWeek } from "@/features/science/rules";
 import { VolumePanel } from "@/features/science/VolumePanel";
 
 function PlanPage() {
@@ -263,6 +264,10 @@ function PlanPage() {
 
       <VolumePanel
         days={program.days}
+        timesPerWeek={timesPerWeek(
+          program.days.length,
+          me.protocol?.restDays ?? [],
+        )}
 
         compact
 

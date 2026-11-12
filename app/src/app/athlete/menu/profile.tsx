@@ -10,6 +10,7 @@ import { NotJoined, useMe } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Eyebrow, Pills } from "@/features/coach/parts";
 import { colors } from "@/theme";
+import { equipmentCode } from "@/features/athlete/programs";
 
 const GOALS = [
   "Lose fat",
@@ -35,7 +36,11 @@ export default function EditProfile() {
     GOALS.find((g) => me?.goal.startsWith(g)) ?? "General fitness",
   );
   const [diet, setDiet] = useState<string>(me?.basics?.diet ?? "vegetarian");
-  const [equipment, setEquipment] = useState(me?.profile?.equipment ?? "Gym");
+  const [equipment, setEquipment] = useState(
+    EQUIPMENT[
+      ["gym", "home", "none"].indexOf(equipmentCode(me?.profile?.equipment))
+    ],
+  );
   const [injuries, setInjuries] = useState(
     (me?.profile?.injuries ?? []).join(", ") || me?.basics?.injuries || "",
   );
@@ -50,7 +55,7 @@ export default function EditProfile() {
         : undefined,
       profile: {
         ...me.profile,
-        equipment,
+        equipment: equipmentCode(equipment),
         injuries: injuries
           .split(",")
           .map((x) => x.trim())

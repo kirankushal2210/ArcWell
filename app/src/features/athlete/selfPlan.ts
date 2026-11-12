@@ -13,6 +13,7 @@ import type { Answers } from "@/features/onboarding/OnboardingContext";
 import { buildPlan } from "@/features/onboarding/plan";
 import {
   balanceVolume,
+  timesPerWeek,
   PROGRESSION,
   proteinTarget,
   restFor,
@@ -54,6 +55,16 @@ export type SelfPlan = {
   summary: { training: string; equipment: string; goal: string; diet: string };
 };
 
+/** Rest days from the athlete's chosen days, or a sensible spread for their days per week. */
+function restDaysFor(a: Answers) {
+  const picked = ((a.preferredDays as number[] | undefined) ?? [])
+    .slice()
+    .sort();
+  const days = Number(a.daysPerWeek ?? 4);
+  const training = picked.length ? picked : (SPREAD[days] ?? SPREAD[4]);
+  return [0, 1, 2, 3, 4, 5, 6].filter((d) => !training.includes(d));
+}
+
 export function selfPlan(a: Answers): SelfPlan {
   const p = buildPlan(a);
   const goalKey = (a.goal as string | undefined) ?? "general_fitness";
@@ -81,6 +92,7 @@ export function selfPlan(a: Answers): SelfPlan {
   program.days = balanceVolume(program.days, {
     min: weeklyMin(goalKey, experience),
     minutes: parseInt(String(a.sessionLength ?? "45"), 10),
+    timesPerWeek: timesPerWeek(program.days.length, restDaysFor(a)),
   }).map((d) => ({
     ...d,
     note: `Leave ${rirFor(experience, true)} reps in reserve on big lifts and ${rirFor(experience, false)} on the rest. ${PROGRESSION}`,
@@ -106,17 +118,11 @@ export function selfPlan(a: Answers): SelfPlan {
     meals: meals <= 3 ? day.filter((m) => m.name !== "Snack") : day,
   };
 
-  const picked = ((a.preferredDays as number[] | undefined) ?? [])
-    .slice()
-    .sort();
-  const training = picked.length
-    ? picked
-    : (SPREAD[p.daysPerWeek] ?? SPREAD[4]);
   const protocol: RecoveryProtocol = {
     sleepH: p.sleepTargetHours,
     bed: typeof a.bedTime === "number" ? a.bedTime : 22 * 60 + 30,
     wake: typeof a.wakeTime === "number" ? a.wakeTime : 6 * 60 + 30,
-    restDays: [0, 1, 2, 3, 4, 5, 6].filter((d) => !training.includes(d)),
+    restDays: restDaysFor(a),
     note: "",
   };
 

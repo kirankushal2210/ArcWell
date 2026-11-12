@@ -145,7 +145,7 @@ export function volumeIssues(days: DayLike[], timesPerWeek: number[] = []) {
         label: g.label,
         sets: n,
         kind: "high",
-        text: `${g.label}: ${fmt(n)} sets a week. Above about 20, each extra set adds less and costs more recovery. Check it's intended.`,
+        text: `${g.label}: ${setsWord(n)} a week. Above about 20, each extra set adds less and costs more recovery. Check it's intended.`,
       });
     else if (n === 0 && g.key !== "abs" && g.key !== "calves")
       issues.push({
@@ -161,7 +161,7 @@ export function volumeIssues(days: DayLike[], timesPerWeek: number[] = []) {
         label: g.label,
         sets: n,
         kind: "low",
-        text: `${g.label}: ${fmt(n)} sets a week. That still builds muscle; more weekly sets usually build more.`,
+        text: `${g.label}: ${setsWord(n)} a week. That still builds muscle; more weekly sets usually build more.`,
       });
   }
   for (const d of days) {
@@ -182,6 +182,7 @@ export function volumeIssues(days: DayLike[], timesPerWeek: number[] = []) {
 
 export const fmt = (n: number) =>
   Number.isInteger(n) ? String(n) : n.toFixed(1);
+const setsWord = (n: number) => `${fmt(n)} set${n === 1 ? "" : "s"}`;
 
 // ---------- Effort, reps and rest ----------
 
@@ -332,31 +333,38 @@ export const ENERGY_EQUATION = "mifflin1990";
  */
 export function balanceVolume<
   D extends { name: string; exercises: { name: string; sets: number }[] },
->(days: D[], opts: { min: number; minutes: number }): D[] {
+>(
+  days: D[],
+  opts: { min: number; minutes: number; timesPerWeek?: number[] },
+): D[] {
   const out = days.map((d) => ({
     ...d,
     exercises: d.exercises.map((e) => ({ ...e })),
   }));
+  const times = opts.timesPerWeek ?? [];
   const maxSessionSets = Math.floor(opts.minutes / 2.5);
   const primaryOf = (name: string) => {
     const e = findExercise(name);
     return e ? PRIMARY[e.muscle] : undefined;
   };
-  for (let i = 0; i < 60; i++) {
-    const weekly = weeklyVolume(out);
-    const over = GROUPS.find((g) => weekly[g.key] > WEEKLY_SETS.range[1]);
+  const stuck = new Set<Group>();
+  for (let i = 0; i < 80; i++) {
+    const weekly = weeklyVolume(out, times);
+    const over = GROUPS.find(
+      (g) => !stuck.has(g.key) && weekly[g.key] > WEEKLY_SETS.range[1],
+    );
     if (over) {
       const ex = out
         .flatMap((d) => d.exercises)
         .filter((e) => primaryOf(e.name) === over.key && e.sets > 2)
         .sort((a, b) => b.sets - a.sets)[0];
-      if (ex) {
-        ex.sets -= 1;
-        continue;
-      }
+      if (ex) ex.sets -= 1;
+      else stuck.add(over.key);
+      continue;
     }
     const under = GROUPS.find(
       (g) =>
+        !stuck.has(g.key) &&
         g.key !== "abs" &&
         g.key !== "calves" &&
         weekly[g.key] > 0 &&
@@ -376,9 +384,22 @@ export function balanceVolume<
         break;
       }
     }
-    if (!added) break;
+    // A muscle that can't go higher (sessions full, exercises at 5 sets) is left as it is.
+    if (!added) stuck.add(under.key);
   }
   return out;
+}
+
+/** How many times each program day runs in a week, from the rest days (rotation as weekSchedule). */
+export function timesPerWeek(dayCount: number, restDays: number[]) {
+  const counts = Array.from({ length: dayCount }, () => 0);
+  let k = 0;
+  for (let d = 0; d < 7; d++) {
+    if (restDays.includes(d) || dayCount === 0) continue;
+    counts[k % dayCount] += 1;
+    k++;
+  }
+  return counts;
 }
 
 /** Weekly minimum the generator aims for, by goal and experience. */

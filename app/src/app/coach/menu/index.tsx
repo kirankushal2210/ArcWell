@@ -6,6 +6,7 @@ import {
   ChevronRight,
   CircleHelp,
   CreditCard,
+  Dumbbell,
   Images,
   LogOut,
   type LucideIcon,
@@ -21,6 +22,7 @@ import { Group, GroupRow, Page, PageHeader } from "@/features/coach/parts";
 import { colors, radius, space } from "@/theme";
 
 type Href =
+  | "/coach/exercises"
   | "/science"
   | "/coach/transformations"
   | "/coach/menu/profile"
@@ -51,6 +53,12 @@ const ITEMS: { icon: LucideIcon; label: string; sub: string; href: Href }[] = [
     label: "Settings and privacy",
     sub: "Notifications, data and your account",
     href: "/coach/menu/settings",
+  },
+  {
+    icon: Dumbbell,
+    label: "Exercise library",
+    sub: "Browse exercises and add your own",
+    href: "/coach/exercises",
   },
   {
     icon: BookOpen,

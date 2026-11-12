@@ -5,6 +5,8 @@ import { router } from "expo-router";
 import {
   Bell,
   BookOpen,
+  CalendarRange,
+  ChartColumn,
   Camera,
   ChartLine,
   Dumbbell,
@@ -74,9 +76,21 @@ export default function AthleteMenu() {
         />
         <NavRow
           icon={ListChecks}
-          label={free ? "Workouts" : "Workouts and programs"}
-          sub={free ? "Templates and your routines" : undefined}
+          label="Workouts"
+          sub="Your plan and your own routines"
           onPress={() => router.push("/athlete/training")}
+        />
+        <NavRow
+          icon={CalendarRange}
+          label="Programs"
+          value={free ? "Plus" : undefined}
+          onPress={() => router.push("/athlete/programs")}
+        />
+        <NavRow
+          icon={ChartColumn}
+          label="Muscle Analytics"
+          value={free ? "Plus" : undefined}
+          onPress={() => router.push("/athlete/analytics")}
         />
         <NavRow
           icon={History}

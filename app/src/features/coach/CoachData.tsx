@@ -136,6 +136,8 @@ type CoachData = {
   /** Gives each client their own copy of the template, replacing their current program or meal plan. */
   assignTemplate: (id: string, clientIds: string[]) => void;
   saveProgram: (id: string, p: TrainingProgram) => void;
+  /** Switch to a new program from today (TR-04): week 1 starts now and rest days follow it. */
+  startProgram: (id: string, p: TrainingProgram, restDays: number[]) => void;
   saveNutrition: (id: string, n: NutritionPlan) => void;
   saveProtocol: (id: string, r: RecoveryProtocol) => void;
   createInvite: (id: string) => { token: string; code: string };
@@ -955,6 +957,16 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       }
       bumpTemplates([id], clientIds.length);
     },
+    startProgram: (id, p, restDays) =>
+      update(id, (c) => ({
+        program: p,
+        programStart: new Date().toISOString(),
+        plan: { training: p.name, meals: c.plan?.meals ?? "" },
+        protocol: c.protocol
+          ? { ...c.protocol, restDays }
+          : { sleepH: 8, bed: 22 * 60 + 30, wake: 6 * 60 + 30, restDays, note: "" },
+        training: { ...c.training, weekPlanned: 7 - restDays.length },
+      })),
     saveProgram: (id, p) =>
       update(id, (c) => ({
         program: p,

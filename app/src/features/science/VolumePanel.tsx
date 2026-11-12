@@ -25,15 +25,21 @@ export function VolumePanel({
   days,
   title = "Weekly sets per muscle",
   compact = false,
+  logged = false,
+  timesPerWeek,
 }: {
+  /** How many times each day runs a week (a repeated workout counts twice). */
+  timesPerWeek?: number[];
+  /** Counting what was logged so far: only flag high volume, not muscles still to train. */
+  logged?: boolean;
   days: DayLike[];
   title?: string;
   /** Hide muscles with no sets and the per-session checks (athlete view). */
   compact?: boolean;
 }) {
-  const weekly = weeklyVolume(days);
-  const issues = volumeIssues(days).filter(
-    (i) => !compact || i.kind !== "missing",
+  const weekly = weeklyVolume(days, timesPerWeek);
+  const issues = volumeIssues(days, timesPerWeek).filter((i) =>
+    logged ? i.kind === "high" : !compact || i.kind !== "missing",
   );
   const rows = GROUPS.filter((g) => !compact || weekly[g.key] > 0);
   if (!days.length) return null;
