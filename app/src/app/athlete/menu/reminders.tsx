@@ -19,7 +19,6 @@ import { NotJoined, useMe } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Group, GroupRow } from "@/features/coach/parts";
 import { clock } from "@/features/coach/plans";
-import { space } from "@/theme";
 
 const STEP = 15;
 
