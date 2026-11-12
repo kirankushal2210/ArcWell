@@ -295,15 +295,19 @@ const questions: Question[] = [
             sub: "Opens the plan builder",
             icon: PencilRuler,
           },
-          // D45: copying from a spreadsheet is v1.1.
+          // D55: back in v1. Most coaches run their clients' workouts in Excel or Google Sheets today.
           {
             value: "spreadsheet",
             label: "Copy from my spreadsheet",
-            sub: "Coming later",
+            sub: "Excel, Google Sheets or CSV",
             icon: Sheet,
-            disabled: true,
           },
         ],
+      },
+      {
+        kind: "sheet",
+        key: "templateSheet",
+        showIf: { key: "firstTemplate", equals: "spreadsheet" },
       },
     ],
   },

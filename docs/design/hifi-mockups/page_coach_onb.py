@@ -129,11 +129,11 @@ def setup() -> str:
     template = phone("CO-10", "First template", notes(
         "Was F2-06.",
         "Starting from an Arcwell template is fastest; the plan builder is drawn in F13.",
-        "“Copy from my spreadsheet” is v1.1 (D45), shown faded with a label."),
+        "D55: “Copy from my spreadsheet” is in v1. Choosing it shows a file chooser for Excel (.xlsx, .xls), Google Sheets or CSV; after setup the file becomes a draft template the coach checks before any client sees it."),
         bar("plans", 1, 1) + qh("Create your first training template", "Reuse it for every client and adjust per person.", "clipboard-list") +
         options(sel("Start from an Arcwell template", "Push / pull / legs, upper / lower, full body", True, "layout-template", tall=True),
-                sel("Build from scratch", "Opens the plan builder", icon="pencil-ruler", tall=True)) +
-        f'<div class="glist"><div class="sel tall faded has-ic" aria-disabled="true">{i("sheet")}<div class="grow"><b>Copy from my spreadsheet</b><span>Coming later</span></div><span class="ck"></span></div></div>',
+                sel("Build from scratch", "Opens the plan builder", icon="pencil-ruler", tall=True),
+                sel("Copy from my spreadsheet", "Excel, Google Sheets or CSV", icon="sheet", tall=True)),
         foot=foot("Continue", skip=True, skip_label="Skip, I'll do this later"))
     def dark(x: int, y: int) -> bool:
         for fx, fy in ((0, 0), (14, 0), (0, 14)):  # three finder squares, like a real QR code

@@ -134,6 +134,8 @@ export type Field =
   | { kind: "agree"; key: string; label: string }
   | { kind: "photo"; key: string }
   | { kind: "services"; key: string }
+  /** Coach's existing Excel, Google Sheets or CSV workout file (D55). */
+  | { kind: "sheet"; key: string; showIf: { key: string; equals: string } }
   | { kind: "invite"; nameKey: string };
 
 export type Question = {

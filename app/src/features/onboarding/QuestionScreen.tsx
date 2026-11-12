@@ -1,8 +1,11 @@
 // One onboarding question screen: athlete AO-01 to AO-17 and coach CO-02 to CO-11. Layout follows the hi-fi mockups:
 // top bar, centred header, the question's fields, and a Next button pinned at the bottom.
+import * as DocumentPicker from "expo-document-picker";
 import {
   Camera,
   Check,
+  FileSpreadsheet,
+  FileUp,
   MessageCircle,
   MessageSquare,
   Plus,
@@ -10,6 +13,7 @@ import {
   Trash2,
   TrendingDown,
   TrendingUp,
+  X,
 } from "lucide-react-native";
 import { useState } from "react";
 import {
@@ -357,6 +361,10 @@ function FieldView({ field: f }: { field: Field }) {
     case "services":
       return <ServicesField storeKey={f.key} />;
 
+    case "sheet":
+      if (answers[f.showIf.key] !== f.showIf.equals) return null;
+      return <SheetField storeKey={f.key} />;
+
     case "invite":
       return (
         <InviteField name={(answers[f.nameKey] as string | undefined) ?? ""} />
@@ -573,6 +581,96 @@ function ServicesField({ storeKey }: { storeKey: string }) {
         <Plus size={20} color={colors.text} />
         <Text weight="semibold">Add a service</Text>
       </PressableScale>
+    </View>
+  );
+}
+
+// ---------- Coach spreadsheet (CO-10, D55): the workouts coaches already keep in Excel or Sheets ----------
+
+type SheetFile = { name: string; size?: number };
+
+const SHEET_TYPES = [
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
+  "application/vnd.ms-excel", // .xls
+  "application/vnd.google-apps.spreadsheet", // Google Sheets (Android Drive)
+  "text/csv",
+  "text/comma-separated-values",
+];
+
+const fileSize = (bytes?: number) =>
+  bytes === undefined
+    ? ""
+    : bytes < 1024 * 1024
+      ? `${Math.max(1, Math.round(bytes / 1024))} KB`
+      : `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+
+function SheetField({ storeKey }: { storeKey: string }) {
+  const { answers, setAnswer } = useOnboarding();
+  const file = answers[storeKey] as SheetFile | undefined;
+  // The file stays on the phone for now. Uploading (signed URL) and turning it into a
+  // draft template come with accounts; nothing here leaves the device.
+  const pick = async () => {
+    const res = await DocumentPicker.getDocumentAsync({
+      type: SHEET_TYPES,
+      copyToCacheDirectory: true,
+      multiple: false,
+    }).catch(() => null);
+    const asset = res && !res.canceled ? res.assets[0] : undefined;
+    if (asset) setAnswer(storeKey, { name: asset.name, size: asset.size });
+  };
+
+  return (
+    <View style={styles.field}>
+      {file ? (
+        <View style={styles.sheetFile}>
+          <FileSpreadsheet size={28} strokeWidth={1.6} color={colors.text} />
+          <View style={styles.flex}>
+            <Text weight="semibold" numberOfLines={1}>
+              {file.name}
+            </Text>
+            <Text variant="label" weight="regular" tone="muted">
+              {[fileSize(file.size), "Ready to copy"]
+                .filter(Boolean)
+                .join(" · ")}
+            </Text>
+          </View>
+          <PressableScale
+            onPress={pick}
+            accessibilityRole="button"
+            accessibilityLabel="Choose a different file"
+            style={styles.sheetAction}
+          >
+            <Text variant="label">Replace</Text>
+          </PressableScale>
+          <PressableScale
+            onPress={() => setAnswer(storeKey, undefined)}
+            accessibilityRole="button"
+            accessibilityLabel="Remove file"
+            style={styles.remove}
+          >
+            <X size={18} color={colors.textMuted} />
+          </PressableScale>
+        </View>
+      ) : (
+        <PressableScale
+          onPress={pick}
+          accessibilityRole="button"
+          accessibilityLabel="Choose your spreadsheet"
+          style={styles.sheetPick}
+        >
+          <FileUp size={28} strokeWidth={1.6} color={colors.text} />
+          <Text weight="semibold">Choose your spreadsheet</Text>
+          <Text variant="label" weight="regular" tone="muted">
+            Excel (.xlsx, .xls), Google Sheets or CSV
+          </Text>
+        </PressableScale>
+      )}
+      <Text variant="caption" tone="muted">
+        Works best with one row per exercise: day, exercise, sets and reps. We
+        turn it into a draft template after setup, and you check it before any
+        client sees it. File on your laptop? Skip and add it later from
+        Templates.
+      </Text>
     </View>
   );
 }
@@ -807,6 +905,28 @@ const styles = StyleSheet.create({
     borderColor: colors.borderStrong,
     backgroundColor: colors.surface,
   },
+  sheetPick: {
+    alignItems: "center",
+    gap: space[1],
+    paddingVertical: space[6],
+    paddingHorizontal: space[4],
+    borderRadius: radius.md,
+    borderWidth: 1.5,
+    borderStyle: "dashed",
+    borderColor: colors.borderStrong,
+    backgroundColor: colors.surface,
+  },
+  sheetFile: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space[3],
+    minHeight: 64,
+    paddingLeft: space[4],
+    paddingRight: space[1],
+    borderRadius: radius.md,
+    backgroundColor: colors.surface,
+  },
+  sheetAction: { paddingHorizontal: space[2], paddingVertical: space[2] },
   inviteBlock: { gap: space[4] },
   linkRow: {
     flexDirection: "row",
