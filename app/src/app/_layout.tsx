@@ -16,6 +16,7 @@ import { StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
+import { AuthProvider } from "@/features/auth/AuthProvider";
 import { CoachDataProvider } from "@/features/coach/CoachData";
 import { colors } from "@/theme";
 
@@ -46,18 +47,23 @@ export default function RootLayout() {
         <StatusBar style="dark" />
         <NavigationBar style="dark" />
         {/* Sample data shared by the coach and athlete sides until the backend exists. */}
-        <CoachDataProvider>
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              contentStyle: { backgroundColor: colors.bg },
-            }}
-          >
-            {/* Once in the coach app, a swipe back must not land in onboarding again. */}
-            <Stack.Screen name="coach" options={{ gestureEnabled: false }} />
-            <Stack.Screen name="athlete" options={{ gestureEnabled: false }} />
-          </Stack>
-        </CoachDataProvider>
+        <AuthProvider>
+          <CoachDataProvider>
+            <Stack
+              screenOptions={{
+                headerShown: false,
+                contentStyle: { backgroundColor: colors.bg },
+              }}
+            >
+              {/* Once in the coach app, a swipe back must not land in onboarding again. */}
+              <Stack.Screen name="coach" options={{ gestureEnabled: false }} />
+              <Stack.Screen
+                name="athlete"
+                options={{ gestureEnabled: false }}
+              />
+            </Stack>
+          </CoachDataProvider>
+        </AuthProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

@@ -3,9 +3,10 @@ import * as Clipboard from "expo-clipboard";
 import { router } from "expo-router";
 import { Copy, Share2 } from "lucide-react-native";
 import { useState } from "react";
-import { Share, StyleSheet, View } from "react-native";
+import { Alert, Share, StyleSheet, View } from "react-native";
 
 import { Avatar, Button, Text } from "@/components/primitives";
+import { useAuth } from "@/features/auth/AuthProvider";
 import { useCoachData } from "@/features/coach/CoachData";
 import {
   Eyebrow,
@@ -19,6 +20,7 @@ import { colors, radius, space } from "@/theme";
 
 export default function BusinessTab() {
   const { clients, leads } = useCoachData();
+  const auth = useAuth();
   const [copied, setCopied] = useState(false);
   const used = clients.filter((c) => c.status !== "completed").length;
   const { link, clientLimit } = sampleCoach;
@@ -79,6 +81,31 @@ export default function BusinessTab() {
           onPress={() => router.push("/join/coach")}
         />
 
+        {auth.session ? (
+          <Button
+            label="Sign out"
+            variant="ghost"
+            fullWidth
+            onPress={() =>
+              Alert.alert(
+                "Sign out?",
+                "Your clients and plans stay on this phone.",
+                [
+                  { text: "Cancel", style: "cancel" },
+                  {
+                    text: "Sign out",
+                    onPress: () => {
+                      auth.signOut().finally(() => {
+                        if (router.canDismiss()) router.dismissAll();
+                        router.replace("/");
+                      });
+                    },
+                  },
+                ],
+              )
+            }
+          />
+        ) : null}
         <Eyebrow>Leads</Eyebrow>
         <Group>
           {leads.map((l, i) => (

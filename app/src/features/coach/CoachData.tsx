@@ -27,12 +27,16 @@ import {
 import type { ActiveWorkout, Session } from "@/features/athlete/training";
 
 import {
+  cloneNutrition,
+  cloneProgram,
   exampleDay,
+  fillTemplate,
   type NutritionPlan,
   programFromTemplate,
   type RecoveryProtocol,
   type TrainingDay,
   type TrainingProgram,
+  uid,
 } from "./plans";
 import {
   type Client,
@@ -68,6 +72,15 @@ type CoachData = {
   client: (id: string) => Client | undefined;
   addClient: (c: NewClient) => string;
   assignPlan: (id: string, training: string, meals: string) => void;
+  /** Adds or updates a template (K-06); returns its id. Clients already on it keep their copy. */
+  saveTemplate: (
+    t: Omit<Template, "id" | "detail" | "clients"> & { id?: string },
+  ) => string;
+  deleteTemplate: (id: string) => void;
+  /** Copies a template under a new name; returns the copy's id. */
+  duplicateTemplate: (id: string) => string;
+  /** Gives each client their own copy of the template, replacing their current program or meal plan. */
+  assignTemplate: (id: string, clientIds: string[]) => void;
   saveProgram: (id: string, p: TrainingProgram) => void;
   saveNutrition: (id: string, n: NutritionPlan) => void;
   saveProtocol: (id: string, r: RecoveryProtocol) => void;
@@ -171,6 +184,7 @@ type Saved = {
   myFoods?: Food[];
   hideUpgrade?: boolean;
   recovery?: Record<string, RecoveryStore>;
+  templates?: Template[];
 };
 
 /** Saved self plans from before exact foods: rebuild the example day with foods (sample data only). */
@@ -215,6 +229,9 @@ const code = (coach: string) =>
 
 export function CoachDataProvider({ children }: { children: ReactNode }) {
   const [clients, setClients] = useState(sampleClients);
+  const [templates, setTemplates] = useState<Template[]>(() =>
+    sampleTemplates.map(fillTemplate),
+  );
   const [reminded, setReminded] = useState<string[]>([]);
   const [meId, setMeId] = useState<string | null>(null);
   const [meTier, setMeTier] = useState<AthleteTier>("coached");
@@ -252,6 +269,7 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
         if (s.myFoods) setMyFoods(s.myFoods);
         if (s.hideUpgrade) setHideUpgrade(true);
         if (s.recovery) setRecovery(s.recovery);
+        if (s.templates) setTemplates(s.templates.map(fillTemplate));
       })
       .catch(() => {})
       .finally(() => setHydrated(true));
@@ -270,6 +288,7 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       myFoods,
       hideUpgrade,
       recovery,
+      templates,
     };
     AsyncStorage.setItem(STORE_KEY, JSON.stringify(saved)).catch(() => {});
   }, [
@@ -285,6 +304,7 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
     myFoods,
     hideUpgrade,
     recovery,
+    templates,
   ]);
   const update = (id: string, patch: (c: Client) => Partial<Client>) => {
     if (self && id === self.id) {
@@ -296,10 +316,16 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
     );
   };
   const coachName = sampleCoach.name;
+  const bumpTemplates = (ids: (string | undefined)[], by: number) =>
+    setTemplates((all) =>
+      all.map((x) =>
+        ids.includes(x.id) ? { ...x, clients: x.clients + by } : x,
+      ),
+    );
 
   const value: CoachData = {
     clients,
-    templates: sampleTemplates,
+    templates,
     leads: sampleLeads,
     coachName,
     reminded,
@@ -317,6 +343,7 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       setMyFoods([]);
       setHideUpgrade(false);
       setRecovery({});
+      setTemplates(sampleTemplates.map(fillTemplate));
       AsyncStorage.removeItem(STORE_KEY).catch(() => {});
     },
     meTier,
@@ -545,15 +572,102 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       return id;
     },
 
-    assignPlan: (id, training, meals) =>
-      update(id, () => ({
+    assignPlan: (id, training, meals) => {
+      const t = templates.find(
+        (x) => x.kind === "training" && x.name === training,
+      );
+      const m = templates.find((x) => x.kind === "meals" && x.name === meals);
+      update(id, (c) => ({
         isNew: false,
         plan: { training, meals },
-        program: programFromTemplate(training),
+        program: t?.program
+          ? { ...cloneProgram(t.program), name: t.name }
+          : programFromTemplate(training),
         programStart: new Date().toISOString(),
+        nutritionPlan: m?.nutrition
+          ? cloneNutrition(m.nutrition)
+          : c.nutritionPlan,
         line: "Plan assigned · starts Monday",
         attention: undefined,
-      })),
+      }));
+      bumpTemplates([t?.id, m?.id], 1);
+    },
+    saveTemplate: (draft) => {
+      const id = draft.id ?? uid(draft.kind === "training" ? "t" : "m");
+      setTemplates((all) => {
+        const prev = all.find((x) => x.id === id);
+        const next = fillTemplate({
+          ...draft,
+          id,
+          detail: "",
+          clients: prev?.clients ?? 0,
+          // Recompute the list line from the new content.
+          program: draft.program,
+          nutrition: draft.nutrition,
+        });
+        return prev ? all.map((x) => (x.id === id ? next : x)) : [next, ...all];
+      });
+      return id;
+    },
+    deleteTemplate: (id) =>
+      setTemplates((all) => all.filter((x) => x.id !== id)),
+    duplicateTemplate: (id) => {
+      const src = templates.find((x) => x.id === id);
+      const copyId = uid(src?.kind === "meals" ? "m" : "t");
+      if (!src) return copyId;
+      const copy: Template = {
+        ...src,
+        id: copyId,
+        name: `${src.name} (copy)`,
+        clients: 0,
+        program: src.program
+          ? { ...cloneProgram(src.program), name: `${src.name} (copy)` }
+          : undefined,
+        nutrition: src.nutrition ? cloneNutrition(src.nutrition) : undefined,
+      };
+      setTemplates((all) => {
+        const at = all.findIndex((x) => x.id === id);
+        return [...all.slice(0, at + 1), copy, ...all.slice(at + 1)];
+      });
+      return copyId;
+    },
+    assignTemplate: (id, clientIds) => {
+      const t = templates.find((x) => x.id === id);
+      if (!t || !clientIds.length) return;
+      for (const cid of clientIds) {
+        if (t.kind === "training" && t.program) {
+          const program = { ...cloneProgram(t.program), name: t.name };
+          update(cid, (c) => ({
+            isNew: false,
+            program,
+            programStart: new Date().toISOString(),
+            plan: { training: t.name, meals: c.plan?.meals ?? "" },
+            training: {
+              ...c.training,
+              weekPlanned: c.protocol
+                ? 7 - c.protocol.restDays.length
+                : program.days.length,
+            },
+          }));
+        }
+        if (t.kind === "meals" && t.nutrition) {
+          const n = cloneNutrition(t.nutrition);
+          update(cid, (c) => ({
+            nutritionPlan: n,
+            plan: {
+              training: c.plan?.training ?? c.program?.name ?? "",
+              meals: t.name,
+            },
+            nutrition: {
+              ...c.nutrition,
+              targetKcal: n.kcal,
+              proteinG: n.protein,
+            },
+          }));
+        }
+      }
+      bumpTemplates([id], clientIds.length);
+    },
     saveProgram: (id, p) =>
       update(id, (c) => ({
         program: p,

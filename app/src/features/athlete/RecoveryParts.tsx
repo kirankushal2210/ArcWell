@@ -146,7 +146,8 @@ export function Ring({
       </View>
       <View style={styles.ringInner}>
         <Text
-          variant={size >= 140 ? "display" : "title"}
+          variant={size >= 140 ? "display" : size >= 72 ? "title" : "label"}
+          weight={size < 72 ? "semibold" : undefined}
           numeric
           style={styles.center}
         >

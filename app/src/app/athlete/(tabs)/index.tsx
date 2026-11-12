@@ -1,13 +1,17 @@
 // Today for a coached athlete: today's workout from the coach's program (or rest day), the next meal
-// from the coach's example day, tonight's bedtime, and the coach's latest message.
+// from the coach's example day, tonight's bedtime with small Recovery, Strain and Stress rings
+// (paid and coached; D60), and the coach's latest message.
 import { router } from "expo-router";
 import { Check, ChevronRight } from "lucide-react-native";
 import { Alert, StyleSheet, View } from "react-native";
 
-import { Avatar, Button, Text } from "@/components/primitives";
+import { Avatar, Button, PressableScale, Text } from "@/components/primitives";
 import { todayKey, useNutrition } from "@/features/athlete/FoodParts";
+import { todayDate } from "@/features/athlete/recovery";
+import { Ring, useRecovery } from "@/features/athlete/RecoveryParts";
 import { programWeek } from "@/features/athlete/training";
 import { AthletePage, NotJoined, useMe } from "@/features/athlete/useMe";
+import { useAuth } from "@/features/auth/AuthProvider";
 import { useCoachData } from "@/features/coach/CoachData";
 import {
   Eyebrow,
@@ -36,6 +40,8 @@ export default function Today() {
   const me = useMe();
   const n = useNutrition();
   const { coachName, meTier, active, resetSample } = useCoachData();
+  const auth = useAuth();
+  const r = useRecovery();
   if (!me) return <NotJoined />;
 
   const first = me.name.split(" ")[0];
@@ -50,6 +56,38 @@ export default function Today() {
       ? [...me.messages].reverse().find((m) => m.from === "coach")
       : undefined;
   const meals = me.nutritionPlan?.meals ?? [];
+  const day = meTier !== "free" ? r.day(todayDate()) : null;
+  const rings = day
+    ? [
+        {
+          label: "Recovery",
+          share: day.recovery.score / 100,
+          value: String(day.recovery.score),
+          unit: "%",
+          open: () =>
+            router.push({
+              pathname: "/athlete/recovery",
+              params: { tab: "recovery" },
+            }),
+        },
+        {
+          label: "Strain",
+          share: day.strain.score / 21,
+          value: day.strain.score.toFixed(1),
+          open: () =>
+            router.push({
+              pathname: "/athlete/recovery",
+              params: { tab: "strain" },
+            }),
+        },
+        {
+          label: "Stress",
+          share: day.stress.value / 3,
+          value: day.stress.value.toFixed(1),
+          open: () => router.push("/athlete/recovery/stress"),
+        },
+      ]
+    : [];
   const eatenToday = n.logs
     .filter((l) => l.date === todayKey())
     .reduce((s, l) => s + l.macros.kcal, 0);
@@ -187,7 +225,58 @@ export default function Today() {
             </Text>
             <ChevronRight size={18} color={colors.textMuted} />
           </GroupRow>
+          {rings.length ? (
+            <GroupRow>
+              <View style={styles.rings}>
+                {rings.map((g) => (
+                  <PressableScale
+                    key={g.label}
+                    onPress={g.open}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${g.label} ${g.value}${g.unit ?? ""}. Open ${g.label}`}
+                    style={styles.ring}
+                  >
+                    <Ring
+                      share={g.share}
+                      value={g.value}
+                      unit={g.unit}
+                      size={52}
+                      stroke={5}
+                    />
+                    <Text variant="caption" tone="muted">
+                      {g.label}
+                    </Text>
+                  </PressableScale>
+                ))}
+              </View>
+            </GroupRow>
+          ) : null}
         </Group>
+        {auth.session ? (
+          <Button
+            label="Sign out"
+            variant="ghost"
+            fullWidth
+            onPress={() =>
+              Alert.alert(
+                "Sign out?",
+                "Your plan and history stay on this phone.",
+                [
+                  { text: "Cancel", style: "cancel" },
+                  {
+                    text: "Sign out",
+                    onPress: () => {
+                      auth.signOut().finally(() => {
+                        if (router.canDismiss()) router.dismissAll();
+                        router.replace("/");
+                      });
+                    },
+                  },
+                ],
+              )
+            }
+          />
+        ) : null}
         <Button
           label="Sample build: reset this phone"
           variant="ghost"
@@ -218,6 +307,12 @@ export default function Today() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
   flex: { flex: 1, gap: space[1] / 2 },
+  rings: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-around",
+  },
+  ring: { alignItems: "center", gap: space[1] },
   coach: {
     flexDirection: "row",
     alignItems: "center",

@@ -2,7 +2,7 @@
 // and the connected device. Scores come from a device, else the morning check-in, else the
 // onboarding answers, and each page says which. Part of Arcwell Plus for self-guided athletes (D5a,
 // D57); full for coached athletes.
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { ChevronLeft, ChevronRight, Lock, Watch } from "lucide-react-native";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
@@ -38,9 +38,16 @@ const TABS: { key: RecoveryTab; label: string }[] = [
 
 export default function Recovery() {
   const r = useRecovery();
+  const p = useLocalSearchParams<{ tab?: RecoveryTab }>();
   const [today] = useState(todayDate);
   const [date, setDate] = useState(today);
-  const [tab, setTab] = useState<RecoveryTab>("overview");
+  const [tab, setTab] = useState<RecoveryTab>(p.tab ?? "overview");
+  // Opened from Today's rings with a section in mind: switch to it.
+  const [asked, setAsked] = useState(p.tab);
+  if (p.tab !== asked) {
+    setAsked(p.tab);
+    if (p.tab) setTab(p.tab);
+  }
   if (!r.me) return <NotJoined />;
 
   if (r.tier === "free")

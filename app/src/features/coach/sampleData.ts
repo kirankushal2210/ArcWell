@@ -105,8 +105,14 @@ export type Template = {
   id: string;
   kind: "training" | "meals";
   name: string;
+  /** One line for the list, built from the content (e.g. "4 workouts · 8 weeks"). */
   detail: string;
+  /** How many clients have been given a copy. */
   clients: number;
+  /** Training templates: the program each client gets a copy of. */
+  program?: TrainingProgram;
+  /** Meal templates: targets plus the example day each client gets a copy of. */
+  nutrition?: NutritionPlan;
 };
 
 export type Lead = {

@@ -1,6 +1,6 @@
 // Save your plan (D57): sign-up comes after the athlete has seen their plan. Health-data consent is
-// given here, before any answer leaves the phone. Google and email sign-in connect with accounts
-// (PLAN.md Phase 1); in this build both continue.
+// given here, before any answer leaves the phone. Email signs up with a 6-digit code (PLAN Phase 1);
+// Google follows with the development build. Sample builds without accounts continue straight on.
 import { router } from "expo-router";
 import { Check, Mail, ShieldCheck } from "lucide-react-native";
 import { useState } from "react";
@@ -9,6 +9,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Button, PressableScale, Text } from "@/components/primitives";
 import { newClientFromAnswers } from "@/features/athlete/selfPlan";
+import { useAuth } from "@/features/auth/AuthProvider";
 import { useCoachData } from "@/features/coach/CoachData";
 import { useOnboarding } from "@/features/onboarding/OnboardingContext";
 import { ProgressBar, QuestionHeader } from "@/features/onboarding/parts";
@@ -19,6 +20,12 @@ export default function SavePlan() {
   const [agree, setAgree] = useState(false);
   const { joiningCoach, joinAsNewClient } = useCoachData();
   const { answers } = useOnboarding();
+  const auth = useAuth();
+  const withEmail = () => {
+    if (!auth.enabled) return next();
+    auth.begin({ role: "athlete", consent: true, then: next });
+    router.push("/auth/email");
+  };
   const next = () => {
     if (!joiningCoach) return router.push("/onboarding/pro");
     // General-link join: into the coach's "Needs a plan" list, then the app, waiting for the plan.
@@ -70,22 +77,23 @@ export default function SavePlan() {
       </View>
       <View style={styles.footer}>
         <Button
-          label="Continue with Google"
-          fullWidth
-          disabled={!agree}
-          onPress={next}
-        />
-        <Button
           label="Continue with email"
           icon={Mail}
-          variant="secondary"
           fullWidth
           disabled={!agree}
-          onPress={next}
+          onPress={withEmail}
+        />
+        <Button
+          label="Continue with Google"
+          variant="secondary"
+          fullWidth
+          disabled
+          onPress={withEmail}
         />
         <Text variant="caption" tone="muted" style={styles.center}>
-          Sample build: sign-in connects with accounts. Both buttons continue
-          for now.
+          {auth.enabled
+            ? "Google sign-in comes with the next build."
+            : "Sample build: accounts are off, so this continues without one."}
         </Text>
       </View>
     </View>
