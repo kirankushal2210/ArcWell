@@ -4,6 +4,8 @@
 // - end-ai (J-02): subscriptions are managed in Google Play; Arcwell only checks the status and never
 //   cancels (D7a, D19). Joining waits until Play reports the subscription as cancelled.
 // - joined (J-03): what changed.
+// - upgraded (U-01): what Arcwell Plus adds, after starting the trial.
+// - ended (F8-08, TL-02): Plus ended; free plan, history kept, AI plan read-only (D32, D33).
 // - already (F3-03): a coached athlete opened another invite; one coach at a time.
 // - left (L-03, and K-29 when the coach closed their account): what changed after coaching ends.
 // The bottom bar follows D57 and D68 (four tabs; AI from Today and the + menu), which postdate the
@@ -20,6 +22,7 @@ import {
   InfoCard,
   MenuPage,
 } from "@/features/athlete/MenuParts";
+import { shortDay, subscriptionInfo } from "@/features/athlete/athleteData";
 import { useMe } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
 import { KeyValues } from "@/features/coach/parts";
@@ -33,7 +36,8 @@ const home = () => {
 export default function Switch() {
   const { step } = useLocalSearchParams<{ step: string }>();
   const me = useMe();
-  const { meTier, coach, coachName, joinCoachFromPro } = useCoachData();
+  const { meTier, coach, coachName, joinCoachFromPro, settingsOf, startPlus } =
+    useCoachData();
   const [cancelled, setCancelled] = useState(false);
   const first = coachName.replace(/^Coach\s+/, "");
 
@@ -90,6 +94,67 @@ export default function Switch() {
             charged for AI you can&apos;t use.
           </InfoCard>
         ) : null}
+      </MenuPage>
+    );
+
+  if (step === "upgraded") {
+    const sub = me ? subscriptionInfo(settingsOf(me.id).sub) : null;
+    return (
+      <MenuPage
+        title="Welcome to Arcwell Plus"
+        back={home}
+        footer={<Button label="Got it" fullWidth onPress={home} />}
+      >
+        <Text tone="muted">Here&apos;s what changed:</Text>
+        <InfoCard>
+          <Bullets
+            items={[
+              "Recovery is unlocked: sleep, recovery and strain every morning",
+              "Food shows full macros: protein, carbs and fat",
+              "Programs and Muscle Analytics are in ☰ → Training",
+              "Your AI coach is on Today and in the + menu",
+            ]}
+          />
+        </InfoCard>
+        {sub?.status === "trial" ? (
+          <InfoCard>
+            {`Your free trial ends on ${shortDay(sub.trialEnds)}. We'll remind you two days before, and you can cancel in the Play Store any time before then.`}
+          </InfoCard>
+        ) : null}
+      </MenuPage>
+    );
+  }
+
+  if (step === "ended")
+    return (
+      <MenuPage
+        title="Arcwell Plus has ended"
+        back={home}
+        footer={
+          <ConfirmButtons
+            label="Restart Arcwell Plus"
+            onConfirm={() => {
+              startPlus("yearly");
+              home();
+            }}
+            cancel="Continue on the free plan"
+            onCancel={home}
+          />
+        }
+      >
+        <Text tone="muted">
+          You&apos;re on the free plan now. What changed:
+        </Text>
+        <InfoCard>
+          <Bullets
+            items={[
+              "Your workouts, food logs and history all stay",
+              "Your plan stays in Training, read-only, and stops adapting",
+              "Recovery is locked; your recovery history is kept for when you come back",
+              "Food logging shows calories only",
+            ]}
+          />
+        </InfoCard>
       </MenuPage>
     );
 

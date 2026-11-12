@@ -276,6 +276,10 @@ type CoachData = {
   ) => void;
   /** The coach deletes their account (K-28): every client is unlinked; templates, leads and transformations go. */
   closeCoachAccount: () => void;
+  /** Arcwell Plus ends (F8-08, TL-02): the athlete moves to Free; the AI plan stays read-only (D33). */
+  endPlus: () => void;
+  /** Start or restart Arcwell Plus (F8-01): a trial the first time, paid after that. */
+  startPlus: (plan: "monthly" | "yearly") => void;
   /** A self-guided Pro athlete joins a coach after ending AI in Play (J-01 to J-03). */
   joinCoachFromPro: () => void;
 };
@@ -964,7 +968,13 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
         plan: { training: p.name, meals: c.plan?.meals ?? "" },
         protocol: c.protocol
           ? { ...c.protocol, restDays }
-          : { sleepH: 8, bed: 22 * 60 + 30, wake: 6 * 60 + 30, restDays, note: "" },
+          : {
+              sleepH: 8,
+              bed: 22 * 60 + 30,
+              wake: 6 * 60 + 30,
+              restDays,
+              note: "",
+            },
         training: { ...c.training, weekPlanned: 7 - restDays.length },
       })),
     saveProgram: (id, p) =>
@@ -1289,6 +1299,41 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       );
       setTemplates([]);
       setLeads([]);
+    },
+    endPlus: () => {
+      if (!self) return;
+      setSelf({
+        ...self,
+        athleteSettings: {
+          ...defaultSettings(),
+          ...self.athleteSettings,
+          sub: {
+            ...(self.athleteSettings?.sub ?? {
+              plan: "yearly",
+              startedAt: isoToday(),
+            }),
+            status: "expired",
+          },
+        },
+      });
+      setMeTier("free");
+    },
+    startPlus: (plan) => {
+      if (!self) return;
+      const had = !!self.athleteSettings?.sub;
+      setSelf({
+        ...self,
+        athleteSettings: {
+          ...defaultSettings(),
+          ...self.athleteSettings,
+          sub: {
+            status: had ? "active" : "trial",
+            plan,
+            startedAt: isoToday(),
+          },
+        },
+      });
+      setMeTier("pro");
     },
     joinCoachFromPro: () => {
       if (!self) return;

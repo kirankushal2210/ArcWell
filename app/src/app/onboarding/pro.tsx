@@ -14,6 +14,8 @@ import { useCoachData } from "@/features/coach/CoachData";
 import { useOnboarding } from "@/features/onboarding/OnboardingContext";
 import { ProgressBar, QuestionHeader } from "@/features/onboarding/parts";
 import { colors, radius, rhythm, space } from "@/theme";
+import { defaultSettings, isoToday } from "@/features/athlete/athleteData";
+import { TrialTimeline } from "@/features/athlete/TrialTimeline";
 
 const BENEFITS = [
   {
@@ -44,7 +46,19 @@ export default function Pro() {
   const [step, setStep] = useState<"offer" | "consent">("offer");
 
   const begin = (tier: "pro" | "free") => {
-    startSelf(selfClient(answers, selfPlan(answers)), tier);
+    const c = selfClient(answers, selfPlan(answers));
+    startSelf(
+      tier === "pro"
+        ? {
+            ...c,
+            athleteSettings: {
+              ...defaultSettings(),
+              sub: { status: "trial", plan: billing, startedAt: isoToday() },
+            },
+          }
+        : c,
+      tier,
+    );
     if (router.canDismiss()) router.dismissAll();
     router.replace("/athlete");
   };
@@ -124,6 +138,7 @@ export default function Pro() {
           ))}
         </View>
 
+        <TrialTimeline />
         <View style={styles.options} accessibilityRole="radiogroup">
           {(
             [

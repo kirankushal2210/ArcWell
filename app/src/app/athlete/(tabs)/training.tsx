@@ -207,7 +207,7 @@ function PlanPage() {
 
       <View style={styles.between}>
         <Eyebrow>{`Your program · ${program.days.length} workouts`}</Eyebrow>
-        {coached || me.formerCoach ? null : (
+        {coached || me.formerCoach || meTier !== "pro" ? null : (
           <PressableScale
             onPress={() =>
               router.push({

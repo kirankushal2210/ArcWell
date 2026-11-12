@@ -80,7 +80,11 @@ export default function Account() {
               icon={CreditCard}
               label="Subscription"
               value={meTier === "pro" ? "Arcwell Plus" : "Free"}
-              onPress={() => router.push("/athlete/ai")}
+              onPress={() =>
+                router.push(
+                  meTier === "pro" ? "/athlete/subscription" : "/athlete/ai",
+                )
+              }
             />
             <NavRow
               icon={Users}

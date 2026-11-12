@@ -32,6 +32,11 @@ import { useCoachData } from "@/features/coach/CoachData";
 import { Group, GroupRow, PageHeader, PillarDot } from "@/features/coach/parts";
 import { clock } from "@/features/coach/plans";
 import { colors, radius, space } from "@/theme";
+import {
+  REMIND_DAY,
+  shortDay,
+  subscriptionInfo,
+} from "@/features/athlete/athleteData";
 
 const dateLabel = () =>
   new Date().toLocaleDateString("en-IN", {
@@ -50,6 +55,7 @@ export default function Today() {
 
   const first = me.name.split(" ")[0];
   const coachFirst = coachName.replace(/^Coach\s+/, "");
+  const sub = meTier === "pro" ? subscriptionInfo(settingsOf(me.id).sub) : null;
   const waitingPhotos = (me.transformations ?? []).find(
     (t) => t.status === "waiting",
   );
@@ -151,6 +157,34 @@ export default function Today() {
         ]}
       />
       <AthletePage dock>
+        {meTier === "pro" &&
+        sub &&
+        (sub.status === "grace" ||
+          (sub.status === "trial" && sub.day >= REMIND_DAY)) ? (
+          <PressableScale
+            onPress={() => router.push("/athlete/subscription")}
+            accessibilityRole="button"
+            accessibilityLabel={
+              sub.status === "grace"
+                ? "Fix your payment"
+                : "Your trial is ending"
+            }
+            style={[styles.banner, sub.status === "grace" && styles.bannerWarn]}
+          >
+            <Text weight="semibold">
+              {sub.status === "grace"
+                ? "Your payment didn't go through"
+                : sub.trialDaysLeft <= 1
+                  ? "Your free trial ends tomorrow"
+                  : `Your free trial ends in ${sub.trialDaysLeft} days`}
+            </Text>
+            <Text variant="label" weight="regular" tone="muted">
+              {sub.status === "grace"
+                ? `Update it in the Play Store by ${shortDay(sub.graceEnds)} to keep Arcwell Plus.`
+                : `Arcwell Plus starts on ${shortDay(sub.trialEnds)}. Cancel in the Play Store before then and you won't be charged.`}
+            </Text>
+          </PressableScale>
+        ) : null}
         {meTier === "coached" &&
         (me.status === "paused" || me.status === "leaving") ? (
           <View style={styles.banner}>
@@ -533,6 +567,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  bannerWarn: { borderColor: colors.warning },
   banner: {
     gap: space[1],
     padding: space[3],

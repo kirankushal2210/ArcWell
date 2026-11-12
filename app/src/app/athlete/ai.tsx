@@ -29,10 +29,11 @@ import {
   space,
   textSizes,
 } from "@/theme";
+import { TrialTimeline } from "@/features/athlete/TrialTimeline";
 
 export default function AICoach() {
   const me = useMe();
-  const { meTier, startSelf } = useCoachData();
+  const { meTier, startPlus, settingsOf } = useCoachData();
   const insets = useSafeAreaInsets();
   const [consent, setConsent] = useState(false);
   const back = () =>
@@ -87,6 +88,7 @@ export default function AICoach() {
                   </View>
                 );
               })}
+              {settingsOf(me.id).sub ? null : <TrialTimeline />}
             </>
           )}
         </Page>
@@ -101,13 +103,21 @@ export default function AICoach() {
               label="Allow and start free trial"
               fullWidth
               onPress={() => {
-                startSelf(me, "pro");
+                startPlus("yearly");
                 setConsent(false);
+                router.replace({
+                  pathname: "/athlete/switch/[step]",
+                  params: { step: "upgraded" },
+                });
               }}
             />
           ) : (
             <Button
-              label="Start 7-day free trial"
+              label={
+                settingsOf(me.id).sub
+                  ? "Restart Arcwell Plus"
+                  : "Start 7-day free trial"
+              }
               fullWidth
               onPress={() => setConsent(true)}
             />

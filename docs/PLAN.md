@@ -58,7 +58,7 @@ The front end is finished on sample data before any backend wiring (Phases 1–8
   - "Why this?" explainers on targets and plans, and a Sources screen listing each paper (author, year, journal, DOI), every source checked on PubMed before it ships;
   - review by a qualified sports scientist and dietitian before launch (added to the pre-build blockers).
 - [x] **FE-3 Training depth:** Programs (TR-04, TR-05), Muscle Analytics with weekly sets against the FE-2 ranges (TR-06, TR-07), estimated 1RM and strength charts, plate calculator, coach exercise library (K-23), free starter workouts (TR-01)
-- [ ] **FE-4 Money states:** subscription details, payment problem, subscription ended (F8-06 to F8-08), trial timeline and reminders (F8-02, TL-01, TL-02), upgrade what changed (U-01)
+- [x] **FE-4 Money states:** subscription details, payment problem, subscription ended (F8-06 to F8-08), trial timeline and reminders (F8-02, TL-01, TL-02), upgrade what changed (U-01)
 - [ ] **FE-5 Extras:** water tracking, reminders, coach message to several clients, Gyms (G-01, G-02), first-run tips
 - [ ] **FE-6 AI, front end only (D70):** no models, no APIs, no AI code. Screens run on sample responses and the FE-2 rules, clearly marked as sample. Pro athletes only; coached athletes never see AI (D44).
   - AI plan builder: build, review and accept a training plan; tailor it ("30 minutes today", "my knee hurts", "no barbell").

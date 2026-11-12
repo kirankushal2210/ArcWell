@@ -69,7 +69,50 @@ export type AthleteSettings = {
   export?: { status: "preparing" | "failed"; requestedAt: string };
   /** When "Share my history from before I joined" last changed (AC-10, D37). */
   historyChangedAt?: string;
+  /** Arcwell Plus through Google Play (F8). Sample build: set on the phone; later from RevenueCat. */
+  sub?: Subscription;
 };
+
+export type Subscription = {
+  status: "trial" | "active" | "grace" | "cancelled" | "expired";
+  plan: "monthly" | "yearly";
+  /** YYYY-MM-DD the trial or subscription started. */
+  startedAt: string;
+};
+
+export const TRIAL_DAYS = 7;
+export const REMIND_DAY = 5;
+
+const addDays = (iso: string, n: number) =>
+  isoDate(new Date(new Date(`${iso}T12:00:00`).getTime() + n * 864e5));
+
+/** Where the subscription stands today, with the dates the screens need. */
+export function subscriptionInfo(sub: Subscription | undefined) {
+  const s: Subscription = sub ?? {
+    status: "trial",
+    plan: "yearly",
+    startedAt: isoToday(),
+  };
+  const day =
+    Math.floor(
+      (new Date(`${isoToday()}T12:00:00`).getTime() -
+        new Date(`${s.startedAt}T12:00:00`).getTime()) /
+        864e5,
+    ) + 1;
+  const trialEnds = addDays(s.startedAt, TRIAL_DAYS);
+  const renewsOn =
+    s.status === "trial"
+      ? trialEnds
+      : addDays(trialEnds, s.plan === "yearly" ? 365 : 30);
+  return {
+    ...s,
+    day,
+    trialDaysLeft: Math.max(0, TRIAL_DAYS - day + 1),
+    trialEnds,
+    renewsOn,
+    graceEnds: addDays(isoToday(), 16),
+  };
+}
 
 export const defaultSettings = (): AthleteSettings => ({
   notify: { messages: true, checkIns: true, plan: true, workout: true },
