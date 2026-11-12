@@ -1,6 +1,6 @@
-// Plans tab (K-05): the training programs and meal plans a coach reuses across clients, as section
-// tabs (D61). Tap a template to edit it (K-06), the person icon to assign it to clients, or New to
-// build one. Each client always gets their own copy (D56).
+// Plans tab (K-05, D64): training programs, meal plans and supplement stacks a coach reuses, plus
+// Enhanced for competitive clients, as section tabs (D61). Tap a template to edit it (K-06), the
+// person icon to give it to clients, or New to build one. Each client gets their own copy (D56).
 import { router } from "expo-router";
 import {
   ChevronRight,
@@ -19,8 +19,10 @@ import {
   Text,
 } from "@/components/primitives";
 import { SectionTabs } from "@/components/SectionTabs";
+import { menuAction } from "@/features/coach/coachProfile";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Group, GroupRow, Page, PageHeader } from "@/features/coach/parts";
+import { EnhancedPage, SupplementsPage } from "@/features/coach/PlansExtras";
 import type { Template } from "@/features/coach/sampleData";
 import { colors, radius, rhythm, space } from "@/theme";
 
@@ -96,16 +98,19 @@ function TemplateList({ kind }: { kind: Kind }) {
   );
 }
 
-const TABS: { key: Kind; label: string }[] = [
+type Tab = Kind | "supplements" | "enhanced";
+const TABS: { key: Tab; label: string }[] = [
   { key: "training", label: "Training" },
-  { key: "meals", label: "Meal plans" },
+  { key: "meals", label: "Meals" },
+  { key: "supplements", label: "Supplements" },
+  { key: "enhanced", label: "Enhanced" },
 ];
 
 export default function PlansTab() {
-  const [kind, setKind] = useState<Kind>("training");
+  const [kind, setKind] = useState<Tab>("training");
   return (
     <View style={styles.root}>
-      <PageHeader title="Plans" />
+      <PageHeader title="Plans" actions={[menuAction]} />
       <SectionTabs
         tabs={TABS}
         value={kind}
@@ -113,16 +118,33 @@ export default function PlansTab() {
         pages={[
           <TemplateList key="t" kind="training" />,
           <TemplateList key="m" kind="meals" />,
+          <SupplementsPage key="s" />,
+          <EnhancedPage key="e" />,
         ]}
       />
-      <View style={styles.footer}>
-        <Button
-          label={kind === "training" ? "New training program" : "New meal plan"}
-          icon={Plus}
-          fullWidth
-          onPress={() => open(null, kind)}
-        />
-      </View>
+      {kind === "enhanced" ? null : (
+        <View style={styles.footer}>
+          <Button
+            label={
+              kind === "training"
+                ? "New training program"
+                : kind === "meals"
+                  ? "New meal plan"
+                  : "New supplement stack"
+            }
+            icon={Plus}
+            fullWidth
+            onPress={() =>
+              kind === "supplements"
+                ? router.push({
+                    pathname: "/coach/stack/[id]",
+                    params: { id: "new" },
+                  })
+                : open(null, kind)
+            }
+          />
+        </View>
+      )}
     </View>
   );
 }

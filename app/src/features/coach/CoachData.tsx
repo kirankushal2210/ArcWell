@@ -26,6 +26,28 @@ import {
 } from "@/features/athlete/library";
 import type { ActiveWorkout, Session } from "@/features/athlete/training";
 
+import { buildCheckIn, type CheckInForm } from "./checkins";
+import { type Enhanced, emptyEnhanced, sampleEnhanced } from "./enhanced";
+import {
+  cloneItems,
+  sampleStacks,
+  type Stack,
+  type Supplement,
+  supId,
+} from "./supplements";
+import {
+  type CoachProfile,
+  type CoachSettings,
+  defaultCoachProfile,
+  defaultCoachSettings,
+} from "./coachProfile";
+import {
+  type ClientAccount,
+  crmId,
+  type Lead,
+  type LeadEventKind,
+  sampleLeads,
+} from "./crm";
 import {
   cloneNutrition,
   cloneProgram,
@@ -40,10 +62,7 @@ import {
 } from "./plans";
 import {
   type Client,
-  type Lead,
   sampleClients,
-  sampleCoach,
-  sampleLeads,
   sampleTemplates,
   type Template,
 } from "./sampleData";
@@ -68,9 +87,35 @@ type CoachData = {
   clients: Client[];
   templates: Template[];
   leads: Lead[];
+  /** CRM (D63): add a lead; returns its id. */
+  addLead: (
+    l: Omit<Lead, "id" | "createdAt" | "events" | "stage"> & { note?: string },
+  ) => string;
+  /** Change a lead's fields; stage changes and follow-ups are written to its timeline. */
+  updateLead: (id: string, patch: Partial<Lead>, log?: string) => void;
+  logLead: (id: string, kind: LeadEventKind, text: string) => void;
+  deleteLead: (id: string) => void;
+  saveAccount: (clientId: string, a: ClientAccount) => void;
+  /** The coach's own profile and settings (D65). */
+  coach: CoachProfile;
+  saveCoach: (p: CoachProfile) => void;
+  settings: CoachSettings;
+  saveSettings: (s: CoachSettings) => void;
+  /** Supplements (D64): a client's own list, and reusable stacks in Plans. */
+  setSupplements: (clientId: string, items: Supplement[]) => void;
+  stacks: Stack[];
+  saveStack: (s: Omit<Stack, "id"> & { id?: string }) => string;
+  deleteStack: (id: string) => void;
+  assignStack: (stackId: string, clientIds: string[]) => void;
+  /** Enhanced athletes (D64): competitive flag, consent request and the record itself. */
+  setCompetitive: (clientId: string, on: boolean) => void;
+  requestEnhanced: (clientId: string) => void;
+  answerEnhanced: (clientId: string, yes: boolean) => void;
+  editEnhanced: (clientId: string, fn: (e: Enhanced) => Enhanced) => void;
   coachName: string;
   client: (id: string) => Client | undefined;
-  addClient: (c: NewClient) => string;
+  /** Adds a client (D56); with `leadId`, the lead is marked joined and linked. */
+  addClient: (c: NewClient, leadId?: string) => string;
   assignPlan: (id: string, training: string, meals: string) => void;
   /** Adds or updates a template (K-06); returns its id. Clients already on it keep their copy. */
   saveTemplate: (
@@ -161,10 +206,20 @@ type CoachData = {
   logSleep: (id: string, hours: number) => void;
   logWeight: (id: string, kg: number) => void;
   reply: (clientId: string, checkInId: string, text: string) => void;
-  send: (clientId: string, text: string) => void;
+  /** The athlete sends their weekly check-in (F6): it lands in the coach's inbox. */
+  submitCheckIn: (clientId: string, form: CheckInForm) => void;
+  send: (clientId: string, text: string, image?: string) => void;
+  /** The client writes to their coach (F7). */
+  sendFromClient: (clientId: string, text: string, image?: string) => void;
+  /** The client opened the chat. */
+  markReadByClient: (clientId: string) => void;
   markRead: (clientId: string) => void;
   setStatus: (clientId: string, status: ClientStatus) => void;
   setNotes: (clientId: string, notes: string) => void;
+  /** The day of the week this client's check-in is due (sitemap §5 Check-ins). */
+  setCheckInDay: (clientId: string, day: string) => void;
+  /** Remove a client who was added but never joined. */
+  removeClient: (clientId: string) => void;
   remind: (clientId: string) => void;
   reminded: string[];
 };
@@ -185,7 +240,20 @@ type Saved = {
   hideUpgrade?: boolean;
   recovery?: Record<string, RecoveryStore>;
   templates?: Template[];
+  leads?: Lead[];
+  coach?: CoachProfile;
+  settings?: CoachSettings;
+  stacks?: Stack[];
 };
+
+/** Sample extras added after the first release of the sample data (D64). */
+function withExtras(c: Client): Client {
+  if (c.id === "karan" && c.competitive === undefined)
+    return { ...c, competitive: true, enhanced: sampleEnhanced() };
+  if (c.id === "priya" && c.supplements === undefined)
+    return { ...c, supplements: cloneItems(sampleStacks()[1].items) };
+  return c;
+}
 
 /** Saved self plans from before exact foods: rebuild the example day with foods (sample data only). */
 function upgradeSelfPlan(c: Client | null): Client | null {
@@ -228,10 +296,14 @@ const code = (coach: string) =>
     .toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
 export function CoachDataProvider({ children }: { children: ReactNode }) {
-  const [clients, setClients] = useState(sampleClients);
+  const [clients, setClients] = useState(() => sampleClients.map(withExtras));
+  const [stacks, setStacks] = useState<Stack[]>(sampleStacks);
   const [templates, setTemplates] = useState<Template[]>(() =>
     sampleTemplates.map(fillTemplate),
   );
+  const [leads, setLeads] = useState<Lead[]>(sampleLeads);
+  const [coach, setCoach] = useState<CoachProfile>(defaultCoachProfile);
+  const [settings, setSettings] = useState<CoachSettings>(defaultCoachSettings);
   const [reminded, setReminded] = useState<string[]>([]);
   const [meId, setMeId] = useState<string | null>(null);
   const [meTier, setMeTier] = useState<AthleteTier>("coached");
@@ -258,7 +330,8 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       .then((raw) => {
         if (!raw) return;
         const s = JSON.parse(migrateNames(raw)) as Partial<Saved>;
-        if (s.clients) setClients(s.clients);
+        if (s.clients) setClients(s.clients.map(withExtras));
+        if (s.stacks) setStacks(s.stacks);
         if (s.meId !== undefined) setMeId(s.meId);
         if (s.meTier) setMeTier(s.meTier);
         if (s.self !== undefined) setSelf(upgradeSelfPlan(s.self));
@@ -270,6 +343,9 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
         if (s.hideUpgrade) setHideUpgrade(true);
         if (s.recovery) setRecovery(s.recovery);
         if (s.templates) setTemplates(s.templates.map(fillTemplate));
+        if (s.leads) setLeads(s.leads);
+        if (s.coach) setCoach(s.coach);
+        if (s.settings) setSettings(s.settings);
       })
       .catch(() => {})
       .finally(() => setHydrated(true));
@@ -289,6 +365,10 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       hideUpgrade,
       recovery,
       templates,
+      leads,
+      coach,
+      settings,
+      stacks,
     };
     AsyncStorage.setItem(STORE_KEY, JSON.stringify(saved)).catch(() => {});
   }, [
@@ -305,6 +385,10 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
     hideUpgrade,
     recovery,
     templates,
+    leads,
+    coach,
+    settings,
+    stacks,
   ]);
   const update = (id: string, patch: (c: Client) => Partial<Client>) => {
     if (self && id === self.id) {
@@ -315,7 +399,7 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       all.map((c) => (c.id === id ? { ...c, ...patch(c) } : c)),
     );
   };
-  const coachName = sampleCoach.name;
+  const coachName = coach.name;
   const bumpTemplates = (ids: (string | undefined)[], by: number) =>
     setTemplates((all) =>
       all.map((x) =>
@@ -326,13 +410,133 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
   const value: CoachData = {
     clients,
     templates,
-    leads: sampleLeads,
+    leads,
+    addLead: (l) => {
+      const id = crmId("l");
+      const now = new Date().toISOString();
+      const { note, ...rest } = l;
+      setLeads((all) => [
+        {
+          ...rest,
+          id,
+          stage: "new",
+          createdAt: now,
+          events: [
+            {
+              id: crmId("v"),
+              at: now,
+              kind: "created",
+              text: note?.trim() || "Added",
+            },
+          ],
+        },
+        ...all,
+      ]);
+      return id;
+    },
+    updateLead: (id, patch, log) =>
+      setLeads((all) =>
+        all.map((l) =>
+          l.id !== id
+            ? l
+            : {
+                ...l,
+                ...patch,
+                events: log
+                  ? [
+                      ...l.events,
+                      {
+                        id: crmId("v"),
+                        at: new Date().toISOString(),
+                        kind:
+                          patch.followUp !== undefined && !patch.stage
+                            ? "follow_up"
+                            : "stage",
+                        text: log,
+                      },
+                    ]
+                  : l.events,
+              },
+        ),
+      ),
+    logLead: (id, kind, text) =>
+      setLeads((all) =>
+        all.map((l) =>
+          l.id !== id
+            ? l
+            : {
+                ...l,
+                // A logged call moves a new or contacted lead along.
+                stage:
+                  kind === "call" &&
+                  (l.stage === "new" ||
+                    l.stage === "contacted" ||
+                    l.stage === "call_booked")
+                    ? "call_done"
+                    : kind === "message" && l.stage === "new"
+                      ? "contacted"
+                      : l.stage,
+                events: [
+                  ...l.events,
+                  { id: crmId("v"), at: new Date().toISOString(), kind, text },
+                ],
+              },
+        ),
+      ),
+    deleteLead: (id) => setLeads((all) => all.filter((l) => l.id !== id)),
+    saveAccount: (clientId, a) => update(clientId, () => ({ account: a })),
+    coach,
+    saveCoach: setCoach,
+    settings,
+    saveSettings: setSettings,
+    setSupplements: (clientId, items) =>
+      update(clientId, () => ({ supplements: items })),
+    stacks,
+    saveStack: (s) => {
+      const id = s.id ?? supId("st");
+      setStacks((all) =>
+        all.some((x) => x.id === id)
+          ? all.map((x) => (x.id === id ? { ...s, id } : x))
+          : [{ ...s, id }, ...all],
+      );
+      return id;
+    },
+    deleteStack: (id) => setStacks((all) => all.filter((x) => x.id !== id)),
+    assignStack: (stackId, clientIds) => {
+      const st = stacks.find((x) => x.id === stackId);
+      if (!st) return;
+      for (const cid of clientIds)
+        update(cid, () => ({ supplements: cloneItems(st.items) }));
+    },
+    setCompetitive: (clientId, on) =>
+      update(clientId, () => ({ competitive: on })),
+    requestEnhanced: (clientId) =>
+      update(clientId, (c) => ({
+        enhanced: {
+          ...(c.enhanced ?? emptyEnhanced()),
+          requestedAt: new Date().toISOString(),
+          declinedAt: undefined,
+        },
+      })),
+    answerEnhanced: (clientId, yes) =>
+      update(clientId, (c) => ({
+        enhanced: {
+          ...(c.enhanced ?? emptyEnhanced()),
+          consentAt: yes ? new Date().toISOString() : undefined,
+          declinedAt: yes ? undefined : new Date().toISOString(),
+        },
+      })),
+    editEnhanced: (clientId, fn) =>
+      update(clientId, (c) => ({
+        enhanced: fn(c.enhanced ?? emptyEnhanced()),
+      })),
     coachName,
     reminded,
     meId,
     hydrated,
     resetSample: () => {
-      setClients(sampleClients);
+      setClients(sampleClients.map(withExtras));
+      setStacks(sampleStacks());
       setMeId(null);
       setMeTier("coached");
       setSelf(null);
@@ -344,6 +548,9 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       setHideUpgrade(false);
       setRecovery({});
       setTemplates(sampleTemplates.map(fillTemplate));
+      setLeads(sampleLeads());
+      setCoach(defaultCoachProfile());
+      setSettings(defaultCoachSettings());
       AsyncStorage.removeItem(STORE_KEY).catch(() => {});
     },
     meTier,
@@ -512,7 +719,7 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       setJoiningCoach(false);
     },
 
-    addClient: (n) => {
+    addClient: (n, leadId) => {
       const id = `c${Date.now().toString(36)}`;
       const goal =
         n.goal.startsWith("Lose fat") || n.goal.startsWith("Build muscle")
@@ -568,6 +775,30 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
         unread: 0,
         notes: n.notes.trim(),
       };
+      const lead = leadId ? leads.find((l) => l.id === leadId) : undefined;
+      if (lead) {
+        client.source = lead.source;
+        setLeads((all) =>
+          all.map((l) =>
+            l.id !== leadId
+              ? l
+              : {
+                  ...l,
+                  stage: "joined",
+                  clientId: id,
+                  events: [
+                    ...l.events,
+                    {
+                      id: crmId("v"),
+                      at: new Date().toISOString(),
+                      kind: "stage",
+                      text: "Joined · added as a client",
+                    },
+                  ],
+                },
+          ),
+        );
+      }
       setClients((all) => [client, ...all]);
       return id;
     },
@@ -765,6 +996,31 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
         ),
       })),
 
+    submitCheckIn: (clientId, form) =>
+      update(clientId, (c) => {
+        const k = buildCheckIn(c, form);
+        const waist = form.waistCm;
+        return {
+          checkIns: [k, ...c.checkIns],
+          weights: [...c.weights, form.weightKg],
+          measurements:
+            waist === undefined
+              ? c.measurements
+              : c.measurements.some((m) => m.label === "Waist")
+                ? c.measurements.map((m) =>
+                    m.label === "Waist" ? { ...m, now: waist } : m,
+                  )
+                : [
+                    ...c.measurements,
+                    { label: "Waist", start: waist, now: waist, unit: "cm" },
+                  ],
+          photoWeeks:
+            Object.keys(form.photos).length && !c.photoWeeks.includes(k.week)
+              ? [...c.photoWeeks, k.week]
+              : c.photoWeeks,
+          attention: "Check-in to review · submitted just now",
+        };
+      }),
     reply: (clientId, checkInId, text) =>
       update(clientId, (c) => ({
         checkIns: c.checkIns.map((k) =>
@@ -774,10 +1030,36 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
           ? undefined
           : c.attention,
       })),
-    send: (clientId, text) =>
+    send: (clientId, text, image) =>
       update(clientId, (c) => ({
-        messages: [...c.messages, { from: "coach", text, time: nowTime() }],
+        messages: [
+          ...c.messages,
+          {
+            from: "coach",
+            text,
+            image,
+            time: nowTime(),
+            at: new Date().toISOString(),
+          },
+        ],
+        coachUnread: (c.coachUnread ?? 0) + 1,
       })),
+    sendFromClient: (clientId, text, image) =>
+      update(clientId, (c) => ({
+        messages: [
+          ...c.messages,
+          {
+            from: "client",
+            text,
+            image,
+            time: nowTime(),
+            at: new Date().toISOString(),
+          },
+        ],
+        unread: c.unread + 1,
+      })),
+    markReadByClient: (clientId) =>
+      update(clientId, () => ({ coachUnread: 0 })),
     markRead: (clientId) => update(clientId, () => ({ unread: 0 })),
     setStatus: (clientId, status) =>
       update(clientId, (c) => ({
@@ -792,6 +1074,10 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
                 : c.line,
       })),
     setNotes: (clientId, notes) => update(clientId, () => ({ notes })),
+    setCheckInDay: (clientId, day) =>
+      update(clientId, () => ({ checkInDay: day })),
+    removeClient: (clientId) =>
+      setClients((all) => all.filter((c) => c.id !== clientId)),
     remind: (clientId) => setReminded((r) => [...r, clientId]),
   };
 

@@ -1,6 +1,6 @@
 // Clients tab (K-01, CO-13, CO-14): setup checklist until it's done, new clients waiting for a plan,
 // then every client sorted by who needs the coach first.
-import { router } from "expo-router";
+import { type Href, router } from "expo-router";
 import { Check, UserPlus } from "lucide-react-native";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
@@ -12,6 +12,7 @@ import {
   StatusChip,
   Text,
 } from "@/components/primitives";
+import { menuAction } from "@/features/coach/coachProfile";
 import { needsAttention, useCoachData } from "@/features/coach/CoachData";
 import { plansReady } from "@/features/coach/PlanRows";
 import {
@@ -25,10 +26,11 @@ import {
 import { sampleCoach } from "@/features/coach/sampleData";
 import { colors, radius, space } from "@/theme";
 
-type Filter = "attention" | "active" | "paused" | "leaving" | "all";
+type Filter =
+  "attention" | "active" | "paused" | "leaving" | "completed" | "all";
 
 export default function ClientsTab() {
-  const { clients } = useCoachData();
+  const { clients, templates } = useCoachData();
   const [filter, setFilter] = useState<Filter>("attention");
   const [setupHidden, setSetupHidden] = useState(false);
 
@@ -40,6 +42,7 @@ export default function ClientsTab() {
     active: linked.filter((c) => c.status === "active").length,
     paused: linked.filter((c) => c.status === "paused").length,
     leaving: linked.filter((c) => c.status === "leaving").length,
+    completed: linked.filter((c) => c.status === "completed").length,
     all: linked.length,
   };
   const shown = linked
@@ -52,7 +55,32 @@ export default function ClientsTab() {
     )
     .sort((a, b) => (a.adherence ?? 101) - (b.adherence ?? 101));
 
-  const setup = sampleCoach.setup;
+  // CO-13: onboarding steps, then the ones checked against what the coach has actually done.
+  const setup: { label: string; done: boolean; action?: string; go?: Href }[] =
+    [
+      ...sampleCoach.setup,
+      {
+        label: "Create a training template",
+        done: templates.some((t) => t.kind === "training"),
+        action: "Create",
+        go: {
+          pathname: "/coach/template/training/[id]",
+          params: { id: "new" },
+        },
+      },
+      {
+        label: "Create a meal plan template",
+        done: templates.some((t) => t.kind === "meals"),
+        action: "Create",
+        go: { pathname: "/coach/template/meals/[id]", params: { id: "new" } },
+      },
+      {
+        label: "Invite your first client",
+        done: clients.some((c) => !c.pending || !!c.invite),
+        action: "Invite",
+        go: "/coach/business",
+      },
+    ];
   const done = setup.filter((s) => s.done).length;
   const open = (id: string) =>
     router.push({ pathname: "/coach/client/[id]", params: { id } });
@@ -62,6 +90,7 @@ export default function ClientsTab() {
       <PageHeader
         title="Clients"
         actions={[
+          menuAction,
           {
             icon: UserPlus,
             label: "Add a client",
@@ -101,13 +130,7 @@ export default function ClientsTab() {
                     {s.label}
                   </Text>
                   <PressableScale
-                    onPress={() =>
-                      router.push(
-                        s.action === "Invite"
-                          ? "/coach/business"
-                          : "/coach/plans",
-                      )
-                    }
+                    onPress={() => s.go && router.push(s.go)}
                     accessibilityRole="button"
                     style={styles.hide}
                   >
@@ -201,6 +224,7 @@ export default function ClientsTab() {
             { value: "active", label: `Active · ${count.active}` },
             { value: "paused", label: `Paused · ${count.paused}` },
             { value: "leaving", label: `Leaving · ${count.leaving}` },
+            { value: "completed", label: `Finished · ${count.completed}` },
             { value: "all", label: `All · ${count.all}` },
           ]}
         />

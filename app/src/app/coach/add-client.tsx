@@ -1,6 +1,6 @@
 // Add a client after a call (D56): the details the coach gathered, so they can build the client's
 // plans before inviting them. The client confirms these when they join and skips onboarding.
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -31,11 +31,14 @@ const SEX: Record<string, NewClient["sex"]> = {
 };
 
 export default function AddClient() {
-  const { addClient } = useCoachData();
+  const { addClient, leads } = useCoachData();
+  const { leadId } = useLocalSearchParams<{ leadId?: string }>();
+  // Joined from a lead (D63): their details carry over.
+  const lead = leadId ? leads.find((l) => l.id === leadId) : undefined;
   const insets = useSafeAreaInsets();
   const [f, setF] = useState<NewClient>({
-    name: "",
-    phone: "",
+    name: lead?.name ?? "",
+    phone: lead?.phone ?? "",
     goal: "Lose fat",
     sex: "female",
     age: 28,
@@ -44,7 +47,7 @@ export default function AddClient() {
     targetKg: 64,
     diet: "Vegetarian",
     injuries: "",
-    notes: "",
+    notes: lead?.goal ? `Wants: ${lead.goal}` : "",
   });
   const set = <K extends keyof NewClient>(k: K, v: NewClient[K]) =>
     setF((x) => ({ ...x, [k]: v }));
@@ -177,10 +180,10 @@ export default function AddClient() {
           fullWidth
           disabled={f.name.trim().length < 2}
           onPress={() => {
-            const id = addClient({
-              ...f,
-              targetKg: hasTarget ? f.targetKg : f.weightKg,
-            });
+            const id = addClient(
+              { ...f, targetKg: hasTarget ? f.targetKg : f.weightKg },
+              lead?.id,
+            );
             router.replace({ pathname: "/coach/client/[id]", params: { id } });
           }}
         />

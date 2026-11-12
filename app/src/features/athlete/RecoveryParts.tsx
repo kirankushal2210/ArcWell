@@ -7,6 +7,7 @@ import Svg, { Circle } from "react-native-svg";
 import { PressableScale, Text } from "@/components/primitives";
 import { useCoachData } from "@/features/coach/CoachData";
 import { todayIndex, weekSchedule } from "@/features/coach/plans";
+import type { Client } from "@/features/coach/sampleData";
 import { colors, radius, space } from "@/theme";
 
 import { dateKey } from "./foods";
@@ -16,33 +17,60 @@ import {
   dayFor,
   DEVICE_LABEL,
   type DeviceBrand,
+  type RecoveryStore,
   type Source,
   type Zone,
 } from "./recovery";
+import type { Session } from "./training";
 import { useMe } from "./useMe";
 
 /** Protocol bedtimes run past midnight (1440+); Recovery counts the evening before as negative. */
 const evening = (m: number) => (m >= 720 ? m - 1440 : m);
 
-export function useRecovery() {
-  const me = useMe();
-  const data = useCoachData();
-  const id = me?.id ?? "";
-  const store = data.recoveryOf(id);
-  const sessions = me ? data.sessions(id) : [];
+/** "Sat 8 Nov" (this year, or last year if that would be in the future) to YYYY-MM-DD. */
+const MONTHS = [
+  "jan",
+  "feb",
+  "mar",
+  "apr",
+  "may",
+  "jun",
+  "jul",
+  "aug",
+  "sep",
+  "oct",
+  "nov",
+  "dec",
+];
+function logDate(label: string) {
+  // Hermes doesn't parse "8 Nov 2026", so read the day and month by hand.
+  const m = /(\d{1,2})\s+([A-Za-z]{3})/.exec(label);
+  const month = m ? MONTHS.indexOf(m[2].toLowerCase()) : -1;
+  if (!m || month < 0) return "";
+  const d = new Date(new Date().getFullYear(), month, Number(m[1]));
+  if (d.getTime() > Date.now()) d.setFullYear(d.getFullYear() - 1);
+  return dateKey(d);
+}
+
+/** Score inputs for any client: their recovery store, baseline from answers/protocol, workouts. */
+export function recoveryInputs(
+  c: Client | undefined,
+  store: RecoveryStore,
+  sessions: Session[],
+): { inputs: DayInputs; baseline: Baseline } {
   const baseline: Baseline = {
-    sleepTargetH: me?.protocol?.sleepH ?? me?.recovery.sleepTargetH ?? 7.5,
-    bed: evening(me?.protocol?.bed ?? 22 * 60 + 30),
-    wake: me?.protocol?.wake ?? 6 * 60 + 30,
-    quality: me?.recovery.quality ?? 3,
-    energy: me?.recovery.energy ?? 3,
-    stress: me?.recovery.stress ?? 3,
-    soreness: me?.recovery.soreness ?? 3,
+    sleepTargetH: c?.protocol?.sleepH ?? c?.recovery.sleepTargetH ?? 7.5,
+    bed: evening(c?.protocol?.bed ?? 22 * 60 + 30),
+    wake: c?.protocol?.wake ?? 6 * 60 + 30,
+    quality: c?.recovery.quality ?? 3,
+    energy: c?.recovery.energy ?? 3,
+    stress: c?.recovery.stress ?? 3,
+    soreness: c?.recovery.soreness ?? 3,
   };
   const inputs: DayInputs = {
     store,
     baseline,
-    restDays: me?.protocol?.restDays ?? [],
+    restDays: c?.protocol?.restDays ?? [],
     workouts: sessions.map((s) => {
       const d = new Date(s.at);
       return {
@@ -54,6 +82,45 @@ export function useRecovery() {
       };
     }),
   };
+  return { inputs, baseline };
+}
+
+/** The coach's view of one client's recovery (D60): same scores the client sees. */
+export function useClientRecovery(c: Client | undefined) {
+  const data = useCoachData();
+  const id = c?.id ?? "";
+  const store = data.recoveryOf(id);
+  const { inputs, baseline } = recoveryInputs(
+    c,
+    store,
+    c ? data.sessions(id) : [],
+  );
+  // Sample clients log workouts as simple rows ("Sat 8 Nov"); count those toward strain too.
+  if (c && !inputs.workouts.length)
+    inputs.workouts = c.training.logs
+      .filter((l) => !l.missed && l.minutes > 0)
+      .map((l) => ({
+        date: logDate(l.date),
+        minutes: l.minutes,
+        name: l.name,
+        start: 18 * 60,
+      }))
+      .filter((w) => !!w.date);
+  return {
+    store,
+    inputs,
+    baseline,
+    day: (date: string) => dayFor(inputs, date),
+  };
+}
+
+export function useRecovery() {
+  const me = useMe();
+  const data = useCoachData();
+  const id = me?.id ?? "";
+  const store = data.recoveryOf(id);
+  const sessions = me ? data.sessions(id) : [];
+  const { inputs, baseline } = recoveryInputs(me ?? undefined, store, sessions);
   const schedule = me?.program
     ? weekSchedule(me.program, me.protocol?.restDays ?? [])
     : [];

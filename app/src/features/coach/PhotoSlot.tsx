@@ -1,0 +1,110 @@
+// Progress photo slots (F6, D12): pick from the camera or library, show the photo or an empty
+// frame. Photos are optional and go to the coach only. Quality 0.6 keeps files small until the
+// signed-URL upload with compression arrives (PLAN Phase 1).
+import { Image } from "expo-image";
+import * as ImagePicker from "expo-image-picker";
+import { Camera, User } from "lucide-react-native";
+import { Alert, StyleSheet, View } from "react-native";
+
+import { PressableScale, Text } from "@/components/primitives";
+import { colors, radius, space } from "@/theme";
+
+async function pick(camera: boolean): Promise<string | null> {
+  const perm = camera
+    ? await ImagePicker.requestCameraPermissionsAsync()
+    : await ImagePicker.requestMediaLibraryPermissionsAsync();
+  if (!perm.granted) {
+    Alert.alert(
+      camera ? "Camera is off for Arcwell" : "Photos are off for Arcwell",
+      "You can turn access on in Settings. Photos are optional.",
+    );
+    return null;
+  }
+  const opts: ImagePicker.ImagePickerOptions = {
+    mediaTypes: ["images"],
+    allowsEditing: true,
+    aspect: [3, 4],
+    quality: 0.6,
+  };
+  const res = camera
+    ? await ImagePicker.launchCameraAsync(opts)
+    : await ImagePicker.launchImageLibraryAsync(opts);
+  return !res.canceled && res.assets[0] ? res.assets[0].uri : null;
+}
+
+/** Ask camera or library, then hand back the photo URI. */
+export function choosePhoto(onPicked: (uri: string) => void) {
+  Alert.alert("Add a photo", undefined, [
+    {
+      text: "Take photo",
+      onPress: () => pick(true).then((u) => u && onPicked(u)),
+    },
+    {
+      text: "Choose from library",
+      onPress: () => pick(false).then((u) => u && onPicked(u)),
+    },
+    { text: "Cancel", style: "cancel" },
+  ]);
+}
+
+/** A 3:4 frame: the photo, or an outline with a label. Tap to add when `onPress` is given. */
+export function PhotoSlot({
+  uri,
+  label,
+  onPress,
+}: {
+  uri?: string;
+  label: string;
+  onPress?: () => void;
+}) {
+  const body = uri ? (
+    <Image
+      source={{ uri }}
+      style={styles.fill}
+      contentFit="cover"
+      accessibilityLabel={`${label} photo`}
+    />
+  ) : (
+    <View style={styles.empty}>
+      {onPress ? (
+        <Camera size={24} color={colors.textMuted} />
+      ) : (
+        <User size={24} color={colors.textMuted} />
+      )}
+    </View>
+  );
+  return (
+    <View style={styles.slot}>
+      {onPress ? (
+        <PressableScale
+          onPress={onPress}
+          accessibilityRole="button"
+          accessibilityLabel={
+            uri ? `Change ${label} photo` : `Add ${label} photo`
+          }
+          style={styles.frame}
+        >
+          {body}
+        </PressableScale>
+      ) : (
+        <View style={styles.frame}>{body}</View>
+      )}
+      <Text variant="caption" weight="semibold" style={styles.center}>
+        {label}
+      </Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  slot: { flex: 1, gap: space[1] },
+  frame: {
+    aspectRatio: 3 / 4,
+    borderRadius: radius.md,
+    overflow: "hidden",
+    backgroundColor: colors.surfaceRaised,
+  },
+  fill: { width: "100%", height: "100%" },
+  empty: { flex: 1, alignItems: "center", justifyContent: "center" },
+  center: { textAlign: "center" },
+});

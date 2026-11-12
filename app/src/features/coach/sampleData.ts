@@ -3,6 +3,9 @@
 // real queries can replace it later without changing the screens.
 import type { ClientStatus } from "@/components/primitives";
 
+import type { ClientAccount, LeadSource } from "./crm";
+import type { Enhanced } from "./enhanced";
+import type { Supplement } from "./supplements";
 import type {
   NutritionPlan,
   RecoveryProtocol,
@@ -19,9 +22,24 @@ export type WorkoutLog = {
   missed?: boolean;
 };
 
+export type CheckInScore =
+  "training" | "nutrition" | "sleep" | "energy" | "stress" | "hunger";
+
 export type CheckIn = {
   id: string;
+  /** 0 is the starting point when coaching begins. */
   week: number;
+  /** ISO date-time, for check-ins sent from the app. */
+  at?: string;
+  /** Local photo URIs, shared with the coach only (D12: optional). */
+  photos?: { front?: string; side?: string; back?: string };
+  weightKg?: number;
+  waistCm?: number;
+  /** 1–5 for the week (stress: 5 = very stressed). */
+  scores?: Partial<Record<CheckInScore, number>>;
+  wins?: string;
+  struggles?: string;
+  question?: string;
   submitted: string;
   /** Weekly averages, last week vs this week. */
   rows: { label: string; last: string; now: string; delta: string }[];
@@ -31,7 +49,15 @@ export type CheckIn = {
   reply?: string;
 };
 
-export type Message = { from: "coach" | "client"; text: string; time: string };
+export type Message = {
+  from: "coach" | "client";
+  text: string;
+  time: string;
+  /** ISO date-time, for messages sent from the app (day separators). */
+  at?: string;
+  /** Local photo URI (F7: image attachments). */
+  image?: string;
+};
 
 export type Client = {
   id: string;
@@ -99,6 +125,20 @@ export type Client = {
   programStart?: string;
   /** The athlete's own routines, outside the program: extra sessions they plan themselves. */
   routines?: TrainingDay[];
+  /** CRM (D63): package, fee, renewal and payment status, recorded by the coach. */
+  account?: ClientAccount;
+  /** Coach messages the client hasn't read yet. */
+  coachUnread?: number;
+  /** Optional supplement list (D64). */
+  supplements?: Supplement[];
+  /** Marked by the coach as a competitive bodybuilder: shows the Enhanced section (D64). */
+  competitive?: boolean;
+  /** Enhanced-athlete record, only after the client's own consent (D64). */
+  enhanced?: Enhanced;
+  /** Earliest date the client shared history from (YYYY-MM-DD); absent = join date (SPEC). */
+  historyFrom?: string;
+  /** Where the client came from, when they joined from a lead. */
+  source?: LeadSource;
 };
 
 export type Template = {
@@ -113,13 +153,6 @@ export type Template = {
   program?: TrainingProgram;
   /** Meal templates: targets plus the example day each client gets a copy of. */
   nutrition?: NutritionPlan;
-};
-
-export type Lead = {
-  id: string;
-  name: string;
-  source: string;
-  status: "New" | "Contacted" | "Follow up" | "Converted" | "Lost";
 };
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -792,37 +825,14 @@ export const sampleTemplates: Template[] = [
   },
 ];
 
-export const sampleLeads: Lead[] = [
-  {
-    id: "l1",
-    name: "Neha Rao",
-    source: "Instagram · asked about pricing",
-    status: "New",
-  },
-  {
-    id: "l2",
-    name: "Siddharth Gupta",
-    source: "Referral · call on Friday",
-    status: "Follow up",
-  },
-  {
-    id: "l3",
-    name: "Aisha Khan",
-    source: "Walk-in at the gym",
-    status: "Contacted",
-  },
-];
-
 export const sampleCoach = {
   name: "Coach Anjali",
   link: "arcwell.app/c/anjali-kapoor",
   clientLimit: 40,
+  /** Steps finished in coach onboarding. Templates and the first client are checked live (CO-13). */
   setup: [
     { label: "Create your profile", done: true },
     { label: "Accept coach terms", done: true },
     { label: "Add your services", done: true },
-    { label: "Create a training template", done: true },
-    { label: "Create a meal plan template", done: false, action: "Create" },
-    { label: "Invite your first client", done: false, action: "Invite" },
   ],
 };

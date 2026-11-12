@@ -2,7 +2,12 @@
 // from the coach's example day, tonight's bedtime with small Recovery, Strain and Stress rings
 // (paid and coached; D60), and the coach's latest message.
 import { router } from "expo-router";
-import { Check, ChevronRight } from "lucide-react-native";
+import {
+  Camera,
+  Check,
+  ChevronRight,
+  MessageCircle,
+} from "lucide-react-native";
 import { Alert, StyleSheet, View } from "react-native";
 
 import { Avatar, Button, PressableScale, Text } from "@/components/primitives";
@@ -12,6 +17,7 @@ import { Ring, useRecovery } from "@/features/athlete/RecoveryParts";
 import { programWeek } from "@/features/athlete/training";
 import { AthletePage, NotJoined, useMe } from "@/features/athlete/useMe";
 import { useAuth } from "@/features/auth/AuthProvider";
+import { dueText, sentThisWeek } from "@/features/coach/checkins";
 import { useCoachData } from "@/features/coach/CoachData";
 import {
   Eyebrow,
@@ -99,15 +105,97 @@ export default function Today() {
         sub={dateLabel()}
       />
       <AthletePage>
-        {lastCoach ? (
-          <View style={styles.coach}>
+        {meTier === "coached" ? (
+          <PressableScale
+            onPress={() => router.push("/athlete/chat")}
+            accessibilityRole="button"
+            accessibilityLabel={`Message ${coachName}${me.coachUnread ? `, ${me.coachUnread} unread` : ""}`}
+            style={styles.coach}
+          >
             <Avatar name={coachName.replace(/^Coach\s+/, "")} />
             <View style={styles.flex}>
               <Text variant="label" tone="muted">
                 {coachName}
               </Text>
-              <Text>{lastCoach.text}</Text>
+              <Text numberOfLines={2}>
+                {lastCoach?.text ?? "Message your coach any time."}
+              </Text>
             </View>
+            {me.coachUnread ? (
+              <View style={styles.badge}>
+                <Text
+                  variant="caption"
+                  weight="semibold"
+                  tone="onBrand"
+                  numeric
+                >
+                  {me.coachUnread}
+                </Text>
+              </View>
+            ) : (
+              <MessageCircle size={20} color={colors.textMuted} />
+            )}
+          </PressableScale>
+        ) : null}
+
+        {meTier === "coached" &&
+        me.enhanced?.requestedAt &&
+        !me.enhanced.consentAt &&
+        !me.enhanced.declinedAt ? (
+          <View style={styles.card}>
+            <Text weight="semibold">
+              {coachName} asked to track your enhanced protocol
+            </Text>
+            <Text tone="muted">
+              Your choice. See what&apos;s recorded before you decide.
+            </Text>
+            <Button
+              label="Review"
+              variant="secondary"
+              fullWidth
+              onPress={() => router.push("/athlete/enhanced")}
+            />
+          </View>
+        ) : null}
+        {meTier === "coached" ? (
+          <View style={styles.card}>
+            {(() => {
+              const k = me.checkIns[0];
+              const sent = sentThisWeek(me);
+              const title = !me.checkIns.length
+                ? "Send your starting point"
+                : sent
+                  ? k?.reviewed
+                    ? `${coachName} replied to your check-in`
+                    : "Check-in sent"
+                  : "Weekly check-in";
+              const sub = !me.checkIns.length
+                ? "Photos and weight, so you can see how far you come"
+                : sent
+                  ? k?.reviewed
+                    ? k.reply
+                    : `${coachName} will reply soon`
+                  : `${dueText(me)} · photos, weight and 6 questions`;
+              return (
+                <>
+                  <View style={styles.head}>
+                    <Camera size={20} color={colors.text} />
+                    <Text weight="semibold" style={styles.flex}>
+                      {title}
+                    </Text>
+                  </View>
+                  <Text tone="muted" numberOfLines={3}>
+                    {sub}
+                  </Text>
+                  <Button
+                    label={sent ? "Open" : "Check in"}
+                    variant={sent ? "secondary" : "primary"}
+                    fullWidth
+                    onPress={() => router.push("/athlete/weekly-check-in")}
+                  />
+                </>
+              );
+            })()}
           </View>
         ) : null}
 
@@ -313,6 +401,15 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
   },
   ring: { alignItems: "center", gap: space[1] },
+  badge: {
+    minWidth: 24,
+    height: 24,
+    paddingHorizontal: space[1],
+    borderRadius: radius.full,
+    backgroundColor: colors.brand,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   coach: {
     flexDirection: "row",
     alignItems: "center",

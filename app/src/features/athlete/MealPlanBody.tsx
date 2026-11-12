@@ -161,6 +161,22 @@ export function MealPlanBody({ date }: { date: string }) {
           ? `Swaps are fine. ${n.coachName} sees what you ate instead.`
           : "Swaps are fine if you stay near your targets."}
       </Text>
+      {n.me?.supplements?.length ? (
+        <View style={styles.card}>
+          <Text weight="semibold">Supplements</Text>
+          {n.me.supplements.map((s) => (
+            <View key={s.id} style={styles.flex}>
+              <Text weight="medium">
+                {s.name}
+                {s.amount ? ` · ${s.amount}` : ""}
+              </Text>
+              <Text variant="label" weight="regular" tone="muted">
+                {[s.timing, s.note].filter(Boolean).join(" · ")}
+              </Text>
+            </View>
+          ))}
+        </View>
+      ) : null}
     </>
   );
 }
