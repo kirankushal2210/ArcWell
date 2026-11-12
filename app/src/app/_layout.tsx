@@ -49,7 +49,10 @@ export default function RootLayout() {
             headerShown: false,
             contentStyle: { backgroundColor: colors.bg },
           }}
-        />
+        >
+          {/* Once in the coach app, a swipe back must not land in onboarding again. */}
+          <Stack.Screen name="coach" options={{ gestureEnabled: false }} />
+        </Stack>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
