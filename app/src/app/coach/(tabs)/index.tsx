@@ -26,6 +26,7 @@ import {
 import { sampleCoach } from "@/features/coach/sampleData";
 import { colors, radius, space } from "@/theme";
 import { BillingBanner } from "@/features/coach/limits";
+import { Tip } from "@/features/athlete/Tip";
 
 type Filter =
   "attention" | "active" | "paused" | "leaving" | "completed" | "all";
@@ -101,6 +102,11 @@ export default function ClientsTab() {
       />
       <Page clearDock>
         <BillingBanner />
+        <Tip
+          coach
+          id="clients-dock"
+          text="The button above the tab bar is always your next most useful step, like reviewing check-ins."
+        />
         {!setupHidden && done < setup.length ? (
           <View style={styles.setup}>
             <View style={styles.between}>

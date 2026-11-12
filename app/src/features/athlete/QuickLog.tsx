@@ -34,6 +34,7 @@ import { slotNow } from "./FoodParts";
 import { Sheet, SheetRow } from "./Sheet";
 import { emptyWorkout } from "./training";
 import { useMe } from "./useMe";
+import { GLASS_ML, ml, useWater } from "./Water";
 
 /** Width the tab bar leaves free for the + button: the button plus the gap before it. */
 export const PLUS_RESERVE = TAB_BAR_HEIGHT + space[2];
@@ -66,6 +67,7 @@ export function QuickLog() {
   const { meTier, active, setActive, logWeight, settingsOf } = useCoachData();
   const insets = useSafeAreaInsets();
   const today = useTodayWorkout();
+  const water = useWater();
   const [open, setOpen] = useState(false);
   const last = me?.weights[me.weights.length - 1] ?? 70;
   const [kg, setKg] = useState(last);
@@ -212,6 +214,20 @@ export function QuickLog() {
               logWeight(me.id, kg);
               setSaved(true);
             }}
+          />
+        </View>
+        <View style={styles.weight}>
+          <View style={styles.flex}>
+            <Text weight="medium">Water</Text>
+            <Text variant="label" weight="regular" tone="muted" numeric>
+              {`${ml(water.today)} today`}
+            </Text>
+          </View>
+          <Button
+            label={`+${GLASS_ML} ml`}
+            size="sm"
+            variant="secondary"
+            onPress={() => water.add(GLASS_ML)}
           />
         </View>
         <SheetRow

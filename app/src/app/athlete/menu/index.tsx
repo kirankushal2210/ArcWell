@@ -3,6 +3,7 @@
 // never an AI item here (D2); Recovery lives in its tab. No Set Videos (D14).
 import { router } from "expo-router";
 import {
+  AlarmClock,
   Bell,
   BookOpen,
   CalendarRange,
@@ -12,6 +13,7 @@ import {
   Dumbbell,
   History,
   ListChecks,
+  MapPin,
   Ruler,
   Scale,
   UserRound,
@@ -59,6 +61,12 @@ export default function AthleteMenu() {
           onPress={() => router.push("/athlete/menu/account")}
         />
         <NavRow
+          icon={AlarmClock}
+          label="Reminders"
+          sub="Workout, weigh-in, meals, wind-down"
+          onPress={() => router.push("/athlete/menu/reminders")}
+        />
+        <NavRow
           icon={Bell}
           label="Notifications"
           value={notes.unread ? `${notes.unread} new` : undefined}
@@ -96,6 +104,16 @@ export default function AthleteMenu() {
           icon={History}
           label="History"
           onPress={() => router.push("/athlete/history")}
+        />
+      </Group>
+
+      <Group>
+        <NavRow
+          first
+          icon={MapPin}
+          label="Gyms"
+          sub="Find a gym near you"
+          onPress={() => router.push("/athlete/gyms")}
         />
       </Group>
 

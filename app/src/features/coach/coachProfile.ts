@@ -40,6 +40,8 @@ export type CoachSettings = {
   /** The coach's Arcwell plan (D40, D41). Sample build: previewed from Plan and billing. */
   billing?: "active" | "grace" | "lapsed";
   clientLimit?: number;
+  /** First-run tips already dismissed. */
+  tipsSeen?: string[];
 };
 
 export const defaultCoachProfile = (): CoachProfile => ({

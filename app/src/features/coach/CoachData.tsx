@@ -276,6 +276,8 @@ type CoachData = {
   ) => void;
   /** The coach deletes their account (K-28): every client is unlinked; templates, leads and transformations go. */
   closeCoachAccount: () => void;
+  /** Log water drunk today (FE-5). */
+  addWater: (clientId: string, ml: number) => void;
   /** Arcwell Plus ends (F8-08, TL-02): the athlete moves to Free; the AI plan stays read-only (D33). */
   endPlus: () => void;
   /** Start or restart Arcwell Plus (F8-01): a trial the first time, paid after that. */
@@ -1300,6 +1302,12 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       setTemplates([]);
       setLeads([]);
     },
+    addWater: (clientId, ml) =>
+      update(clientId, (c) => {
+        const d = isoToday();
+        const now = (c.water?.[d] ?? 0) + ml;
+        return { water: { ...c.water, [d]: Math.max(0, now) } };
+      }),
     endPlus: () => {
       if (!self) return;
       setSelf({

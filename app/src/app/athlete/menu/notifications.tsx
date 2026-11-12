@@ -87,6 +87,14 @@ export default function Notifications() {
       <Text variant="caption" tone="muted">
         Turning a type off here also stops its phone notifications.
       </Text>
+      <Text
+        variant="label"
+        weight="medium"
+        accessibilityRole="link"
+        onPress={() => router.push("/athlete/menu/reminders")}
+      >
+        Set reminder times
+      </Text>
     </MenuPage>
   );
 }

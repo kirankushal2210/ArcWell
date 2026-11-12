@@ -39,6 +39,7 @@ import { todayIndex, WEEKDAYS, weekSchedule } from "@/features/coach/plans";
 import { colors, radius, space } from "@/theme";
 import { timesPerWeek } from "@/features/science/rules";
 import { VolumePanel } from "@/features/science/VolumePanel";
+import { Tip } from "@/features/athlete/Tip";
 
 function PlanPage() {
   const me = useMe();
@@ -261,6 +262,12 @@ function PlanPage() {
           );
         })}
       </Group>
+
+      <Tip
+        id="training-volume"
+
+        text="Your weekly sets per muscle are checked against the research. Tap Why this? to see how."
+      />
 
       <VolumePanel
         days={program.days}

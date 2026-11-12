@@ -33,6 +33,7 @@ import { useCoachData } from "@/features/coach/CoachData";
 import { Bars, PageHeader, Pills } from "@/features/coach/parts";
 import { colors, radius, space } from "@/theme";
 import { WhyThis } from "@/features/science/WhyThis";
+import { WaterCard } from "@/features/athlete/Water";
 
 function Bar({ value, target }: { value: number; target: number }) {
   const pct = target > 0 ? Math.min(1, value / target) : 0;
@@ -144,6 +145,8 @@ function DayPage({
           ))}
         </View>
       ) : null}
+
+      {date === today ? <WaterCard /> : null}
 
       {n.tier === "free" && !hideUpgrade ? (
         <View style={styles.upsell}>

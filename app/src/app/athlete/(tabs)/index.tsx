@@ -37,6 +37,7 @@ import {
   shortDay,
   subscriptionInfo,
 } from "@/features/athlete/athleteData";
+import { Tip } from "@/features/athlete/Tip";
 
 const dateLabel = () =>
   new Date().toLocaleDateString("en-IN", {
@@ -157,6 +158,10 @@ export default function Today() {
         ]}
       />
       <AthletePage dock>
+        <Tip
+          id="today-plus"
+          text="Tap + at the bottom right to log food, water, weight or a check-in from anywhere."
+        />
         {meTier === "pro" &&
         sub &&
         (sub.status === "grace" ||

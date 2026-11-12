@@ -1,7 +1,7 @@
 // Messages tab (F7): one conversation per client. Unread first, then the newest; search by name and
 // filter to unread. Clients you haven't written to yet sit under "Start a conversation".
 import { router } from "expo-router";
-import { Search } from "lucide-react-native";
+import { Megaphone, Search } from "lucide-react-native";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
@@ -46,7 +46,17 @@ export default function MessagesTab() {
 
   return (
     <View style={styles.root}>
-      <PageHeader title="Messages" actions={[menuAction]} />
+      <PageHeader
+        title="Messages"
+        actions={[
+          {
+            icon: Megaphone,
+            label: "Message several clients",
+            onPress: () => router.push("/coach/broadcast"),
+          },
+          menuAction,
+        ]}
+      />
       <Page>
         <TextField
           value={q}

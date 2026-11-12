@@ -71,7 +71,25 @@ export type AthleteSettings = {
   historyChangedAt?: string;
   /** Arcwell Plus through Google Play (F8). Sample build: set on the phone; later from RevenueCat. */
   sub?: Subscription;
+  /** Reminders (FE-5). Delivered by Expo Notifications once the backend schedules them. */
+  reminders?: Reminders;
+  /** First-run tips already dismissed. */
+  tipsSeen?: string[];
 };
+
+export type Reminders = {
+  workout: { on: boolean; at: number };
+  weighIn: { on: boolean; at: number };
+  meals: boolean;
+  windDown: boolean;
+};
+
+export const defaultReminders = (): Reminders => ({
+  workout: { on: true, at: 18 * 60 },
+  weighIn: { on: false, at: 7 * 60 },
+  meals: false,
+  windDown: true,
+});
 
 export type Subscription = {
   status: "trial" | "active" | "grace" | "cancelled" | "expired";
