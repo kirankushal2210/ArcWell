@@ -350,3 +350,71 @@ export const minutesSince = (start: number) =>
 
 /** Monday = 0 … Sunday = 6. */
 export const todayIndex = () => (new Date().getDay() + 6) % 7;
+
+// ---------- Templates (K-05, K-06): reusable programs and meal plans ----------
+
+/** A fresh copy with new ids, so a client's plan never shares rows with the template (D56). */
+export const cloneProgram = (p: TrainingProgram): TrainingProgram => ({
+  ...p,
+  days: p.days.map((d) => ({
+    ...d,
+    id: uid("d"),
+    exercises: d.exercises.map((e) => ({ ...e, id: uid("e") })),
+  })),
+});
+
+export const cloneNutrition = (n: NutritionPlan): NutritionPlan => ({
+  ...n,
+  meals: n.meals.map((m) => ({
+    ...m,
+    id: uid("m"),
+    items: m.items?.map((i) => ({ ...i })),
+  })),
+});
+
+/** Carbs and fat for a calorie and protein target: fat at 25% of calories, carbs the rest. */
+export function targetsFor(kcal: number, protein: number) {
+  const fat = Math.round((kcal * 0.25) / 9 / 5) * 5;
+  const carbs = Math.max(
+    0,
+    Math.round((kcal - protein * 4 - fat * 9) / 4 / 5) * 5,
+  );
+  return { kcal, protein, carbs, fat };
+}
+
+/** One line for a template row, e.g. "4 workouts · 8 weeks". */
+export const programDetail = (p: TrainingProgram) =>
+  `${p.days.length} ${p.days.length === 1 ? "workout" : "workouts"} · ${p.weeks} ${p.weeks === 1 ? "week" : "weeks"}`;
+
+export const mealsDetail = (n: NutritionPlan) =>
+  `${n.meals.length} ${n.meals.length === 1 ? "meal" : "meals"} · ${n.kcal.toLocaleString("en-IN")} kcal · ${n.protein} g protein`;
+
+/** Sample templates arrive as names only; give each its program or meal plan. */
+export function fillTemplate<
+  T extends {
+    kind: "training" | "meals";
+    name: string;
+    detail: string;
+    program?: TrainingProgram;
+    nutrition?: NutritionPlan;
+  },
+>(t: T): T {
+  if (t.kind === "training") {
+    const program = t.program ?? {
+      ...programFromTemplate(t.name),
+      name: t.name,
+    };
+    return { ...t, program, detail: programDetail(program) };
+  }
+  if (t.nutrition) return { ...t, detail: mealsDetail(t.nutrition) };
+  const kcal =
+    Number(/([\d,]+) kcal/.exec(t.name)?.[1]?.replace(",", "")) || 2000;
+  const protein = Number(/(\d+) g protein/.exec(t.detail)?.[1]) || 120;
+  const diet = t.name.startsWith("Vegetarian")
+    ? "Vegetarian"
+    : t.name.startsWith("Non-veg")
+      ? "Non-vegetarian"
+      : "Eggetarian";
+  const nutrition = { ...targetsFor(kcal, protein), meals: exampleDay(diet) };
+  return { ...t, nutrition, detail: mealsDetail(nutrition) };
+}

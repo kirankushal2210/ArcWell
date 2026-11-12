@@ -13,26 +13,57 @@ import {
 import type { ClientStatus } from "@/components/primitives";
 import type { Food, FoodLog } from "@/features/athlete/foods";
 import {
+  type DayActivity,
+  type DeviceBrand,
+  emptyRecovery,
+  type RecoveryStore,
+  type WellnessLog,
+} from "@/features/athlete/recovery";
+import {
   type Exercise,
   migrateNames,
   registerCustomExercises,
 } from "@/features/athlete/library";
 import type { ActiveWorkout, Session } from "@/features/athlete/training";
 
+import { buildCheckIn, type CheckInForm } from "./checkins";
+import { withInstagram } from "./instagram";
+import { type Enhanced, emptyEnhanced, sampleEnhanced } from "./enhanced";
 import {
+  cloneItems,
+  sampleStacks,
+  type Stack,
+  type Supplement,
+  supId,
+} from "./supplements";
+import {
+  type CoachProfile,
+  type CoachSettings,
+  defaultCoachProfile,
+  defaultCoachSettings,
+} from "./coachProfile";
+import {
+  type ClientAccount,
+  crmId,
+  type Lead,
+  type LeadEventKind,
+  sampleLeads,
+} from "./crm";
+import {
+  cloneNutrition,
+  cloneProgram,
   exampleDay,
+  fillTemplate,
   type NutritionPlan,
   programFromTemplate,
   type RecoveryProtocol,
   type TrainingDay,
   type TrainingProgram,
+  uid,
 } from "./plans";
 import {
   type Client,
-  type Lead,
   sampleClients,
-  sampleCoach,
-  sampleLeads,
   sampleTemplates,
   type Template,
 } from "./sampleData";
@@ -57,10 +88,45 @@ type CoachData = {
   clients: Client[];
   templates: Template[];
   leads: Lead[];
+  /** CRM (D63): add a lead; returns its id. */
+  addLead: (
+    l: Omit<Lead, "id" | "createdAt" | "events" | "stage"> & { note?: string },
+  ) => string;
+  /** Change a lead's fields; stage changes and follow-ups are written to its timeline. */
+  updateLead: (id: string, patch: Partial<Lead>, log?: string) => void;
+  logLead: (id: string, kind: LeadEventKind, text: string) => void;
+  deleteLead: (id: string) => void;
+  saveAccount: (clientId: string, a: ClientAccount) => void;
+  /** The coach's own profile and settings (D65). */
+  coach: CoachProfile;
+  saveCoach: (p: CoachProfile) => void;
+  settings: CoachSettings;
+  saveSettings: (s: CoachSettings) => void;
+  /** Supplements (D64): a client's own list, and reusable stacks in Plans. */
+  setSupplements: (clientId: string, items: Supplement[]) => void;
+  stacks: Stack[];
+  saveStack: (s: Omit<Stack, "id"> & { id?: string }) => string;
+  deleteStack: (id: string) => void;
+  assignStack: (stackId: string, clientIds: string[]) => void;
+  /** Enhanced athletes (D64): competitive flag, consent request and the record itself. */
+  setCompetitive: (clientId: string, on: boolean) => void;
+  requestEnhanced: (clientId: string) => void;
+  answerEnhanced: (clientId: string, yes: boolean) => void;
+  editEnhanced: (clientId: string, fn: (e: Enhanced) => Enhanced) => void;
   coachName: string;
   client: (id: string) => Client | undefined;
-  addClient: (c: NewClient) => string;
+  /** Adds a client (D56); with `leadId`, the lead is marked joined and linked. */
+  addClient: (c: NewClient, leadId?: string) => string;
   assignPlan: (id: string, training: string, meals: string) => void;
+  /** Adds or updates a template (K-06); returns its id. Clients already on it keep their copy. */
+  saveTemplate: (
+    t: Omit<Template, "id" | "detail" | "clients"> & { id?: string },
+  ) => string;
+  deleteTemplate: (id: string) => void;
+  /** Copies a template under a new name; returns the copy's id. */
+  duplicateTemplate: (id: string) => string;
+  /** Gives each client their own copy of the template, replacing their current program or meal plan. */
+  assignTemplate: (id: string, clientIds: string[]) => void;
   saveProgram: (id: string, p: TrainingProgram) => void;
   saveNutrition: (id: string, n: NutritionPlan) => void;
   saveProtocol: (id: string, r: RecoveryProtocol) => void;
@@ -118,6 +184,14 @@ type CoachData = {
   /** Free athletes can dismiss the Arcwell Plus card on Nutrition (F5-02). */
   hideUpgrade: boolean;
   setHideUpgrade: (v: boolean) => void;
+  /** Recovery per athlete (D60): device link, morning check-ins, activities, protocols done. */
+  recoveryOf: (clientId: string) => RecoveryStore;
+  saveWellness: (clientId: string, log: WellnessLog) => void;
+  connectDevice: (clientId: string, brand: DeviceBrand) => void;
+  disconnectDevice: (clientId: string) => void;
+  addActivity: (clientId: string, a: DayActivity) => void;
+  removeActivity: (clientId: string, id: string) => void;
+  toggleProtocol: (clientId: string, date: string, protocolId: string) => void;
   /** Someone joining through the coach's general link (not a personal invite) is onboarding. */
   joiningCoach: boolean;
   setJoiningCoach: (v: boolean) => void;
@@ -133,10 +207,20 @@ type CoachData = {
   logSleep: (id: string, hours: number) => void;
   logWeight: (id: string, kg: number) => void;
   reply: (clientId: string, checkInId: string, text: string) => void;
-  send: (clientId: string, text: string) => void;
+  /** The athlete sends their weekly check-in (F6): it lands in the coach's inbox. */
+  submitCheckIn: (clientId: string, form: CheckInForm) => void;
+  send: (clientId: string, text: string, image?: string) => void;
+  /** The client writes to their coach (F7). */
+  sendFromClient: (clientId: string, text: string, image?: string) => void;
+  /** The client opened the chat. */
+  markReadByClient: (clientId: string) => void;
   markRead: (clientId: string) => void;
   setStatus: (clientId: string, status: ClientStatus) => void;
   setNotes: (clientId: string, notes: string) => void;
+  /** The day of the week this client's check-in is due (sitemap §5 Check-ins). */
+  setCheckInDay: (clientId: string, day: string) => void;
+  /** Remove a client who was added but never joined. */
+  removeClient: (clientId: string) => void;
   remind: (clientId: string) => void;
   reminded: string[];
 };
@@ -155,7 +239,22 @@ type Saved = {
   foodLogs?: Record<string, FoodLog[]>;
   myFoods?: Food[];
   hideUpgrade?: boolean;
+  recovery?: Record<string, RecoveryStore>;
+  templates?: Template[];
+  leads?: Lead[];
+  coach?: CoachProfile;
+  settings?: CoachSettings;
+  stacks?: Stack[];
 };
+
+/** Sample extras added after the first release of the sample data (D64). */
+function withExtras(c: Client): Client {
+  if (c.id === "karan" && c.competitive === undefined)
+    return { ...c, competitive: true, enhanced: sampleEnhanced() };
+  if (c.id === "priya" && c.supplements === undefined)
+    return { ...c, supplements: cloneItems(sampleStacks()[1].items) };
+  return c;
+}
 
 /** Saved self plans from before exact foods: rebuild the example day with foods (sample data only). */
 function upgradeSelfPlan(c: Client | null): Client | null {
@@ -198,7 +297,16 @@ const code = (coach: string) =>
     .toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
 export function CoachDataProvider({ children }: { children: ReactNode }) {
-  const [clients, setClients] = useState(sampleClients);
+  const [clients, setClients] = useState(() => sampleClients.map(withExtras));
+  const [stacks, setStacks] = useState<Stack[]>(sampleStacks);
+  const [templates, setTemplates] = useState<Template[]>(() =>
+    sampleTemplates.map(fillTemplate),
+  );
+  const [leads, setLeads] = useState<Lead[]>(() =>
+    withInstagram(sampleLeads()),
+  );
+  const [coach, setCoach] = useState<CoachProfile>(defaultCoachProfile);
+  const [settings, setSettings] = useState<CoachSettings>(defaultCoachSettings);
   const [reminded, setReminded] = useState<string[]>([]);
   const [meId, setMeId] = useState<string | null>(null);
   const [meTier, setMeTier] = useState<AthleteTier>("coached");
@@ -211,6 +319,9 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
   const [foodLogs, setFoodLogs] = useState<Record<string, FoodLog[]>>({});
   const [myFoods, setMyFoods] = useState<Food[]>([]);
   const [hideUpgrade, setHideUpgrade] = useState(false);
+  const [recovery, setRecovery] = useState<Record<string, RecoveryStore>>({});
+  const editRecovery = (id: string, fn: (r: RecoveryStore) => RecoveryStore) =>
+    setRecovery((all) => ({ ...all, [id]: fn(all[id] ?? emptyRecovery()) }));
   // Plain helpers (set labels, workout set-up) look custom exercises up by name.
   registerCustomExercises(customExercises);
 
@@ -222,7 +333,8 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       .then((raw) => {
         if (!raw) return;
         const s = JSON.parse(migrateNames(raw)) as Partial<Saved>;
-        if (s.clients) setClients(s.clients);
+        if (s.clients) setClients(s.clients.map(withExtras));
+        if (s.stacks) setStacks(s.stacks);
         if (s.meId !== undefined) setMeId(s.meId);
         if (s.meTier) setMeTier(s.meTier);
         if (s.self !== undefined) setSelf(upgradeSelfPlan(s.self));
@@ -232,6 +344,11 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
         if (s.foodLogs) setFoodLogs(s.foodLogs);
         if (s.myFoods) setMyFoods(s.myFoods);
         if (s.hideUpgrade) setHideUpgrade(true);
+        if (s.recovery) setRecovery(s.recovery);
+        if (s.templates) setTemplates(s.templates.map(fillTemplate));
+        if (s.leads) setLeads(withInstagram(s.leads));
+        if (s.coach) setCoach(s.coach);
+        if (s.settings) setSettings(s.settings);
       })
       .catch(() => {})
       .finally(() => setHydrated(true));
@@ -249,6 +366,12 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       foodLogs,
       myFoods,
       hideUpgrade,
+      recovery,
+      templates,
+      leads,
+      coach,
+      settings,
+      stacks,
     };
     AsyncStorage.setItem(STORE_KEY, JSON.stringify(saved)).catch(() => {});
   }, [
@@ -263,6 +386,12 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
     foodLogs,
     myFoods,
     hideUpgrade,
+    recovery,
+    templates,
+    leads,
+    coach,
+    settings,
+    stacks,
   ]);
   const update = (id: string, patch: (c: Client) => Partial<Client>) => {
     if (self && id === self.id) {
@@ -273,18 +402,144 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       all.map((c) => (c.id === id ? { ...c, ...patch(c) } : c)),
     );
   };
-  const coachName = sampleCoach.name;
+  const coachName = coach.name;
+  const bumpTemplates = (ids: (string | undefined)[], by: number) =>
+    setTemplates((all) =>
+      all.map((x) =>
+        ids.includes(x.id) ? { ...x, clients: x.clients + by } : x,
+      ),
+    );
 
   const value: CoachData = {
     clients,
-    templates: sampleTemplates,
-    leads: sampleLeads,
+    templates,
+    leads,
+    addLead: (l) => {
+      const id = crmId("l");
+      const now = new Date().toISOString();
+      const { note, ...rest } = l;
+      setLeads((all) => [
+        {
+          ...rest,
+          id,
+          stage: "new",
+          createdAt: now,
+          events: [
+            {
+              id: crmId("v"),
+              at: now,
+              kind: "created",
+              text: note?.trim() || "Added",
+            },
+          ],
+        },
+        ...all,
+      ]);
+      return id;
+    },
+    updateLead: (id, patch, log) =>
+      setLeads((all) =>
+        all.map((l) =>
+          l.id !== id
+            ? l
+            : {
+                ...l,
+                ...patch,
+                events: log
+                  ? [
+                      ...l.events,
+                      {
+                        id: crmId("v"),
+                        at: new Date().toISOString(),
+                        kind:
+                          patch.followUp !== undefined && !patch.stage
+                            ? "follow_up"
+                            : "stage",
+                        text: log,
+                      },
+                    ]
+                  : l.events,
+              },
+        ),
+      ),
+    logLead: (id, kind, text) =>
+      setLeads((all) =>
+        all.map((l) =>
+          l.id !== id
+            ? l
+            : {
+                ...l,
+                // A logged call moves a new or contacted lead along.
+                stage:
+                  kind === "call" &&
+                  (l.stage === "new" ||
+                    l.stage === "contacted" ||
+                    l.stage === "call_booked")
+                    ? "call_done"
+                    : kind === "message" && l.stage === "new"
+                      ? "contacted"
+                      : l.stage,
+                events: [
+                  ...l.events,
+                  { id: crmId("v"), at: new Date().toISOString(), kind, text },
+                ],
+              },
+        ),
+      ),
+    deleteLead: (id) => setLeads((all) => all.filter((l) => l.id !== id)),
+    saveAccount: (clientId, a) => update(clientId, () => ({ account: a })),
+    coach,
+    saveCoach: setCoach,
+    settings,
+    saveSettings: setSettings,
+    setSupplements: (clientId, items) =>
+      update(clientId, () => ({ supplements: items })),
+    stacks,
+    saveStack: (s) => {
+      const id = s.id ?? supId("st");
+      setStacks((all) =>
+        all.some((x) => x.id === id)
+          ? all.map((x) => (x.id === id ? { ...s, id } : x))
+          : [{ ...s, id }, ...all],
+      );
+      return id;
+    },
+    deleteStack: (id) => setStacks((all) => all.filter((x) => x.id !== id)),
+    assignStack: (stackId, clientIds) => {
+      const st = stacks.find((x) => x.id === stackId);
+      if (!st) return;
+      for (const cid of clientIds)
+        update(cid, () => ({ supplements: cloneItems(st.items) }));
+    },
+    setCompetitive: (clientId, on) =>
+      update(clientId, () => ({ competitive: on })),
+    requestEnhanced: (clientId) =>
+      update(clientId, (c) => ({
+        enhanced: {
+          ...(c.enhanced ?? emptyEnhanced()),
+          requestedAt: new Date().toISOString(),
+          declinedAt: undefined,
+        },
+      })),
+    answerEnhanced: (clientId, yes) =>
+      update(clientId, (c) => ({
+        enhanced: {
+          ...(c.enhanced ?? emptyEnhanced()),
+          consentAt: yes ? new Date().toISOString() : undefined,
+          declinedAt: yes ? undefined : new Date().toISOString(),
+        },
+      })),
+    editEnhanced: (clientId, fn) =>
+      update(clientId, (c) => ({
+        enhanced: fn(c.enhanced ?? emptyEnhanced()),
+      })),
     coachName,
     reminded,
     meId,
     hydrated,
     resetSample: () => {
-      setClients(sampleClients);
+      setClients(sampleClients.map(withExtras));
+      setStacks(sampleStacks());
       setMeId(null);
       setMeTier("coached");
       setSelf(null);
@@ -294,6 +549,11 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       setFoodLogs({});
       setMyFoods([]);
       setHideUpgrade(false);
+      setRecovery({});
+      setTemplates(sampleTemplates.map(fillTemplate));
+      setLeads(withInstagram(sampleLeads()));
+      setCoach(defaultCoachProfile());
+      setSettings(defaultCoachSettings());
       AsyncStorage.removeItem(STORE_KEY).catch(() => {});
     },
     meTier,
@@ -326,6 +586,51 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       setMyFoods((all) => [...all.filter((x) => x.id !== f.id), f]),
     hideUpgrade,
     setHideUpgrade,
+    recoveryOf: (id) => recovery[id] ?? emptyRecovery(),
+    saveWellness: (id, log) => {
+      editRecovery(id, (r) => ({
+        ...r,
+        logs: [...r.logs.filter((l) => l.date !== log.date), log],
+      }));
+      // The coach's client profile reads nightly sleep from here too.
+      update(id, (c) => ({
+        recovery: {
+          ...c.recovery,
+          nights: [
+            ...c.recovery.nights,
+            { day: today().slice(0, 3), hours: log.sleepH },
+          ].slice(-7),
+          quality: log.quality,
+          stress: log.stress,
+          energy: log.energy,
+          soreness: log.soreness,
+        },
+      }));
+    },
+    connectDevice: (id, brand) =>
+      editRecovery(id, (r) => ({
+        ...r,
+        device: { brand, connectedAt: new Date().toISOString() },
+      })),
+    disconnectDevice: (id) =>
+      editRecovery(id, (r) => ({ ...r, device: undefined })),
+    addActivity: (id, a) =>
+      editRecovery(id, (r) => ({ ...r, activities: [...r.activities, a] })),
+    removeActivity: (id, aid) =>
+      editRecovery(id, (r) => ({
+        ...r,
+        activities: r.activities.filter((a) => a.id !== aid),
+      })),
+    toggleProtocol: (id, date, pid) =>
+      editRecovery(id, (r) => {
+        const k = `${date}:${pid}`;
+        return {
+          ...r,
+          done: r.done.includes(k)
+            ? r.done.filter((x) => x !== k)
+            : [...r.done, k],
+        };
+      }),
     customExercises,
     addCustomExercise: (e) =>
       setCustom((all) => [
@@ -417,7 +722,7 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       setJoiningCoach(false);
     },
 
-    addClient: (n) => {
+    addClient: (n, leadId) => {
       const id = `c${Date.now().toString(36)}`;
       const goal =
         n.goal.startsWith("Lose fat") || n.goal.startsWith("Build muscle")
@@ -473,19 +778,130 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
         unread: 0,
         notes: n.notes.trim(),
       };
+      const lead = leadId ? leads.find((l) => l.id === leadId) : undefined;
+      if (lead) {
+        client.source = lead.source;
+        setLeads((all) =>
+          all.map((l) =>
+            l.id !== leadId
+              ? l
+              : {
+                  ...l,
+                  stage: "joined",
+                  clientId: id,
+                  events: [
+                    ...l.events,
+                    {
+                      id: crmId("v"),
+                      at: new Date().toISOString(),
+                      kind: "stage",
+                      text: "Joined · added as a client",
+                    },
+                  ],
+                },
+          ),
+        );
+      }
       setClients((all) => [client, ...all]);
       return id;
     },
 
-    assignPlan: (id, training, meals) =>
-      update(id, () => ({
+    assignPlan: (id, training, meals) => {
+      const t = templates.find(
+        (x) => x.kind === "training" && x.name === training,
+      );
+      const m = templates.find((x) => x.kind === "meals" && x.name === meals);
+      update(id, (c) => ({
         isNew: false,
         plan: { training, meals },
-        program: programFromTemplate(training),
+        program: t?.program
+          ? { ...cloneProgram(t.program), name: t.name }
+          : programFromTemplate(training),
         programStart: new Date().toISOString(),
+        nutritionPlan: m?.nutrition
+          ? cloneNutrition(m.nutrition)
+          : c.nutritionPlan,
         line: "Plan assigned · starts Monday",
         attention: undefined,
-      })),
+      }));
+      bumpTemplates([t?.id, m?.id], 1);
+    },
+    saveTemplate: (draft) => {
+      const id = draft.id ?? uid(draft.kind === "training" ? "t" : "m");
+      setTemplates((all) => {
+        const prev = all.find((x) => x.id === id);
+        const next = fillTemplate({
+          ...draft,
+          id,
+          detail: "",
+          clients: prev?.clients ?? 0,
+          // Recompute the list line from the new content.
+          program: draft.program,
+          nutrition: draft.nutrition,
+        });
+        return prev ? all.map((x) => (x.id === id ? next : x)) : [next, ...all];
+      });
+      return id;
+    },
+    deleteTemplate: (id) =>
+      setTemplates((all) => all.filter((x) => x.id !== id)),
+    duplicateTemplate: (id) => {
+      const src = templates.find((x) => x.id === id);
+      const copyId = uid(src?.kind === "meals" ? "m" : "t");
+      if (!src) return copyId;
+      const copy: Template = {
+        ...src,
+        id: copyId,
+        name: `${src.name} (copy)`,
+        clients: 0,
+        program: src.program
+          ? { ...cloneProgram(src.program), name: `${src.name} (copy)` }
+          : undefined,
+        nutrition: src.nutrition ? cloneNutrition(src.nutrition) : undefined,
+      };
+      setTemplates((all) => {
+        const at = all.findIndex((x) => x.id === id);
+        return [...all.slice(0, at + 1), copy, ...all.slice(at + 1)];
+      });
+      return copyId;
+    },
+    assignTemplate: (id, clientIds) => {
+      const t = templates.find((x) => x.id === id);
+      if (!t || !clientIds.length) return;
+      for (const cid of clientIds) {
+        if (t.kind === "training" && t.program) {
+          const program = { ...cloneProgram(t.program), name: t.name };
+          update(cid, (c) => ({
+            isNew: false,
+            program,
+            programStart: new Date().toISOString(),
+            plan: { training: t.name, meals: c.plan?.meals ?? "" },
+            training: {
+              ...c.training,
+              weekPlanned: c.protocol
+                ? 7 - c.protocol.restDays.length
+                : program.days.length,
+            },
+          }));
+        }
+        if (t.kind === "meals" && t.nutrition) {
+          const n = cloneNutrition(t.nutrition);
+          update(cid, (c) => ({
+            nutritionPlan: n,
+            plan: {
+              training: c.plan?.training ?? c.program?.name ?? "",
+              meals: t.name,
+            },
+            nutrition: {
+              ...c.nutrition,
+              targetKcal: n.kcal,
+              proteinG: n.protein,
+            },
+          }));
+        }
+      }
+      bumpTemplates([id], clientIds.length);
+    },
     saveProgram: (id, p) =>
       update(id, (c) => ({
         program: p,
@@ -583,6 +999,31 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
         ),
       })),
 
+    submitCheckIn: (clientId, form) =>
+      update(clientId, (c) => {
+        const k = buildCheckIn(c, form);
+        const waist = form.waistCm;
+        return {
+          checkIns: [k, ...c.checkIns],
+          weights: [...c.weights, form.weightKg],
+          measurements:
+            waist === undefined
+              ? c.measurements
+              : c.measurements.some((m) => m.label === "Waist")
+                ? c.measurements.map((m) =>
+                    m.label === "Waist" ? { ...m, now: waist } : m,
+                  )
+                : [
+                    ...c.measurements,
+                    { label: "Waist", start: waist, now: waist, unit: "cm" },
+                  ],
+          photoWeeks:
+            Object.keys(form.photos).length && !c.photoWeeks.includes(k.week)
+              ? [...c.photoWeeks, k.week]
+              : c.photoWeeks,
+          attention: "Check-in to review · submitted just now",
+        };
+      }),
     reply: (clientId, checkInId, text) =>
       update(clientId, (c) => ({
         checkIns: c.checkIns.map((k) =>
@@ -592,10 +1033,36 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
           ? undefined
           : c.attention,
       })),
-    send: (clientId, text) =>
+    send: (clientId, text, image) =>
       update(clientId, (c) => ({
-        messages: [...c.messages, { from: "coach", text, time: nowTime() }],
+        messages: [
+          ...c.messages,
+          {
+            from: "coach",
+            text,
+            image,
+            time: nowTime(),
+            at: new Date().toISOString(),
+          },
+        ],
+        coachUnread: (c.coachUnread ?? 0) + 1,
       })),
+    sendFromClient: (clientId, text, image) =>
+      update(clientId, (c) => ({
+        messages: [
+          ...c.messages,
+          {
+            from: "client",
+            text,
+            image,
+            time: nowTime(),
+            at: new Date().toISOString(),
+          },
+        ],
+        unread: c.unread + 1,
+      })),
+    markReadByClient: (clientId) =>
+      update(clientId, () => ({ coachUnread: 0 })),
     markRead: (clientId) => update(clientId, () => ({ unread: 0 })),
     setStatus: (clientId, status) =>
       update(clientId, (c) => ({
@@ -610,6 +1077,10 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
                 : c.line,
       })),
     setNotes: (clientId, notes) => update(clientId, () => ({ notes })),
+    setCheckInDay: (clientId, day) =>
+      update(clientId, () => ({ checkInDay: day })),
+    removeClient: (clientId) =>
+      setClients((all) => all.filter((c) => c.id !== clientId)),
     remind: (clientId) => setReminded((r) => [...r, clientId]),
   };
 

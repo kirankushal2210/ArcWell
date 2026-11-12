@@ -5,6 +5,7 @@ import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { Avatar, Button, Text } from "@/components/primitives";
+import { menuAction } from "@/features/coach/coachProfile";
 import { useCoachData } from "@/features/coach/CoachData";
 import {
   Eyebrow,
@@ -17,6 +18,13 @@ import {
 import { colors, space } from "@/theme";
 
 type Filter = "review" | "overdue" | "reviewed";
+
+/** Monday of this week, e.g. "9 Nov". */
+const weekStart = () => {
+  const d = new Date();
+  d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+  return d.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+};
 
 export default function CheckInsTab() {
   const { clients, remind, reminded } = useCoachData();
@@ -35,7 +43,11 @@ export default function CheckInsTab() {
 
   return (
     <View style={styles.root}>
-      <PageHeader title="Check-ins" sub="Week of 9 Nov" />
+      <PageHeader
+        title="Check-ins"
+        sub={`Week of ${weekStart()}`}
+        actions={[menuAction]}
+      />
       <Page>
         <Pills<Filter>
           value={filter}
@@ -101,7 +113,11 @@ export default function CheckInsTab() {
                       numeric
                     >
                       {[
-                        weight ? `${weight.delta} kg` : null,
+                        weight
+                          ? weight.delta === "—"
+                            ? "weight steady"
+                            : `${weight.delta} kg`
+                          : null,
                         workouts ? `${workouts.now} workouts` : null,
                         k.note ? `“${k.note}”` : null,
                       ]

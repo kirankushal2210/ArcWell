@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Logo } from "@/components/brand";
 import { Avatar, Button, PressableScale, Text } from "@/components/primitives";
+import { useAuth } from "@/features/auth/AuthProvider";
 import { useCoachData } from "@/features/coach/CoachData";
 import {
   Eyebrow,
@@ -36,6 +37,7 @@ import {
 
 export function JoinScreen({ code: initial }: { code?: string }) {
   const { findInvite, claimInvite, coachName } = useCoachData();
+  const auth = useAuth();
   const insets = useSafeAreaInsets();
   const [code, setCode] = useState(initial ?? "");
   const [tried, setTried] = useState(initial ?? "");
@@ -186,13 +188,21 @@ export function JoinScreen({ code: initial }: { code?: string }) {
           fullWidth
           disabled={!agree}
           onPress={() => {
-            claimInvite(c.id);
-            if (router.canDismiss()) router.dismissAll();
-            router.replace("/athlete");
+            const start = () => {
+              claimInvite(c.id);
+              if (router.canDismiss()) router.dismissAll();
+              router.replace("/athlete");
+            };
+            if (!auth.enabled) return start();
+            // The client gives their own consent (D56); the account is made by email code.
+            auth.begin({ role: "athlete", consent: true, then: start });
+            router.push("/auth/email");
           }}
         />
         <Text variant="caption" tone="muted" style={styles.center}>
-          Sign-in with Google or email comes with accounts.
+          {auth.enabled
+            ? "Next, we'll email you a code to make your account."
+            : "Sample build: accounts are off, so this continues without one."}
         </Text>
       </View>
     </View>
