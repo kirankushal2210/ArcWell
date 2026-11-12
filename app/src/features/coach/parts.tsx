@@ -73,12 +73,9 @@ export function PageHeader({
 
 export function Page({
   children,
-  clearFloating = false,
   clearDock = false,
 }: {
   children: ReactNode;
-  /** Extra room at the end so a floating button (the athlete AI button) never covers content. */
-  clearFloating?: boolean;
   /** Extra room at the end for an ActionDock above the tab bar. */
   clearDock?: boolean;
 }) {
@@ -87,7 +84,6 @@ export function Page({
       style={styles.flex}
       contentContainerStyle={[
         styles.page,
-        clearFloating && styles.pageFloating,
         clearDock && styles.pageDock,
       ]}
       showsVerticalScrollIndicator={false}
@@ -346,11 +342,21 @@ export function CoachTabBar({
   descriptors,
   emitter,
   navigateToTab,
-}: BottomTabBarProps) {
+  reserveRight = 0,
+}: BottomTabBarProps & {
+  /** Room kept free at the right end for the athlete + button (D67). */
+  reserveRight?: number;
+}) {
   const insets = useSafeAreaInsets();
   return (
     <GlassSurface
-      style={[styles.tabBar, { bottom: tabBarBottom(insets.bottom) }]}
+      style={[
+        styles.tabBar,
+        {
+          bottom: tabBarBottom(insets.bottom),
+          right: rhythm.gutter + reserveRight,
+        },
+      ]}
     >
       <View style={styles.tabRow} accessibilityRole="tablist">
         {state.routes.map((route, index) => {
@@ -457,7 +463,6 @@ const styles = StyleSheet.create({
     paddingBottom: space[12] * 2 + space[4],
     gap: space[3],
   },
-  pageFloating: { paddingBottom: space[12] * 3 + space[4] },
   pageDock: { paddingBottom: space[12] * 3 + space[6] },
   dock: { position: "absolute", left: rhythm.gutter, right: rhythm.gutter },
   group: {
@@ -511,9 +516,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: space[1],
   },
-  tab: { flex: 1, alignItems: "center", gap: space[1] / 2 },
+  // Tabs share the spare width on top of their own label width, so long labels never truncate.
+  tab: {
+    flexGrow: 1,
+    flexBasis: "auto",
+    alignItems: "center",
+    gap: space[1] / 2,
+  },
   tabIcon: {
-    width: 52,
+    width: 44,
     height: 28,
     borderRadius: radius.full,
     alignItems: "center",

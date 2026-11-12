@@ -3,7 +3,13 @@
 // onboarding answers, and each page says which. Part of Arcwell Plus for self-guided athletes (D5a,
 // D57); full for coached athletes.
 import { router, useLocalSearchParams } from "expo-router";
-import { ChevronLeft, ChevronRight, Lock, Watch } from "lucide-react-native";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Lock,
+  Sun,
+  Watch,
+} from "lucide-react-native";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
@@ -24,7 +30,7 @@ import {
   StrainPage,
 } from "@/features/athlete/RecoveryPages";
 import { useRecovery } from "@/features/athlete/RecoveryParts";
-import { AthletePage, NotJoined } from "@/features/athlete/useMe";
+import { AthleteDock, AthletePage, NotJoined } from "@/features/athlete/useMe";
 import { PageHeader } from "@/features/coach/parts";
 import { clock } from "@/features/coach/plans";
 import { colors, radius, rhythm, space } from "@/theme";
@@ -129,6 +135,14 @@ export default function Recovery() {
           <StrainPage key="t" r={r} day={day} isToday={isToday} />,
         ]}
       />
+      {isToday && !day.log ? (
+        <AthleteDock
+          label="Morning check-in"
+          icon={Sun}
+          pillar="recovery"
+          onPress={() => router.push("/athlete/recovery/check-in")}
+        />
+      ) : null}
     </View>
   );
 }

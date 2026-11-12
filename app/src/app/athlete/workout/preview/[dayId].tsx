@@ -142,6 +142,7 @@ export default function Preview() {
         <Button
           label={active?.dayId === day.id ? "Resume workout" : "Start workout"}
           icon={Play}
+          pillar="training"
           fullWidth
           onPress={start}
         />

@@ -17,11 +17,14 @@ import { colors } from "@/theme";
 export function GlassSurface({
   children,
   style,
+  solid = false,
 }: {
   children?: ReactNode;
   style?: StyleProp<ViewStyle>;
+  /** Solid glass on every platform: for sheets, which hold content that must stay readable. */
+  solid?: boolean;
 }) {
-  if (Platform.OS === "android")
+  if (solid || Platform.OS === "android")
     return <View style={[styles.base, styles.solid, style]}>{children}</View>;
   return (
     <View style={[styles.base, style]}>

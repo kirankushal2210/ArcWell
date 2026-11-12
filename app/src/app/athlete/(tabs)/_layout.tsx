@@ -1,5 +1,6 @@
-// Athlete tabs. Self-guided (D57): Today · Training · Nutrition · Recovery plus the floating AI button.
-// Coached (sitemap): the same four plus Progress, and never the AI button (D44).
+// Athlete tabs. Self-guided (D57): Today · Training · Nutrition · Recovery. Coached (sitemap): the
+// same four plus Progress. The glass + button sits at the bottom right beside the tab bar (D67); the
+// AI coach is reached from it and from Today, and coached athletes never see AI (D44).
 import { Tabs } from "expo-router/tabs";
 import {
   Dumbbell,
@@ -11,19 +12,21 @@ import {
 
 import { View } from "react-native";
 
-import { AIButton } from "@/features/athlete/AIButton";
+import { PLUS_RESERVE, QuickLog } from "@/features/athlete/QuickLog";
 import { WorkoutBar } from "@/features/athlete/WorkoutBar";
 import { useCoachData } from "@/features/coach/CoachData";
 import { CoachTabBar } from "@/features/coach/parts";
 import { colors } from "@/theme";
 
 export default function AthleteTabs() {
-  const { meTier, active } = useCoachData();
+  const { meTier } = useCoachData();
   const coached = meTier === "coached";
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
       <Tabs
-        tabBar={(props) => <CoachTabBar {...props} />}
+        tabBar={(props) => (
+          <CoachTabBar {...props} reserveRight={PLUS_RESERVE} />
+        )}
         screenOptions={{
           headerShown: false,
           sceneStyle: { backgroundColor: colors.bg },
@@ -67,9 +70,7 @@ export default function AthleteTabs() {
         />
       </Tabs>
       <WorkoutBar />
-      {coached ? null : (
-        <AIButton locked={meTier === "free"} raised={!!active} />
-      )}
+      <QuickLog />
     </View>
   );
 }

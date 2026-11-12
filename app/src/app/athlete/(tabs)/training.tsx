@@ -25,7 +25,13 @@ import { recentNames } from "@/features/athlete/ExercisePicker";
 import { ExerciseList } from "@/features/athlete/ExerciseList";
 import { HistoryWeeks } from "@/features/athlete/HistoryWeeks";
 import { MyRoutines } from "@/features/athlete/MyRoutines";
-import { AthletePage, NotJoined, useMe } from "@/features/athlete/useMe";
+import { useTodayWorkout } from "@/features/athlete/QuickLog";
+import {
+  AthleteDock,
+  AthletePage,
+  NotJoined,
+  useMe,
+} from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Eyebrow, Group, GroupRow, PageHeader } from "@/features/coach/parts";
 import { todayIndex, WEEKDAYS, weekSchedule } from "@/features/coach/plans";
@@ -39,7 +45,7 @@ function PlanPage() {
   const coached = meTier === "coached";
   if (!me.program)
     return (
-      <AthletePage>
+      <AthletePage dock>
         {/* W-02: joined through the coach's general link; the coach hasn't assigned a plan yet. */}
         <View style={styles.card}>
           <Text variant="title">{coachName} is building your plan</Text>
@@ -48,15 +54,6 @@ function PlanPage() {
             any workout you do and
             {` ${coachName}`} sees it.
           </Text>
-          <Button
-            label="Start an empty workout"
-            icon={Plus}
-            fullWidth
-            onPress={() => {
-              if (!active) setActive(emptyWorkout());
-              router.push("/athlete/workout");
-            }}
-          />
         </View>
         <MyRoutines me={me} />
       </AthletePage>
@@ -80,8 +77,14 @@ function PlanPage() {
       params: { dayId },
     });
 
+  const startEmpty = () => {
+    if (!active) setActive(emptyWorkout());
+    router.push("/athlete/workout");
+  };
+  const dockToday = !!today && !doneOn.has(t);
+
   return (
-    <AthletePage>
+    <AthletePage dock>
       {active ? (
         <PressableScale
           onPress={() => router.push("/athlete/workout")}
@@ -100,7 +103,7 @@ function PlanPage() {
           <Text weight="semibold" tone="onBrand">
             Resume
           </Text>
-          <ChevronRight size={20} color={colors.onBrand} />
+          <ChevronRight size={20} color={colors.onPillar} />
         </PressableScale>
       ) : null}
 
@@ -187,19 +190,6 @@ function PlanPage() {
             >
               {today.exercises.map((e) => e.name).join(" · ")}
             </Text>
-            <Button
-              label={
-                active?.dayId === today.id
-                  ? "Resume workout"
-                  : doneOn.has(t)
-                    ? "Done today · train again"
-                    : "Start workout"
-              }
-              icon={Play}
-              variant={doneOn.has(t) ? "secondary" : "primary"}
-              fullWidth
-              onPress={() => openPreview(today.id)}
-            />
           </>
         ) : (
           <>
@@ -266,22 +256,17 @@ function PlanPage() {
 
       <MyRoutines me={me} />
 
-      <Group>
-        <GroupRow
-          first
-          label="Start an empty workout"
-          onPress={() => {
-            if (!active) setActive(emptyWorkout());
-            router.push("/athlete/workout");
-          }}
-        >
-          <Plus size={20} color={colors.text} />
-          <Text weight="medium" style={styles.flex}>
-            Start an empty workout
-          </Text>
-          <ChevronRight size={18} color={colors.textMuted} />
-        </GroupRow>
-      </Group>
+      {dockToday ? (
+        <Group>
+          <GroupRow first label="Start an empty workout" onPress={startEmpty}>
+            <Plus size={20} color={colors.text} />
+            <Text weight="medium" style={styles.flex}>
+              Start an empty workout
+            </Text>
+            <ChevronRight size={18} color={colors.textMuted} />
+          </GroupRow>
+        </Group>
+      ) : null}
     </AthletePage>
   );
 }
@@ -296,9 +281,11 @@ const TABS: { key: TrainingTab; label: string }[] = [
 /** Training (D61): Plan · History · Exercises as section tabs under the title. */
 export default function Training() {
   const me = useMe();
-  const { coachName, meTier, sessions } = useCoachData();
+  const { coachName, meTier, sessions, active, setActive } = useCoachData();
   const [tab, setTab] = useState<TrainingTab>("plan");
+  const tw = useTodayWorkout();
   if (!me) return <NotJoined />;
+  const startToday = !!tw.day && !tw.done;
   const program = me.program;
   const pw = program ? programWeek(program.weeks, me.programStart) : null;
   return (
@@ -341,6 +328,28 @@ export default function Training() {
           </View>,
         ]}
       />
+      {tab !== "plan" ? null : startToday && tw.day ? (
+        <AthleteDock
+          label="Start workout"
+          icon={Play}
+          pillar="training"
+          onPress={() =>
+            router.push({
+              pathname: "/athlete/workout/preview/[dayId]",
+              params: { dayId: tw.day?.id ?? "" },
+            })
+          }
+        />
+      ) : (
+        <AthleteDock
+          label="Start an empty workout"
+          icon={Plus}
+          onPress={() => {
+            if (!active) setActive(emptyWorkout());
+            router.push("/athlete/workout");
+          }}
+        />
+      )}
     </View>
   );
 }
@@ -360,7 +369,7 @@ const styles = StyleSheet.create({
     gap: space[2],
     padding: space[4],
     borderRadius: radius.lg,
-    backgroundColor: colors.brand,
+    backgroundColor: colors.training,
   },
   card: {
     gap: space[2],
@@ -387,8 +396,8 @@ const styles = StyleSheet.create({
     borderColor: colors.borderStrong,
     backgroundColor: colors.surface,
   },
-  dotToday: { borderWidth: 2, borderColor: colors.brand },
-  dotDone: { backgroundColor: colors.brand, borderColor: colors.brand },
+  dotToday: { borderWidth: 2, borderColor: colors.training },
+  dotDone: { backgroundColor: colors.training, borderColor: colors.training },
   edit: {
     flexDirection: "row",
     alignItems: "center",

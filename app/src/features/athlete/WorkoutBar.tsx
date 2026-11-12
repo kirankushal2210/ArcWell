@@ -1,5 +1,5 @@
-// Minimised workout (F4-09): while a workout runs, a black bar above the tab bar keeps the time and
-// the rest countdown in view on every tab. Tap to go back to the workout.
+// Minimised workout (F4-09): while a workout runs, a Honey bar above the tab bar keeps the time and
+// the rest countdown in view on every tab, in the action dock's spot (D67). Tap to go back.
 import { router } from "expo-router";
 import { ChevronUp } from "lucide-react-native";
 import { useEffect, useState } from "react";
@@ -7,14 +7,13 @@ import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { PressableScale, Text } from "@/components/primitives";
-import { colors, radius, space } from "@/theme";
+import { colors, radius, rhythm, space } from "@/theme";
 
 import { clockTime, now } from "./training";
 import { useCoachData } from "@/features/coach/CoachData";
 import { tabBarTop } from "@/features/coach/parts";
 
-/** Height of this bar, so the AI button can sit above it. */
-export const WORKOUT_BAR = 60;
+const WORKOUT_BAR = 52;
 
 export function WorkoutBar() {
   const { active } = useCoachData();
@@ -55,22 +54,22 @@ export function WorkoutBar() {
               : "Tap to keep logging"}
           </Text>
         </View>
-        <ChevronUp size={20} color={colors.onBrand} />
+        <ChevronUp size={20} color={colors.onPillar} />
       </PressableScale>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrap: { position: "absolute", left: space[4], right: space[4] },
+  wrap: { position: "absolute", left: rhythm.gutter, right: rhythm.gutter },
   bar: {
     flexDirection: "row",
     alignItems: "center",
     gap: space[3],
     height: WORKOUT_BAR,
     paddingHorizontal: space[4],
-    borderRadius: radius.lg,
-    backgroundColor: colors.brand,
+    borderRadius: radius.md,
+    backgroundColor: colors.training,
   },
   flex: { flex: 1 },
   sub: { opacity: 0.75 },

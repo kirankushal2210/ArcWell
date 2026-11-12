@@ -7,12 +7,7 @@ import { ChevronLeft, ChevronRight, Plus, X } from "lucide-react-native";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
-import {
-  Button,
-  IconButton,
-  PressableScale,
-  Text,
-} from "@/components/primitives";
+import { IconButton, PressableScale, Text } from "@/components/primitives";
 import { SectionTabs } from "@/components/SectionTabs";
 import {
   kcalText,
@@ -32,7 +27,7 @@ import {
   sumMacros,
 } from "@/features/athlete/foods";
 import { MealPlanBody } from "@/features/athlete/MealPlanBody";
-import { AthletePage, NotJoined } from "@/features/athlete/useMe";
+import { AthleteDock, AthletePage, NotJoined } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Bars, PageHeader, Pills } from "@/features/coach/parts";
 import { colors, radius, space } from "@/theme";
@@ -79,7 +74,7 @@ function DayPage({
     : 0;
 
   return (
-    <AthletePage>
+    <AthletePage dock>
       <View style={styles.hero}>
         {target ? (
           <>
@@ -182,11 +177,6 @@ function DayPage({
               ? "Start with what you just ate. Your recent foods are one tap away."
               : "Add what you remember. Something beats nothing."}
           </Text>
-          <Button
-            label={`Log ${slotLabel(date === today ? slotNow() : "lunch").toLowerCase()}`}
-            icon={Plus}
-            onPress={() => open(date === today ? slotNow() : "lunch")}
-          />
         </View>
       ) : null}
 
@@ -351,6 +341,7 @@ export default function Nutrition() {
   const [date, setDate] = useState(today);
   const [tab, setTab] = useState<NutritionTab>("day");
   if (!n.me) return <NotJoined />;
+  const slot = date === today ? slotNow() : "lunch";
   return (
     <View style={styles.root}>
       <PageHeader
@@ -384,7 +375,7 @@ export default function Nutrition() {
             today={today}
             openPlan={() => setTab("plan")}
           />,
-          <AthletePage key="p">
+          <AthletePage key="p" dock>
             {n.macros ? (
               <MealPlanBody date={date} />
             ) : (
@@ -411,6 +402,19 @@ export default function Nutrition() {
           <TrendsPage key="t" date={date} />,
         ]}
       />
+      {tab === "trends" ? null : (
+        <AthleteDock
+          label={`Log ${slotLabel(slot).toLowerCase()}`}
+          icon={Plus}
+          pillar="nutrition"
+          onPress={() =>
+            router.push({
+              pathname: "/athlete/food/add",
+              params: { meal: slot, date },
+            })
+          }
+        />
+      )}
     </View>
   );
 }
@@ -437,7 +441,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceRaised,
     overflow: "hidden",
   },
-  fill: { height: 8, borderRadius: radius.full, backgroundColor: colors.brand },
+  fill: {
+    height: 8,
+    borderRadius: radius.full,
+    backgroundColor: colors.nutrition,
+  },
   macros: { flexDirection: "row", gap: space[2] },
   macro: {
     flex: 1,
