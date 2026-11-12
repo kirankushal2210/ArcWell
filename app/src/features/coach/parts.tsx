@@ -8,6 +8,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Circle, Line, Polyline, Rect } from "react-native-svg";
 
 import { IconButton, PressableScale, Text } from "@/components/primitives";
+import { GlassSurface } from "@/components/GlassSurface";
 import { colors, radius, rhythm, space } from "@/theme";
 
 // ---------- Page header: large title with up to two icon actions ----------
@@ -329,58 +330,65 @@ export function CoachTabBar({
 }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   return (
-    <View
-      style={[
-        styles.tabBar,
-        { paddingBottom: Math.max(insets.bottom, space[2]) },
-      ]}
-      accessibilityRole="tablist"
+    <GlassSurface
+      style={[styles.tabBar, { bottom: tabBarBottom(insets.bottom) }]}
     >
-      {state.routes.map((route, index) => {
-        const { options } = descriptors[route.key];
-        // Tabs hidden with href: null (e.g. Progress for self-guided athletes, D57) aren't drawn.
-        if ((options as { href?: unknown }).href === null) return null;
-        const on = state.index === index;
-        const label =
-          typeof options.title === "string" ? options.title : route.name;
-        const badge = options.tabBarBadge;
-        return (
-          <PressableScale
-            key={route.key}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: on }}
-            accessibilityLabel={badge ? `${label}, ${badge} new` : label}
-            onPress={() => {
-              const e = emitter.emit({
-                type: "tabPress",
-                target: route.key,
-                canPreventDefault: true,
-              });
-              if (!on && !e.defaultPrevented) navigateToTab(route.key);
-            }}
-            style={styles.tab}
-          >
-            <View style={[styles.tabIcon, on && styles.tabIconOn]}>
-              {options.tabBarIcon?.({
-                focused: on,
-                color: on ? colors.text : colors.textMuted,
-                size: 24,
-              })}
-              {badge ? <View style={styles.badge} /> : null}
-            </View>
-            <Text
-              variant="caption"
-              weight={on ? "semibold" : "regular"}
-              tone={on ? "default" : "muted"}
+      <View style={styles.tabRow} accessibilityRole="tablist">
+        {state.routes.map((route, index) => {
+          const { options } = descriptors[route.key];
+          // Tabs hidden with href: null (e.g. Progress for self-guided athletes, D57) aren't drawn.
+          if ((options as { href?: unknown }).href === null) return null;
+          const on = state.index === index;
+          const label =
+            typeof options.title === "string" ? options.title : route.name;
+          const badge = options.tabBarBadge;
+          return (
+            <PressableScale
+              key={route.key}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: on }}
+              accessibilityLabel={badge ? `${label}, ${badge} new` : label}
+              onPress={() => {
+                const e = emitter.emit({
+                  type: "tabPress",
+                  target: route.key,
+                  canPreventDefault: true,
+                });
+                if (!on && !e.defaultPrevented) navigateToTab(route.key);
+              }}
+              style={styles.tab}
             >
-              {label}
-            </Text>
-          </PressableScale>
-        );
-      })}
-    </View>
+              <View style={[styles.tabIcon, on && styles.tabIconOn]}>
+                {options.tabBarIcon?.({
+                  focused: on,
+                  color: on ? colors.text : colors.textMuted,
+                  size: 22,
+                })}
+                {badge ? <View style={styles.badge} /> : null}
+              </View>
+              <Text
+                variant="caption"
+                weight={on ? "semibold" : "medium"}
+                tone={on ? "default" : "muted"}
+                numberOfLines={1}
+              >
+                {label}
+              </Text>
+            </PressableScale>
+          );
+        })}
+      </View>
+    </GlassSurface>
   );
 }
+
+/** Floating glass tab bar (D67): its height, and where it sits above the bottom inset. */
+export const TAB_BAR_HEIGHT = 60;
+export const tabBarBottom = (insetBottom: number) =>
+  Math.max(insetBottom, space[3]);
+/** Distance from the screen bottom to the tab bar's top edge: anything fixed sits above this. */
+export const tabBarTop = (insetBottom: number) =>
+  tabBarBottom(insetBottom) + TAB_BAR_HEIGHT;
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
@@ -395,10 +403,11 @@ const styles = StyleSheet.create({
   page: {
     paddingHorizontal: rhythm.gutter,
     paddingTop: space[2],
-    paddingBottom: space[12],
+    // Room for the floating glass tab bar (D67).
+    paddingBottom: space[12] * 2 + space[4],
     gap: space[4],
   },
-  pageFloating: { paddingBottom: space[12] + space[12] + space[4] },
+  pageFloating: { paddingBottom: space[12] * 3 + space[4] },
   group: {
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
@@ -437,16 +446,22 @@ const styles = StyleSheet.create({
   barLabel: { flex: 1, textAlign: "center" },
   dot: { width: 8, height: 8, borderRadius: radius.full },
   tabBar: {
-    flexDirection: "row",
-    backgroundColor: colors.surface,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    paddingTop: space[2],
+    position: "absolute",
+    left: rhythm.gutter,
+    right: rhythm.gutter,
+    height: TAB_BAR_HEIGHT,
+    borderRadius: radius.xl,
   },
-  tab: { flex: 1, alignItems: "center", gap: space[1] },
+  tabRow: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: space[1],
+  },
+  tab: { flex: 1, alignItems: "center", gap: space[1] / 2 },
   tabIcon: {
-    width: 64,
-    height: 32,
+    width: 52,
+    height: 28,
     borderRadius: radius.full,
     alignItems: "center",
     justifyContent: "center",

@@ -231,6 +231,7 @@ export default function Today() {
                       : "Start workout"
                 }
                 variant={doneToday ? "secondary" : "primary"}
+                pillar="training"
                 fullWidth
                 onPress={() =>
                   router.push({

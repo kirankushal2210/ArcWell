@@ -11,6 +11,7 @@ import {
 } from "lucide-react-native";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import {
   Button,
@@ -21,7 +22,13 @@ import {
 import { SectionTabs } from "@/components/SectionTabs";
 import { menuAction } from "@/features/coach/coachProfile";
 import { useCoachData } from "@/features/coach/CoachData";
-import { Group, GroupRow, Page, PageHeader } from "@/features/coach/parts";
+import {
+  Group,
+  GroupRow,
+  Page,
+  PageHeader,
+  tabBarTop,
+} from "@/features/coach/parts";
 import { EnhancedPage, SupplementsPage } from "@/features/coach/PlansExtras";
 import type { Template } from "@/features/coach/sampleData";
 import { colors, radius, rhythm, space } from "@/theme";
@@ -107,6 +114,7 @@ const TABS: { key: Tab; label: string }[] = [
 ];
 
 export default function PlansTab() {
+  const insets = useSafeAreaInsets();
   const [kind, setKind] = useState<Tab>("training");
   return (
     <View style={styles.root}>
@@ -123,7 +131,12 @@ export default function PlansTab() {
         ]}
       />
       {kind === "enhanced" ? null : (
-        <View style={styles.footer}>
+        <View
+          style={[
+            styles.footer,
+            { marginBottom: tabBarTop(insets.bottom) + space[2] },
+          ]}
+        >
           <Button
             label={
               kind === "training"
@@ -171,6 +184,5 @@ const styles = StyleSheet.create({
   footer: {
     paddingHorizontal: rhythm.gutter,
     paddingTop: space[2],
-    paddingBottom: space[4],
   },
 });

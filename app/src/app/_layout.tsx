@@ -44,7 +44,7 @@ export default function RootLayout() {
     <GestureHandlerRootView style={styles.root}>
       <SafeAreaProvider>
         {/* Light app (D49): dark status-bar and navigation-bar content. */}
-        <StatusBar style="dark" />
+        <StatusBar style="light" />
         <NavigationBar style="dark" />
         {/* Sample data shared by the coach and athlete sides until the backend exists. */}
         <AuthProvider>

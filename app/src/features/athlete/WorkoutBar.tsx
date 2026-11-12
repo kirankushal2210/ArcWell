@@ -11,9 +11,8 @@ import { colors, radius, space } from "@/theme";
 
 import { clockTime, now } from "./training";
 import { useCoachData } from "@/features/coach/CoachData";
+import { tabBarTop } from "@/features/coach/parts";
 
-/** CoachTabBar height above the bottom inset. */
-export const TAB_BAR = 64;
 /** Height of this bar, so the AI button can sit above it. */
 export const WORKOUT_BAR = 60;
 
@@ -32,10 +31,7 @@ export function WorkoutBar() {
   return (
     <View
       pointerEvents="box-none"
-      style={[
-        styles.wrap,
-        { bottom: Math.max(insets.bottom, space[2]) + TAB_BAR + space[2] },
-      ]}
+      style={[styles.wrap, { bottom: tabBarTop(insets.bottom) + space[2] }]}
     >
       <PressableScale
         onPress={() => router.push("/athlete/workout")}

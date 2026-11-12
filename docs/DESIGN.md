@@ -23,7 +23,7 @@ Mockups and wireframes live in `docs/design/`.
 | Who designs | Founder + Claude; design system built directly in code, rough layouts as mockups | No design budget yet |
 | Where designs live | Interactive HTML mockups in `docs/design/` (Figma later if a designer joins) | No tool to learn; shareable |
 | Reference apps | Hevy (workout logging), MyFitnessPal (food logging), Trainerize/TrueCoach (coach side) | Proven patterns for each job |
-| Theme | Dark-first, with a light theme | Gym use, low light, OLED Android phones |
+| Theme | Dark only for now: Liquid Glass with the Stone palette (D67); light theme later | Gym use, low light, OLED Android phones |
 | Language | English only at launch; layouts allow ~40% longer text for a later Hindi version | Avoid redesign when adding Hindi |
 | Ergonomics | One-handed use mid-workout | Logging happens between sets |
 
@@ -116,31 +116,35 @@ Draft, not approved or user-tested. Rendered at 3× from [onboarding-flow.html](
 
 ### Colour
 
-Monochrome light theme (D50, replaces the blue of D49 on 2026-11-11; earlier palettes in DECISIONS.md D47 and D49):
+Liquid Glass with the soft Stone palette, Honey for Training (D67, replaces the black and white of D50; earlier palettes in DECISIONS.md D47, D49 and D50). Dark only for now.
 
 | Token | Value | Use |
 |---|---|---|
-| `bg` | `#F5F5F5` | App background (light grey) |
-| `surface` | `#FFFFFF` | Cards, sheets |
-| `surfaceRaised` | `#EBEBEB` | Inputs, pressed states |
-| `border` | `#E0E0E0` | Dividers only |
-| `borderStrong` | `#7A7A7A` | Input, tick-box and secondary-button outlines (3:1+ on every surface) |
-| `text` | `#111111` | Primary text |
-| `textMuted` | `#5C5C5C` | Secondary text |
-| `textDisabled` | `#A3A3A3` | Disabled controls only (WCAG-exempt) |
-| `brand` | `#111111` | Primary actions (black buttons) |
-| `brandHover` | `#333333` | Hover / pressed step |
-| `onBrand` | `#FFFFFF` | Text on black buttons |
-| `accent` / `focus` | `#111111` | Selection, focus, active tab |
-| `training` | `#0E7490` | Training pillar marker |
-| `nutrition` | `#C2570C` | Nutrition pillar marker |
-| `recovery` | `#6D5BD0` | Recovery pillar marker |
-| `success` | `#127235` | Completed, positive |
-| `warning` | `#A34A06` | Needs attention |
-| `danger` | `#C81E1E` | Destructive actions, errors only |
-| `scrim` | `rgb(17 17 17 / 0.4)` | Dims the screen behind modal sheets and dialogs |
+| `bg` | `#141416` | App background (charcoal) |
+| `surface` | `#1D1E21` | Cards |
+| `surfaceRaised` | `#26272B` | Inputs, pressed states, secondary buttons |
+| `border` | `#303136` | Dividers only |
+| `borderStrong` | `#77787F` | Input and tick-box outlines (3:1+ on every surface) |
+| `text` | `#ECEDF0` | Primary text |
+| `textMuted` | `#9C9CA6` | Secondary text |
+| `textDisabled` | `#5E5F66` | Disabled controls only (WCAG-exempt) |
+| `brand` | `#E8EAEE` | Primary actions (soft-white buttons) |
+| `brandHover` | `#CFD2D8` | Pressed step |
+| `onBrand` | `#141416` | Text on primary buttons |
+| `accent` / `focus` | `#ECEDF0` | Selection, focus, active tab |
+| `training` | `#E8B65E` | Honey: Training fills, rings, numbers |
+| `nutrition` | `#A9C79E` | Sage: Nutrition |
+| `recovery` | `#9FB4DC` | Slate: Recovery |
+| `onPillar` | `#141416` | Text on any coloured fill |
+| `success` | `#A9C79E` | Completed, positive |
+| `warning` | `#E79AA8` | Rose: needs attention, new items |
+| `danger` | `#F2877F` | Errors and destructive actions only |
+| `glass` | `rgb(60 62 70 / 0.42)` | Glass controls (with blur) |
+| `glassEdge` | `rgb(255 255 255 / 0.16)` | Hairline edge on glass |
+| `glassSolid` | `#2A2B30` | Glass where blur is off |
+| `scrim` | `rgb(0 0 0 / 0.6)` | Dims the screen behind sheets and dialogs |
 
-Black and white first: black is the only action colour; colour is kept for small pillar dots (never text) and status; progress bars, rings, ticks and charts are black. Solid colours only: no gradients, no glows, no shadows. Every text pair passes WCAG AA (checked 2026-11-11: text 17.3:1, muted 6.1:1, white on black 18.9:1). No streaks, XP or badges.
+Colour on charcoal, dark text on colour: white text never sits on a pillar colour. One coloured action per screen, in the pillar's colour; everything else is glass, raised or plain. Glass is for the functional layer only (tab bar, +, toolbar buttons, sheets), never for content. No gradients or glows. Rose and coral are never used for eating over a target. Every text pair passes WCAG AA (checked 2026-11-13: text 15.7:1 on bg, muted 6.8:1, dark text on primary 15.3:1, on Honey 9.9:1).
 
 ### Typography
 
@@ -150,10 +154,11 @@ Black and white first: black is the only action colour; colour is kept for small
 
 ### Spacing, shape, motion
 
-- **Spacing:** 4-point scale — 4, 8, 12, 16, 24, 32, 48.
-- **Radius:** 8 (inputs, chips) · 12 (cards) · 20 (sheets) · full (pills, avatars).
-- **Tap targets:** minimum 48 × 48dp.
-- **Motion** (rendered in the spec sheet): changing numbers roll instead of jumping. Tokens: micro 120 ms (press, tick), standard 200 ms (number rolls, cards, tabs), sheet 280 ms, big moment 600 ms. Easing `cubic-bezier(.2,0,0,1)`, built with React Native Reanimated. The only big animation is the workout summary (F4-12): ring fills, volume rolls up, new bests slide in, strong haptic, no confetti. Skeleton loaders, never spinners. No animated backgrounds. With Android "Remove animations" on, every transition is instant. Haptic tick when a set is logged.
+- **Spacing:** 4-point scale: 4, 8, 12, 16, 24, 32, 48. Dense by default: card padding 12, rows 40 dp.
+- **Radius:** 10 (chips, small buttons, set cells) · 12 (buttons, inputs) · 16 (cards) · 28 (sheets, tab bar) · full (avatars, round glass buttons).
+- **Controls:** main button 40 dp, small 32 dp; the tap area stays at least 48 × 48 dp. Labels keep full size on one line; buttons widen to fit.
+- **Layout:** thumb-first. One action dock (the screen's main action) above the tab bar; floating glass tab bar bottom left and + bottom right, in the same place on every screen.
+- **Motion:** changing numbers roll instead of jumping. Tokens: micro 120 ms (press, tick), standard 200 ms (number rolls, cards, tabs), sheet 280 ms, big moment 600 ms. Easing `cubic-bezier(.2,0,0,1)`, built with React Native Reanimated. Controls respond on press-in. Skeleton loaders, never spinners. With Android "Remove animations" on, every transition is instant. Haptic tick when a set is logged.
 
 ## 6. Components (to build in `app/src/components/`)
 

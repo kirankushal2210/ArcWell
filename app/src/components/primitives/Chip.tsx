@@ -1,7 +1,7 @@
 import { Check } from "lucide-react-native";
 import { StyleSheet, View } from "react-native";
 
-import { borderWidth, colors, radius, space, tapMin } from "@/theme";
+import { colors, radius, space, tapMin } from "@/theme";
 
 import { PressableScale } from "./PressableScale";
 import { Text } from "./Text";
@@ -33,9 +33,15 @@ export function Chip({ label, selected, onPress, count, testID }: ChipProps) {
     >
       <View style={[styles.chip, selected && styles.on]}>
         {selected && (
-          <Check size={16} strokeWidth={2.5} color={colors.accent} />
+          <Check size={16} strokeWidth={2.5} color={colors.onAccent} />
         )}
-        <Text variant="label" tone={selected ? "accent" : "default"} numeric>
+        <Text
+          variant="label"
+          weight="semibold"
+          tone="default"
+          style={selected ? { color: colors.onAccent } : undefined}
+          numeric
+        >
           {text}
         </Text>
       </View>
@@ -52,8 +58,7 @@ const styles = StyleSheet.create({
     gap: space[1],
     paddingHorizontal: space[3],
     borderRadius: radius.sm,
-    borderWidth,
-    borderColor: colors.borderStrong,
+    backgroundColor: colors.surfaceRaised,
   },
-  on: { borderColor: colors.accent, backgroundColor: colors.surfaceRaised },
+  on: { backgroundColor: colors.accent },
 });

@@ -56,7 +56,7 @@ export function Card({
 const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.surface,
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
     padding: rhythm.cardPad,
   },
   raised: { backgroundColor: colors.surfaceRaised },

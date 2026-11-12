@@ -2,9 +2,9 @@ import type { LucideIcon } from "lucide-react-native";
 import { StyleSheet, View } from "react-native";
 
 import {
-  borderWidth,
   colors,
   controlHeight,
+  controlHeightSm,
   radius,
   rhythm,
   space,
@@ -15,11 +15,16 @@ import { PressableScale } from "./PressableScale";
 import { Text, type TextTone } from "./Text";
 
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "destructive";
+export type ButtonPillar = "training" | "nutrition" | "recovery";
 
 export type ButtonProps = {
   label: string;
   onPress?: () => void;
   variant?: ButtonVariant;
+  /** Fills a primary button with a pillar colour (dark text), for that pillar's main action (D67). */
+  pillar?: ButtonPillar;
+  /** "sm" is 32 dp to look at; both sizes keep a 48 dp tap area. */
+  size?: "md" | "sm";
   icon?: LucideIcon;
   disabled?: boolean;
   /** Shows `loadingLabel` and blocks presses. Never a spinner (C10). */
@@ -30,57 +35,53 @@ export type ButtonProps = {
   testID?: string;
 };
 
-const look: Record<
-  ButtonVariant,
-  { bg: string; pressedBg: string; border: string; tone: TextTone }
-> = {
+type Look = { bg: string; pressedBg: string; fg: string; tone: TextTone };
+
+const look: Record<ButtonVariant, Look> = {
   primary: {
     bg: colors.brand,
     pressedBg: colors.brandHover,
-    border: colors.brand,
+    fg: colors.onBrand,
     tone: "onBrand",
   },
   secondary: {
-    bg: "transparent",
-    pressedBg: colors.surfaceRaised,
-    border: colors.borderStrong,
+    bg: colors.surfaceRaised,
+    pressedBg: colors.border,
+    fg: colors.text,
     tone: "default",
   },
   ghost: {
     bg: "transparent",
     pressedBg: colors.surfaceRaised,
-    border: "transparent",
-    tone: "muted",
+    fg: colors.text,
+    tone: "default",
   },
   destructive: {
-    bg: "transparent",
-    pressedBg: colors.surfaceRaised,
-    border: colors.danger,
+    bg: colors.surfaceRaised,
+    pressedBg: colors.border,
+    fg: colors.danger,
     tone: "danger",
   },
 };
 
-const iconColor: Record<TextTone, string> = {
-  onBrand: colors.onBrand,
-  default: colors.text,
-  muted: colors.textMuted,
-  danger: colors.danger,
-  disabled: colors.textDisabled,
-  brand: colors.brand,
-  accent: colors.accent,
-  success: colors.success,
-  warning: colors.warning,
+const pillarFill: Record<ButtonPillar, string> = {
+  training: colors.training,
+  nutrition: colors.nutrition,
+  recovery: colors.recovery,
 };
 
 /**
- * DESIGN.md §6 button: 48 dp tall, 12 dp radius, label 16/600. One primary per
- * screen, in the bottom half (spec sheet). Disabled is a raised fill with
- * disabled text, so it never relies on opacity alone.
+ * DESIGN.md §6 button (D67): 40 dp tall (32 dp small), 12 dp corners (10 small), label
+ * 16/600 at full size. The tap area is always at least 48 dp: the shape is smaller, the
+ * finger target is not. Labels never truncate; the button grows to fit. One coloured
+ * button per screen. Disabled is a raised fill with disabled text, never opacity alone.
  */
 export function Button({
   label,
   onPress,
   variant = "primary",
+  pillar,
+  size = "md",
   icon: Icon,
   disabled,
   loading,
@@ -91,33 +92,58 @@ export function Button({
 }: ButtonProps) {
   const inactive = disabled || loading;
   const v = look[variant];
+  const fill = pillar && variant === "primary" ? pillarFill[pillar] : v.bg;
+  const fg = pillar && variant === "primary" ? colors.onPillar : v.fg;
   const tone: TextTone = inactive ? "disabled" : v.tone;
+  const height = size === "sm" ? controlHeightSm : controlHeight;
+  const slop = Math.max(0, (tapMin - height) / 2);
 
   return (
     <PressableScale
       onPress={onPress}
       disabled={inactive}
+      hitSlop={{ top: slop, bottom: slop }}
       accessibilityRole="button"
       accessibilityLabel={loading && loadingLabel ? loadingLabel : label}
       accessibilityHint={accessibilityHint}
       accessibilityState={{ disabled: !!inactive, busy: !!loading }}
       testID={testID}
-      style={[styles.hit, fullWidth && styles.full]}
+      style={[styles.hit, { minHeight: height }, fullWidth && styles.full]}
     >
       {({ pressed }) => (
         <View
           style={[
             styles.body,
+            {
+              minHeight: height,
+              borderRadius: size === "sm" ? radius.sm : radius.md,
+              paddingHorizontal: size === "sm" ? space[3] : space[4],
+            },
             inactive
               ? styles.inactive
               : {
-                  backgroundColor: pressed ? v.pressedBg : v.bg,
-                  borderColor: v.border,
+                  backgroundColor:
+                    pressed && !(pillar && variant === "primary")
+                      ? v.pressedBg
+                      : fill,
+                  opacity:
+                    pressed && pillar && variant === "primary" ? 0.85 : 1,
                 },
           ]}
         >
-          {Icon && <Icon size={20} color={iconColor[tone]} strokeWidth={2} />}
-          <Text variant="body" weight="semibold" tone={tone} numberOfLines={1}>
+          {Icon && (
+            <Icon
+              size={size === "sm" ? 16 : 18}
+              color={inactive ? colors.textDisabled : fg}
+              strokeWidth={2.2}
+            />
+          )}
+          <Text
+            variant="body"
+            weight="semibold"
+            tone={tone}
+            style={!inactive ? { color: fg } : undefined}
+          >
             {loading && loadingLabel ? loadingLabel : label}
           </Text>
         </View>
@@ -127,23 +153,17 @@ export function Button({
 }
 
 const styles = StyleSheet.create({
-  hit: { minHeight: controlHeight, minWidth: tapMin, alignSelf: "flex-start" },
+  hit: { minWidth: tapMin, alignSelf: "flex-start" },
   full: { alignSelf: "stretch" },
   body: {
-    minHeight: controlHeight,
     flexDirection: "row",
     alignItems: "center",
     // A lone label is centred inside its button (C6 exception).
     justifyContent: "center",
     gap: rhythm.inline,
-    paddingHorizontal: space[4],
-    // Height comes from minHeight (48 incl. the 1 dp border); the label grows it at large font sizes.
-    paddingVertical: 0,
-    borderRadius: radius.md,
-    borderWidth,
+    paddingVertical: space[1],
   },
   inactive: {
     backgroundColor: colors.surfaceRaised,
-    borderColor: "transparent",
   },
 });

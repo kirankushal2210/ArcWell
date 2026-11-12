@@ -7,9 +7,10 @@ import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { PressableScale, Text } from "@/components/primitives";
+import { tabBarTop } from "@/features/coach/parts";
 import { colors, radius, space } from "@/theme";
 
-import { TAB_BAR, WORKOUT_BAR } from "./WorkoutBar";
+import { WORKOUT_BAR } from "./WorkoutBar";
 
 export function AIButton({
   locked,
@@ -26,8 +27,7 @@ export function AIButton({
         styles.wrap,
         {
           bottom:
-            Math.max(insets.bottom, space[2]) +
-            TAB_BAR +
+            tabBarTop(insets.bottom) +
             space[3] +
             (raised ? WORKOUT_BAR + space[2] : 0),
         },
