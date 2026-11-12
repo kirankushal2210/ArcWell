@@ -180,7 +180,7 @@ Colour on charcoal, dark text on colour: white text never sits on a pillar colou
 
 ## 7. Screen inventory
 
-Tracked here as screens are designed (Wireframe → Mockup → Built). **✅ in the Wireframe column means drawn only** — not reviewed by the founder, not tested with users.
+Tracked here as screens are designed (Wireframe → Mockup → Built). **✅ in the Wireframe column means drawn only** — not reviewed by the founder, not tested with users. **Built ✅ sample data** (2026-11-13) means the screen exists in the app on sample data and was checked in the web preview at phone size; it is wired to the backend in the build phases.
 
 **Onboarding IDs changed on 2026-11-12 (D52).** Athlete onboarding is now AO-xx and coach onboarding CO-xx, the same IDs in wireframes and mockups. Old IDs in earlier decisions map like this:
 
@@ -200,223 +200,223 @@ New with D52: AO-02, AO-06, AO-07, AO-13 to AO-15, AO-17, AO-18, AO-20, CO-04, C
 
 | Screen | Role | Wireframe | Mockup | Built |
 |---|---|---|---|---|
-| F1-01 Splash | All | ✅ | ✅ draft | — |
-| F1-02 Welcome | All | ✅ | ✅ draft | — |
-| F1-02a Choose your role (sheet) | All | ✅ | ✅ draft | — |
-| F1-03 Sign up | All | ✅ | ✅ draft | — |
-| F1-04 Sign in | All | ✅ | ✅ draft | — |
-| F1-05 Consent | All | ✅ | ✅ draft | — |
-| AO-01 Gender | Athlete | ✅ | ✅ draft | — |
-| AO-02 Age | Athlete | ✅ | ✅ draft | — |
-| AO-03 Height | Athlete | ✅ | ✅ draft | — |
-| AO-04 Current weight | Athlete | ✅ | ✅ draft | — |
-| AO-05 Main goal | Athlete | ✅ | ✅ draft | — |
-| AO-06 Goal weight | Athlete | ✅ | ✅ draft | — |
-| AO-07 Activity level | Athlete | ✅ | ✅ draft | — |
-| AO-08 Gym experience | Athlete | ✅ | ✅ draft | — |
-| AO-09 Where you train | Athlete | ✅ | ✅ draft | — |
-| AO-10 Training days | Athlete | ✅ | ✅ draft | — |
-| AO-11 Session length and time | Athlete | ✅ | ✅ draft | — |
-| AO-12 Injuries and limitations | Athlete | ✅ | ✅ draft | — |
-| AO-13 Sleep | Athlete | ✅ | ✅ draft | — |
-| AO-14 Sleep quality | Athlete | ✅ | ✅ draft | — |
-| AO-15 Stress and energy | Athlete | ✅ | ✅ draft | — |
-| AO-16 Diet type | Athlete | ✅ | ✅ draft | — |
-| AO-17 Meals per day | Athlete | ✅ | ✅ draft | — |
-| AO-18 Building your plan | Athlete (free) | ✅ | ✅ draft | — |
-| AO-19 Calorie target | Athlete (free) | ✅ | ✅ draft | — |
-| AO-20 Plan preview | Athlete (free) | ✅ | ✅ draft | — |
-| AO-21 All set — free | Athlete (free) | ✅ | ✅ draft | — |
-| AO-21b All set — coached | Athlete (coached) | ✅ | ✅ draft | — |
-| CO-02 Coach — what you get | Coach | ✅ | ✅ draft | — |
-| CO-03 Coach agreement | Coach | ✅ | ✅ draft | — |
-| CO-04 How you coach | Coach | ✅ | ✅ draft | — |
-| CO-05 Clients today | Coach | ✅ | ✅ draft | — |
-| CO-06 Coach profile basics | Coach | ✅ | ✅ draft | — |
-| CO-07 Specialisations | Coach | ✅ | ✅ draft | — |
-| CO-08 About you | Coach | ✅ | ✅ draft | — |
-| CO-09 Services | Coach | ✅ | ✅ draft | — |
-| CO-10 First template | Coach | ✅ | ✅ draft | — |
-| CO-11 Invite clients | Coach | ✅ | ✅ draft | — |
-| CO-12 Ready to coach | Coach | ✅ | ✅ draft | — |
-| CO-13 Clients — empty with setup checklist | Coach | ✅ | ✅ draft | — |
-| CO-14 Clients — first clients join | Coach | ✅ | ✅ draft | — |
-| CO-15 New client — assign plan | Coach | ✅ | ✅ draft | — |
-| F3-01 Invite shared (WhatsApp) | Coach → client | ✅ | ✅ draft | — |
-| F3-02 Invite landing | Athlete | ✅ | ✅ draft | — |
-| F3-03 Already coached (switch coach) | Athlete | ✅ | ✅ draft | — |
-| F4-01 Today — workout entry point | Athlete | ✅ | — | — |
-| F4-02 Workout preview | Athlete | ✅ | — | — |
-| F4-03 Active workout — set logging | Athlete | ✅ | — | — |
-| F4-04 Rest timer | Athlete | ✅ | — | — |
-| F4-05 Edit weight / reps | Athlete | ✅ | — | — |
-| F4-06 Exercise options | Athlete | ✅ | — | — |
-| F4-07 Swap exercise | Athlete | ✅ | — | — |
-| F4-08 Exercise detail | Athlete | ✅ | — | — |
-| F4-09 Offline during workout | Athlete | ✅ | — | — |
-| F4-10 Minimised workout | Athlete | ✅ | — | — |
-| F4-11 Finish confirmation | Athlete | ✅ | — | — |
-| F4-12 Workout summary | Athlete | ✅ | — | — |
-| F4-13 Workout history | Athlete | ✅ | — | — |
-| F5-01 Day log — paid / coached | Athlete (paid, coached) | ✅ | — | — |
-| F5-02 Day log — free | Athlete (free) | ✅ | — | — |
-| F5-03 Empty day | Athlete | ✅ | — | — |
-| F5-04 Add food — recent | Athlete | ✅ | — | — |
-| F5-05 Search results | Athlete | ✅ | — | — |
-| F5-06 Portion picker | Athlete | ✅ | — | — |
-| F5-07 Quick add | Athlete | ✅ | — | — |
-| F5-08 Create custom food | Athlete | ✅ | — | — |
-| F5-09 Photo — camera | Athlete (paid) | ✅ | — | — |
-| F5-10 Photo — analysing | Athlete (paid) | ✅ | — | — |
-| F5-11 Photo — confirm results | Athlete (paid) | ✅ | — | — |
-| F5-12 Coach meal plan | Athlete (coached) | ✅ | — | — |
-| F5-13 AI meal plan | Athlete (paid) | ✅ | — | — |
-| F5-14 Upgrade moment | Athlete (free) | ✅ | — | — |
-| F6-01 Progress area — check-in due | Athlete (coached) | ✅ | — | — |
-| F6-02 Check-in step 1 — measurements | Athlete (coached) | ✅ | — | — |
-| F6-03 Check-in step 2 — photos | Athlete (coached) | ✅ | — | — |
-| F6-04 Check-in step 3 — how the week went | Athlete (coached) | ✅ | — | — |
-| F6-05 Check-in review and submit | Athlete (coached) | ✅ | — | — |
-| F6-06 Coach feedback received | Athlete (coached) | ✅ | — | — |
-| F6-07 Check-in inbox | Coach | ✅ | — | — |
-| F6-08 Check-in review | Coach | ✅ | — | — |
-| F6-09 Write feedback | Coach | ✅ | — | — |
-| F6-10 Check-in schedule | Coach | ✅ | — | — |
-| F7-01 Chat with coach | Athlete (coached) | ✅ | — | — |
-| F7-02 Attach sheet | Athlete, Coach | ✅ | — | — |
-| F7-03 Chat — poor connection | Athlete, Coach | ✅ | — | — |
-| F7-04 Messages list | Coach | ✅ | — | — |
-| F7-05 Chat with client context | Coach | ✅ | — | — |
-| F8-01 Paywall | Athlete (free) | ✅ | — | — |
-| F8-02 Trial timeline | Athlete (free) | ✅ | — | — |
-| F8-03 AI consent | Athlete (upgrading) | ✅ | — | — |
-| F8-04 Google Play purchase (system) | Athlete (upgrading) | ✅ | — | — |
-| F8-05 Welcome — AI builds the plan | Athlete (paid) | ✅ | — | — |
-| F8-06 Subscription details | Athlete (paid) | ✅ | — | — |
-| F8-07 Payment problem (grace period) | Athlete (paid) | ✅ | — | — |
-| F8-08 Subscription ended | Athlete | ✅ | — | — |
-| F9-01 Transformations list | Coach | ✅ | — | — |
-| F9-02 Request photos | Coach | ✅ | — | — |
-| F9-03 Review request | Athlete (coached) | ✅ | — | — |
-| F9-04 Adjust blur and crop | Athlete (coached) | ✅ | — | — |
-| F9-05 Export approved photo | Coach | ✅ | — | — |
-| F9-06 Manage and withdraw approvals | Athlete | ✅ | — | — |
-| N-01 Today — free | Athlete (free) | ✅ | — | — |
-| N-02 Today — AI-coached | Athlete (AI) | ✅ | — | — |
-| N-03 Today — human-coached | Athlete (coached) | ✅ | — | — |
-| N-04 Side menu — free | Athlete (free) | ✅ | — | — |
-| N-05 Side menu — Pro | Athlete (Pro) | ✅ | — | — |
-| N-06 Notifications | Athlete | ✅ | — | — |
-| AC-01 Account | Athlete | ✅ | — | — |
-| AC-02 Privacy and permissions | Athlete | ✅ | — | — |
-| AC-03 Export my data | Athlete | ✅ | — | — |
-| AC-04 Delete account | Athlete | ✅ | — | — |
-| AC-05 Forgot password | All | ✅ | — | — |
-| AC-06 Reset link sent / email check | All | ✅ | — | — |
-| R-01 Recovery — log today | Athlete (Pro) | ✅ | — | — |
-| R-02 Recovery — trends | Athlete (Pro) | ✅ | — | — |
-| R-03 Recovery — first use | Athlete (Pro) | ✅ | — | — |
-| PH-01 Bodyweight | Athlete | ✅ | — | — |
-| PH-02 Measurements | Athlete | ✅ | — | — |
-| PH-03 Photos | Athlete | ✅ | — | — |
-| PH-04 Charts | Athlete | ✅ | — | — |
-| AI-01 AI Coaching | Athlete (AI) | ✅ | — | — |
-| AI-02 AI Coaching — permission declined | Athlete (AI) | ✅ | — | — |
-| CP-01 Progress area — check-in due | Athlete (coached) | ✅ | — | — |
-| CP-02 Check-in sent, awaiting feedback | Athlete (coached) | ✅ | — | — |
-| CP-03 Check-in without photo permission | Athlete (coached) | ✅ | — | — |
-| CP-04 Progress switch — check-in timeline | Athlete (coached) | ✅ | — | — |
-| CP-05 Chat switch | Athlete (coached) | ✅ | — | — |
-| W-01 Today — waiting for plan | Athlete (coached) | ✅ | — | — |
-| W-02 Training — waiting for plan | Athlete (coached) | ✅ | — | — |
-| J-01 Join coach — AI subscriber | Athlete (AI) | ✅ | — | — |
-| J-02 End AI subscription | Athlete (AI) | ✅ | — | — |
-| J-03 Joined — what changed | Athlete (coached) | ✅ | — | — |
-| L-01 My coach | Athlete (coached) | ✅ | — | — |
-| L-02 Leave coach — confirm | Athlete (coached) | ✅ | — | — |
-| L-03 After leaving — what changed | Athlete (free) | ✅ | — | — |
-| K-01 Client list | Coach | ✅ | — | — |
-| K-02 Client profile — overview | Coach | ✅ | — | — |
-| K-03 Client profile — training | Coach | ✅ | — | — |
-| K-04 Change client status | Coach | ✅ | — | — |
-| K-05 Plans — templates | Coach | ✅ | — | — |
-| K-06 Plan builder — week | Coach | ✅ | — | — |
-| K-07 Plan builder — exercise | Coach | ✅ | — | — |
-| K-08 Assign and customise | Coach | ✅ | — | — |
-| K-09 Meal plan builder | Coach | ✅ | — | — |
-| K-10 Leads | Coach | ✅ | — | — |
-| K-11 Lead — add or edit | Coach | ✅ | — | — |
-| K-12 Business | Coach | ✅ | — | — |
-| K-13 Plan and billing | Coach | ✅ | — | — |
-| K-14 Client profile — nutrition | Coach | ✅ | — | — |
-| K-15 Client profile — recovery | Coach | ✅ | — | — |
-| K-16 Client profile — progress | Coach | ✅ | — | — |
-| K-17 Client profile — check-ins | Coach | ✅ | — | — |
-| K-18 Client profile — private notes | Coach | ✅ | — | — |
-| K-19 Coach sign-up (CO-01 in the coach onboarding mockups) | Coach | ✅ | ✅ draft | — |
-| K-20 Edit coach profile | Coach | ✅ | — | — |
-| K-21 Coach settings | Coach | ✅ | — | — |
-| T-01 Training — free | Athlete (free) | ✅ | — | — |
-| T-02 Training — AI-coached | Athlete (AI) | ✅ | — | — |
-| T-03 Training — human-coached | Athlete (coached) | ✅ | — | — |
-| T-04 Exercise library | Athlete | ✅ | — | — |
-| AC-07 Edit profile | Athlete | ✅ | — | — |
-| AC-08 Units | Athlete | ✅ | — | — |
-| AC-09 Help and support | Athlete | ✅ | — | — |
-| U-01 Upgrade — what changed | Athlete (AI) | ✅ | — | — |
-| S-01 Loading (pattern) | All | ✅ | — | — |
-| S-02 Error and retry (pattern) | All | ✅ | — | — |
-| S-03 Form validation (pattern) | All | ✅ | — | — |
-| S-04 Permission denied (pattern) | All | ✅ | — | — |
-| X-01 AI daily limit reached | Athlete (AI) | ✅ | — | — |
-| X-02 AI plan couldn't be built | Athlete (AI) | ✅ | — | — |
-| X-03 Edit a logged food | Athlete | ✅ | — | — |
-| X-04 Removed — undo | Athlete | ✅ | — | — |
-| X-05 Image viewer | Athlete, Coach | ✅ | — | — |
-| X-06 PDF viewer | Athlete, Coach | ✅ | — | — |
-| X-07 Notification permission — before asking | All | ✅ | — | — |
-| X-08 Android notification dialog (system) | All | ✅ | — | — |
-| X-09 Export — preparing | All | ✅ | — | — |
-| X-10 Export — failed | All | ✅ | — | — |
-| E-01 Workout history — empty | Athlete | ✅ | — | — |
-| E-02 Notifications — empty | Athlete | ✅ | — | — |
-| E-03 Exercise library — no results | Athlete | ✅ | — | — |
-| E-04 Physique charts — no data | Athlete | ✅ | — | — |
-| E-05 Check-in inbox — empty | Coach | ✅ | — | — |
-| E-06 Messages — empty | Coach | ✅ | — | — |
-| E-07 Leads — empty | Coach | ✅ | — | — |
-| E-08 Transformations — empty | Coach | ✅ | — | — |
-| K-22 Plans — meal plan templates | Coach | ✅ | — | — |
-| K-23 Coach exercise library | Coach | ✅ | — | — |
-| S-05 Force update | All | ✅ | — | — |
-| S-06 Maintenance / service down | All | ✅ | — | — |
-| TR-01 Workouts — free | Athlete (free) | ✅ | — | — |
-| TR-02 Workouts — Pro | Athlete (Pro) | ✅ | — | — |
-| TR-03 Create workout | Athlete (Pro) | ✅ | — | — |
-| TR-04 Programs — Pro | Athlete (Pro) | ✅ | — | — |
-| TR-05 Programs — locked | Athlete (free) | ✅ | — | — |
-| TR-06 Muscle Analytics — Pro | Athlete (Pro) | ✅ | — | — |
-| TR-07 Muscle Analytics — locked | Athlete (free) | ✅ | — | — |
-| TR-08 Timed and bodyweight sets | Athlete | ✅ | — | — |
-| G-01 Gyms — map and list | Athlete | ✅ | — | — |
-| G-02 Gym detail | Athlete | ✅ | — | — |
-| CP-06 Past check-in — read-only | Athlete (coached) | ✅ | — | — |
-| R-04 Recovery — coached, with coach target | Athlete (coached) | ✅ | — | — |
-| AC-10 Coach access to earlier history | Athlete (coached) | ✅ | — | — |
-| CS-01 Coaching paused | Athlete (coached) | ✅ | — | — |
-| CS-02 Coaching ending | Athlete (coached) | ✅ | — | — |
-| F1-05b Consent — invite sign-up | Athlete (coached) | ✅ | ✅ draft | — |
-| AI-03 Turn off AI — confirm | Athlete (AI) | ✅ | — | — |
-| AI-04 Out of scope | Athlete (AI) | ✅ | — | — |
-| TL-01 Trial ending reminder | Athlete (AI trial) | ✅ | — | — |
-| TL-02 Trial ended — not paid | Athlete (free) | ✅ | — | — |
-| K-24 Set sleep target and recovery note | Coach | ✅ | — | — |
-| K-25 Client limit reached | Coach | ✅ | — | — |
-| K-26 Invite page — coach is full | Athlete | ✅ | — | — |
-| K-27 Coach billing lapsed | Coach | ✅ | — | — |
-| K-28 Delete coach account | Coach | ✅ | — | — |
-| K-29 Coach account closed | Athlete (coached) | ✅ | — | — |
-| K-30 Complete a client — confirm | Coach | ✅ | — | — |
+| F1-01 Splash | All | ✅ | ✅ draft | ✅ (system splash) |
+| F1-02 Welcome | All | ✅ | ✅ draft | ✅ sample data |
+| F1-02a Choose your role (sheet) | All | ✅ | ✅ draft | ✅ sample data |
+| F1-03 Sign up | All | ✅ | ✅ draft | ✅ sample data |
+| F1-04 Sign in | All | ✅ | ✅ draft | ✅ sample data |
+| F1-05 Consent | All | ✅ | ✅ draft | ✅ sample data |
+| AO-01 Gender | Athlete | ✅ | ✅ draft | ✅ sample data |
+| AO-02 Age | Athlete | ✅ | ✅ draft | ✅ sample data |
+| AO-03 Height | Athlete | ✅ | ✅ draft | ✅ sample data |
+| AO-04 Current weight | Athlete | ✅ | ✅ draft | ✅ sample data |
+| AO-05 Main goal | Athlete | ✅ | ✅ draft | ✅ sample data |
+| AO-06 Goal weight | Athlete | ✅ | ✅ draft | ✅ sample data |
+| AO-07 Activity level | Athlete | ✅ | ✅ draft | ✅ sample data |
+| AO-08 Gym experience | Athlete | ✅ | ✅ draft | ✅ sample data |
+| AO-09 Where you train | Athlete | ✅ | ✅ draft | ✅ sample data |
+| AO-10 Training days | Athlete | ✅ | ✅ draft | ✅ sample data |
+| AO-11 Session length and time | Athlete | ✅ | ✅ draft | ✅ sample data |
+| AO-12 Injuries and limitations | Athlete | ✅ | ✅ draft | ✅ sample data |
+| AO-13 Sleep | Athlete | ✅ | ✅ draft | ✅ sample data |
+| AO-14 Sleep quality | Athlete | ✅ | ✅ draft | ✅ sample data |
+| AO-15 Stress and energy | Athlete | ✅ | ✅ draft | ✅ sample data |
+| AO-16 Diet type | Athlete | ✅ | ✅ draft | ✅ sample data |
+| AO-17 Meals per day | Athlete | ✅ | ✅ draft | ✅ sample data |
+| AO-18 Building your plan | Athlete (free) | ✅ | ✅ draft | ✅ sample data |
+| AO-19 Calorie target | Athlete (free) | ✅ | ✅ draft | ✅ sample data |
+| AO-20 Plan preview | Athlete (free) | ✅ | ✅ draft | ✅ sample data |
+| AO-21 All set — free | Athlete (free) | ✅ | ✅ draft | ✅ sample data |
+| AO-21b All set — coached | Athlete (coached) | ✅ | ✅ draft | ✅ sample data |
+| CO-02 Coach — what you get | Coach | ✅ | ✅ draft | ✅ sample data |
+| CO-03 Coach agreement | Coach | ✅ | ✅ draft | ✅ sample data |
+| CO-04 How you coach | Coach | ✅ | ✅ draft | ✅ sample data |
+| CO-05 Clients today | Coach | ✅ | ✅ draft | ✅ sample data |
+| CO-06 Coach profile basics | Coach | ✅ | ✅ draft | ✅ sample data |
+| CO-07 Specialisations | Coach | ✅ | ✅ draft | ✅ sample data |
+| CO-08 About you | Coach | ✅ | ✅ draft | ✅ sample data |
+| CO-09 Services | Coach | ✅ | ✅ draft | ✅ sample data |
+| CO-10 First template | Coach | ✅ | ✅ draft | ✅ sample data |
+| CO-11 Invite clients | Coach | ✅ | ✅ draft | ✅ sample data |
+| CO-12 Ready to coach | Coach | ✅ | ✅ draft | ✅ sample data |
+| CO-13 Clients — empty with setup checklist | Coach | ✅ | ✅ draft | ✅ sample data |
+| CO-14 Clients — first clients join | Coach | ✅ | ✅ draft | ✅ sample data |
+| CO-15 New client — assign plan | Coach | ✅ | ✅ draft | ✅ sample data |
+| F3-01 Invite shared (WhatsApp) | Coach → client | ✅ | ✅ draft | ✅ sample data |
+| F3-02 Invite landing | Athlete | ✅ | ✅ draft | ✅ sample data |
+| F3-03 Already coached (switch coach) | Athlete | ✅ | ✅ draft | ✅ sample data |
+| F4-01 Today — workout entry point | Athlete | ✅ | — | ✅ sample data |
+| F4-02 Workout preview | Athlete | ✅ | — | ✅ sample data |
+| F4-03 Active workout — set logging | Athlete | ✅ | — | ✅ sample data |
+| F4-04 Rest timer | Athlete | ✅ | — | ✅ sample data |
+| F4-05 Edit weight / reps | Athlete | ✅ | — | ✅ sample data |
+| F4-06 Exercise options | Athlete | ✅ | — | ✅ sample data |
+| F4-07 Swap exercise | Athlete | ✅ | — | ✅ sample data |
+| F4-08 Exercise detail | Athlete | ✅ | — | ✅ sample data |
+| F4-09 Offline during workout | Athlete | ✅ | — | ✅ sample data |
+| F4-10 Minimised workout | Athlete | ✅ | — | ✅ sample data |
+| F4-11 Finish confirmation | Athlete | ✅ | — | ✅ sample data |
+| F4-12 Workout summary | Athlete | ✅ | — | ✅ sample data |
+| F4-13 Workout history | Athlete | ✅ | — | ✅ sample data |
+| F5-01 Day log — paid / coached | Athlete (paid, coached) | ✅ | — | ✅ sample data |
+| F5-02 Day log — free | Athlete (free) | ✅ | — | ✅ sample data |
+| F5-03 Empty day | Athlete | ✅ | — | ✅ sample data |
+| F5-04 Add food — recent | Athlete | ✅ | — | ✅ sample data |
+| F5-05 Search results | Athlete | ✅ | — | ✅ sample data |
+| F5-06 Portion picker | Athlete | ✅ | — | ✅ sample data |
+| F5-07 Quick add | Athlete | ✅ | — | ✅ sample data |
+| F5-08 Create custom food | Athlete | ✅ | — | ✅ sample data |
+| F5-09 Photo — camera | Athlete (paid) | ✅ | — | ✅ sample data |
+| F5-10 Photo — analysing | Athlete (paid) | ✅ | — | ✅ sample data |
+| F5-11 Photo — confirm results | Athlete (paid) | ✅ | — | ✅ sample data |
+| F5-12 Coach meal plan | Athlete (coached) | ✅ | — | ✅ sample data |
+| F5-13 AI meal plan | Athlete (paid) | ✅ | — | ✅ sample data |
+| F5-14 Upgrade moment | Athlete (free) | ✅ | — | ✅ sample data |
+| F6-01 Progress area — check-in due | Athlete (coached) | ✅ | — | ✅ sample data |
+| F6-02 Check-in step 1 — measurements | Athlete (coached) | ✅ | — | ✅ sample data |
+| F6-03 Check-in step 2 — photos | Athlete (coached) | ✅ | — | ✅ sample data |
+| F6-04 Check-in step 3 — how the week went | Athlete (coached) | ✅ | — | ✅ sample data |
+| F6-05 Check-in review and submit | Athlete (coached) | ✅ | — | ✅ sample data |
+| F6-06 Coach feedback received | Athlete (coached) | ✅ | — | ✅ sample data |
+| F6-07 Check-in inbox | Coach | ✅ | — | ✅ sample data |
+| F6-08 Check-in review | Coach | ✅ | — | ✅ sample data |
+| F6-09 Write feedback | Coach | ✅ | — | ✅ sample data |
+| F6-10 Check-in schedule | Coach | ✅ | — | ✅ sample data |
+| F7-01 Chat with coach | Athlete (coached) | ✅ | — | ✅ sample data |
+| F7-02 Attach sheet | Athlete, Coach | ✅ | — | ✅ sample data |
+| F7-03 Chat — poor connection | Athlete, Coach | ✅ | — | ✅ sample data |
+| F7-04 Messages list | Coach | ✅ | — | ✅ sample data |
+| F7-05 Chat with client context | Coach | ✅ | — | ✅ sample data |
+| F8-01 Paywall | Athlete (free) | ✅ | — | ✅ sample data |
+| F8-02 Trial timeline | Athlete (free) | ✅ | — | ✅ sample data |
+| F8-03 AI consent | Athlete (upgrading) | ✅ | — | ✅ sample data |
+| F8-04 Google Play purchase (system) | Athlete (upgrading) | ✅ | — | System screen |
+| F8-05 Welcome — AI builds the plan | Athlete (paid) | ✅ | — | ✅ sample data |
+| F8-06 Subscription details | Athlete (paid) | ✅ | — | ✅ sample data |
+| F8-07 Payment problem (grace period) | Athlete (paid) | ✅ | — | ✅ sample data |
+| F8-08 Subscription ended | Athlete | ✅ | — | ✅ sample data |
+| F9-01 Transformations list | Coach | ✅ | — | ✅ sample data |
+| F9-02 Request photos | Coach | ✅ | — | ✅ sample data |
+| F9-03 Review request | Athlete (coached) | ✅ | — | ✅ sample data |
+| F9-04 Adjust blur and crop | Athlete (coached) | ✅ | — | ✅ sample data |
+| F9-05 Export approved photo | Coach | ✅ | — | ✅ sample data |
+| F9-06 Manage and withdraw approvals | Athlete | ✅ | — | ✅ sample data |
+| N-01 Today — free | Athlete (free) | ✅ | — | ✅ sample data |
+| N-02 Today — AI-coached | Athlete (AI) | ✅ | — | ✅ sample data |
+| N-03 Today — human-coached | Athlete (coached) | ✅ | — | ✅ sample data |
+| N-04 Side menu — free | Athlete (free) | ✅ | — | ✅ sample data |
+| N-05 Side menu — Pro | Athlete (Pro) | ✅ | — | ✅ sample data |
+| N-06 Notifications | Athlete | ✅ | — | ✅ sample data |
+| AC-01 Account | Athlete | ✅ | — | ✅ sample data |
+| AC-02 Privacy and permissions | Athlete | ✅ | — | ✅ sample data |
+| AC-03 Export my data | Athlete | ✅ | — | ✅ sample data |
+| AC-04 Delete account | Athlete | ✅ | — | ✅ sample data |
+| AC-05 Forgot password | All | ✅ | — | Replaced by email code (D62) |
+| AC-06 Reset link sent / email check | All | ✅ | — | Replaced by email code (D62) |
+| R-01 Recovery — log today | Athlete (Pro) | ✅ | — | ✅ sample data |
+| R-02 Recovery — trends | Athlete (Pro) | ✅ | — | ✅ sample data |
+| R-03 Recovery — first use | Athlete (Pro) | ✅ | — | ✅ sample data |
+| PH-01 Bodyweight | Athlete | ✅ | — | ✅ sample data |
+| PH-02 Measurements | Athlete | ✅ | — | ✅ sample data |
+| PH-03 Photos | Athlete | ✅ | — | ✅ sample data |
+| PH-04 Charts | Athlete | ✅ | — | ✅ sample data |
+| AI-01 AI Coaching | Athlete (AI) | ✅ | — | ✅ sample data |
+| AI-02 AI Coaching — permission declined | Athlete (AI) | ✅ | — | ✅ sample data |
+| CP-01 Progress area — check-in due | Athlete (coached) | ✅ | — | ✅ sample data |
+| CP-02 Check-in sent, awaiting feedback | Athlete (coached) | ✅ | — | ✅ sample data |
+| CP-03 Check-in without photo permission | Athlete (coached) | ✅ | — | ✅ sample data |
+| CP-04 Progress switch — check-in timeline | Athlete (coached) | ✅ | — | ✅ sample data |
+| CP-05 Chat switch | Athlete (coached) | ✅ | — | ✅ sample data |
+| W-01 Today — waiting for plan | Athlete (coached) | ✅ | — | ✅ sample data |
+| W-02 Training — waiting for plan | Athlete (coached) | ✅ | — | ✅ sample data |
+| J-01 Join coach — AI subscriber | Athlete (AI) | ✅ | — | ✅ sample data |
+| J-02 End AI subscription | Athlete (AI) | ✅ | — | ✅ sample data |
+| J-03 Joined — what changed | Athlete (coached) | ✅ | — | ✅ sample data |
+| L-01 My coach | Athlete (coached) | ✅ | — | ✅ sample data |
+| L-02 Leave coach — confirm | Athlete (coached) | ✅ | — | ✅ sample data |
+| L-03 After leaving — what changed | Athlete (free) | ✅ | — | ✅ sample data |
+| K-01 Client list | Coach | ✅ | — | ✅ sample data |
+| K-02 Client profile — overview | Coach | ✅ | — | ✅ sample data |
+| K-03 Client profile — training | Coach | ✅ | — | ✅ sample data |
+| K-04 Change client status | Coach | ✅ | — | ✅ sample data |
+| K-05 Plans — templates | Coach | ✅ | — | ✅ sample data |
+| K-06 Plan builder — week | Coach | ✅ | — | ✅ sample data |
+| K-07 Plan builder — exercise | Coach | ✅ | — | ✅ sample data |
+| K-08 Assign and customise | Coach | ✅ | — | ✅ sample data |
+| K-09 Meal plan builder | Coach | ✅ | — | ✅ sample data |
+| K-10 Leads | Coach | ✅ | — | ✅ sample data |
+| K-11 Lead — add or edit | Coach | ✅ | — | ✅ sample data |
+| K-12 Business | Coach | ✅ | — | ✅ sample data |
+| K-13 Plan and billing | Coach | ✅ | — | ✅ sample data |
+| K-14 Client profile — nutrition | Coach | ✅ | — | ✅ sample data |
+| K-15 Client profile — recovery | Coach | ✅ | — | ✅ sample data |
+| K-16 Client profile — progress | Coach | ✅ | — | ✅ sample data |
+| K-17 Client profile — check-ins | Coach | ✅ | — | ✅ sample data |
+| K-18 Client profile — private notes | Coach | ✅ | — | ✅ sample data |
+| K-19 Coach sign-up (CO-01 in the coach onboarding mockups) | Coach | ✅ | ✅ draft | ✅ sample data |
+| K-20 Edit coach profile | Coach | ✅ | — | ✅ sample data |
+| K-21 Coach settings | Coach | ✅ | — | ✅ sample data |
+| T-01 Training — free | Athlete (free) | ✅ | — | ✅ sample data |
+| T-02 Training — AI-coached | Athlete (AI) | ✅ | — | ✅ sample data |
+| T-03 Training — human-coached | Athlete (coached) | ✅ | — | ✅ sample data |
+| T-04 Exercise library | Athlete | ✅ | — | ✅ sample data |
+| AC-07 Edit profile | Athlete | ✅ | — | ✅ sample data |
+| AC-08 Units | Athlete | ✅ | — | ✅ sample data |
+| AC-09 Help and support | Athlete | ✅ | — | ✅ sample data |
+| U-01 Upgrade — what changed | Athlete (AI) | ✅ | — | ✅ sample data |
+| S-01 Loading (pattern) | All | ✅ | — | ✅ sample data |
+| S-02 Error and retry (pattern) | All | ✅ | — | ✅ sample data |
+| S-03 Form validation (pattern) | All | ✅ | — | ✅ sample data |
+| S-04 Permission denied (pattern) | All | ✅ | — | ✅ sample data |
+| X-01 AI daily limit reached | Athlete (AI) | ✅ | — | ✅ sample data |
+| X-02 AI plan couldn't be built | Athlete (AI) | ✅ | — | ✅ sample data |
+| X-03 Edit a logged food | Athlete | ✅ | — | ✅ sample data |
+| X-04 Removed — undo | Athlete | ✅ | — | ✅ sample data |
+| X-05 Image viewer | Athlete, Coach | ✅ | — | ✅ sample data |
+| X-06 PDF viewer | Athlete, Coach | ✅ | — | ✅ sample data |
+| X-07 Notification permission — before asking | All | ✅ | — | ✅ sample data |
+| X-08 Android notification dialog (system) | All | ✅ | — | System screen |
+| X-09 Export — preparing | All | ✅ | — | ✅ sample data |
+| X-10 Export — failed | All | ✅ | — | ✅ sample data |
+| E-01 Workout history — empty | Athlete | ✅ | — | ✅ sample data |
+| E-02 Notifications — empty | Athlete | ✅ | — | ✅ sample data |
+| E-03 Exercise library — no results | Athlete | ✅ | — | ✅ sample data |
+| E-04 Physique charts — no data | Athlete | ✅ | — | ✅ sample data |
+| E-05 Check-in inbox — empty | Coach | ✅ | — | ✅ sample data |
+| E-06 Messages — empty | Coach | ✅ | — | ✅ sample data |
+| E-07 Leads — empty | Coach | ✅ | — | ✅ sample data |
+| E-08 Transformations — empty | Coach | ✅ | — | ✅ sample data |
+| K-22 Plans — meal plan templates | Coach | ✅ | — | ✅ sample data |
+| K-23 Coach exercise library | Coach | ✅ | — | ✅ sample data |
+| S-05 Force update | All | ✅ | — | ✅ sample data |
+| S-06 Maintenance / service down | All | ✅ | — | ✅ sample data |
+| TR-01 Workouts — free | Athlete (free) | ✅ | — | ✅ sample data |
+| TR-02 Workouts — Pro | Athlete (Pro) | ✅ | — | ✅ sample data |
+| TR-03 Create workout | Athlete (Pro) | ✅ | — | ✅ sample data |
+| TR-04 Programs — Pro | Athlete (Pro) | ✅ | — | ✅ sample data |
+| TR-05 Programs — locked | Athlete (free) | ✅ | — | ✅ sample data |
+| TR-06 Muscle Analytics — Pro | Athlete (Pro) | ✅ | — | ✅ sample data |
+| TR-07 Muscle Analytics — locked | Athlete (free) | ✅ | — | ✅ sample data |
+| TR-08 Timed and bodyweight sets | Athlete | ✅ | — | ✅ sample data |
+| G-01 Gyms — map and list | Athlete | ✅ | — | ✅ sample data |
+| G-02 Gym detail | Athlete | ✅ | — | ✅ sample data |
+| CP-06 Past check-in — read-only | Athlete (coached) | ✅ | — | ✅ sample data |
+| R-04 Recovery — coached, with coach target | Athlete (coached) | ✅ | — | ✅ sample data |
+| AC-10 Coach access to earlier history | Athlete (coached) | ✅ | — | ✅ sample data |
+| CS-01 Coaching paused | Athlete (coached) | ✅ | — | ✅ sample data |
+| CS-02 Coaching ending | Athlete (coached) | ✅ | — | ✅ sample data |
+| F1-05b Consent — invite sign-up | Athlete (coached) | ✅ | ✅ draft | ✅ sample data |
+| AI-03 Turn off AI — confirm | Athlete (AI) | ✅ | — | ✅ sample data |
+| AI-04 Out of scope | Athlete (AI) | ✅ | — | ✅ sample data |
+| TL-01 Trial ending reminder | Athlete (AI trial) | ✅ | — | ✅ sample data |
+| TL-02 Trial ended — not paid | Athlete (free) | ✅ | — | ✅ sample data |
+| K-24 Set sleep target and recovery note | Coach | ✅ | — | ✅ sample data |
+| K-25 Client limit reached | Coach | ✅ | — | ✅ sample data |
+| K-26 Invite page — coach is full | Athlete | ✅ | — | ✅ sample data |
+| K-27 Coach billing lapsed | Coach | ✅ | — | ✅ sample data |
+| K-28 Delete coach account | Coach | ✅ | — | ✅ sample data |
+| K-29 Coach account closed | Athlete (coached) | ✅ | — | ✅ sample data |
+| K-30 Complete a client — confirm | Coach | ✅ | — | ✅ sample data |
 
 ## 8. Accessibility and quality checklist
 

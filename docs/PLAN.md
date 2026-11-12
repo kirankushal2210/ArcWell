@@ -67,7 +67,7 @@ The front end is finished on sample data before any backend wiring (Phases 1–8
   - Weekly AI review of training, food and recovery; every suggestion shows why, and links to its FE-2 source.
   - AI states: AI off, out of scope, daily limit, couldn't build a plan (AI-02, AI-04, X-01, X-02).
   - Coached athletes: no AI; their coach sees a plain low-recovery flag on the client profile and decides.
-- [ ] **FE-7 System states and full QA loop:** loading, error, offline, permission denied, force update, maintenance, notification pre-ask (S-01 to S-06, X-07, F4-09, F7-03), PDF attach and viewer UI (F7-02, X-06), then a full walk of every screen as free, Pro, coached and coach, fixing what's found, until nothing is left (Phase 14 of the frontend execution prompt)
+- [x] **FE-7 System states and full QA loop:** loading, error, offline, permission denied, force update, maintenance, notification pre-ask (S-01 to S-06, X-07, F4-09, F7-03), PDF attach and viewer UI (F7-02, X-06), then a full walk of every screen as free, Pro, coached and coach, fixing what's found, until nothing is left (Phase 14 of the frontend execution prompt)
 
 ## Phase 1 — Foundations (2–3 weeks)
 
