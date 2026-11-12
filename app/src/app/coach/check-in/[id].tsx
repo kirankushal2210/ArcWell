@@ -301,15 +301,28 @@ export default function CheckInReview() {
             { paddingBottom: Math.max(insets.bottom, space[4]) },
           ]}
         >
-          <Button
-            label="Send feedback"
-            fullWidth
-            disabled={!text.trim()}
-            onPress={() => {
-              reply(c.id, k.id, text.trim());
-              setText("");
-            }}
-          />
+          {(() => {
+            // Review run (D67): after sending, go straight to the next waiting check-in.
+            const next = clients
+              .flatMap((x) => x.checkIns)
+              .find((y) => !y.reviewed && y.id !== k.id);
+            return (
+              <Button
+                label={next ? "Send and next client" : "Send feedback"}
+                fullWidth
+                disabled={!text.trim()}
+                onPress={() => {
+                  reply(c.id, k.id, text.trim());
+                  setText("");
+                  if (next)
+                    router.replace({
+                      pathname: "/coach/check-in/[id]",
+                      params: { id: next.id },
+                    });
+                }}
+              />
+            );
+          })()}
         </View>
       ) : null}
     </KeyboardAvoidingView>

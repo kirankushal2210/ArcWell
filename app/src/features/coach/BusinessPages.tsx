@@ -3,7 +3,7 @@
 // package, fee, renewal, payment) and Invite (link, QR, spots).
 import * as Clipboard from "expo-clipboard";
 import { router } from "expo-router";
-import { ChevronRight, Copy, Phone, Plus, Share2 } from "lucide-react-native";
+import { ChevronRight, Copy, Phone, Share2 } from "lucide-react-native";
 import { useState } from "react";
 import { Share, StyleSheet, View } from "react-native";
 import QRCode from "react-native-qrcode-svg";
@@ -51,7 +51,7 @@ export function OverviewPage() {
   const s = crmStats(leads, clients, period);
   const max = Math.max(s.leads, 1);
   return (
-    <Page>
+    <Page clearDock>
       <Pills
         value={period}
         onChange={setPeriod}
@@ -230,7 +230,7 @@ export function LeadsPage() {
     leads.filter((l) => (f === "open" ? isOpen(l.stage) : l.stage === f))
       .length;
   return (
-    <Page>
+    <Page clearDock>
       <Pills<LeadFilter>
         value={filter}
         onChange={setFilter}
@@ -285,13 +285,6 @@ export function LeadsPage() {
           No leads here.
         </Text>
       )}
-      <Button
-        label="Add a lead"
-        icon={Plus}
-        variant="secondary"
-        fullWidth
-        onPress={() => openLead("new")}
-      />
     </Page>
   );
 }
@@ -323,7 +316,7 @@ export function ClientsPage() {
           : c.status === f;
     }).length;
   return (
-    <Page>
+    <Page clearDock>
       <Pills<ClientFilter>
         value={filter}
         onChange={setFilter}
@@ -392,7 +385,7 @@ export function InvitePage() {
   const url = `https://${link}`;
   const message = `Join my coaching on Arcwell: your plans, check-ins and chat in one app. ${url}`;
   return (
-    <Page>
+    <Page clearDock>
       <View style={[styles.card, styles.centerCard]}>
         <View
           style={styles.qr}
@@ -538,7 +531,7 @@ export function InstagramPage() {
     setCopied(key);
   };
   return (
-    <Page>
+    <Page clearDock>
       <Pills
         value={period}
         onChange={setPeriod}
@@ -564,18 +557,6 @@ export function InstagramPage() {
                 : `${s.conversion}% of those who decided`,
           },
         ]}
-      />
-
-      <Button
-        label="Add an Instagram lead"
-        icon={Plus}
-        fullWidth
-        onPress={() =>
-          router.push({
-            pathname: "/coach/lead/[id]",
-            params: { id: "new", source: "instagram" },
-          })
-        }
       />
 
       {s.byTouch.length ? (

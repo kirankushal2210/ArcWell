@@ -7,7 +7,6 @@ import { StyleSheet, View } from "react-native";
 
 import {
   Avatar,
-  Button,
   PressableScale,
   StatusChip,
   Text,
@@ -16,6 +15,7 @@ import { menuAction } from "@/features/coach/coachProfile";
 import { needsAttention, useCoachData } from "@/features/coach/CoachData";
 import { plansReady } from "@/features/coach/PlanRows";
 import {
+  ActionDock,
   Eyebrow,
   Group,
   GroupRow,
@@ -98,7 +98,7 @@ export default function ClientsTab() {
           },
         ]}
       />
-      <Page>
+      <Page clearDock>
         {!setupHidden && done < setup.length ? (
           <View style={styles.setup}>
             <View style={styles.between}>
@@ -146,14 +146,6 @@ export default function ClientsTab() {
             </View>
           </View>
         ) : null}
-
-        <Button
-          label="Add a client and build their plan"
-          icon={UserPlus}
-          variant="secondary"
-          fullWidth
-          onPress={() => router.push("/coach/add-client")}
-        />
 
         {pending.length > 0 ? (
           <>
@@ -282,6 +274,29 @@ export default function ClientsTab() {
           and check-ins done.
         </Text>
       </Page>
+      {(() => {
+        // D67 action dock: review waiting check-ins first, otherwise add a client.
+        const waiting = clients
+          .flatMap((c) => c.checkIns)
+          .filter((k) => !k.reviewed);
+        return waiting.length ? (
+          <ActionDock
+            label={`Review ${waiting.length} check-in${waiting.length === 1 ? "" : "s"}`}
+            onPress={() =>
+              router.push({
+                pathname: "/coach/check-in/[id]",
+                params: { id: waiting[0].id },
+              })
+            }
+          />
+        ) : (
+          <ActionDock
+            label="Add a client"
+            icon={UserPlus}
+            onPress={() => router.push("/coach/add-client")}
+          />
+        );
+      })()}
     </View>
   );
 }

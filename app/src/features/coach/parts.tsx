@@ -1,5 +1,6 @@
-// Building blocks for the coach app, following the hi-fi mockups (coach-and-system.html, coach-onboarding.html):
-// large page titles, white grouped lists, black selection, pillar colours as small dots only (D50).
+// Building blocks for the coach app in Liquid Glass with the Stone palette (D67): large titles with
+// round glass toolbar buttons, dense charcoal grouped lists, slim pills, and one action dock per
+// screen just above the floating glass tab bar.
 import type { BottomTabBarProps } from "expo-router/tabs";
 import { ArrowLeft, type LucideIcon } from "lucide-react-native";
 import type { ReactNode } from "react";
@@ -7,9 +8,14 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Circle, Line, Polyline, Rect } from "react-native-svg";
 
-import { IconButton, PressableScale, Text } from "@/components/primitives";
+import {
+  Button,
+  IconButton,
+  PressableScale,
+  Text,
+} from "@/components/primitives";
 import { GlassSurface } from "@/components/GlassSurface";
-import { colors, radius, rhythm, space } from "@/theme";
+import { colors, controlHeightSm, radius, rhythm, space } from "@/theme";
 
 // ---------- Page header: large title with up to two icon actions ----------
 
@@ -31,6 +37,7 @@ export function PageHeader({
         {onBack ? (
           <IconButton
             icon={ArrowLeft}
+            variant="glass"
             accessibilityLabel="Back"
             onPress={onBack}
           />
@@ -47,6 +54,7 @@ export function PageHeader({
           <IconButton
             key={a.label}
             icon={a.icon}
+            variant="glass"
             accessibilityLabel={a.label}
             onPress={a.onPress}
           />
@@ -66,10 +74,13 @@ export function PageHeader({
 export function Page({
   children,
   clearFloating = false,
+  clearDock = false,
 }: {
   children: ReactNode;
   /** Extra room at the end so a floating button (the athlete AI button) never covers content. */
   clearFloating?: boolean;
+  /** Extra room at the end for an ActionDock above the tab bar. */
+  clearDock?: boolean;
 }) {
   return (
     <ScrollView
@@ -77,6 +88,7 @@ export function Page({
       contentContainerStyle={[
         styles.page,
         clearFloating && styles.pageFloating,
+        clearDock && styles.pageDock,
       ]}
       showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"
@@ -192,9 +204,16 @@ export function Pills<T extends string>({
             onPress={() => onChange(o.value)}
             accessibilityRole="tab"
             accessibilityState={{ selected: on }}
+            hitSlop={{ top: space[2], bottom: space[2] }}
             style={[styles.pill, on && styles.pillOn]}
           >
-            <Text variant="label" tone={on ? "onBrand" : "default"} numeric>
+            <Text
+              variant="label"
+              weight="semibold"
+              tone={on ? "onBrand" : "default"}
+              style={on ? { color: colors.onAccent } : undefined}
+              numeric
+            >
               {o.label}
             </Text>
           </PressableScale>
@@ -390,13 +409,44 @@ export const tabBarBottom = (insetBottom: number) =>
 export const tabBarTop = (insetBottom: number) =>
   tabBarBottom(insetBottom) + TAB_BAR_HEIGHT;
 
+// ---------- Action dock: the screen's one main action, above the tab bar (D67) ----------
+
+/**
+ * The single main action of a tab screen, always in the same spot just above the floating
+ * tab bar, so the thumb finds it without looking. Pair with `<Page clearDock>`.
+ */
+export function ActionDock(props: {
+  label: string;
+  onPress: () => void;
+  icon?: LucideIcon;
+  pillar?: "training" | "nutrition" | "recovery";
+  disabled?: boolean;
+}) {
+  const insets = useSafeAreaInsets();
+  return (
+    <View
+      pointerEvents="box-none"
+      style={[styles.dock, { bottom: tabBarTop(insets.bottom) + space[2] }]}
+    >
+      <Button
+        label={props.label}
+        onPress={props.onPress}
+        icon={props.icon}
+        pillar={props.pillar}
+        disabled={props.disabled}
+        fullWidth
+      />
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   header: {
     backgroundColor: colors.bg,
     paddingHorizontal: space[1],
-    paddingBottom: space[2],
-    gap: space[1],
+    paddingBottom: space[1],
+    gap: space[1] / 2,
   },
   headerRow: { flexDirection: "row", alignItems: "center", gap: space[1] },
   titlePad: { paddingHorizontal: space[3] },
@@ -405,42 +455,45 @@ const styles = StyleSheet.create({
     paddingTop: space[2],
     // Room for the floating glass tab bar (D67).
     paddingBottom: space[12] * 2 + space[4],
-    gap: space[4],
+    gap: space[3],
   },
   pageFloating: { paddingBottom: space[12] * 3 + space[4] },
+  pageDock: { paddingBottom: space[12] * 3 + space[6] },
+  dock: { position: "absolute", left: rhythm.gutter, right: rhythm.gutter },
   group: {
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
-    paddingHorizontal: space[4],
+    paddingHorizontal: space[3],
   },
   groupRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: space[3],
-    minHeight: 56,
-    paddingVertical: space[3],
+    minHeight: 44,
+    paddingVertical: space[2],
   },
-  groupLine: { borderTopWidth: 1, borderTopColor: colors.border },
-  eyebrow: { paddingTop: space[2] },
+  groupLine: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.border,
+  },
+  eyebrow: { paddingTop: space[1] },
   kvValue: { flex: 1, textAlign: "right" },
   tile: {
     flex: 1,
     gap: space[1] / 2,
-    padding: space[4],
+    padding: space[3],
     borderRadius: radius.lg,
     backgroundColor: colors.surface,
   },
   pills: { gap: space[2], paddingRight: space[4] },
   pill: {
-    minHeight: 40,
+    minHeight: controlHeightSm,
     justifyContent: "center",
-    paddingHorizontal: space[4],
-    borderRadius: radius.full,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
+    paddingHorizontal: space[3],
+    borderRadius: radius.sm,
+    backgroundColor: colors.surfaceRaised,
   },
-  pillOn: { backgroundColor: colors.brand, borderColor: colors.brand },
+  pillOn: { backgroundColor: colors.accent },
   bars: { gap: space[1] },
   barLabels: { flexDirection: "row" },
   barLabel: { flex: 1, textAlign: "center" },

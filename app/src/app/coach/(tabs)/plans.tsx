@@ -3,7 +3,6 @@
 // person icon to give it to clients, or New to build one. Each client gets their own copy (D56).
 import { router } from "expo-router";
 import {
-  ChevronRight,
   ListChecks,
   Plus,
   UserPlus,
@@ -11,14 +10,8 @@ import {
 } from "lucide-react-native";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import {
-  Button,
-  IconButton,
-  PressableScale,
-  Text,
-} from "@/components/primitives";
+import { IconButton, PressableScale, Text } from "@/components/primitives";
 import { SectionTabs } from "@/components/SectionTabs";
 import { menuAction } from "@/features/coach/coachProfile";
 import { useCoachData } from "@/features/coach/CoachData";
@@ -27,11 +20,11 @@ import {
   GroupRow,
   Page,
   PageHeader,
-  tabBarTop,
+  ActionDock,
 } from "@/features/coach/parts";
 import { EnhancedPage, SupplementsPage } from "@/features/coach/PlansExtras";
 import type { Template } from "@/features/coach/sampleData";
-import { colors, radius, rhythm, space } from "@/theme";
+import { colors, radius, space } from "@/theme";
 
 type Kind = Template["kind"];
 
@@ -50,7 +43,7 @@ function TemplateList({ kind }: { kind: Kind }) {
   const Icon = kind === "training" ? ListChecks : Utensils;
   if (!list.length)
     return (
-      <Page>
+      <Page clearDock>
         <View style={styles.empty}>
           <Icon size={32} strokeWidth={1.6} color={colors.text} />
           <Text variant="title" style={styles.center}>
@@ -63,7 +56,7 @@ function TemplateList({ kind }: { kind: Kind }) {
       </Page>
     );
   return (
-    <Page>
+    <Page clearDock>
       <Group>
         {list.map((t, i) => (
           <GroupRow key={t.id} first={i === 0}>
@@ -74,7 +67,7 @@ function TemplateList({ kind }: { kind: Kind }) {
               style={styles.rowMain}
             >
               <View style={styles.icon}>
-                <Icon size={22} color={colors.text} />
+                <Icon size={20} color={colors.text} />
               </View>
               <View style={styles.flex}>
                 <Text weight="semibold">{t.name}</Text>
@@ -83,7 +76,6 @@ function TemplateList({ kind }: { kind: Kind }) {
                   {t.clients === 1 ? "client" : "clients"}
                 </Text>
               </View>
-              <ChevronRight size={18} color={colors.textMuted} />
             </PressableScale>
             <IconButton
               icon={UserPlus}
@@ -114,7 +106,6 @@ const TABS: { key: Tab; label: string }[] = [
 ];
 
 export default function PlansTab() {
-  const insets = useSafeAreaInsets();
   const [kind, setKind] = useState<Tab>("training");
   return (
     <View style={styles.root}>
@@ -131,32 +122,24 @@ export default function PlansTab() {
         ]}
       />
       {kind === "enhanced" ? null : (
-        <View
-          style={[
-            styles.footer,
-            { marginBottom: tabBarTop(insets.bottom) + space[2] },
-          ]}
-        >
-          <Button
-            label={
-              kind === "training"
-                ? "New training program"
-                : kind === "meals"
-                  ? "New meal plan"
-                  : "New supplement stack"
-            }
-            icon={Plus}
-            fullWidth
-            onPress={() =>
-              kind === "supplements"
-                ? router.push({
-                    pathname: "/coach/stack/[id]",
-                    params: { id: "new" },
-                  })
-                : open(null, kind)
-            }
-          />
-        </View>
+        <ActionDock
+          label={
+            kind === "training"
+              ? "New training program"
+              : kind === "meals"
+                ? "New meal plan"
+                : "New supplement stack"
+          }
+          icon={Plus}
+          onPress={() =>
+            kind === "supplements"
+              ? router.push({
+                  pathname: "/coach/stack/[id]",
+                  params: { id: "new" },
+                })
+              : open(null, kind)
+          }
+        />
       )}
     </View>
   );
@@ -174,15 +157,11 @@ const styles = StyleSheet.create({
   center: { textAlign: "center" },
   empty: { alignItems: "center", gap: space[3], paddingTop: space[8] },
   icon: {
-    width: 44,
-    height: 44,
-    borderRadius: radius.md,
+    width: 36,
+    height: 36,
+    borderRadius: radius.sm,
     backgroundColor: colors.surfaceRaised,
     alignItems: "center",
     justifyContent: "center",
-  },
-  footer: {
-    paddingHorizontal: rhythm.gutter,
-    paddingTop: space[2],
   },
 });
