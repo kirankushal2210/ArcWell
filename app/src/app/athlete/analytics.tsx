@@ -21,6 +21,8 @@ export default function MuscleAnalytics() {
   const me = useMe();
   const { meTier, sessions } = useCoachData();
   const [span, setSpan] = useState<Span>("this");
+  // The clock is read once when the page opens (render must stay pure).
+  const [now] = useState(() => Date.now());
   if (!me) return <NotJoined />;
   const back = backTo("/athlete/menu");
 
@@ -51,7 +53,7 @@ export default function MuscleAnalytics() {
       </MenuPage>
     );
 
-  const monday = weekStart(new Date()).getTime();
+  const monday = weekStart(new Date(now)).getTime();
   const week = 7 * 864e5;
   const from =
     span === "this"
@@ -59,7 +61,7 @@ export default function MuscleAnalytics() {
       : span === "last"
         ? monday - week
         : monday - 4 * week;
-  const to = span === "last" ? monday : Date.now() + week;
+  const to = span === "last" ? monday : now + week;
   const done = sessions(me.id).filter((s) => {
     const t = new Date(s.at).getTime();
     return t >= from && t < to;
