@@ -37,6 +37,7 @@ import { useCoachData } from "@/features/coach/CoachData";
 import { Eyebrow, Group, GroupRow, PageHeader } from "@/features/coach/parts";
 import { todayIndex, WEEKDAYS, weekSchedule } from "@/features/coach/plans";
 import { colors, radius, space } from "@/theme";
+import { VolumePanel } from "@/features/science/VolumePanel";
 
 function PlanPage() {
   const me = useMe();
@@ -259,6 +260,14 @@ function PlanPage() {
           );
         })}
       </Group>
+
+      <VolumePanel
+        days={program.days}
+
+        compact
+
+        title="Your weekly sets per muscle"
+      />
 
       <MyRoutines me={me} />
 

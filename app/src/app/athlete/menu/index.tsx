@@ -4,6 +4,7 @@
 import { router } from "expo-router";
 import {
   Bell,
+  BookOpen,
   Camera,
   ChartLine,
   Dumbbell,
@@ -106,6 +107,16 @@ export default function AthleteMenu() {
           icon={ChartLine}
           label="Charts"
           onPress={() => router.push("/athlete/physique/charts")}
+        />
+      </Group>
+
+      <Group>
+        <NavRow
+          first
+          icon={BookOpen}
+          label="The science behind Arcwell"
+          sub="The research every target and plan follows"
+          onPress={() => router.push("/science")}
         />
       </Group>
     </MenuPage>

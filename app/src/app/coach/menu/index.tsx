@@ -2,6 +2,7 @@
 // settings and privacy, help, then sign out.
 import { router } from "expo-router";
 import {
+  BookOpen,
   ChevronRight,
   CircleHelp,
   CreditCard,
@@ -20,6 +21,7 @@ import { Group, GroupRow, Page, PageHeader } from "@/features/coach/parts";
 import { colors, radius, space } from "@/theme";
 
 type Href =
+  | "/science"
   | "/coach/transformations"
   | "/coach/menu/profile"
   | "/coach/menu/billing"
@@ -49,6 +51,12 @@ const ITEMS: { icon: LucideIcon; label: string; sub: string; href: Href }[] = [
     label: "Settings and privacy",
     sub: "Notifications, data and your account",
     href: "/coach/menu/settings",
+  },
+  {
+    icon: BookOpen,
+    label: "The science behind Arcwell",
+    sub: "Research behind the volume checks and targets",
+    href: "/science",
   },
   {
     icon: CircleHelp,

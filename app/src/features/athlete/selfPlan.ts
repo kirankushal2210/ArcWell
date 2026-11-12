@@ -11,6 +11,14 @@ import {
 import type { Client } from "@/features/coach/sampleData";
 import type { Answers } from "@/features/onboarding/OnboardingContext";
 import { buildPlan } from "@/features/onboarding/plan";
+import {
+  balanceVolume,
+  PROGRESSION,
+  proteinTarget,
+  restFor,
+  rirFor,
+  weeklyMin,
+} from "@/features/science/rules";
 
 const GOAL: Record<string, string> = {
   lose_fat: "Lose fat",
@@ -64,13 +72,25 @@ export function selfPlan(a: Answers): SelfPlan {
         name: e.name,
         sets: e.sets,
         reps: e.reps,
-        restSec: 90,
+        restSec: restFor(e.name),
       })),
     })),
   };
+  // Evidence pass (D69): weekly sets per muscle into range, effort and rest by the rules.
+  const experience = (a.experience as string | undefined) ?? "some";
+  program.days = balanceVolume(program.days, {
+    min: weeklyMin(goalKey, experience),
+    minutes: parseInt(String(a.sessionLength ?? "45"), 10),
+  }).map((d) => ({
+    ...d,
+    note: `Leave ${rirFor(experience, true)} reps in reserve on big lifts and ${rirFor(experience, false)} on the rest. ${PROGRESSION}`,
+  }));
 
-  const protein =
-    Math.round((weight * (goalKey === "lose_fat" ? 2 : 1.8)) / 5) * 5;
+  const protein = proteinTarget(
+    weight,
+    typeof a.heightCm === "number" ? a.heightCm : 172,
+    goalKey,
+  ).grams;
   const fat = Math.round((p.kcal * 0.27) / 9 / 5) * 5;
   const carbs = Math.max(
     0,

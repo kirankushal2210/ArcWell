@@ -2,7 +2,14 @@
 // part of the functional layer (D67), in its solid form so what's behind never bleeds into the
 // content. Tap outside to close.
 import type { ReactNode } from "react";
-import { Modal, Pressable, StyleSheet, View } from "react-native";
+import {
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { GlassSurface } from "@/components/GlassSurface";
@@ -23,6 +30,7 @@ export function Sheet({
   children: ReactNode;
 }) {
   const insets = useSafeAreaInsets();
+  const { height } = useWindowDimensions();
   return (
     <Modal
       visible={visible}
@@ -48,8 +56,17 @@ export function Sheet({
             {title}
           </Text>
         ) : null}
-        {sub ? <Text tone="muted">{sub}</Text> : null}
-        {children}
+        {/* Tall content scrolls inside the sheet instead of running off the screen. */}
+        <ScrollView
+          style={{ maxHeight: height * 0.75 }}
+          contentContainerStyle={styles.body}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+        >
+          {sub ? <Text tone="muted">{sub}</Text> : null}
+          {children}
+        </ScrollView>
       </GlassSurface>
     </Modal>
   );
@@ -86,6 +103,7 @@ export function SheetRow({
 }
 
 const styles = StyleSheet.create({
+  body: { gap: space[2] },
   scrim: { flex: 1, backgroundColor: colors.scrim },
   sheet: {
     gap: space[2],

@@ -50,7 +50,7 @@ After this, every phase starts by designing its screens with these components be
 The front end is finished on sample data before any backend wiring (Phases 1–8 below then connect these screens to Supabase). Audit on 2026-11-13: about 160 of the 199 inventory screens built. Remaining work, in order:
 
 - [x] **FE-1 Coached loop:** Progress area (Check-ins · Progress · Chat, CP-01 to CP-06), image viewer (X-05), coach completes or closes → athlete moves to Free (K-29, K-30), switch-coach invite (F3-03), client limit and coach full (K-25, K-26), coach billing lapsed (K-27)
-- [ ] **FE-2 Science foundation (D69):** one evidence rules module that every screen, template, generator and later the AI follows:
+- [x] **FE-2 Science foundation (D69):** one evidence rules module that every screen, template, generator and later the AI follows:
   - training: weekly hard sets per muscle within the researched range (no junk volume), sets taken close to failure (0–3 reps in reserve), rep ranges by goal, rest periods, training frequency, progression, deloads;
   - nutrition: energy and protein targets (protein from goal or lean weight for higher body fat), rate of loss or gain, fibre and hydration;
   - recovery: sleep need, and when to pull back training after a poor night;

@@ -32,6 +32,7 @@ import { AthleteDock, AthletePage, NotJoined } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Bars, PageHeader, Pills } from "@/features/coach/parts";
 import { colors, radius, space } from "@/theme";
+import { WhyThis } from "@/features/science/WhyThis";
 
 function Bar({ value, target }: { value: number; target: number }) {
   const pct = target > 0 ? Math.min(1, value / target) : 0;
@@ -90,6 +91,25 @@ function DayPage({
               {Math.round(eaten.kcal).toLocaleString("en-IN")} eaten · target{" "}
               {target.toLocaleString("en-IN")}
             </Text>
+            <WhyThis
+              title="How your targets are set"
+              label="How targets are set"
+              points={[
+                "Calories start from your resting energy (the Mifflin–St Jeor equation) times your activity, then a small change for your goal.",
+                "Fat loss is kept to about 0.5–1% of your bodyweight a week. Slower loss kept more muscle in athletes.",
+                "Protein is about 1.8 g per kg a day, or 2.0 g while losing fat. Muscle gains level off around 1.6 g on average, and up to about 2.2 g may help those wanting the most.",
+                "With a higher body fat, Arcwell works protein out from a healthy reference weight so the target isn't inflated. That's our choice, not a research finding.",
+                "Aim for at least 25 g of fibre a day, and about 2 to 2.5 litres of water in total from drinks and food.",
+              ]}
+              sources={[
+                "mifflin1990",
+                "helms2014",
+                "morton2018",
+                "jager2017",
+                "efsa2010fibre",
+                "efsa2010water",
+              ]}
+            />
           </>
         ) : (
           <>

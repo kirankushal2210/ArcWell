@@ -9,6 +9,7 @@ import { Button, PressableScale, Text } from "@/components/primitives";
 import { colors, radius, space } from "@/theme";
 
 import { Sheet } from "./Sheet";
+import { platesText } from "@/features/science/strength";
 
 export type KeypadField = "kg" | "reps" | "seconds" | "minutes" | "km" | "m";
 
@@ -40,7 +41,10 @@ export function Keypad({
   onDone,
   onNext,
   onClose,
+  barbell = false,
 }: {
+  /** Barbell exercise: show the plates for each side under a kg value. */
+  barbell?: boolean;
   visible: boolean;
   title: string;
   field: KeypadField;
@@ -87,6 +91,17 @@ export function Keypad({
           {UNIT[field]}
         </Text>
       </View>
+      {barbell && field === "kg" && parsed ? (
+        <Text
+          variant="label"
+          weight="regular"
+          tone="muted"
+          style={styles.plates}
+          numeric
+        >
+          {platesText(parsed)}
+        </Text>
+      ) : null}
       <View style={styles.steps}>
         {STEPS[field].map((d) => (
           <PressableScale
@@ -158,6 +173,7 @@ export function Keypad({
 }
 
 const styles = StyleSheet.create({
+  plates: { textAlign: "center" },
   flex: { flex: 1 },
   display: {
     flexDirection: "row",

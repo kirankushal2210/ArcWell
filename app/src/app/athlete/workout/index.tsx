@@ -32,6 +32,7 @@ import { ExercisePicker } from "@/features/athlete/ExercisePicker";
 import {
   type ExerciseType,
   fieldHead,
+  findExercise,
   LIBRARY,
   type SetField,
   typeOf,
@@ -1033,6 +1034,7 @@ export default function Workout() {
       {pad && padEx && padSet ? (
         <Keypad
           key={`${pad.setId}-${pad.field}`}
+          barbell={findExercise(padEx.name)?.equipment === "barbell"}
           visible
           title={`${padEx.name} · ${padSet.warmup ? "warm-up" : `set ${padEx.sets.filter((x) => !x.warmup).indexOf(padSet) + 1}`}`}
           field={pad.field}
