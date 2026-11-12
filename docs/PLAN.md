@@ -14,6 +14,7 @@ Rough estimates assume two builders using AI tools heavily. Total ≈ 18–24 we
 - [ ] Coach Terms legal review (coaches handle client health data under DPDP)
 - [ ] Groq data terms: confirm the AI photo-deletion wording in F8-03
 - [ ] Standard gram weights for Indian portions (katori, phulka, piece), checked by a nutrition reviewer
+- [ ] Review of the FE-2 evidence rules and Sources screen by a qualified sports scientist and a registered dietitian (D69)
 - [ ] Invite-link domain and web page (link preview + redirect)
 - [ ] Play Console prices for Arcwell Plus (monthly, yearly) and trial setup
 - [ ] Sleep-score formula (from hours and quality, no wearables)
@@ -49,10 +50,24 @@ After this, every phase starts by designing its screens with these components be
 The front end is finished on sample data before any backend wiring (Phases 1–8 below then connect these screens to Supabase). Audit on 2026-11-13: about 160 of the 199 inventory screens built. Remaining work, in order:
 
 - [x] **FE-1 Coached loop:** Progress area (Check-ins · Progress · Chat, CP-01 to CP-06), image viewer (X-05), coach completes or closes → athlete moves to Free (K-29, K-30), switch-coach invite (F3-03), client limit and coach full (K-25, K-26), coach billing lapsed (K-27)
-- [ ] **FE-2 Training depth:** Programs (TR-04, TR-05), Muscle Analytics (TR-06, TR-07), estimated 1RM and strength charts, plate calculator, coach exercise library (K-23), free starter workouts (TR-01)
-- [ ] **FE-3 Money and AI states:** subscription details, payment problem, subscription ended (F8-06 to F8-08), trial timeline and reminders (F8-02, TL-01, TL-02), upgrade what changed (U-01), AI off, out of scope, daily limit, failure (AI-02, AI-04, X-01, X-02), photo food logging with mock results (F5-09 to F5-11)
-- [ ] **FE-4 Extras:** water tracking, reminders, coach message to several clients, Gyms (G-01, G-02), first-run tips
-- [ ] **FE-5 System and QA:** loading, error, offline, permission denied, force update, maintenance, notification pre-ask (S-01 to S-06, X-07, F4-09, F7-03), PDF attach and viewer UI (F7-02, X-06), then the full QA walk (Phase 14 of the frontend execution prompt)
+- [ ] **FE-2 Science foundation (D69):** one evidence rules module that every screen, template, generator and later the AI follows:
+  - training: weekly hard sets per muscle within the researched range (no junk volume), sets taken close to failure (0–3 reps in reserve), rep ranges by goal, rest periods, training frequency, progression, deloads;
+  - nutrition: energy and protein targets (protein from goal or lean weight for higher body fat), rate of loss or gain, fibre and hydration;
+  - recovery: sleep need, and when to pull back training after a poor night;
+  - audit and fix existing content: the onboarding plan generator, starter and coach templates, the coach plan builder (live volume warnings), the exercise library cues;
+  - "Why this?" explainers on targets and plans, and a Sources screen listing each paper (author, year, journal, DOI), every source checked on PubMed before it ships;
+  - review by a qualified sports scientist and dietitian before launch (added to the pre-build blockers).
+- [ ] **FE-3 Training depth:** Programs (TR-04, TR-05), Muscle Analytics with weekly sets against the FE-2 ranges (TR-06, TR-07), estimated 1RM and strength charts, plate calculator, coach exercise library (K-23), free starter workouts (TR-01)
+- [ ] **FE-4 Money states:** subscription details, payment problem, subscription ended (F8-06 to F8-08), trial timeline and reminders (F8-02, TL-01, TL-02), upgrade what changed (U-01)
+- [ ] **FE-5 Extras:** water tracking, reminders, coach message to several clients, Gyms (G-01, G-02), first-run tips
+- [ ] **FE-6 AI, front end only (D70):** no models, no APIs, no AI code. Screens run on sample responses and the FE-2 rules, clearly marked as sample. Pro athletes only; coached athletes never see AI (D44).
+  - AI plan builder: build, review and accept a training plan; tailor it ("30 minutes today", "my knee hurts", "no barbell").
+  - Nutrition assistant: meal plan generation and swaps, fit a meal into the day, eating out, Indian dishes; photo food logging with mock results (F5-09 to F5-11).
+  - Recovery-aware day: after a poor night (for example 4 hours' sleep before a hard session) a suggestion on Today to cut that day's volume, with the reason. Nothing changes unless the athlete accepts; accepting tailors that day's workout only.
+  - Weekly AI review of training, food and recovery; every suggestion shows why, and links to its FE-2 source.
+  - AI states: AI off, out of scope, daily limit, couldn't build a plan (AI-02, AI-04, X-01, X-02).
+  - Coached athletes: no AI; their coach sees a plain low-recovery flag on the client profile and decides.
+- [ ] **FE-7 System states and full QA loop:** loading, error, offline, permission denied, force update, maintenance, notification pre-ask (S-01 to S-06, X-07, F4-09, F7-03), PDF attach and viewer UI (F7-02, X-06), then a full walk of every screen as free, Pro, coached and coach, fixing what's found, until nothing is left (Phase 14 of the frontend execution prompt)
 
 ## Phase 1 — Foundations (2–3 weeks)
 
