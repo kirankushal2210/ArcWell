@@ -9,11 +9,18 @@ import {
   Dumbbell,
   Ellipsis,
   MessageCircle,
+  Send,
 } from "lucide-react-native";
 import { useState } from "react";
 import { Alert, StyleSheet, TextInput, View } from "react-native";
 
 import { Avatar, Button, StatusChip, Text } from "@/components/primitives";
+import {
+  dateKey,
+  type FoodLog,
+  shiftDate,
+  slotLabel,
+} from "@/features/athlete/foods";
 import { useCoachData } from "@/features/coach/CoachData";
 import {
   Bars,
@@ -28,6 +35,7 @@ import {
   StatTile,
   WeightChart,
 } from "@/features/coach/parts";
+import { PlanRows, plansReady } from "@/features/coach/PlanRows";
 import type { Client } from "@/features/coach/sampleData";
 import { colors, fontFamilyFor, radius, space, textSizes } from "@/theme";
 
@@ -94,18 +102,26 @@ export default function ClientProfile() {
       <PageHeader
         title={c.name}
         onBack={back}
-        actions={[
-          {
-            icon: MessageCircle,
-            label: "Message",
-            onPress: () =>
-              router.push({
-                pathname: "/coach/chat/[id]",
-                params: { id: c.id },
-              }),
-          },
-          { icon: Ellipsis, label: "Change status", onPress: changeStatus },
-        ]}
+        actions={
+          c.pending
+            ? []
+            : [
+                {
+                  icon: MessageCircle,
+                  label: "Message",
+                  onPress: () =>
+                    router.push({
+                      pathname: "/coach/chat/[id]",
+                      params: { id: c.id },
+                    }),
+                },
+                {
+                  icon: Ellipsis,
+                  label: "Change status",
+                  onPress: changeStatus,
+                },
+              ]
+        }
       />
       <Page>
         <View style={styles.hero}>
@@ -113,15 +129,21 @@ export default function ClientProfile() {
           <View style={styles.flex}>
             <Text weight="semibold">{c.goal}</Text>
             <Text variant="label" weight="regular" tone="muted">
-              {c.isNew
-                ? `Joined ${c.joined} with your link`
-                : `${c.weeksWithYou} weeks with you · check-in ${c.checkInDay}`}
+              {c.pending
+                ? c.invite
+                  ? `Invite sent · waiting for them to join`
+                  : `Added by you · not invited yet`
+                : c.isNew
+                  ? `Joined ${c.joined} with your link`
+                  : `${c.weeksWithYou ? `${c.weeksWithYou} weeks with you` : `Joined ${c.joined}`} · check-in ${c.checkInDay}`}
             </Text>
           </View>
-          <StatusChip status={c.status} />
+          {c.pending ? null : <StatusChip status={c.status} />}
         </View>
 
-        {c.isNew ? (
+        {c.pending ? (
+          <SetUpPlans c={c} />
+        ) : c.isNew ? (
           <NewClient c={c} />
         ) : (
           <>
@@ -141,6 +163,48 @@ export default function ClientProfile() {
         )}
       </Page>
     </View>
+  );
+}
+
+// ---------- Added after a call: build the three plans, then invite (D56) ----------
+
+function SetUpPlans({ c }: { c: Client }) {
+  const first = c.name.split(" ")[0];
+  const ready = plansReady(c);
+  const open = () =>
+    router.push({ pathname: "/coach/invite/[id]", params: { id: c.id } });
+  return (
+    <>
+      <Text tone="muted">
+        Build {first}&apos;s training, nutrition and recovery, then send one
+        invite. When {first} joins, everything is already in their app and they
+        skip the onboarding questions.
+      </Text>
+      <Eyebrow>Plans</Eyebrow>
+      <PlanRows c={c} />
+      <Button
+        label={c.invite ? "View invite" : "Create invite"}
+        icon={Send}
+        fullWidth
+        disabled={!ready}
+        onPress={open}
+      />
+      {!ready ? (
+        <Text variant="caption" tone="muted">
+          All three need a plan before you can invite {first}.
+        </Text>
+      ) : null}
+      <Eyebrow>From your call</Eyebrow>
+      <KeyValues rows={c.answers} />
+      {c.notes ? (
+        <View style={styles.card}>
+          <Text variant="label" tone="muted">
+            Your notes
+          </Text>
+          <Text>{c.notes}</Text>
+        </View>
+      ) : null}
+    </>
   );
 }
 
@@ -217,11 +281,40 @@ function NewClient({ c }: { c: Client }) {
   );
 }
 
+// ---------- Nutrition from the client's own food logs (F5) ----------
+
+const todayStr = () => dateKey(new Date());
+
+/** The last 7 days from the client's logs, or the sample week when they haven't logged yet. */
+function useNutritionWeek(c: Client) {
+  const { foodLogs } = useCoachData();
+  const logs = foodLogs(c.id);
+  const target = c.nutritionPlan?.kcal ?? c.nutrition.targetKcal;
+  const protein = c.nutritionPlan?.protein ?? c.nutrition.proteinG;
+  if (!logs.length) return { days: c.nutrition.days, target, protein, logs };
+  const today = todayStr();
+  const days = Array.from({ length: 7 }, (_, i) => {
+    const d = shiftDate(today, i - 6);
+    const ls = logs.filter((l) => l.date === d);
+    const [y, m, dd] = d.split("-").map(Number);
+    return {
+      day: new Date(y, m - 1, dd).toLocaleDateString("en-IN", {
+        weekday: "short",
+      }),
+      kcal: Math.round(ls.reduce((n, l) => n + l.macros.kcal, 0)),
+      protein: Math.round(ls.reduce((n, l) => n + l.macros.p, 0)),
+      date: d,
+    };
+  }).filter((d) => d.kcal > 0);
+  return { days, target, protein, logs };
+}
+
 // ---------- Overview ----------
 
 function Overview({ c, go }: { c: Client; go: (s: Section) => void }) {
   const change = c.weights[c.weights.length - 1] - c.weights[0];
-  const kcal = avg(c.nutrition.days.map((d) => d.kcal));
+  const week = useNutritionWeek(c);
+  const kcal = avg(week.days.map((d) => d.kcal));
   const sleep = avg(c.recovery.nights.map((n) => n.hours));
   const lastCheckIn = c.checkIns[0];
   return (
@@ -280,7 +373,7 @@ function Overview({ c, go }: { c: Client; go: (s: Section) => void }) {
           <PillarDot pillar="nutrition" />
           <Text style={styles.flex}>Average calories</Text>
           <Text weight="semibold" numeric>
-            {kcal ? `${fmt(kcal)} / ${fmt(c.nutrition.targetKcal)}` : "—"}
+            {kcal ? `${fmt(kcal)} / ${fmt(week.target)}` : "—"}
           </Text>
           <ChevronRight size={18} color={colors.textMuted} />
         </GroupRow>
@@ -306,18 +399,11 @@ function Overview({ c, go }: { c: Client; go: (s: Section) => void }) {
         </GroupRow>
       </Group>
 
-      {c.plan ? (
-        <>
-          <Eyebrow>Plan</Eyebrow>
-          <KeyValues
-            rows={[
-              ["Training", c.plan.training],
-              ["Meals", c.plan.meals],
-              ["Sleep target", `${c.recovery.sleepTargetH} h`],
-            ]}
-          />
-        </>
-      ) : null}
+      <Eyebrow>Plans · tap to edit</Eyebrow>
+      <PlanRows c={c} />
+      <Text variant="caption" tone="muted">
+        Changes show in {c.name.split(" ")[0]}&apos;s app straight away.
+      </Text>
     </>
   );
 }
@@ -325,7 +411,19 @@ function Overview({ c, go }: { c: Client; go: (s: Section) => void }) {
 // ---------- Training ----------
 
 function Training({ c }: { c: Client }) {
+  const { sessions } = useCoachData();
   const { weekDone, weekPlanned, logs } = c.training;
+  // F4-06, F4-07: what changed on the day, so the coach knows why a session differs from the plan.
+  const changes = sessions(c.id)
+    .map((s) => ({
+      s,
+      lines: s.exercises.flatMap((e) => [
+        ...(e.swappedFrom ? [`Swapped ${e.swappedFrom} for ${e.name}`] : []),
+        ...(e.skipped ? [`Skipped ${e.name}`] : []),
+        ...(e.note ? [`${e.name}: “${e.note}”`] : []),
+      ]),
+    }))
+    .filter((x) => x.lines.length || x.s.note);
   if (!logs.length)
     return (
       <Text tone="muted">
@@ -344,18 +442,20 @@ function Training({ c }: { c: Client }) {
         <StatTile label="Sets" value={String(volume)} sub="this week" />
         <StatTile
           label="Avg session"
-          value={`${Math.round(avg(logs.filter((l) => !l.missed).map((l) => l.minutes)))} min`}
+          value={`${Math.round(avg(logs.filter((l) => !l.missed && l.minutes > 0).map((l) => l.minutes)))} min`}
         />
       </View>
       <Eyebrow>{c.plan?.training ?? "Workouts"}</Eyebrow>
       <Group>
         {logs.map((l, i) => (
-          <GroupRow key={l.date} first={i === 0}>
+          <GroupRow key={`${l.date}-${i}`} first={i === 0}>
             <View style={styles.flex}>
               <Text weight="medium">{l.name}</Text>
               <Text variant="label" weight="regular" tone="muted" numeric>
                 {l.date}
-                {l.missed ? "" : ` · ${l.sets} sets · ${l.minutes} min`}
+                {l.missed
+                  ? ""
+                  : ` · ${l.sets} sets${l.minutes ? ` · ${l.minutes} min` : ""}`}
               </Text>
             </View>
             <Text
@@ -368,6 +468,42 @@ function Training({ c }: { c: Client }) {
           </GroupRow>
         ))}
       </Group>
+      {changes.length ? (
+        <>
+          <Eyebrow>Changes and notes from workouts</Eyebrow>
+          <Group>
+            {changes.map(({ s, lines }, k) => (
+              <GroupRow key={s.id} first={k === 0}>
+                <View style={styles.flex}>
+                  <Text weight="medium">
+                    {s.name} ·{" "}
+                    {new Date(s.at).toLocaleDateString("en-IN", {
+                      weekday: "short",
+                      day: "numeric",
+                      month: "short",
+                    })}
+                  </Text>
+                  {lines.map((line) => (
+                    <Text
+                      key={line}
+                      variant="label"
+                      weight="regular"
+                      tone="muted"
+                    >
+                      {line}
+                    </Text>
+                  ))}
+                  {s.note ? (
+                    <Text variant="label" weight="regular" tone="muted">
+                      Session note: “{s.note}”
+                    </Text>
+                  ) : null}
+                </View>
+              </GroupRow>
+            ))}
+          </Group>
+        </>
+      ) : null}
     </>
   );
 }
@@ -375,8 +511,28 @@ function Training({ c }: { c: Client }) {
 // ---------- Nutrition ----------
 
 function Nutrition({ c }: { c: Client }) {
-  const { days, targetKcal, proteinG } = c.nutrition;
+  const {
+    days,
+    target: targetKcal,
+    protein: proteinG,
+    logs,
+  } = useNutritionWeek(c);
   if (!days.length) return <Text tone="muted">No food logged this week.</Text>;
+  const since = shiftDate(todayStr(), -6);
+  const week = logs.filter((l) => l.date >= since);
+  const planMeals = c.nutritionPlan?.meals.filter((m) => m.items?.length) ?? [];
+  const followed = new Set(
+    week.filter((l) => l.fromPlan).map((l) => `${l.date}:${l.fromPlan}`),
+  ).size;
+  const swaps = new Map<string, FoodLog[]>();
+  for (const l of week.filter((x) => x.swappedFor)) {
+    const k = `${l.date}:${l.swappedFor}`;
+    swaps.set(k, [...(swaps.get(k) ?? []), l]);
+  }
+  const loggedDays = new Set(week.map((l) => l.date)).size;
+  const own = Array.from(
+    new Set(week.filter((l) => l.source === "mine").map((l) => l.name)),
+  );
   const onTarget = days.filter(
     (d) => Math.abs(d.kcal - targetKcal) <= targetKcal * 0.1,
   ).length;
@@ -406,6 +562,38 @@ function Nutrition({ c }: { c: Client }) {
           Dashed line is the target. Grey bars are more than 10% under it.
         </Text>
       </View>
+      {week.length && planMeals.length ? (
+        <View style={styles.card}>
+          <Text weight="semibold" numeric>
+            Meal plan: {followed} of {planMeals.length * loggedDays} planned
+            meals eaten as planned
+          </Text>
+          {swaps.size ? (
+            Array.from(swaps.entries()).map(([k, ls]) => {
+              const [d, mealId] = k.split(":");
+              const meal = planMeals.find((m) => m.id === mealId);
+              return (
+                <Text key={k} variant="label" weight="regular" tone="muted">
+                  {new Date(d).toLocaleDateString("en-IN", {
+                    weekday: "short",
+                  })}{" "}
+                  {meal?.name ?? slotLabel(ls[0].meal)}: ate{" "}
+                  {ls.map((l) => l.name).join(", ")} instead
+                </Text>
+              );
+            })
+          ) : (
+            <Text variant="label" weight="regular" tone="muted">
+              No swaps this week.
+            </Text>
+          )}
+          {own.length ? (
+            <Text variant="label" weight="regular" tone="muted">
+              Their own foods: {own.join(", ")}
+            </Text>
+          ) : null}
+        </View>
+      ) : null}
       {c.plan ? <KeyValues rows={[["Meal plan", c.plan.meals]]} /> : null}
     </>
   );

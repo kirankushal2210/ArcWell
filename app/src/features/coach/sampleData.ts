@@ -3,6 +3,13 @@
 // real queries can replace it later without changing the screens.
 import type { ClientStatus } from "@/components/primitives";
 
+import type {
+  NutritionPlan,
+  RecoveryProtocol,
+  TrainingDay,
+  TrainingProgram,
+} from "./plans";
+
 export type WorkoutLog = {
   date: string;
   name: string;
@@ -64,6 +71,28 @@ export type Client = {
   messages: Message[];
   unread: number;
   notes: string;
+  /** Added by the coach after a call and not joined yet (D56). */
+  pending?: boolean;
+  phone?: string;
+  /** Details the coach entered, used for suggested targets and shown for the client to confirm. */
+  basics?: {
+    sex: "female" | "male" | "unsaid";
+    age: number;
+    heightCm: number;
+    weightKg: number;
+    diet: string;
+    injuries: string;
+  };
+  program?: TrainingProgram;
+  nutritionPlan?: NutritionPlan;
+  protocol?: RecoveryProtocol;
+  invite?: { token: string; code: string; claimed: boolean };
+  /** Self-guided athletes: the onboarding answers that shape swaps (equipment, home kit, injuries). */
+  profile?: { equipment?: string; homeKit?: string[]; injuries?: string[] };
+  /** When the current training program started, for "Week 3 of 8" (ISO date). */
+  programStart?: string;
+  /** The athlete's own routines, outside the program: extra sessions they plan themselves. */
+  routines?: TrainingDay[];
 };
 
 export type Template = {

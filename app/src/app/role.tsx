@@ -138,10 +138,17 @@ export default function RoleScreen() {
           ))}
         </View>
       </View>
+      <PressableScale
+        onPress={() => router.push("/join")}
+        accessibilityRole="button"
+        style={styles.invite}
+      >
+        <Text variant="label">Have an invite code from your coach?</Text>
+      </PressableScale>
       <View style={styles.note}>
         <Info size={16} strokeWidth={1.75} color={colors.textMuted} />
         <Text variant="caption" tone="muted">
-          One role per account. Invited by a coach? Open their link.
+          One role per account. Your coach&apos;s invite sets up your plan.
         </Text>
       </View>
       <NextButton label="Continue" disabled={role === null} onPress={go} />
@@ -193,6 +200,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   radioOn: { backgroundColor: colors.onBrand, borderColor: colors.onBrand },
+  invite: {
+    alignSelf: "center",
+    paddingVertical: space[3],
+    paddingHorizontal: space[4],
+  },
   note: {
     flexDirection: "row",
     alignItems: "center",

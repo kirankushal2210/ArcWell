@@ -36,12 +36,12 @@ type Exercise = { name: string; pattern: Pattern; kit: Kit[]; loads: Area[] };
 // Each exercise lists every equipment option that can do it; "bodyweight" means nothing is needed.
 const LIBRARY: Exercise[] = [
   {
-    name: "Back squat",
+    name: "Squat (barbell)",
     pattern: "squat",
     kit: ["gym"],
     loads: ["Knee", "Lower back", "Hip"],
   },
-  { name: "Leg press", pattern: "squat", kit: ["gym"], loads: ["Knee"] },
+  { name: "Leg press (machine)", pattern: "squat", kit: ["gym"], loads: ["Knee"] },
   {
     name: "Goblet squat",
     pattern: "squat",
@@ -49,20 +49,20 @@ const LIBRARY: Exercise[] = [
     loads: ["Knee"],
   },
   {
-    name: "Box squat",
+    name: "Squat (bodyweight)",
     pattern: "squat",
     kit: ["bench", "bodyweight"],
     loads: ["Knee"],
   },
   { name: "Glute bridge", pattern: "hinge", kit: ["bodyweight"], loads: [] },
   {
-    name: "Romanian deadlift",
+    name: "Romanian deadlift (barbell)",
     pattern: "hinge",
     kit: ["gym", "dumbbells", "kettlebell"],
     loads: ["Lower back"],
   },
   {
-    name: "Hip thrust",
+    name: "Hip thrust (barbell)",
     pattern: "hinge",
     kit: ["gym", "bench"],
     loads: ["Hip"],
@@ -80,75 +80,75 @@ const LIBRARY: Exercise[] = [
     loads: ["Knee", "Ankle"],
   },
   {
-    name: "Step-up",
+    name: "Step up",
     pattern: "lunge",
     kit: ["bench", "gym"],
     loads: ["Knee", "Ankle"],
   },
-  { name: "Leg curl", pattern: "lunge", kit: ["gym"], loads: [] },
+  { name: "Lying leg curl (machine)", pattern: "lunge", kit: ["gym"], loads: [] },
   {
-    name: "Bench press",
+    name: "Bench press (barbell)",
     pattern: "push_h",
     kit: ["gym"],
     loads: ["Shoulder", "Wrist / elbow"],
   },
   {
-    name: "Dumbbell bench press",
+    name: "Bench press (dumbbell)",
     pattern: "push_h",
     kit: ["dumbbells"],
     loads: ["Shoulder", "Wrist / elbow"],
   },
   {
-    name: "Push-up",
+    name: "Push up",
     pattern: "push_h",
     kit: ["bodyweight"],
     loads: ["Shoulder", "Wrist / elbow"],
   },
   {
-    name: "Band chest press",
+    name: "Chest press (band)",
     pattern: "push_h",
     kit: ["bands"],
     loads: ["Shoulder"],
   },
   {
-    name: "Overhead press",
+    name: "Overhead press (barbell)",
     pattern: "push_v",
     kit: ["gym", "dumbbells", "kettlebell"],
     loads: ["Shoulder", "Lower back", "Neck"],
   },
   {
-    name: "Pike push-up",
+    name: "Pike pushup",
     pattern: "push_v",
     kit: ["bodyweight"],
     loads: ["Shoulder", "Wrist / elbow", "Neck"],
   },
-  { name: "Seated cable row", pattern: "pull_h", kit: ["gym"], loads: [] },
+  { name: "Seated cable row - bar grip", pattern: "pull_h", kit: ["gym"], loads: [] },
   {
-    name: "One-arm dumbbell row",
+    name: "Dumbbell row",
     pattern: "pull_h",
     kit: ["dumbbells", "kettlebell"],
     loads: ["Lower back"],
   },
-  { name: "Band row", pattern: "pull_h", kit: ["bands"], loads: [] },
+  { name: "Bent over row (band)", pattern: "pull_h", kit: ["bands"], loads: [] },
   {
-    name: "Table row",
+    name: "Inverted row",
     pattern: "pull_h",
     kit: ["bodyweight"],
     loads: ["Wrist / elbow"],
   },
   {
-    name: "Lat pulldown",
+    name: "Lat pulldown (cable)",
     pattern: "pull_v",
     kit: ["gym"],
     loads: ["Shoulder"],
   },
   {
-    name: "Pull-up",
+    name: "Pull up",
     pattern: "pull_v",
     kit: ["pullup"],
     loads: ["Shoulder", "Wrist / elbow"],
   },
-  { name: "Band pulldown", pattern: "pull_v", kit: ["bands"], loads: [] },
+  { name: "Lat pulldown (band)", pattern: "pull_v", kit: ["bands"], loads: [] },
   {
     name: "Plank",
     pattern: "core",
@@ -163,19 +163,19 @@ const LIBRARY: Exercise[] = [
     loads: ["Shoulder", "Wrist / elbow"],
   },
   {
-    name: "Dumbbell curl",
+    name: "Bicep curl (dumbbell)",
     pattern: "arms",
     kit: ["dumbbells", "gym"],
     loads: ["Wrist / elbow"],
   },
   {
-    name: "Band triceps pushdown",
+    name: "Triceps pushdown (band)",
     pattern: "arms",
     kit: ["bands", "gym"],
     loads: ["Wrist / elbow"],
   },
   {
-    name: "Calf raise",
+    name: "Standing calf raise",
     pattern: "calves",
     kit: ["bodyweight", "gym"],
     loads: ["Ankle"],
@@ -348,10 +348,8 @@ function prescription(
   }
 }
 
-export function buildWorkouts(a: Answers): Workout[] {
-  const days = Number(a.daysPerWeek ?? 4);
-  const minutes = parseInt(String(a.sessionLength ?? "45"), 10);
-  const count = minutes <= 30 ? 4 : minutes <= 45 ? 6 : minutes <= 60 ? 7 : 8;
+/** Exercises the athlete has the equipment for and that don't load an injured area. */
+function usableFor(a: Answers) {
   const injuries = ((a.injuries as string[] | undefined) ?? []).filter(
     (x) => x !== "None" && x !== "Other",
   ) as Area[];
@@ -366,11 +364,30 @@ export function buildWorkouts(a: Answers): Workout[] {
       (k) => KIT_FROM_ANSWER[k] && have.add(KIT_FROM_ANSWER[k]),
     );
 
-  const usable = LIBRARY.filter(
+  return LIBRARY.filter(
     (e) =>
       e.kit.some((k) => have.has(k)) &&
       !e.loads.some((area) => injuries.includes(area)),
   );
+}
+
+/**
+ * Swap alternatives (F4-07): the same movement pattern, using equipment the athlete has and nothing
+ * that loads an injured area. Null when the exercise isn't in this library.
+ */
+export function alternativesFor(name: string, a: Answers): string[] | null {
+  const ex = LIBRARY.find((e) => e.name === name);
+  if (!ex) return null;
+  return usableFor(a)
+    .filter((e) => e.pattern === ex.pattern && e.name !== name)
+    .map((e) => e.name);
+}
+
+export function buildWorkouts(a: Answers): Workout[] {
+  const days = Number(a.daysPerWeek ?? 4);
+  const minutes = parseInt(String(a.sessionLength ?? "45"), 10);
+  const count = minutes <= 30 ? 4 : minutes <= 45 ? 6 : minutes <= 60 ? 7 : 8;
+  const usable = usableFor(a);
   const { sets, reps, main } = prescription(
     (a.goal as string) ?? "general_fitness",
     (a.experience as string) ?? "some",

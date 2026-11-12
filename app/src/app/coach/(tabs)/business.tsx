@@ -1,5 +1,6 @@
 // Business tab (K-10, K-14): invite link and client spots, then leads.
 import * as Clipboard from "expo-clipboard";
+import { router } from "expo-router";
 import { Copy, Share2 } from "lucide-react-native";
 import { useState } from "react";
 import { Share, StyleSheet, View } from "react-native";
@@ -70,6 +71,13 @@ export default function BusinessTab() {
             />
           </View>
         </View>
+
+        <Button
+          label="Preview your link as a new client"
+          variant="ghost"
+          fullWidth
+          onPress={() => router.push("/join/coach")}
+        />
 
         <Eyebrow>Leads</Eyebrow>
         <Group>

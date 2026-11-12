@@ -14,11 +14,13 @@ flowchart TD
   Consent --> AOnb[Athlete onboarding] --> Tier{Tier}
   Consent --> COnb[Coach onboarding] --> CShell[Coach tabs]
   Auth -- Yes --> Tier
-  Tier -- Free --> FBar[Today · Training · Nutrition]
-  Tier -- AI-coached --> ABar[Today · Training · Nutrition · Recovery · AI Coaching]
+  Tier -- Free --> FBar[Today · Training · Nutrition · Recovery locked + AI button]
+  Tier -- AI-coached --> ABar[Today · Training · Nutrition · Recovery + AI button]
   Tier -- Human-coached --> HBar[Today · Training · Nutrition · Recovery · Progress]
   FBar & ABar & HBar --> Menu[☰ Side menu]
 ```
+
+**D57 (self-guided athletes):** sign-up moves after the plan. Welcome → I'm training → onboarding questions → plan ready → save your plan (sign up + consent) → AI plan paywall (or Continue free) → app. Coaches and invited clients still sign up first.
 
 ## 1. Entry and account (shared)
 
@@ -44,8 +46,8 @@ Onboarding v2 (D52): five sections on one progress bar. Screen IDs AO-xx (wirefr
 
 | Tier | Bottom bar |
 |---|---|
-| Free | Today · Training · Nutrition |
-| AI-coached (Pro) | Today · Training · Nutrition · Recovery · AI Coaching |
+| Free | Today · Training · Nutrition · Recovery (locked) + AI button (opens the trial offer) (D57) |
+| AI-coached (Pro) | Today · Training · Nutrition · Recovery + floating AI button (D57, replaces the AI Coaching tab of D2) |
 | Human-coached (Pro) | Today · Training · Nutrition · Recovery · Progress |
 
 ### Today

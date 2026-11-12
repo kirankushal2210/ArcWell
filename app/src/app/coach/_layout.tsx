@@ -2,18 +2,15 @@
 // Sample data only until accounts and the database exist (PLAN.md Phases 1–2).
 import { Stack } from "expo-router";
 
-import { CoachDataProvider } from "@/features/coach/CoachData";
 import { colors } from "@/theme";
 
 export default function CoachLayout() {
   return (
-    <CoachDataProvider>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: colors.bg },
-        }}
-      />
-    </CoachDataProvider>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { backgroundColor: colors.bg },
+      }}
+    />
   );
 }

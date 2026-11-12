@@ -62,11 +62,21 @@ export function PageHeader({
 
 // ---------- Scrolling page body ----------
 
-export function Page({ children }: { children: ReactNode }) {
+export function Page({
+  children,
+  clearFloating = false,
+}: {
+  children: ReactNode;
+  /** Extra room at the end so a floating button (the athlete AI button) never covers content. */
+  clearFloating?: boolean;
+}) {
   return (
     <ScrollView
       style={styles.flex}
-      contentContainerStyle={styles.page}
+      contentContainerStyle={[
+        styles.page,
+        clearFloating && styles.pageFloating,
+      ]}
       showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"
     >
@@ -328,6 +338,8 @@ export function CoachTabBar({
     >
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
+        // Tabs hidden with href: null (e.g. Progress for self-guided athletes, D57) aren't drawn.
+        if ((options as { href?: unknown }).href === null) return null;
         const on = state.index === index;
         const label =
           typeof options.title === "string" ? options.title : route.name;
@@ -386,6 +398,7 @@ const styles = StyleSheet.create({
     paddingBottom: space[12],
     gap: space[4],
   },
+  pageFloating: { paddingBottom: space[12] + space[12] + space[4] },
   group: {
     backgroundColor: colors.surface,
     borderRadius: radius.lg,

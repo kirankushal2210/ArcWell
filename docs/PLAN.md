@@ -50,7 +50,7 @@ Auth (Google + email), role choice, onboarding; core tables with RLS on every ta
 
 ## Phase 2 — Coach ↔ client core (3 weeks)
 
-Invite links (Android App Links) auto-linking client to coach; exercise library seed + browse/search/detail; plan builder (templates, assign, customise); Hevy-style workout logging with local caching of the in-progress workout; coach dashboard, client profile, client lifecycle.
+Invite links (Android App Links) auto-linking client to coach, including personal invites that carry a pending client's plans and skip onboarding (D56; Play Install Referrer through install, typed code fallback, single-use tokens, RLS on pending clients); exercise library seed + browse/search/detail; plan builder (templates, assign, customise); Hevy-style workout logging with local caching of the in-progress workout; coach dashboard, client profile, client lifecycle.
 
 ## Phase 3 — Nutrition (2–3 weeks)
 

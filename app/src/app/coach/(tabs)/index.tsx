@@ -7,11 +7,13 @@ import { StyleSheet, View } from "react-native";
 
 import {
   Avatar,
+  Button,
   PressableScale,
   StatusChip,
   Text,
 } from "@/components/primitives";
 import { needsAttention, useCoachData } from "@/features/coach/CoachData";
+import { plansReady } from "@/features/coach/PlanRows";
 import {
   Eyebrow,
   Group,
@@ -31,7 +33,8 @@ export default function ClientsTab() {
   const [setupHidden, setSetupHidden] = useState(false);
 
   const fresh = clients.filter((c) => c.isNew);
-  const linked = clients.filter((c) => !c.isNew);
+  const pending = clients.filter((c) => c.pending);
+  const linked = clients.filter((c) => !c.isNew && !c.pending);
   const count = {
     attention: linked.filter(needsAttention).length,
     active: linked.filter((c) => c.status === "active").length,
@@ -61,8 +64,8 @@ export default function ClientsTab() {
         actions={[
           {
             icon: UserPlus,
-            label: "Invite a client",
-            onPress: () => router.push("/coach/business"),
+            label: "Add a client",
+            onPress: () => router.push("/coach/add-client"),
           },
         ]}
       />
@@ -119,6 +122,45 @@ export default function ClientsTab() {
               <Text tone="muted">{done} steps done</Text>
             </View>
           </View>
+        ) : null}
+
+        <Button
+          label="Add a client and build their plan"
+          icon={UserPlus}
+          variant="secondary"
+          fullWidth
+          onPress={() => router.push("/coach/add-client")}
+        />
+
+        {pending.length > 0 ? (
+          <>
+            <Eyebrow>{`Added by you · ${pending.length}`}</Eyebrow>
+            <Group>
+              {pending.map((c, i) => (
+                <GroupRow
+                  key={c.id}
+                  first={i === 0}
+                  onPress={() => open(c.id)}
+                  label={`${c.name}, ${c.line}`}
+                >
+                  <Avatar name={c.name} />
+                  <View style={styles.flex}>
+                    <Text weight="semibold" numberOfLines={1}>
+                      {c.name}
+                    </Text>
+                    <Text variant="label" weight="regular" tone="muted">
+                      {c.invite
+                        ? "Invite sent · waiting to join"
+                        : plansReady(c)
+                          ? "Plans ready · send the invite"
+                          : "Build their plans"}
+                    </Text>
+                  </View>
+                  <Text variant="label">{c.invite ? "Invite" : "Plan"}</Text>
+                </GroupRow>
+              ))}
+            </Group>
+          </>
         ) : null}
 
         {fresh.length > 0 ? (
