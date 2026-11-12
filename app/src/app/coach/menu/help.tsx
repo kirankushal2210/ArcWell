@@ -11,7 +11,7 @@ import { colors, radius, space } from "@/theme";
 const FAQ: { q: string; a: string }[] = [
   {
     q: "How do clients join me?",
-    a: "Share your invite link from Business → Invite. New people answer the onboarding and appear under Needs a plan. For someone you've already spoken to, use Add a client: build their plans first, then send their personal invite.",
+    a: "Share your invite link from the QR button on Business. New people answer the onboarding and appear under Needs a plan. For someone you've already spoken to, use Add a client: build their plans first, then send their personal invite.",
   },
   {
     q: "What happens when a client leaves?",

@@ -2,6 +2,7 @@
 // payment status recorded by hand; payments stay outside the app, D56), and the numbers the
 // Business overview shows. Plain functions over sample data; the real build reads the same
 // shapes from Supabase.
+import type { IgInfo } from "./instagram";
 import type { Client } from "./sampleData";
 
 // ---------- Leads ----------
@@ -71,6 +72,8 @@ export type Lead = {
   lostReason?: string;
   /** Set when the lead joined as a client. */
   clientId?: string;
+  /** Instagram leads (D66): handle, where on Instagram, and which post or reel. */
+  instagram?: IgInfo;
   events: LeadEvent[];
 };
 

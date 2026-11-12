@@ -1,7 +1,8 @@
-// Business (D63): the coach's CRM as section tabs (D61): Overview · Leads · Clients · Invite.
-// Leads and client accounts open detail pages; the + adds a lead.
+// Business (D63, D66): the coach's CRM as section tabs (D61): Overview · Leads · Instagram ·
+// Clients. Most clients start on Instagram, so it has its own tab. The QR button opens the invite
+// link page; + adds a lead.
 import { router } from "expo-router";
-import { Plus } from "lucide-react-native";
+import { Plus, QrCode } from "lucide-react-native";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
@@ -9,19 +10,19 @@ import { SectionTabs } from "@/components/SectionTabs";
 import { menuAction } from "@/features/coach/coachProfile";
 import {
   ClientsPage,
-  InvitePage,
+  InstagramPage,
   LeadsPage,
   OverviewPage,
 } from "@/features/coach/BusinessPages";
 import { PageHeader } from "@/features/coach/parts";
 import { colors } from "@/theme";
 
-type Tab = "overview" | "leads" | "clients" | "invite";
+type Tab = "overview" | "leads" | "instagram" | "clients";
 const TABS: { key: Tab; label: string }[] = [
   { key: "overview", label: "Overview" },
   { key: "leads", label: "Leads" },
+  { key: "instagram", label: "Instagram" },
   { key: "clients", label: "Clients" },
-  { key: "invite", label: "Invite" },
 ];
 
 export default function BusinessTab() {
@@ -32,6 +33,11 @@ export default function BusinessTab() {
         title="Business"
         actions={[
           menuAction,
+          {
+            icon: QrCode,
+            label: "Invite link and QR code",
+            onPress: () => router.push("/coach/invite-link"),
+          },
           {
             icon: Plus,
             label: "Add a lead",
@@ -50,8 +56,8 @@ export default function BusinessTab() {
         pages={[
           <OverviewPage key="o" />,
           <LeadsPage key="l" />,
+          <InstagramPage key="g" />,
           <ClientsPage key="c" />,
-          <InvitePage key="i" />,
         ]}
       />
     </View>

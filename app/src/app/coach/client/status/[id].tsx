@@ -143,8 +143,7 @@ export default function ClientStatusScreen() {
         )}
         {c.status === "completed" ? (
           <Text variant="caption" tone="muted">
-            To coach {first} again, send them a new invite from Business →
-            Invite.
+            To coach {first} again, send them a new invite with Add a client.
           </Text>
         ) : null}
       </Page>

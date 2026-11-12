@@ -1,8 +1,10 @@
 // One lead (D63). "new" is the add form. Otherwise: contact buttons, the stage, the next follow-up
 // or booked call, the timeline of calls, messages and notes, and the outcome: Joined (opens Add
 // client prefilled, so their details carry over) or Not joined with a reason.
+import * as Clipboard from "expo-clipboard";
 import { router, useLocalSearchParams } from "expo-router";
 import {
+  AtSign,
   MessageCircle,
   NotebookPen,
   Phone,
@@ -38,6 +40,17 @@ import {
   timeText,
 } from "@/features/coach/crm";
 import { StageTag } from "@/features/coach/CrmParts";
+import {
+  cleanHandle,
+  contentNames,
+  DM_TEMPLATES,
+  dmUrl,
+  fillTemplate,
+  type IgTouch,
+  profileUrl,
+  TOUCH_LABEL,
+  TOUCHES,
+} from "@/features/coach/instagram";
 import { Eyebrow, Page, PageHeader, Pills } from "@/features/coach/parts";
 import {
   colors,
@@ -69,12 +82,16 @@ const waNumber = (p: string) => {
   return d.length === 10 ? `91${d}` : d;
 };
 
-function NewLead() {
-  const { addLead } = useCoachData();
+function NewLead({ preset }: { preset?: LeadSource }) {
+  const { addLead, leads } = useCoachData();
   const insets = useSafeAreaInsets();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [source, setSource] = useState<LeadSource>("instagram");
+  const [source, setSource] = useState<LeadSource>(preset ?? "instagram");
+  const [handle, setHandle] = useState("");
+  const [touch, setTouch] = useState<IgTouch>("dm");
+  const [content, setContent] = useState("");
+  const used = contentNames(leads).slice(0, 6);
   const [goal, setGoal] = useState("");
   const [note, setNote] = useState("");
   const back = () =>
@@ -106,6 +123,41 @@ function NewLead() {
           onChange={setSource}
           options={SOURCES.map((s) => ({ value: s, label: SOURCE_LABEL[s] }))}
         />
+        {source === "instagram" ? (
+          <>
+            <TextField
+              label="Instagram handle"
+              value={handle}
+              onChangeText={(v) => setHandle(cleanHandle(v))}
+              placeholder="e.g. rohit.trains"
+              autoCapitalize="none"
+              autoCorrect={false}
+              leadingIcon={AtSign}
+            />
+            <Eyebrow>Where on Instagram</Eyebrow>
+            <Pills
+              value={touch}
+              onChange={setTouch}
+              options={TOUCHES.map((x) => ({
+                value: x,
+                label: TOUCH_LABEL[x],
+              }))}
+            />
+            <TextField
+              label="Which post or reel (optional)"
+              value={content}
+              onChangeText={setContent}
+              placeholder="e.g. Priya's 12-week reel"
+            />
+            {used.length ? (
+              <Pills
+                value={used.includes(content) ? content : ""}
+                onChange={setContent}
+                options={used.map((c) => ({ value: c, label: c }))}
+              />
+            ) : null}
+          </>
+        ) : null}
         <TextField
           label="What they want (optional)"
           value={goal}
@@ -137,6 +189,10 @@ function NewLead() {
               goal: goal.trim() || undefined,
               followUp: dayOffset(1),
               note,
+              instagram:
+                source === "instagram" && handle
+                  ? { handle, touch, content: content.trim() || undefined }
+                  : undefined,
             });
             router.replace({ pathname: "/coach/lead/[id]", params: { id } });
           }}
@@ -147,14 +203,18 @@ function NewLead() {
 }
 
 export default function LeadDetail() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, source: preset } = useLocalSearchParams<{
+    id: string;
+    source?: LeadSource;
+  }>();
   const { leads, updateLead, logLead, deleteLead } = useCoachData();
+  const [copied, setCopied] = useState<string | null>(null);
   const insets = useSafeAreaInsets();
   const [entry, setEntry] = useState("");
   const [picking, setPicking] = useState<"lost" | null>(null);
   const back = () =>
     router.canGoBack() ? router.back() : router.replace("/coach/business");
-  if (id === "new") return <NewLead />;
+  if (id === "new") return <NewLead preset={preset} />;
   const l = leads.find((x) => x.id === id);
   if (!l) return <PageHeader title="Lead not found" onBack={back} />;
   const open = isOpen(l.stage);
@@ -196,6 +256,76 @@ export default function LeadDetail() {
             </Text>
           ) : null}
         </View>
+
+        {l.instagram ? (
+          <View style={styles.card}>
+            <View style={styles.headRow}>
+              <AtSign size={18} color={colors.text} />
+              <Text weight="semibold" style={styles.flex}>
+                {l.instagram.handle}
+              </Text>
+              <Text variant="label" weight="regular" tone="muted">
+                {TOUCH_LABEL[l.instagram.touch]}
+              </Text>
+            </View>
+            {l.instagram.content ? (
+              <Text variant="label" weight="regular" tone="muted">
+                From: {l.instagram.content}
+              </Text>
+            ) : null}
+            <View style={styles.row}>
+              <View style={styles.flex}>
+                <Button
+                  label="Open DM"
+                  icon={MessageCircle}
+                  fullWidth
+                  onPress={() => {
+                    Linking.openURL(dmUrl(l.instagram?.handle ?? "")).catch(
+                      () => {},
+                    );
+                    logLead(l.id, "message", "Opened Instagram DM");
+                  }}
+                />
+              </View>
+              <View style={styles.flex}>
+                <Button
+                  label="Profile"
+                  variant="secondary"
+                  fullWidth
+                  onPress={() =>
+                    Linking.openURL(
+                      profileUrl(l.instagram?.handle ?? ""),
+                    ).catch(() => {})
+                  }
+                />
+              </View>
+            </View>
+            <Text variant="caption" tone="muted">
+              Copy a reply with {l.name.split(" ")[0]}&apos;s name, then paste
+              it in the DM.
+            </Text>
+            <View style={styles.chips}>
+              {DM_TEMPLATES.map((tpl) => (
+                <Button
+                  key={tpl.label}
+                  label={copied === tpl.label ? "Copied" : tpl.label}
+                  variant="ghost"
+                  onPress={async () => {
+                    await Clipboard.setStringAsync(
+                      fillTemplate(tpl.text, l.name),
+                    );
+                    setCopied(tpl.label);
+                    logLead(
+                      l.id,
+                      "message",
+                      `Sent the ${tpl.label.toLowerCase()} reply on Instagram`,
+                    );
+                  }}
+                />
+              ))}
+            </View>
+          </View>
+        ) : null}
 
         {l.phone ? (
           <View style={styles.row}>
@@ -402,6 +532,7 @@ const styles = StyleSheet.create({
   flex: { flex: 1, gap: space[1] / 2 },
   row: { flexDirection: "row", gap: space[2] },
   headRow: { flexDirection: "row", alignItems: "center", gap: space[2] },
+  chips: { flexDirection: "row", flexWrap: "wrap", gap: space[1] },
   card: {
     gap: space[3],
     padding: space[4],

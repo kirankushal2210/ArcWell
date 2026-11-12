@@ -27,6 +27,7 @@ import {
 import type { ActiveWorkout, Session } from "@/features/athlete/training";
 
 import { buildCheckIn, type CheckInForm } from "./checkins";
+import { withInstagram } from "./instagram";
 import { type Enhanced, emptyEnhanced, sampleEnhanced } from "./enhanced";
 import {
   cloneItems,
@@ -301,7 +302,9 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
   const [templates, setTemplates] = useState<Template[]>(() =>
     sampleTemplates.map(fillTemplate),
   );
-  const [leads, setLeads] = useState<Lead[]>(sampleLeads);
+  const [leads, setLeads] = useState<Lead[]>(() =>
+    withInstagram(sampleLeads()),
+  );
   const [coach, setCoach] = useState<CoachProfile>(defaultCoachProfile);
   const [settings, setSettings] = useState<CoachSettings>(defaultCoachSettings);
   const [reminded, setReminded] = useState<string[]>([]);
@@ -343,7 +346,7 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
         if (s.hideUpgrade) setHideUpgrade(true);
         if (s.recovery) setRecovery(s.recovery);
         if (s.templates) setTemplates(s.templates.map(fillTemplate));
-        if (s.leads) setLeads(s.leads);
+        if (s.leads) setLeads(withInstagram(s.leads));
         if (s.coach) setCoach(s.coach);
         if (s.settings) setSettings(s.settings);
       })
@@ -548,7 +551,7 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       setHideUpgrade(false);
       setRecovery({});
       setTemplates(sampleTemplates.map(fillTemplate));
-      setLeads(sampleLeads());
+      setLeads(withInstagram(sampleLeads()));
       setCoach(defaultCoachProfile());
       setSettings(defaultCoachSettings());
       AsyncStorage.removeItem(STORE_KEY).catch(() => {});

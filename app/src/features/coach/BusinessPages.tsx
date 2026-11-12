@@ -33,6 +33,7 @@ import {
   StageTag,
   StatGrid,
 } from "@/features/coach/CrmParts";
+import { DM_TEMPLATES, igStats, TOUCH_LABEL } from "@/features/coach/instagram";
 import { Eyebrow, Group, GroupRow, Page, Pills } from "@/features/coach/parts";
 import { sampleCoach } from "@/features/coach/sampleData";
 import { colors, radius, space } from "@/theme";
@@ -502,6 +503,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
   },
   centerCard: { alignItems: "center" },
+  reply: { flexDirection: "row", alignItems: "center", gap: space[2] },
   qr: {
     padding: space[2],
     borderRadius: radius.md,
@@ -515,3 +517,196 @@ const styles = StyleSheet.create({
   },
   fill: { height: 8, borderRadius: radius.full, backgroundColor: colors.brand },
 });
+
+// ---------- Instagram (D66) ----------
+
+export function InstagramPage() {
+  const { leads } = useCoachData();
+  const [period, setPeriod] = useState<Period>("30");
+  const [copied, setCopied] = useState<string | null>(null);
+  const s = igStats(leads, period);
+  const ig = leads
+    .filter((l) => l.source === "instagram")
+    .sort((a, b) => {
+      const oa = isOpen(a.stage) ? 0 : 1;
+      const ob = isOpen(b.stage) ? 0 : 1;
+      return oa - ob || b.createdAt.localeCompare(a.createdAt);
+    });
+  const bio = `https://${sampleCoach.link}?src=instagram`;
+  const copy = async (key: string, text: string) => {
+    await Clipboard.setStringAsync(text);
+    setCopied(key);
+  };
+  return (
+    <Page>
+      <Pills
+        value={period}
+        onChange={setPeriod}
+        options={[
+          { value: "30", label: "30 days" },
+          { value: "90", label: "90 days" },
+          { value: "all", label: "All time" },
+        ]}
+      />
+      <StatGrid
+        items={[
+          {
+            label: "Instagram leads",
+            value: String(s.leads),
+            sub: `${s.share}% of all leads`,
+          },
+          {
+            label: "Joined from Instagram",
+            value: String(s.joined),
+            sub:
+              s.conversion === null
+                ? "No decisions yet"
+                : `${s.conversion}% of those who decided`,
+          },
+        ]}
+      />
+
+      <Button
+        label="Add an Instagram lead"
+        icon={Plus}
+        fullWidth
+        onPress={() =>
+          router.push({
+            pathname: "/coach/lead/[id]",
+            params: { id: "new", source: "instagram" },
+          })
+        }
+      />
+
+      {s.byTouch.length ? (
+        <>
+          <Eyebrow>Where on Instagram</Eyebrow>
+          <View style={styles.card}>
+            {s.byTouch.map((x) => (
+              <FunnelRow
+                key={x.touch}
+                label={TOUCH_LABEL[x.touch]}
+                value={x.leads}
+                max={s.byTouch[0]?.leads ?? 1}
+              />
+            ))}
+            <Text variant="caption" tone="muted">
+              {s.byTouch
+                .filter((x) => x.joined)
+                .map((x) => `${TOUCH_LABEL[x.touch]}: ${x.joined} joined`)
+                .join(" · ") || "No one has joined from these yet."}
+            </Text>
+          </View>
+        </>
+      ) : null}
+
+      {s.byContent.length ? (
+        <>
+          <Eyebrow>Content that brings clients</Eyebrow>
+          <Group>
+            {s.byContent.map((x, i) => (
+              <GroupRow key={x.content} first={i === 0}>
+                <View style={styles.flex}>
+                  <Text weight="medium">{x.content}</Text>
+                  <Text variant="label" weight="regular" tone="muted" numeric>
+                    {x.leads} {x.leads === 1 ? "lead" : "leads"} · {x.joined}{" "}
+                    joined
+                  </Text>
+                </View>
+              </GroupRow>
+            ))}
+          </Group>
+          <Text variant="caption" tone="muted">
+            Name the post or reel when you add a lead to see what works.
+          </Text>
+        </>
+      ) : null}
+
+      <Eyebrow>{`Instagram leads · ${s.open} open`}</Eyebrow>
+      {ig.length ? (
+        <Group>
+          {ig.map((l, i) => (
+            <GroupRow
+              key={l.id}
+              first={i === 0}
+              onPress={() => openLead(l.id)}
+              label={`${l.name}, ${l.stage}`}
+            >
+              <Avatar name={l.name} />
+              <View style={styles.flex}>
+                <Text weight="semibold">{l.name}</Text>
+                <Text
+                  variant="label"
+                  weight="regular"
+                  tone="muted"
+                  numberOfLines={1}
+                >
+                  {l.instagram
+                    ? `@${l.instagram.handle} · ${TOUCH_LABEL[l.instagram.touch]}`
+                    : "Instagram"}
+                </Text>
+                {isOpen(l.stage) && l.followUp ? (
+                  <Text
+                    variant="caption"
+                    tone={l.followUp < todayKey() ? "danger" : "muted"}
+                  >
+                    Follow up {dayInline(l.followUp)}
+                  </Text>
+                ) : null}
+              </View>
+              <StageTag stage={l.stage} />
+            </GroupRow>
+          ))}
+        </Group>
+      ) : (
+        <Text tone="muted">No Instagram leads yet.</Text>
+      )}
+
+      <Eyebrow>Link in bio</Eyebrow>
+      <View style={styles.card}>
+        <Text weight="medium" numberOfLines={1}>
+          {bio.replace("https://", "")}
+        </Text>
+        <Text variant="caption" tone="muted">
+          Put this in your bio. People who join through it count as Instagram.
+        </Text>
+        <Button
+          label={copied === "bio" ? "Copied" : "Copy bio link"}
+          icon={Copy}
+          variant="secondary"
+          fullWidth
+          onPress={() => copy("bio", bio)}
+        />
+      </View>
+
+      <Eyebrow>Saved DM replies</Eyebrow>
+      <View style={styles.card}>
+        {DM_TEMPLATES.map((t) => (
+          <View key={t.label} style={styles.reply}>
+            <View style={styles.flex}>
+              <Text weight="medium">{t.label}</Text>
+              <Text
+                variant="label"
+                weight="regular"
+                tone="muted"
+                numberOfLines={2}
+              >
+                {t.text.replaceAll("{name}", "[name]")}
+              </Text>
+            </View>
+            <Button
+              label={copied === t.label ? "Copied" : "Copy"}
+              variant="ghost"
+              onPress={() =>
+                copy(t.label, t.text.replaceAll("{name}", "[name]"))
+              }
+            />
+          </View>
+        ))}
+        <Text variant="caption" tone="muted">
+          Open a lead to copy these with their name filled in.
+        </Text>
+      </View>
+    </Page>
+  );
+}
