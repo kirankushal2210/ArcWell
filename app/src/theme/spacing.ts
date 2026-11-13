@@ -36,7 +36,9 @@ export const rhythm = {
 
 /** Android 48 dp minimum, stricter than Apple's 44 pt (C5). */
 export const tapMin = 48;
-/** Main buttons and inputs look 40 dp tall; their tap area stays `tapMin` (D67). */
-export const controlHeight = 40;
-/** Small buttons look 32 dp tall; tap area still `tapMin`. */
-export const controlHeightSm = 32;
+/** Main buttons look 36 dp tall; their tap area stays `tapMin` (D81, was 40 in D67). */
+export const controlHeight = 36;
+/** Small buttons look 28 dp tall; tap area still `tapMin`. */
+export const controlHeightSm = 28;
+/** Text inputs stay 40 dp so typing isn't cramped. */
+export const inputHeight = 40;

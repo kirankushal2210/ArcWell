@@ -21,6 +21,7 @@ import {
 import { useCoachData } from "@/features/coach/CoachData";
 import {
   colors,
+  controlHeight,
   fontFamilyFor,
   radius,
   rhythm,
@@ -412,7 +413,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     gap: space[1],
-    minHeight: 44,
+    minHeight: controlHeight,
     paddingHorizontal: space[3],
     borderRadius: radius.full,
     backgroundColor: colors.surface,

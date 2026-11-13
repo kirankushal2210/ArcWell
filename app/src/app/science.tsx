@@ -1,4 +1,4 @@
-// Sources (D69): every paper Arcwell's training, nutrition and recovery rules rest on, grouped by
+// Sources (D69): every paper Arcwell's training, nutrition, recovery and habit rules rest on, grouped by
 // topic, with what we take from each and a link to it. Open to athletes and coaches.
 import { router } from "expo-router";
 import { ExternalLink } from "lucide-react-native";
@@ -10,7 +10,7 @@ import { Eyebrow, Group, GroupRow } from "@/features/coach/parts";
 import { SOURCES, type Topic, TOPIC_LABEL } from "@/features/science/sources";
 import { colors, space } from "@/theme";
 
-const TOPICS: Topic[] = ["training", "nutrition", "recovery"];
+const TOPICS: Topic[] = ["training", "nutrition", "recovery", "habits"];
 
 export default function Science() {
   const back = () => (router.canGoBack() ? router.back() : router.replace("/"));

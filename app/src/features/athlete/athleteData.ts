@@ -3,6 +3,9 @@
 // live on the client record on the phone; with the backend each becomes its own RLS-protected table.
 import type { PhotoPose } from "@/features/coach/checkins";
 import type { PlannedExercise } from "@/features/coach/plans";
+import type { DivisionKey, StationKey } from "@/features/race/data";
+import type { Machine, Vo2Test } from "@/features/science/cardio";
+import type { ModuleKey, MorningItem, SafetyKey } from "@/features/science/habits";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 /** YYYY-MM-DD in the phone's own time zone (toISOString would use UTC). */
@@ -84,7 +87,90 @@ export type AthleteSettings = {
   notesRead?: string[];
   /** AI questions asked today, for the daily cap (X-01). */
   aiUsage?: { date: string; n: number };
+  /** What Arcwell shows (D78). Unset: the defaults for the goal. */
+  modules?: ModuleKey[];
+  /** Habit reminders a day, 0–2 (D77). */
+  nudges?: number;
+  /** Daily habits (D74): active habits, when the first started, safety checks passed. */
+  habits?: {
+    active: ActiveHabit[];
+    firstAt?: string;
+    safety?: Partial<Record<SafetyKey, string>>;
+  };
+  /** Habit logs by date, then habit id: a value (minutes, count, clock minute) or true. */
+  habitLog?: Record<string, Record<string, number | true>>;
+  /** Morning start ticks by date (D80): the minute each was done. */
+  morning?: Record<string, Partial<Record<MorningItem, number>>>;
+  /** Cardio fitness (D79). */
+  cardio?: CardioState;
+  /** HYROX race track (D76). */
+  race?: RaceState;
+  /** If-then plans (implementation intentions) for goals and habits. */
+  ifThen?: IfThen[];
 };
+
+export type ActiveHabit = {
+  id: string;
+  origin: "self" | "coach" | "suggested";
+  since: string;
+};
+
+export type CardioState = {
+  machines: Machine[];
+  /** Weekdays allowed for cardio, 0 = Monday; empty = any. */
+  days: number[];
+  tests: Vo2Test[];
+  /** PAR-Q+ answered: date and whether every answer was no. */
+  parq?: { date: string; clear: boolean };
+  startedAt: string;
+  /** Interval and easy sessions done, by date. */
+  done?: { date: string; kind: "intervals" | "easy"; minutes: number; machine: Machine }[];
+  restingHr?: number;
+};
+
+export type SimSplit = {
+  /** Index in the format's segments; Roxzone splits use kind "roxzone". */
+  i: number;
+  kind: "run" | "station" | "roxzone";
+  station?: StationKey;
+  seconds: number;
+  /** Done on other equipment: never compared with real station times. */
+  substitute?: string;
+};
+
+export type RaceSim = {
+  id: string;
+  date: string;
+  kind: "full" | "half" | "race";
+  division: DivisionKey;
+  totalSec: number;
+  splits: SimSplit[];
+};
+
+export type RaceState = {
+  goal?: {
+    date: string;
+    division: DivisionKey;
+    targetSec?: number;
+    recent5kSec?: number;
+    kit: string[];
+    event?: string;
+  };
+  status?: "active" | "done" | "cancelled";
+  sims: RaceSim[];
+  /** A sim in progress: timestamps so a locked phone or a killed app loses nothing. */
+  live?: {
+    id: string;
+    kind: "full" | "half" | "race";
+    roxzone: boolean;
+    division: string;
+    startedAt: number;
+    marks: number[];
+    substitutes: Partial<Record<StationKey, string>>;
+  };
+};
+
+export type IfThen = { id: string; goal: string; obstacle: string; plan: string };
 
 export type DayPlan = {
   date: string;

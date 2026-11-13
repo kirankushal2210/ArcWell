@@ -122,11 +122,11 @@ const styles = StyleSheet.create({
     marginBottom: space[2],
   },
   row: {
-    minHeight: 48,
+    minHeight: 44,
     justifyContent: "center",
     gap: space[1] / 2,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: colors.glassEdge,
-    paddingVertical: space[2],
+    paddingVertical: space[1] + space[1] / 2,
   },
 });

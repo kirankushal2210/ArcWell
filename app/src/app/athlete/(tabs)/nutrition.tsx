@@ -149,6 +149,21 @@ function DayPage({
         </View>
       ) : null}
 
+      {n.macros && plan && day.length ? (
+        <Text variant="caption" tone="muted">
+          {`Protein by meal: ${MEAL_SLOTS.filter((m) =>
+            day.some((l) => l.meal === m.value),
+          )
+            .map(
+              (m) =>
+                `${m.label} ${Math.round(sumMacros(day.filter((l) => l.meal === m.value).map((l) => l.macros)).p)} g`,
+            )
+            .join(
+              " · ",
+            )}. Aim for about ${Math.round(0.3 * (n.me?.weights.at(-1) ?? 70))}–${Math.round(0.4 * (n.me?.weights.at(-1) ?? 70))} g at each main meal.`}
+        </Text>
+      ) : null}
+
       {date === today ? <WaterCard /> : null}
 
       {n.tier === "free" && !hideUpgrade ? (

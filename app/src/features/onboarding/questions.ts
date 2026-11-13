@@ -155,7 +155,13 @@ export type Question = {
   logoHeader?: boolean;
   /** Small line under the main button, e.g. "Takes about 5 minutes". */
   caption?: string;
+  /** Only shown when an earlier answer matches (the HYROX branch, D76). */
+  showIf?: { key: string; equals: string };
 };
+
+/** Whether a question applies, given the answers so far. */
+export const questionShown = (q: Question, answers: Record<string, unknown>) =>
+  !q.showIf || answers[q.showIf.key] === q.showIf.equals;
 
 export type Section = { id: string; name: string; dot?: ColorRole };
 export type Flow = { sections: Section[]; questions: Question[] };
@@ -304,7 +310,76 @@ export const questions: Question[] = [
             sub: "Feel fitter and healthier",
             icon: Heart,
           },
+          {
+            value: "hyrox",
+            label: "Train for a HYROX race",
+            sub: "We'll plan back from your race date",
+            icon: Medal,
+          },
         ],
+      },
+    ],
+  },
+  // ---------- HYROX branch (D76): only after choosing the race goal ----------
+  {
+    id: "AO-05R1",
+    section: "goal",
+    glyph: CalendarDays,
+    title: "How far away is your race?",
+    sub: "We count your plan back from race day.",
+    showIf: { key: "goal", equals: "hyrox" },
+    fields: [
+      {
+        kind: "wheel",
+        key: "raceWeeks",
+        initial: 12,
+        unit: "weeks",
+        values: range(4, 40, 1, (v) => String(v)),
+      },
+    ],
+  },
+  {
+    id: "AO-05R2",
+    section: "goal",
+    glyph: Trophy,
+    title: "Your division and kit",
+    sub: "Station weights follow your division.",
+    showIf: { key: "goal", equals: "hyrox" },
+    fields: [
+      {
+        kind: "single",
+        key: "raceDivision",
+        required: true,
+        options: [
+          { value: "open_women", label: "Women Open" },
+          { value: "pro_women", label: "Women Pro" },
+          { value: "open_men", label: "Men Open" },
+          { value: "pro_men", label: "Men Pro" },
+        ],
+      },
+      {
+        kind: "chips",
+        key: "raceKit",
+        label: "What can you use where you train?",
+        options: ["Sled", "SkiErg", "Rower", "Wall-ball target", "Sandbag"],
+      },
+    ],
+  },
+  {
+    id: "AO-05R3",
+    section: "goal",
+    glyph: Timer,
+    title: "Your recent 5 km time",
+    sub: "A rough guess is fine. It sets your running paces.",
+    skippable: true,
+    showIf: { key: "goal", equals: "hyrox" },
+    fields: [
+      {
+        kind: "wheel",
+        key: "recent5k",
+        initial: 30,
+        unit: "min",
+        values: range(16, 60, 1, (v) => String(v)),
       },
     ],
   },
@@ -369,6 +444,36 @@ export const questions: Question[] = [
             icon: HardHat,
           },
         ],
+      },
+    ],
+  },
+  // ---------- What Arcwell shows (D78): one optional screen ----------
+  {
+    id: "AO-07B",
+    section: "goal",
+    glyph: Sprout,
+    title: "Anything else you'd like help with?",
+    sub: "Optional. Your plan is built around your main goal; add only what you want. You can change this any time.",
+    fields: [
+      {
+        kind: "chips",
+        key: "addons",
+        options: [
+          "Just my main goal",
+          "Cardio fitness",
+          "Running",
+          "Daily steps",
+          "Sleep and energy habits",
+          "Calm and breathing",
+          "Mobility",
+          "Focus",
+        ],
+        initial: ["Just my main goal"],
+        exclusive: "Just my main goal",
+      },
+      {
+        kind: "note",
+        text: "Cardio fitness is closely linked to long-term health. It doesn't have to mean running: a bike or rower works too.",
       },
     ],
   },

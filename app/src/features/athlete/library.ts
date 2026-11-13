@@ -543,6 +543,7 @@ const ROWS: [string, Muscle, Equipment, ExerciseType][] = [
   ["Scapular pull ups", "upper_back", "none", "bodyweight_reps"],
   ["Seal row (barbell)", "upper_back", "barbell", "weight_reps"],
   ["Seal row (dumbbell)", "upper_back", "dumbbell", "weight_reps"],
+  ["Sandbag walking lunge", "quadriceps", "other", "weight_distance"],
   ["Seated cable row - bar grip", "upper_back", "cable", "weight_reps"],
   ["Seated cable row - bar wide grip", "upper_back", "cable", "weight_reps"],
   ["Seated cable row - V grip (cable)", "upper_back", "cable", "weight_reps"],
