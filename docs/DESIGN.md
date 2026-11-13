@@ -418,6 +418,27 @@ New with D52: AO-02, AO-06, AO-07, AO-13 to AO-15, AO-17, AO-18, AO-20, CO-04, C
 | K-29 Coach account closed | Athlete (coached) | ✅ | — | ✅ sample data |
 | K-30 Complete a client — confirm | Coach | ✅ | — | ✅ sample data |
 
+
+### FE-8 and FE-9 screens (D74–D82)
+| Screen | Route | Built |
+|---|---|---|
+| Cortisol graph and morning to-do on Today | `athlete/(tabs)/index` | ✅ sample data |
+| Habit tiles and Later today on Today | `athlete/(tabs)/index` | ✅ sample data |
+| What Arcwell shows | `athlete/menu/shows` | ✅ sample data |
+| Daily habits library, cold safety check | `athlete/habits` | ✅ sample data |
+| Habit page with timer | `athlete/habits/[id]` | ✅ sample data |
+| If-then plans | `athlete/habits/plans` | ✅ sample data |
+| Long-exhale breathing | `athlete/recovery/breathe?pattern=sigh` | ✅ sample data |
+| Cardio fitness card (Training > Plan) and Today row | `athlete/(tabs)/training` | ✅ sample data |
+| Cardio fitness detail | `athlete/cardio` | ✅ sample data |
+| Fitness test with PAR-Q+ | `athlete/cardio/test` | ✅ sample data |
+| Interval timer | `athlete/cardio/session` | ✅ sample data |
+| Race section (Training 4th tab) | `athlete/(tabs)/training`, `athlete/race` | ✅ sample data |
+| Race goal setup | `athlete/race/setup` | ✅ sample data |
+| HYROX onboarding by level | `onboarding/[step]` (HX-01 to HX-T1) | ✅ sample data |
+| Race sim setup, race mode, results | `athlete/race/sim/new`, `live`, `[id]` | ✅ sample data |
+| Coach: client habits, cardio and race | `coach/client/[id]` Recovery | ✅ sample data |
+
 ## 8. Accessibility and quality checklist
 
 Checked 2026-11-13 on the web build at phone size; still to repeat on a real Android phone with TalkBack before launch.
