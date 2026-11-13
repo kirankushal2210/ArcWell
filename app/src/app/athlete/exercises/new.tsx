@@ -9,7 +9,7 @@ import { colors, space } from "@/theme";
 export default function NewExercise() {
   const insets = useSafeAreaInsets();
   const back = () =>
-    router.canGoBack() ? router.back() : router.replace("/athlete/exercises");
+    router.canGoBack() ? router.back() : router.replace("/athlete/training");
   return (
     <View style={[styles.root, { paddingTop: insets.top + space[2] }]}>
       <CreateExercise

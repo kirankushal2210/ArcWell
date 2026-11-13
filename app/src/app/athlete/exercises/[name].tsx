@@ -17,7 +17,7 @@ export default function ExerciseDetail() {
   const { name } = useLocalSearchParams<{ name: string }>();
   const history = useMyHistory();
   const back = () =>
-    router.canGoBack() ? router.back() : router.replace("/athlete/exercises");
+    router.canGoBack() ? router.back() : router.replace("/athlete/training");
   // Older logs can hold names the library doesn't know; show them as "other".
   const e: Exercise = findExercise(name) ?? {
     name,
