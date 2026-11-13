@@ -69,6 +69,9 @@ The front end is finished on sample data before any backend wiring (Phases 1–8
   - Coached athletes: no AI; their coach sees a plain low-recovery flag on the client profile and decides.
 - [x] **FE-7 System states and full QA loop:** loading, error, offline, permission denied, force update, maintenance, notification pre-ask (S-01 to S-06, X-07, F4-09, F7-03), PDF attach and viewer UI (F7-02, X-06), then a full walk of every screen as free, Pro, coached and coach, fixing what's found, until nothing is left (Phase 14 of the frontend execution prompt)
 
+- [ ] **FE-8 Habits and cardio fitness (D74–D81):** smaller buttons (D81); module preferences and `useVisibility()` (D78); Morning start card with the cortisol-rhythm curve (D80); Daily habits with the Today selector, library, habit sheets and safety checks (D74, D77); Cardio fitness with estimates, tests, interval sessions and the live timer (D79); long-exhale breathing, focus block, walk after a meal, nutrition signals, if-then plans and the coach habits section.
+- [ ] **FE-9 HYROX race track (D76):** race data by season, race goal and onboarding branch, Race section, race simulator and results, hybrid-race plan rules, coach builder blocks and the client Race section.
+
 ## Backend build (D72, D73)
 
 The front end is complete (FE-1 to FE-7). The backend wires those screens to Supabase one slice at a time, coach loop first. Each slice: migrations with RLS and pgTAP tests (coach isolation, join-date visibility, access ending on leave), a repository that replaces the sample store for that area so screens don't change, then a check on web and a phone. Built against the local stack first; the hosted Mumbai project follows once the founder creates it.

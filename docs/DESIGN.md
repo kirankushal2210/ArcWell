@@ -156,7 +156,7 @@ Colour on charcoal, dark text on colour: white text never sits on a pillar colou
 
 - **Spacing:** 4-point scale: 4, 8, 12, 16, 24, 32, 48. Dense by default: card padding 12, rows 40 dp.
 - **Radius:** 10 (chips, small buttons, set cells) · 12 (buttons, inputs) · 16 (cards) · 28 (sheets, tab bar) · full (avatars, round glass buttons).
-- **Controls:** main button 40 dp, small 32 dp; the tap area stays at least 48 × 48 dp. Labels keep full size on one line; buttons widen to fit.
+- **Controls:** main button 36 dp, small 28 dp (D81); the tap area stays at least 48 × 48 dp. Labels keep full size on one line; buttons widen to fit.
 - **Layout:** thumb-first. One action dock (the screen's main action) above the tab bar; floating glass tab bar bottom left and + bottom right, in the same place on every screen.
 - **Motion:** changing numbers roll instead of jumping. Tokens: micro 120 ms (press, tick), standard 200 ms (number rolls, cards, tabs), sheet 280 ms, big moment 600 ms. Easing `cubic-bezier(.2,0,0,1)`, built with React Native Reanimated. Controls respond on press-in. Skeleton loaders, never spinners. With Android "Remove animations" on, every transition is instant. Haptic tick when a set is logged.
 
@@ -423,7 +423,7 @@ New with D52: AO-02, AO-06, AO-07, AO-13 to AO-15, AO-17, AO-18, AO-20, CO-04, C
 Checked 2026-11-13 on the web build at phone size; still to repeat on a real Android phone with TalkBack before launch.
 
 - [x] WCAG AA contrast for all text. Muted text is 5.2:1 at worst (on the sheet fallback); every pillar colour is at least 5.7:1 on every surface; dark text on soft-white and Honey fills is 15.3:1 and 9.9:1.
-- [x] 48dp tap targets. 40 dp and 32 dp buttons get `hitSlop` up to 48 dp; icon buttons, chips and section actions use `tapMin`.
+- [x] 48dp tap targets. 36 dp and 28 dp buttons (D81) get `hitSlop` up to 48 dp; icon buttons, chips and section actions use `tapMin`.
 - [x] Works at 130% system font size. A sweep of the main coach and athlete tabs at 1.3× text found nothing clipped. Fixed heights that held text (chips, recovery cells, onboarding tokens) became minimum heights, and names, titles and row subtitles wrap instead of truncating (D67). Exception: tab bar labels stay at 100% so five fit the 60 dp bar, as Material and iOS tab bars do. Message previews, links and file names stay one line by design.
 - [x] Screen-reader labels on all icons and controls. Every pressable has a role and label; photos carry labels or sit inside a labelled button.
 - [x] Never rely on colour alone. Unread dots come with bold text or a count; pillar colours always sit next to their label; warnings and errors carry an icon and text.
