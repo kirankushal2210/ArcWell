@@ -20,9 +20,9 @@ import {
   kcalText,
   newLogId,
   slotNow,
-  todayKey,
   useNutrition,
 } from "@/features/athlete/FoodParts";
+import { useDayPicker } from "@/features/athlete/useToday";
 import {
   type FoodLog,
   type Macros,
@@ -52,7 +52,7 @@ import {
   StreakPill,
 } from "@/features/athlete/NutritionParts";
 import { logStreak } from "@/features/athlete/streak";
-import { foodQuality } from "@/features/athlete/foodQuality";
+import { FIBRE_TARGET_G, foodQuality } from "@/features/athlete/foodQuality";
 import { FoodQualityCard } from "@/features/athlete/FoodQualityCard";
 
 function DayPage({
@@ -86,6 +86,13 @@ function DayPage({
       ).length
     : 0;
 
+  // Fibre comes from the foods with a known fibre value (D103).
+  const quality = foodQuality(day, {
+    weightKg: n.me.weights.at(-1) ?? 70,
+    bedMinute: n.me.protocol?.bed ?? 22 * 60 + 30,
+    mine: n.myFoods,
+  });
+
   return (
     <AthletePage dock>
       <CaloriesCard
@@ -99,20 +106,22 @@ function DayPage({
       />
       {n.macros && plan ? (
         <MacroCards
-          eaten={{ protein: eaten.p, carbs: eaten.c, fat: eaten.f }}
-          target={{ protein: plan.protein, carbs: plan.carbs, fat: plan.fat }}
+          eaten={{
+            protein: eaten.p,
+            carbs: eaten.c,
+            fat: eaten.f,
+            fibre: quality.fibre,
+          }}
+          target={{
+            protein: plan.protein,
+            carbs: plan.carbs,
+            fat: plan.fat,
+            fibre: FIBRE_TARGET_G,
+          }}
         />
       ) : null}
 
-      {n.macros && day.length ? (
-        <FoodQualityCard
-          q={foodQuality(day, {
-            weightKg: n.me.weights.at(-1) ?? 70,
-            bedMinute: n.me.protocol?.bed ?? 22 * 60 + 30,
-            mine: n.myFoods,
-          })}
-        />
-      ) : null}
+      {n.macros && day.length ? <FoodQualityCard q={quality} /> : null}
 
       {date === today ? <WaterCard /> : null}
 
@@ -397,8 +406,7 @@ const TABS: { key: NutritionTab; label: string }[] = [
 export default function Nutrition() {
   const n = useNutrition();
   const { removedFood } = useCoachData();
-  const [today] = useState(todayKey);
-  const [date, setDate] = useState(today);
+  const { today, date, setDate } = useDayPicker();
   const [tab, setTab] = useState<NutritionTab>("day");
   if (!n.me) return <NotJoined />;
   const slot = date === today ? slotNow() : "lunch";

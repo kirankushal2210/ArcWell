@@ -1,7 +1,7 @@
 // Nutrition day parts (D94), in Arcwell's black and red: a progress ring, the week strip with each
 // day's calories as a ring around its date, the streak pill and sheet, the calories card and the
 // three macro cards.
-import { Drumstick, Droplet, Flame, Wheat } from "lucide-react-native";
+import { Carrot, Drumstick, Droplet, Flame, Wheat } from "lucide-react-native";
 import { type ReactNode, useRef, useState } from "react";
 import {
   ScrollView,
@@ -225,8 +225,15 @@ export function CaloriesCard({
             "Resting energy from your lean mass if you gave a body fat level, otherwise from the Mifflin–St Jeor equation, times your activity, then a small change for your goal.",
             "Fat loss is kept to about 0.5–1% of bodyweight a week, so you keep muscle.",
             "Protein is about 1.8 g per kg a day, or 2.0 g while losing fat.",
+            "Fibre: at least 25 g a day; 25–29 g was linked with better health.",
           ]}
-          sources={["mifflin1990", "cunningham1980", "helms2014", "morton2018"]}
+          sources={[
+            "mifflin1990",
+            "cunningham1980",
+            "helms2014",
+            "morton2018",
+            "reynolds2019",
+          ]}
         />
       </View>
       <Ring size={96} stroke={9} progress={target ? eaten / target : 0}>
@@ -240,11 +247,12 @@ const MACRO_LOOK = {
   protein: { label: "Protein", icon: Drumstick, color: colors.accent },
   carbs: { label: "Carbs", icon: Wheat, color: colors.warning },
   fat: { label: "Fat", icon: Droplet, color: colors.nutrition },
+  fibre: { label: "Fibre", icon: Carrot, color: colors.text },
 } as const;
 export type MacroKey = keyof typeof MACRO_LOOK;
 export const macroColor = (k: MacroKey) => MACRO_LOOK[k].color;
 
-/** Grams left of each macro, each with its own ring. */
+/** Grams left of each macro and of fibre, four small cards in a row, each with its own ring. */
 export function MacroCards({
   eaten,
   target,
@@ -262,17 +270,17 @@ export function MacroCards({
             <Text style={styles.macroNum} numeric>
               {`${Math.round(Math.abs(left))}g`}
             </Text>
-            <Text variant="caption" tone="muted">
-              {`${m.label} ${left >= 0 ? "left" : "over"}`}
+            <Text variant="caption" tone="muted" numberOfLines={2}>
+              {`${m.label}\n${left >= 0 ? "left" : "over"}`}
             </Text>
             <View style={styles.macroRing}>
               <Ring
-                size={58}
-                stroke={6}
+                size={44}
+                stroke={5}
                 progress={target[k] ? eaten[k] / target[k] : 0}
                 color={m.color}
               >
-                <m.icon size={18} color={m.color} />
+                <m.icon size={15} color={m.color} />
               </Ring>
             </View>
           </View>
@@ -335,10 +343,11 @@ const styles = StyleSheet.create({
   macroCard: {
     flex: 1,
     gap: space[1] / 2,
-    padding: space[3],
+    paddingVertical: space[3],
+    paddingHorizontal: space[2],
     borderRadius: radius.lg,
     backgroundColor: colors.surface,
   },
-  macroNum: { fontSize: 20, lineHeight: 26, fontWeight: "700" },
+  macroNum: { fontSize: 17, lineHeight: 22, fontWeight: "700" },
   macroRing: { alignItems: "center", paddingTop: space[2] },
 });

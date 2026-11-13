@@ -1,18 +1,14 @@
-// Food quality on the Day page (D96): fibre, fermented foods, whole foods, caffeine and protein at
-// each main meal, as numbers with one word each. The reasons sit behind Why?.
-import { Check, Coffee, Leaf, Sprout, Wheat } from "lucide-react-native";
+// Food quality on the Day page (D96): fermented foods, whole foods, caffeine and protein at each
+// main meal, as numbers with one word each. The reasons sit behind Why?. Fibre has its own card
+// beside the macros (D103).
+import { Check, Coffee, Leaf, Sprout } from "lucide-react-native";
 import { StyleSheet, View } from "react-native";
 
 import { Text } from "@/components/primitives";
 import { WhyThis } from "@/features/science/WhyThis";
 import { colors, radius, space } from "@/theme";
 
-import {
-  clockText,
-  FERMENTED_TARGET,
-  FIBRE_TARGET_G,
-  type FoodQuality,
-} from "./foodQuality";
+import { clockText, FERMENTED_TARGET, type FoodQuality } from "./foodQuality";
 import { slotLabel } from "./foods";
 import { Ring } from "./NutritionParts";
 
@@ -64,14 +60,12 @@ export function FoodQualityCard({ q }: { q: FoodQuality }) {
           label="Why?"
           title="Food quality"
           points={[
-            "Fibre: at least 25 g a day; 25–29 g was linked with better health.",
             "Fermented foods like curd, chaas, idli and kombucha: eating more of them raised gut microbe diversity and lowered inflammation markers.",
             "Whole foods: on an ultra-processed diet people ate about 500 kcal a day more.",
             "Protein: about 0.4 g per kg at each main meal.",
             "Caffeine: a coffee at least 8.8 hours before bed avoids losing sleep.",
           ]}
           sources={[
-            "reynolds2019",
             "wastyk2021",
             "hall2019",
             "schoenfeld2018meal",
@@ -80,12 +74,6 @@ export function FoodQualityCard({ q }: { q: FoodQuality }) {
         />
       </View>
       <View style={styles.grid}>
-        <Tile
-          icon={Wheat}
-          value={`${Math.round(q.fibre)}/${FIBRE_TARGET_G} g`}
-          label="Fibre"
-          share={q.fibre / FIBRE_TARGET_G}
-        />
         <Tile
           icon={Sprout}
           value={`${q.fermented}/${FERMENTED_TARGET}`}
