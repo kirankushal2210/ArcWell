@@ -22,7 +22,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { Alert, ScrollView, StyleSheet, TextInput, View } from "react-native";
+import { ScrollView, StyleSheet, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import {
@@ -40,6 +40,7 @@ import {
   cancelRestAlert,
   scheduleRestAlert,
 } from "@/features/athlete/restAlert";
+import { confirmDiscard } from "@/features/athlete/discardWorkout";
 import { ExercisePicker } from "@/features/athlete/ExercisePicker";
 import {
   type ExerciseType,
@@ -485,22 +486,11 @@ function Logger({
           variant="ghost"
           fullWidth
           onPress={() =>
-            Alert.alert(
-              "Discard this workout?",
-              "Nothing from this session will be saved.",
-              [
-                { text: "Keep going", style: "cancel" },
-                {
-                  text: "Discard",
-                  style: "destructive",
-                  onPress: () => {
-                    cancelRestAlert();
-                    setActive(null);
-                    router.replace("/athlete/training");
-                  },
-                },
-              ],
-            )
+            confirmDiscard(() => {
+              cancelRestAlert();
+              setActive(null);
+              router.replace("/athlete/training");
+            })
           }
         />
       </ScrollView>
