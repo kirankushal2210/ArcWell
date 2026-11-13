@@ -82,7 +82,6 @@ export default function AthleteTabs() {
         <Tabs.Screen
           name="progress"
           options={{
-            href: coached ? undefined : null,
             title: "Progress",
             tabBarIcon: ({ color }) => <TrendingUp size={24} color={color} />,
           }}
