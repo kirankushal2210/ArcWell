@@ -23,18 +23,18 @@ import {
   type MealSlot,
   portionText,
   shiftDate,
-  slotLabel,
   sumMacros,
 } from "@/features/athlete/foods";
 import { athleteMenuAction } from "@/features/athlete/MenuParts";
 import { MealPlanBody } from "@/features/athlete/MealPlanBody";
-import { AthleteDock, AthletePage, NotJoined } from "@/features/athlete/useMe";
+import { AthletePage, NotJoined } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Bars, PageHeader, Pills } from "@/features/coach/parts";
 import { colors, radius, space } from "@/theme";
 import { WhyThis } from "@/features/science/WhyThis";
 import { WaterCard } from "@/features/athlete/Water";
 import { UndoDock } from "@/features/athlete/UndoDock";
+import { FoodScanButton } from "@/features/athlete/FoodScanButton";
 
 function Bar({ value, target }: { value: number; target: number }) {
   const pct = target > 0 ? Math.min(1, value / target) : 0;
@@ -450,17 +450,7 @@ export default function Nutrition() {
       {removedFood?.clientId === n.me?.id ? (
         <UndoDock />
       ) : tab === "trends" ? null : (
-        <AthleteDock
-          label={`Log ${slotLabel(slot).toLowerCase()}`}
-          icon={Plus}
-          pillar="nutrition"
-          onPress={() =>
-            router.push({
-              pathname: "/athlete/food/add",
-              params: { meal: slot, date },
-            })
-          }
-        />
+        <FoodScanButton meal={slot} date={date} />
       )}
     </View>
   );

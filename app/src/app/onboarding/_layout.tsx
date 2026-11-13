@@ -10,6 +10,8 @@ export default function OnboardingLayout() {
       <Stack
         screenOptions={{
           headerShown: false,
+          // Earlier questions stay in the stack; freeze them so an answer re-renders only this one.
+          freezeOnBlur: true,
           contentStyle: { backgroundColor: colors.bg },
         }}
       />

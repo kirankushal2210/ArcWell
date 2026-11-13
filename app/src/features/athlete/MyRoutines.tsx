@@ -2,7 +2,13 @@
 // athlete's own saved workouts. Each card lists its exercises and starts in one tap; own routines
 // have a menu to edit, duplicate or delete.
 import { router } from "expo-router";
-import { Compass, Ellipsis, Play, Plus } from "lucide-react-native";
+import {
+  ClipboardPlus,
+  Compass,
+  Ellipsis,
+  Play,
+  Plus,
+} from "lucide-react-native";
 import { useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
 
@@ -25,48 +31,54 @@ const start = (dayId: string) =>
     params: { dayId },
   });
 
-/** One routine as a list row: tap it to start; own routines also have a menu beside it. */
-function RoutineRow({
+/** One routine: name and menu, its exercises, then the length and a compact Start. */
+function RoutineCard({
   day,
-  first,
   onMenu,
 }: {
   day: TrainingDay;
-  first: boolean;
   onMenu?: () => void;
 }) {
   return (
-    <View style={[styles.row, !first && styles.rowLine]}>
-      <PressableScale
-        onPress={() => start(day.id)}
-        accessibilityRole="button"
-        accessibilityLabel={`Start ${day.name}`}
-        style={styles.rowMain}
-      >
-        <View style={styles.play}>
-          <Play size={14} color={colors.onBrand} fill={colors.onBrand} />
-        </View>
-        <View style={styles.flex}>
-          <Text weight="semibold">{day.name}</Text>
-          <Text variant="label" weight="regular" tone="muted" numeric>
-            {`${day.exercises.length} exercises · ${estimateMinutes(day)} min`}
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text weight="semibold" style={styles.flex}>
+          {day.name}
+        </Text>
+        {onMenu ? (
+          <IconButton
+            icon={Ellipsis}
+            accessibilityLabel={`${day.name} options`}
+            onPress={onMenu}
+          />
+        ) : null}
+      </View>
+      <Text variant="label" weight="regular" tone="muted" numberOfLines={2}>
+        {day.exercises.map((e) => e.name).join(", ")}
+      </Text>
+      <View style={styles.cardFoot}>
+        <Text variant="caption" tone="muted" style={styles.flex} numeric>
+          {`${day.exercises.length} exercises · ${estimateMinutes(day)} min`}
+        </Text>
+        <PressableScale
+          onPress={() => start(day.id)}
+          accessibilityRole="button"
+          accessibilityLabel={`Start ${day.name}`}
+          style={styles.start}
+        >
+          <Play size={12} color={colors.onBrand} fill={colors.onBrand} />
+          <Text variant="label" weight="semibold" tone="onBrand">
+            Start
           </Text>
-        </View>
-      </PressableScale>
-      {onMenu ? (
-        <IconButton
-          icon={Ellipsis}
-          accessibilityLabel={`${day.name} options`}
-          onPress={onMenu}
-        />
-      ) : null}
+        </PressableScale>
+      </View>
     </View>
   );
 }
 
 /**
- * Routines on the Training tab (D83, D84): a title with New and Explore beside it, then the plan's
- * workouts and the athlete's own routines as tap-to-start lists.
+ * Routines on the Training tab (D83–D86): New routine and Explore, the plan's workouts, then the
+ * athlete's own routines, each card with a compact Start.
  */
 export function MyRoutines({
   me,
@@ -83,64 +95,63 @@ export function MyRoutines({
 
   return (
     <>
-      <View style={styles.titleRow}>
-        <Text variant="heading" style={styles.flex}>
-          Routines
-        </Text>
-        {explore ? (
-          <IconButton
-            icon={Compass}
-            variant="glass"
-            accessibilityLabel="Explore programs"
-            onPress={() => router.push("/athlete/programs")}
-          />
-        ) : null}
-        <IconButton
-          icon={Plus}
-          variant="glass"
-          accessibilityLabel="New routine"
+      <Text variant="heading" style={styles.title}>
+        Routines
+      </Text>
+      <View style={styles.tiles}>
+        <PressableScale
           onPress={() => edit("new")}
-        />
+          accessibilityRole="button"
+          accessibilityLabel="New routine"
+          style={styles.tile}
+        >
+          <ClipboardPlus size={22} color={colors.accent} />
+          <Text variant="label" weight="semibold">
+            New routine
+          </Text>
+        </PressableScale>
+        {explore ? (
+          <PressableScale
+            onPress={() => router.push("/athlete/programs")}
+            accessibilityRole="button"
+            accessibilityLabel="Explore programs"
+            style={styles.tile}
+          >
+            <Compass size={22} color={colors.accent} />
+            <Text variant="label" weight="semibold">
+              Explore
+            </Text>
+          </PressableScale>
+        ) : null}
       </View>
 
       {plan ? (
         <>
-          <Eyebrow>{plan.name}</Eyebrow>
-          <View style={styles.group}>
-            {plan.days.map((d, i) => (
-              <RoutineRow key={d.id} day={d} first={i === 0} />
-            ))}
-          </View>
+          <Eyebrow>{`${plan.days.length} days`}</Eyebrow>
+          {plan.days.map((d) => (
+            <RoutineCard key={d.id} day={d} />
+          ))}
         </>
       ) : null}
 
-      <Eyebrow>Your routines</Eyebrow>
-      <View style={styles.group}>
-        {routines.length ? (
-          routines.map((r, i) => (
-            <RoutineRow
-              key={r.id}
-              day={r}
-              first={i === 0}
-              onMenu={() => setMenu(r)}
-            />
-          ))
-        ) : (
-          <PressableScale
-            onPress={() => edit("new")}
-            accessibilityRole="button"
-            accessibilityLabel="Create a routine"
-            style={styles.row}
-          >
-            <View style={[styles.play, styles.addIcon]}>
-              <Plus size={16} color={colors.text} />
-            </View>
-            <Text weight="semibold" style={styles.flex}>
-              Create a routine
-            </Text>
-          </PressableScale>
-        )}
-      </View>
+      <Eyebrow>{`My routines · ${routines.length}`}</Eyebrow>
+      {routines.length ? (
+        routines.map((r) => (
+          <RoutineCard key={r.id} day={r} onMenu={() => setMenu(r)} />
+        ))
+      ) : (
+        <PressableScale
+          onPress={() => edit("new")}
+          accessibilityRole="button"
+          accessibilityLabel="Create a routine"
+          style={styles.empty}
+        >
+          <Plus size={16} color={colors.accent} />
+          <Text variant="label" weight="semibold" tone="accent">
+            Create a routine
+          </Text>
+        </PressableScale>
+      )}
 
       <Sheet visible={!!menu} onClose={() => setMenu(null)} title={menu?.name}>
         {menu ? (
@@ -195,43 +206,51 @@ export function MyRoutines({
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, gap: space[1] / 2 },
-  titleRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: space[2],
-    paddingTop: space[2],
-  },
-  group: {
-    borderRadius: radius.lg,
-    backgroundColor: colors.surface,
-    overflow: "hidden",
-  },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: space[2],
-    minHeight: space[12] + space[4],
-    paddingHorizontal: space[3],
-  },
-  rowLine: {
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: colors.border,
-  },
-  rowMain: {
+  flex: { flex: 1 },
+  title: { paddingTop: space[2] },
+  tiles: { flexDirection: "row", gap: space[2] },
+  tile: {
     flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: space[3],
-    paddingVertical: space[3],
-  },
-  play: {
-    width: space[8],
-    height: space[8],
-    borderRadius: radius.full,
-    backgroundColor: colors.brand,
     alignItems: "center",
     justifyContent: "center",
+    gap: space[1],
+    paddingVertical: space[3],
+    borderRadius: radius.lg,
+    backgroundColor: colors.surface,
   },
-  addIcon: { backgroundColor: colors.surfaceRaised },
+  card: {
+    gap: space[2],
+    padding: space[3],
+    borderRadius: radius.lg,
+    backgroundColor: colors.surface,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.brand,
+  },
+  cardHead: { flexDirection: "row", alignItems: "center", gap: space[2] },
+  cardFoot: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space[2],
+    paddingTop: space[1],
+  },
+  start: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space[1],
+    paddingHorizontal: space[3],
+    paddingVertical: space[1] + space[1] / 2,
+    borderRadius: radius.full,
+    backgroundColor: colors.brand,
+  },
+  empty: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: space[2],
+    minHeight: space[12],
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderStyle: "dashed",
+    borderColor: colors.borderStrong,
+  },
 });

@@ -2,7 +2,7 @@
 // athlete's own), history and the exercise library. The plan comes from the coach (coached) or from
 // the athlete's answers (self-guided, D57).
 import { router } from "expo-router";
-import { ChevronRight, Play, Plus } from "lucide-react-native";
+import { Play, Plus } from "lucide-react-native";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
@@ -55,10 +55,9 @@ function PlanPage() {
             <Plus size={22} strokeWidth={2.4} color={colors.onBrand} />
           )}
         </View>
-        <Text variant="heading" style={styles.flex}>
-          {active ? `Resume ${active.name}` : "Empty workout"}
+        <Text weight="semibold" style={styles.flex}>
+          {active ? `Resume ${active.name}` : "Start empty workout"}
         </Text>
-        <ChevronRight size={20} color={colors.textMuted} />
       </PressableScale>
 
       {!program && coached ? (
@@ -104,21 +103,9 @@ export default function Training() {
   const [tab, setTab] = useState<TrainingTab>("plan");
   const vis = useVisibility();
   if (!me) return <NotJoined />;
-  const program = me.program;
-  const pw = program ? programWeek(program.weeks, me.programStart) : null;
   return (
     <View style={styles.root}>
-      <PageHeader
-        title="Training"
-        sub={
-          program && pw
-            ? pw.done
-              ? "Program complete"
-              : `Week ${pw.week} of ${pw.weeks}`
-            : undefined
-        }
-        actions={[athleteMenuAction]}
-      />
+      <PageHeader title="Training" actions={[athleteMenuAction]} />
       <SectionTabs
         tabs={
           vis.race
@@ -155,13 +142,11 @@ const styles = StyleSheet.create({
     padding: space[3],
     borderRadius: radius.lg,
     backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.brand,
   },
   quickIcon: {
-    width: space[12],
-    height: space[12],
-    borderRadius: radius.md,
+    width: space[8] + space[1],
+    height: space[8] + space[1],
+    borderRadius: radius.sm,
     backgroundColor: colors.brand,
     alignItems: "center",
     justifyContent: "center",

@@ -8,7 +8,6 @@ import {
   Check,
   MessageCircle,
   Play,
-  Plus,
   Sparkles,
 } from "lucide-react-native";
 import { Alert, StyleSheet, View } from "react-native";
@@ -19,6 +18,7 @@ import { athleteMenuAction } from "@/features/athlete/MenuParts";
 import { useTodayWorkout } from "@/features/athlete/QuickLog";
 import { todayDate } from "@/features/athlete/recovery";
 import { Ring, useRecovery } from "@/features/athlete/RecoveryParts";
+import { FoodScanButton } from "@/features/athlete/FoodScanButton";
 import { programWeek } from "@/features/athlete/training";
 import {
   AthleteDock,
@@ -513,17 +513,7 @@ export default function Today() {
           onPress={openToday}
         />
       ) : (
-        <AthleteDock
-          label="Log food"
-          icon={Plus}
-          pillar="nutrition"
-          onPress={() =>
-            router.push({
-              pathname: "/athlete/food/add",
-              params: { meal: slotNow() },
-            })
-          }
-        />
+        <FoodScanButton meal={slotNow()} />
       )}
     </View>
   );
