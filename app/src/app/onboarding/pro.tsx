@@ -53,6 +53,7 @@ export default function Pro() {
             ...c,
             athleteSettings: {
               ...defaultSettings(),
+              ...c.athleteSettings,
               sub: { status: "trial", plan: billing, startedAt: isoToday() },
             },
           }

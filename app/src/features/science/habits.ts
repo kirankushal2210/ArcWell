@@ -62,7 +62,8 @@ export const MODULES: {
 /** On by default (D78, D80): Morning start for everyone; cardio for general fitness and race goals. */
 export function defaultModules(goal?: string): ModuleKey[] {
   const out: ModuleKey[] = ["morning"];
-  if (goal === "general_fitness" || goal === "hyrox") out.push("cardio_fitness");
+  if (goal === "general_fitness" || goal === "hyrox")
+    out.push("cardio_fitness");
   if (goal === "hyrox") out.push("running");
   return out;
 }
@@ -84,7 +85,8 @@ export const EVIDENCE_LABEL: Record<Evidence, string> = {
   practice: "Practice, not trial-tested",
 };
 
-export type Tracker = "check" | "minutes" | "count" | "clock" | "timer" | "amount";
+export type Tracker =
+  "check" | "minutes" | "count" | "clock" | "timer" | "amount";
 
 /** A window relative to the athlete's day: anchor plus offsets in minutes. */
 export type Window = {
@@ -141,7 +143,10 @@ export const HABITS: Habit[] = [
     area: "sleep_light",
     name: "Afternoon daylight",
     summary: "A few minutes outside in the late afternoon.",
-    steps: ["Step outside for 5 to 30 minutes before sunset.", "No phone needed."],
+    steps: [
+      "Step outside for 5 to 30 minutes before sunset.",
+      "No phone needed.",
+    ],
     tracker: "minutes",
     target: 10,
     unit: "min",
@@ -171,7 +176,10 @@ export const HABITS: Habit[] = [
     area: "sleep_light",
     name: "Same wake time",
     summary: "Waking within 30 minutes of your usual time, weekends too.",
-    steps: ["Keep the alarm the same every day.", "After a late night, nap rather than sleep in."],
+    steps: [
+      "Keep the alarm the same every day.",
+      "After a late night, nap rather than sleep in.",
+    ],
     tracker: "check",
     window: { anchor: "wake", start: 0, end: 2 * H },
     evidence: "moderate",
@@ -182,7 +190,8 @@ export const HABITS: Habit[] = [
     module: "sleep_light",
     area: "sleep_light",
     name: "Caffeine cut-off",
-    summary: "Last coffee or tea well before bed, so it doesn't cut into your sleep.",
+    summary:
+      "Last coffee or tea well before bed, so it doesn't cut into your sleep.",
     steps: [
       "Have your last caffeine by the time shown.",
       "Decaf and caffeine-free tea are fine after that.",
@@ -210,7 +219,8 @@ export const HABITS: Habit[] = [
     module: "daily_movement",
     area: "movement",
     name: "Daily steps",
-    summary: "More daily steps are linked with longer life, levelling off around 8,000 to 10,000.",
+    summary:
+      "More daily steps are linked with longer life, levelling off around 8,000 to 10,000.",
     steps: ["Walk calls, take the stairs, walk after meals."],
     tracker: "amount",
     target: 8000,
@@ -224,7 +234,8 @@ export const HABITS: Habit[] = [
     module: "daily_movement",
     area: "movement",
     name: "Walk after a meal",
-    summary: "A short walk within 30 minutes of eating lowers the rise in blood sugar.",
+    summary:
+      "Short, light walks that break up sitting lowered blood sugar after meals in trials.",
     steps: ["5 to 15 minutes at an easy pace, soon after lunch or dinner."],
     tracker: "check",
     window: { anchor: "wake", start: 5 * H, end: 8 * H },
@@ -236,7 +247,8 @@ export const HABITS: Habit[] = [
     module: "mobility",
     area: "movement",
     name: "Mobility, 10 minutes",
-    summary: "Gentle range-of-motion work. Lifting through a full range also helps.",
+    summary:
+      "Gentle range-of-motion work. Lifting through a full range also helps.",
     steps: [
       "Deep squat hold, hip-flexor stretch, chest opener, hamstring hinge.",
       "Slow, painless, about 10 minutes.",
@@ -251,8 +263,13 @@ export const HABITS: Habit[] = [
     module: "calm",
     area: "calm",
     name: "Long-exhale breathing",
-    summary: "A double breath in through the nose, then a long breath out, for a few minutes.",
-    steps: ["Breathe in, then a second short breath in.", "Breathe out slowly and fully.", "Repeat for 1 to 5 minutes."],
+    summary:
+      "A double breath in through the nose, then a long breath out, for a few minutes.",
+    steps: [
+      "Breathe in, then a second short breath in.",
+      "Breathe out slowly and fully.",
+      "Repeat for 1 to 5 minutes.",
+    ],
     tracker: "timer",
     target: 5,
     unit: "min",
@@ -266,7 +283,10 @@ export const HABITS: Habit[] = [
     area: "calm",
     name: "5-minute meditation",
     summary: "Short daily meditation improved attention and mood in trials.",
-    steps: ["Sit or lie down, eyes closed.", "Rest attention on your breath; when it wanders, bring it back."],
+    steps: [
+      "Sit or lie down, eyes closed.",
+      "Rest attention on your breath; when it wanders, bring it back.",
+    ],
     tracker: "timer",
     target: 5,
     unit: "min",
@@ -279,8 +299,13 @@ export const HABITS: Habit[] = [
     module: "calm",
     area: "calm",
     name: "10-minute rest (NSDR)",
-    summary: "Lying still with slow breathing and a body scan. It doesn't replace sleep.",
-    steps: ["Lie down, long slow breaths out.", "Move attention slowly through the body.", "10 to 20 minutes."],
+    summary:
+      "Lying still with slow breathing and a body scan. It doesn't replace sleep.",
+    steps: [
+      "Lie down, long slow breaths out.",
+      "Move attention slowly through the body.",
+      "10 to 20 minutes.",
+    ],
     tracker: "timer",
     target: 10,
     unit: "min",
@@ -293,8 +318,13 @@ export const HABITS: Habit[] = [
     module: "calm",
     area: "calm",
     name: "Cold shower",
-    summary: "Cold water for 1 to 3 minutes, as an optional extra. Kept away from lifting.",
-    steps: ["Uncomfortably cold, never painful.", "1 to 3 minutes, never more than 5.", "Never with breath holds."],
+    summary:
+      "Cold water for 1 to 3 minutes, as an optional extra. Kept away from lifting.",
+    steps: [
+      "Uncomfortably cold, never painful.",
+      "1 to 3 minutes, never more than 5.",
+      "Never with breath holds.",
+    ],
     tracker: "timer",
     target: 2,
     unit: "min",
@@ -309,7 +339,8 @@ export const HABITS: Habit[] = [
     module: "food_habits",
     area: "nutrition",
     name: "Fermented foods",
-    summary: "Curd, buttermilk, idli or dosa batter, kanji. One small trial found more variety in gut bacteria.",
+    summary:
+      "Curd, buttermilk, idli or dosa batter, kanji. One small trial found more variety in gut bacteria.",
     steps: ["2 or more small servings a day, low in sugar."],
     tracker: "count",
     target: 2,
@@ -324,13 +355,15 @@ export const HABITS: Habit[] = [
     area: "nutrition",
     name: "Fatty fish",
     summary: "Fish like salmon, mackerel or sardines once or twice a week.",
-    steps: ["Count servings this week. Vegetarian? This one isn't for you, and that's fine."],
+    steps: [
+      "Count servings this week. Vegetarian? This one isn't for you, and that's fine.",
+    ],
     tracker: "count",
     target: 2,
     unit: "a week",
     window: { anchor: "wake", start: 5 * H, end: 14 * H },
     evidence: "moderate",
-    sources: ["rimm2018"],
+    sources: ["aha2018fish"],
   },
   {
     id: "focus-block",
@@ -338,7 +371,11 @@ export const HABITS: Habit[] = [
     area: "focus",
     name: "Focus block",
     summary: "A timed block of work with the phone in another room.",
-    steps: ["Choose 25, 45, 60 or 90 minutes.", "Phone in another room.", "Short pauses help; no scrolling in them."],
+    steps: [
+      "Choose 25, 45, 60 or 90 minutes.",
+      "Phone in another room.",
+      "Short pauses help; no scrolling in them.",
+    ],
     tracker: "timer",
     target: 45,
     unit: "min",
@@ -356,7 +393,8 @@ export const START_HABITS = 3;
 export function habitCap(firstHabitDate: string | undefined, today: string) {
   if (!firstHabitDate) return START_HABITS;
   const days =
-    (Date.parse(`${today}T00:00:00`) - Date.parse(`${firstHabitDate}T00:00:00`)) /
+    (Date.parse(`${today}T00:00:00`) -
+      Date.parse(`${firstHabitDate}T00:00:00`)) /
     86400000;
   return days >= 14 ? MAX_HABITS : START_HABITS;
 }
@@ -391,7 +429,11 @@ export function inWindow(h: Habit, r: Rhythm, now: number) {
 
 /** Daylight target by sky: about 10 min clear, 20 some cloud, 30 overcast (practical guide). */
 export type Sky = "clear" | "cloud" | "overcast";
-export const DAYLIGHT_MIN: Record<Sky, number> = { clear: 10, cloud: 20, overcast: 30 };
+export const DAYLIGHT_MIN: Record<Sky, number> = {
+  clear: 10,
+  cloud: 20,
+  overcast: 30,
+};
 
 /** Last caffeine about 9 hours before bed (caffeine 6 h before bed still cut sleep; meta-analysis). */
 export const CAFFEINE_GAP_MIN = 9 * H;
@@ -443,13 +485,15 @@ export function typicalCortisol(t: number, r: Rhythm) {
   const peakAt = 40;
   const lowAt = bed - r.wake + 3 * H; // lowest a few hours into sleep
   const riseFrom = 1440 - 3 * H; // starts climbing ~3 h before waking
-  if (sinceWake <= peakAt) return 0.62 + 0.38 * Math.sin((sinceWake / peakAt) * (Math.PI / 2));
+  if (sinceWake <= peakAt)
+    return 0.62 + 0.38 * Math.sin((sinceWake / peakAt) * (Math.PI / 2));
   if (sinceWake <= lowAt) {
     const x = (sinceWake - peakAt) / (lowAt - peakAt);
     const e = Math.exp(-3);
     return 0.08 + 0.92 * ((Math.exp(-3 * x) - e) / (1 - e));
   }
-  if (sinceWake < riseFrom) return 0.08 + 0.02 * ((sinceWake - lowAt) / Math.max(1, riseFrom - lowAt));
+  if (sinceWake < riseFrom)
+    return 0.08 + 0.02 * ((sinceWake - lowAt) / Math.max(1, riseFrom - lowAt));
   return 0.1 + 0.52 * ((sinceWake - riseFrom) / (1440 - riseFrom));
 }
 

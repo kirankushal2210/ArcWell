@@ -7,8 +7,8 @@ import {
   Bell,
   BookOpen,
   CalendarRange,
-  ChartColumn,
   Camera,
+  ChartColumn,
   ChartLine,
   Dumbbell,
   History,
@@ -16,6 +16,7 @@ import {
   MapPin,
   Ruler,
   Scale,
+  SlidersHorizontal,
   UserRound,
 } from "lucide-react-native";
 import { StyleSheet, View } from "react-native";
@@ -59,6 +60,18 @@ export default function AthleteMenu() {
           label="Account"
           sub="Profile, privacy, units, your data"
           onPress={() => router.push("/athlete/menu/account")}
+        />
+        <NavRow
+          icon={SlidersHorizontal}
+          label="What Arcwell shows"
+          sub="Choose what's on your Today and in your plan"
+          onPress={() => router.push("/athlete/menu/shows")}
+        />
+        <NavRow
+          icon={ListChecks}
+          label="Daily habits"
+          sub="Small daily habits, each at its time of day"
+          onPress={() => router.push("/athlete/habits")}
         />
         <NavRow
           icon={AlarmClock}

@@ -70,7 +70,11 @@ describe("habits", () => {
 
   test("only Morning start is on by default for a muscle goal (D78, D80)", () => {
     expect(defaultModules("build_muscle")).toEqual(["morning"]);
-    expect(defaultModules("hyrox")).toEqual(["morning", "cardio_fitness", "running"]);
+    expect(defaultModules("hyrox")).toEqual([
+      "morning",
+      "cardio_fitness",
+      "running",
+    ]);
   });
 
   test("Morning start runs from waking to 3 hours after", () => {
@@ -99,10 +103,22 @@ describe("cardio fitness (VO2 max)", () => {
     expect(hrMaxFor(30)).toBe(187);
     expect(cooperVo2(2400)).toBeCloseTo(42.4, 1);
     expect(
-      rockportVo2({ weightKg: 70, age: 30, sex: "female", minutes: 15, endHr: 130 }),
+      rockportVo2({
+        weightKg: 70,
+        age: 30,
+        sex: "female",
+        minutes: 15,
+        endHr: 130,
+      }),
     ).toBeGreaterThan(30);
     expect(
-      nonExerciseVo2({ age: 30, sex: "male", weightKg: 75, heightCm: 178, activity: 5 }),
+      nonExerciseVo2({
+        age: 30,
+        sex: "male",
+        weightKg: 75,
+        heightCm: 178,
+        activity: 5,
+      }),
     ).toBeGreaterThan(40);
   });
 
@@ -115,7 +131,9 @@ describe("cardio fitness (VO2 max)", () => {
 
   test("leg days are recognised", () => {
     expect(isLowerBodyDay([{ name: "Squat (barbell)", sets: 4 }])).toBe(true);
-    expect(isLowerBodyDay([{ name: "Bench press (barbell)", sets: 4 }])).toBe(false);
+    expect(isLowerBodyDay([{ name: "Bench press (barbell)", sets: 4 }])).toBe(
+      false,
+    );
   });
 
   test("intervals never land on a leg day or the day before one", () => {
@@ -130,7 +148,13 @@ describe("cardio fitness (VO2 max)", () => {
       null,
     ];
     for (const level of ["beginner", "intermediate", "advanced"] as const) {
-      const slots = weekCardio({ level, week: 2, days: [], machines: ["bike"], lifting });
+      const slots = weekCardio({
+        level,
+        week: 2,
+        days: [],
+        machines: ["bike"],
+        lifting,
+      });
       for (const s of slots.filter((x) => x.kind === "intervals")) {
         expect(lifting[s.day]?.lower).not.toBe(true);
         expect(lifting[(s.day + 1) % 7]?.lower).not.toBe(true);
@@ -180,7 +204,8 @@ describe("hybrid race plan", () => {
   });
 
   test("the plan has one session per available day", () => {
-    for (const d of [3, 4, 5, 6]) expect(hybridProgram(d, 60).days).toHaveLength(d);
+    for (const d of [3, 4, 5, 6])
+      expect(hybridProgram(d, 60).days).toHaveLength(d);
     expect(hybridProgram(4, 50).name).toContain("Specific");
   });
 });

@@ -39,6 +39,8 @@ import {
 } from "@/features/athlete/athleteData";
 import { Tip } from "@/features/athlete/Tip";
 import { TodaySuggestion } from "@/features/ai/TodaySuggestion";
+import { MorningStart } from "@/features/protocols/MorningStart";
+import { TodayHabits } from "@/features/protocols/TodayHabits";
 import { SAMPLE_TOOLS } from "@/features/system/store";
 
 const dateLabel = () =>
@@ -310,6 +312,8 @@ export default function Today() {
           </Group>
         ) : null}
 
+        <MorningStart />
+        <TodayHabits />
         <TodaySuggestion />
 
         <PressableScale
