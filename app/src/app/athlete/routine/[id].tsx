@@ -82,7 +82,7 @@ export default function RoutineEditor() {
       <View style={[styles.bar, { paddingTop: insets.top + space[2] }]}>
         <Button label="Cancel" variant="ghost" size="sm" onPress={back} />
         <Text weight="semibold" style={styles.barTitle}>
-          {saved ? "Edit routine" : "Create routine"}
+          {saved ? "Edit template" : "Create template"}
         </Text>
         <Button
           label="Save"
@@ -96,15 +96,15 @@ export default function RoutineEditor() {
           <TextInput
             value={r.name}
             onChangeText={(v) => setR((x) => ({ ...x, name: v }))}
-            placeholder="Routine title"
+            placeholder="Template name"
             placeholderTextColor={colors.textMuted}
             style={[styles.name, tried && !r.name.trim() && styles.nameError]}
             autoFocus={!saved}
-            accessibilityLabel="Routine title"
+            accessibilityLabel="Template name"
           />
           {tried && !r.name.trim() ? (
             <Text variant="label" weight="regular" tone="danger">
-              Give your routine a title.
+              Give your template a name.
             </Text>
           ) : null}
         </View>
@@ -142,7 +142,7 @@ export default function RoutineEditor() {
 
         {saved ? (
           <Button
-            label="Delete routine"
+            label="Delete template"
             icon={Trash2}
             variant="destructive"
             fullWidth

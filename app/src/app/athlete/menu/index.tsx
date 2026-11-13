@@ -92,7 +92,7 @@ export default function AthleteMenu() {
           first
           icon={ListChecks}
           label="Workouts"
-          sub="Your plan and your own routines"
+          sub="Your plan and your templates"
           onPress={() => router.push("/athlete/training")}
         />
         <NavRow

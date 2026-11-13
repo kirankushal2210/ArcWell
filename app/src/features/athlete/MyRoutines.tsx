@@ -1,35 +1,32 @@
-// Routines on the Training tab (F4-01, D83): New routine and Explore, the plan's workouts and the
-// athlete's own saved workouts. Each card lists its exercises and starts in one tap; own routines
-// have a menu to edit, duplicate or delete.
+// Templates on the Training tab (F4-01, D89, D92): saved workouts the athlete starts in one tap.
+// New template and the plan tile on top, then My templates, each card with a menu to edit,
+// duplicate or delete. (Stored as "routines" in the data.)
 import { router } from "expo-router";
 import {
   ChevronDown,
   ChevronRight,
   ClipboardList,
   Ellipsis,
-  Plus,
   ListChecks,
+  Play,
+  Plus,
 } from "lucide-react-native";
 import { useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
 
-import {
-  Button,
-  IconButton,
-  PressableScale,
-  Text,
-} from "@/components/primitives";
+import { IconButton, PressableScale, Text } from "@/components/primitives";
 import { useCoachData } from "@/features/coach/CoachData";
 import { type TrainingDay, uid } from "@/features/coach/plans";
 import type { Client } from "@/features/coach/sampleData";
 import { colors, radius, space } from "@/theme";
 
 import { Sheet, SheetRow } from "./Sheet";
+import { estimateMinutes } from "./training";
 
 const edit = (id: string) =>
   router.push({ pathname: "/athlete/routine/[id]", params: { id } });
 
-/** One routine: name, its exercises on one line, and a Start button. */
+/** One template (D92): a lettered badge, name and length, its exercises, and a compact Start. */
 export function RoutineCard({
   day,
   onMenu,
@@ -40,9 +37,17 @@ export function RoutineCard({
   return (
     <View style={styles.card}>
       <View style={styles.head}>
-        <Text variant="heading" style={styles.flex}>
-          {day.name}
-        </Text>
+        <View style={styles.badge}>
+          <Text weight="bold" tone="onBrand">
+            {day.name.trim().charAt(0).toUpperCase() || "T"}
+          </Text>
+        </View>
+        <View style={styles.flex}>
+          <Text weight="semibold">{day.name}</Text>
+          <Text variant="caption" tone="muted" numeric>
+            {`${day.exercises.length} exercises · ${estimateMinutes(day)} min`}
+          </Text>
+        </View>
         {onMenu ? (
           <IconButton
             icon={Ellipsis}
@@ -51,19 +56,27 @@ export function RoutineCard({
           />
         ) : null}
       </View>
-      <Text tone="muted" numberOfLines={2}>
-        {day.exercises.map((e) => e.name).join(", ")}
+      <Text variant="label" weight="regular" tone="muted" numberOfLines={2}>
+        {day.exercises.map((e) => e.name).join(" · ")}
       </Text>
-      <Button
-        label="Start routine"
-        fullWidth
-        onPress={() =>
-          router.push({
-            pathname: "/athlete/workout/preview/[dayId]",
-            params: { dayId: day.id },
-          })
-        }
-      />
+      <View style={styles.foot}>
+        <PressableScale
+          onPress={() =>
+            router.push({
+              pathname: "/athlete/workout/preview/[dayId]",
+              params: { dayId: day.id },
+            })
+          }
+          accessibilityRole="button"
+          accessibilityLabel={`Start ${day.name}`}
+          style={styles.start}
+        >
+          <Play size={13} color={colors.onBrand} fill={colors.onBrand} />
+          <Text variant="label" weight="semibold" tone="onBrand">
+            Start
+          </Text>
+        </PressableScale>
+      </View>
     </View>
   );
 }
@@ -127,16 +140,18 @@ export function MyRoutines({
 
   return (
     <>
-      <Text variant="title">Routines</Text>
+      <Text variant="title">Templates</Text>
       <View style={styles.actions}>
         <PressableScale
           onPress={() => edit("new")}
           accessibilityRole="button"
-          accessibilityLabel="New routine"
+          accessibilityLabel="New template"
           style={styles.action}
         >
-          <ClipboardList size={20} color={colors.text} />
-          <Text weight="semibold">New routine</Text>
+          <View style={styles.tileIcon}>
+            <ClipboardList size={18} color={colors.onBrand} />
+          </View>
+          <Text weight="semibold">New template</Text>
         </PressableScale>
         {planTile ? (
           <PressableScale
@@ -145,42 +160,43 @@ export function MyRoutines({
             accessibilityLabel={planTile.label}
             style={styles.action}
           >
-            <ListChecks size={20} color={colors.text} />
+            <View style={styles.tileIcon}>
+              <ListChecks size={18} color={colors.onBrand} />
+            </View>
             <Text weight="semibold">{planTile.label}</Text>
           </PressableScale>
         ) : null}
       </View>
 
       <Fold
-        title={`My routines (${routines.length})`}
+        title={`My templates (${routines.length})`}
         open={mineOpen}
         onToggle={() => setMineOpen(!mineOpen)}
       />
       {mineOpen ? (
-        routines.length ? (
-          routines.map((r) => (
+        <>
+          {routines.map((r) => (
             <RoutineCard key={r.id} day={r} onMenu={() => setMenu(r)} />
-          ))
-        ) : (
+          ))}
           <PressableScale
             onPress={() => edit("new")}
             accessibilityRole="button"
-            accessibilityLabel="Add a new routine"
-            style={styles.empty}
+            accessibilityLabel="Add a new template"
+            style={styles.add}
           >
-            <Plus size={18} color={colors.accent} />
-            <Text weight="semibold" tone="accent">
-              Add a new routine
-            </Text>
+            <View style={styles.addIcon}>
+              <Plus size={16} strokeWidth={2.6} color={colors.onBrand} />
+            </View>
+            <Text weight="semibold">Add a new template</Text>
           </PressableScale>
-        )
+        </>
       ) : null}
 
       <Sheet visible={!!menu} onClose={() => setMenu(null)} title={menu?.name}>
         {menu ? (
           <>
             <SheetRow
-              label="Edit routine"
+              label="Edit template"
               onPress={() => {
                 setMenu(null);
                 edit(menu.id);
@@ -229,17 +245,23 @@ export function MyRoutines({
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1 },
-  actions: { flexDirection: "row", gap: space[3] },
+  flex: { flex: 1, gap: space[1] / 2 },
+  actions: { flexDirection: "row", gap: space[2] },
   action: {
     flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     gap: space[2],
-    minHeight: space[12],
-    paddingHorizontal: space[4],
-    borderRadius: radius.md,
+    padding: space[3],
+    borderRadius: radius.lg,
     backgroundColor: colors.surface,
+  },
+  tileIcon: {
+    width: space[8],
+    height: space[8],
+    borderRadius: radius.sm,
+    backgroundColor: colors.brand,
+    alignItems: "center",
+    justifyContent: "center",
   },
   fold: {
     flexDirection: "row",
@@ -248,21 +270,45 @@ const styles = StyleSheet.create({
     minHeight: space[12],
   },
   card: {
-    gap: space[3],
-    padding: space[4],
+    gap: space[2],
+    padding: space[3],
     borderRadius: radius.lg,
     backgroundColor: colors.surface,
   },
-  head: { flexDirection: "row", alignItems: "center", gap: space[2] },
-  empty: {
-    flexDirection: "row",
+  head: { flexDirection: "row", alignItems: "center", gap: space[3] },
+  badge: {
+    width: space[8] + space[2],
+    height: space[8] + space[2],
+    borderRadius: radius.md,
+    backgroundColor: colors.brand,
     alignItems: "center",
     justifyContent: "center",
-    gap: space[2],
-    minHeight: space[12] + space[4],
+  },
+  foot: { flexDirection: "row", justifyContent: "flex-end" },
+  start: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space[1],
+    paddingHorizontal: space[4],
+    paddingVertical: space[2],
+    borderRadius: radius.full,
+    backgroundColor: colors.brand,
+  },
+  add: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space[3],
+    minHeight: space[12] + space[2],
+    paddingHorizontal: space[3],
     borderRadius: radius.lg,
-    borderWidth: 1,
-    borderStyle: "dashed",
-    borderColor: colors.borderStrong,
+    backgroundColor: colors.surface,
+  },
+  addIcon: {
+    width: space[8],
+    height: space[8],
+    borderRadius: radius.full,
+    backgroundColor: colors.brand,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

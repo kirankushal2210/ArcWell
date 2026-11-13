@@ -77,7 +77,7 @@ export default function Preview() {
             ? [
                 {
                   icon: PencilLine,
-                  label: "Edit routine",
+                  label: "Edit template",
                   onPress: () =>
                     router.push({
                       pathname: "/athlete/routine/[id]",
@@ -117,7 +117,7 @@ export default function Preview() {
         <Text tone="muted" numeric>
           About {estimateMinutes(day)} min · {day.exercises.length} exercises ·{" "}
           {sets} sets
-          {routine ? " · your routine" : coached ? ` · from ${coachName}` : ""}
+          {routine ? " · your template" : coached ? ` · from ${coachName}` : ""}
         </Text>
         {/* Only notes a person wrote: the coach's, or the athlete's own on a routine (D88). */}
         {day.note?.trim() && (routine || coached) ? (
