@@ -1,15 +1,14 @@
-// Morning start on Today (D80): four quick ticks after waking (daylight, water, moving, and coffee or
-// tea for people who drink it) beside a small curve of the typical daily cortisol rhythm: high
-// soon after waking, low at night. The curve is drawn from the athlete's own wake and bed times; it
-// is a typical rhythm, never a measurement. Water ticks for hydration, not cortisol. Compact by
-// design: one card in the morning, one slim row later in the day, nothing in the evening.
+// Cortisol meter on Today (D80, founder request): a four-step morning to-do (sunlight, water,
+// caffeine, movement) and a meter that rises as they're ticked, then falls through the day to low at
+// night, ready for sleep. An estimate from the morning steps and the typical daily rhythm, never a
+// measurement. Compact: one card all day, with the to-do only in the morning window.
 import {
   Check,
   Coffee,
   Droplet,
   Footprints,
   Sun,
-  Sunrise,
+  Gauge,
 } from "lucide-react-native";
 import { StyleSheet, View } from "react-native";
 import Svg, { Circle, Line, Path, Text as SvgText } from "react-native-svg";
@@ -23,7 +22,8 @@ import { useCoachData } from "@/features/coach/CoachData";
 import {
   bedAfterWake,
   cortisolCurve,
-  inMorning,
+  cortisolMeter,
+  meterLabel,
   MORNING_ITEMS,
   MORNING_WINDOW_MIN,
   type MorningItem,
@@ -113,16 +113,17 @@ export function CortisolCurve({
 }
 
 const WHY = {
-  title: "Morning start",
+  title: "Cortisol meter",
   points: [
-    "Cortisol has a daily rhythm: it rises soon after waking, falls through the day and is lowest at night. The curve shows that typical rhythm on your wake and bed times. It is not measured.",
-    "Bright morning light, exercise and caffeine each raised cortisol in studies. A rhythm that is high in the morning and low at night has been linked with better health in long-term studies, which can't prove cause.",
-    "Water is here because you wake up after hours without drinking, not because it changes cortisol.",
-    "Coffee or tea only if you already drink it; there's no need to start.",
+    "Cortisol follows a daily rhythm: it rises after waking, falls through the day and is lowest at night. High in the morning and low at night is the healthy pattern, and low at night helps you sleep.",
+    "Bright morning light, caffeine and exercise each raised cortisol in studies. A rhythm that is high in the morning and low at night has been linked with better health in long-term studies, which can't prove cause.",
+    "Water is on the list because you wake up after hours without drinking. Caffeine only if you already drink it; there's no need to start.",
+    "The meter is an estimate from your morning steps and the typical daily rhythm. It doesn't measure your cortisol.",
   ],
   sources: ["leproult2001", "hill2008", "lovallo2005", "adam2017", "fries2009"],
 };
 
+/** Cortisol meter on Today (D80): a small morning to-do and a meter that rises with it, then falls by night. */
 export function MorningStart() {
   const v = useVisibility();
   const rec = useRecovery();
@@ -132,10 +133,6 @@ export function MorningStart() {
   if (!v.me || !v.settings || !v.has("morning")) return null;
   const me = v.me;
   const rhythm: Rhythm = { wake: rec.baseline.wake, bed: rec.baseline.bed };
-  const bed = bedAfterWake(rhythm);
-  const t = now < rhythm.wake - 180 ? now + 1440 : now;
-  // Evening (from an hour before bed) Today calms down: no Morning start at all (D77).
-  if (t >= bed - 60) return null;
 
   const today = isoToday();
   const ticks = v.settings.morning?.[today] ?? {};
@@ -159,42 +156,70 @@ export function MorningStart() {
       morning: { ...v.settings?.morning, [today]: next },
     });
   };
-  const core = MORNING_ITEMS.filter((i) => !i.optional);
-  const count = core.filter((i) => done(i.key)).length;
-
-  // Later in the day: one slim row with the curve and the morning's count.
-  if (!inMorning(rhythm, now))
-    return (
-      <View style={styles.slim}>
-        <CortisolCurve
-          rhythm={rhythm}
-          now={now}
-          width={72}
-          height={30}
-          labels={false}
-        />
-        <View style={styles.flex}>
-          <Text variant="label" weight="semibold">
-            Your day&apos;s rhythm
-          </Text>
-          <Text variant="caption" tone="muted">
-            {`Morning start ${count} of ${core.length} · typical, not measured`}
-          </Text>
-        </View>
-        <WhyThis {...WHY} label="Why?" />
-      </View>
-    );
+  const count = MORNING_ITEMS.filter((i) => done(i.key)).length;
+  const m = cortisolMeter(count, now, rhythm);
+  const label = meterLabel(m.value);
+  const headline =
+    m.phase === "night"
+      ? `Night cortisol: ${label}`
+      : m.phase === "morning"
+        ? `Morning cortisol: ${label}`
+        : `Cortisol: ${label}, coming down`;
+  const note =
+    m.phase === "night"
+      ? "Low at night is what sleep needs."
+      : m.phase === "morning"
+        ? count === 4
+          ? "All four done. A strong start."
+          : `Tick all four to raise it (${count} of 4).`
+        : `Morning: ${count} of 4 done. It falls through the day to low at night.`;
 
   return (
     <View style={styles.card}>
       <View style={styles.head}>
-        <Sunrise size={16} color={colors.training} />
+        <Gauge
+          size={16}
+          color={m.phase === "night" ? colors.recovery : colors.training}
+        />
         <Text variant="label" weight="semibold" style={styles.flex}>
-          {`Morning start · ${count} of ${core.length}`}
+          {headline}
         </Text>
-        <WhyThis {...WHY} />
+        <WhyThis {...WHY} label="Why?" />
       </View>
-      <View style={styles.body}>
+      <View
+        style={styles.meter}
+        accessibilityRole="progressbar"
+        accessibilityLabel={`${headline}. Estimate, not measured.`}
+        accessibilityValue={{
+          min: 0,
+          max: 100,
+          now: Math.round(m.value * 100),
+        }}
+      >
+        <View
+          style={[
+            styles.fill,
+            {
+              width: `${Math.round(m.value * 100)}%`,
+              backgroundColor:
+                m.phase === "night" ? colors.recovery : colors.training,
+            },
+          ]}
+        />
+      </View>
+      <View style={styles.scale}>
+        <Text variant="caption" tone="muted">
+          Low
+        </Text>
+        <Text variant="caption" tone="muted" style={styles.flex}>
+          {"   "}
+          {note}
+        </Text>
+        <Text variant="caption" tone="muted">
+          High
+        </Text>
+      </View>
+      {m.phase === "morning" ? (
         <View style={styles.ticks}>
           {MORNING_ITEMS.map((i) => {
             const on = done(i.key);
@@ -224,13 +249,7 @@ export function MorningStart() {
             );
           })}
         </View>
-        <View style={styles.curve}>
-          <CortisolCurve rhythm={rhythm} now={now} width={116} height={64} />
-          <Text variant="caption" tone="muted" style={styles.center}>
-            Cortisol, typical day
-          </Text>
-        </View>
-      </View>
+      ) : null}
     </View>
   );
 }
@@ -262,7 +281,14 @@ const styles = StyleSheet.create({
   },
   tickOn: { backgroundColor: colors.success },
   onText: { color: colors.onPillar },
-  curve: { alignItems: "center" },
+  meter: {
+    height: space[2] + space[1] / 2,
+    borderRadius: radius.full,
+    backgroundColor: colors.surfaceRaised,
+    overflow: "hidden",
+  },
+  fill: { height: "100%", borderRadius: radius.full },
+  scale: { flexDirection: "row", alignItems: "center" },
   center: { textAlign: "center" },
   slim: {
     flexDirection: "row",

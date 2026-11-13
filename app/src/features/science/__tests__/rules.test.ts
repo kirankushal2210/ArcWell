@@ -16,6 +16,8 @@ import {
   caffeineCutoff,
   coldAllowed,
   cortisolCurve,
+  cortisolMeter,
+  meterLabel,
   defaultModules,
   habitById,
   habitCap,
@@ -75,6 +77,20 @@ describe("habits", () => {
       "cardio_fitness",
       "running",
     ]);
+  });
+
+  test("the cortisol meter rises with the morning steps and is low at night", () => {
+    const none = cortisolMeter(0, day.wake + 30, day);
+    const all = cortisolMeter(4, day.wake + 30, day);
+    expect(none.phase).toBe("morning");
+    expect(all.value).toBeGreaterThan(none.value);
+    expect(meterLabel(all.value)).toBe("High");
+    const evening = cortisolMeter(4, 22 * 60, day);
+    expect(evening.phase).toBe("night");
+    expect(meterLabel(evening.value)).toBe("Low");
+    const afternoon = cortisolMeter(4, 15 * 60, day);
+    expect(afternoon.phase).toBe("day");
+    expect(afternoon.value).toBeLessThan(all.value);
   });
 
   test("Morning start runs from waking to 3 hours after", () => {
