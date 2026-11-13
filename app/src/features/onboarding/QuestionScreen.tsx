@@ -37,6 +37,7 @@ import {
   textSizes,
 } from "@/theme";
 
+import { BodyFatPicker } from "./BodyFatPicker";
 import { useOnboarding } from "./OnboardingContext";
 import {
   DayPicker,
@@ -204,6 +205,15 @@ function FieldView({ field: f }: { field: Field }) {
 
     case "wheel":
       return <WheelField field={f} />;
+
+    case "bodyFat":
+      return (
+        <BodyFatPicker
+          sex={answers[f.sexKey]}
+          value={answers[f.key]}
+          onChange={(v) => setAnswer(f.key, v)}
+        />
+      );
 
     case "timePair":
       return (

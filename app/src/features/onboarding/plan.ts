@@ -51,9 +51,14 @@ export function buildPlan(a: Answers): Plan {
   const age = num(a.age, 27);
   const sex = (a.sex as string | undefined) ?? "unspecified";
 
-  // Mifflin–St Jeor; "Prefer not to say" uses the average of the two constants (D44).
+  // With a body fat level (D84), resting energy comes from lean mass (cunningham1980); otherwise
+  // Mifflin–St Jeor, where "Prefer not to say" uses the average of the two constants (D44).
   const sexConstant = sex === "male" ? 5 : sex === "female" ? -161 : -78;
-  const bmr = 10 * weight + 6.25 * height - 5 * age + sexConstant;
+  const bodyFat = typeof a.bodyFatPct === "number" ? a.bodyFatPct : null;
+  const bmr =
+    bodyFat !== null
+      ? 500 + 22 * weight * (1 - bodyFat / 100)
+      : 10 * weight + 6.25 * height - 5 * age + sexConstant;
   const tdee = bmr * (ACTIVITY[(a.activity as string) ?? "moderate"] ?? 1.55);
 
   // Fat loss is capped at about 0.5% of body weight a week; gains stay small.

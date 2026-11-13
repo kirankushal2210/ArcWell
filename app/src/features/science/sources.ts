@@ -257,6 +257,19 @@ export const SOURCES: Record<string, Source> = {
     finding:
       "The equation Arcwell uses to estimate the energy you burn at rest from weight, height, age and sex.",
   },
+  cunningham1980: {
+    id: "cunningham1980",
+    topic: "nutrition",
+    authors: "Cunningham JJ",
+    year: 1980,
+    title:
+      "A reanalysis of the factors influencing basal metabolic rate in normal adults",
+    journal: "Am J Clin Nutr",
+    ref: "33(11):2372–2374",
+    pmid: "7435418",
+    finding:
+      "Lean body mass alone predicted resting energy use (500 + 22 × lean kg); sex and age added little. Arcwell uses it when you give your body fat level.",
+  },
   efsa2010water: {
     id: "efsa2010water",
     topic: "nutrition",

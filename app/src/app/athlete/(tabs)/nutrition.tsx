@@ -97,7 +97,7 @@ function DayPage({
               title="How your targets are set"
               label="How targets are set"
               points={[
-                "Calories start from your resting energy (the Mifflin–St Jeor equation) times your activity, then a small change for your goal.",
+                "Calories start from your resting energy times your activity, then a small change for your goal. Resting energy comes from your lean mass if you gave a body fat level, otherwise from the Mifflin–St Jeor equation.",
                 "Fat loss is kept to about 0.5–1% of your bodyweight a week. Slower loss kept more muscle in athletes.",
                 "Protein is about 1.8 g per kg a day, or 2.0 g while losing fat. Muscle gains level off around 1.6 g on average, and up to about 2.2 g may help those wanting the most.",
                 "With a higher body fat, Arcwell works protein out from a healthy reference weight so the target isn't inflated. That's our choice, not a research finding.",
@@ -105,6 +105,7 @@ function DayPage({
               ]}
               sources={[
                 "mifflin1990",
+                "cunningham1980",
                 "helms2014",
                 "morton2018",
                 "jager2017",

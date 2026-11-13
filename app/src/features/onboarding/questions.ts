@@ -137,7 +137,9 @@ export type Field =
   | { kind: "services"; key: string }
   /** Coach's existing Excel, Google Sheets or CSV workout file (D55). */
   | { kind: "sheet"; key: string; showIf: { key: string; equals: string } }
-  | { kind: "invite"; nameKey: string };
+  | { kind: "invite"; nameKey: string }
+  /** Body fat level from drawn torsos (D84); bands follow the answer under `sexKey`. */
+  | { kind: "bodyFat"; key: string; sexKey: string };
 
 export type Question = {
   id: string;
@@ -278,6 +280,15 @@ export const questions: Question[] = [
         values: kg,
       },
     ],
+  },
+  {
+    id: "AO-04b",
+    section: "you",
+    glyph: Scale,
+    title: "What's your body fat level?",
+    sub: "Pick the closest look. It doesn't need to be exact.",
+    skippable: true,
+    fields: [{ kind: "bodyFat", key: "bodyFatPct", sexKey: "sex" }],
   },
   // ---------- Your goal ----------
   {

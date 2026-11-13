@@ -349,7 +349,8 @@ export const GAIN_RATE_WEEK = [0.0025, 0.005] as const;
 export const FIBRE_G = [25, 29] as const;
 export const WATER_L = { female: 2.0, male: 2.5 } as const;
 
-/** Calorie targets use the Mifflin–St Jeor equation for resting energy (mifflin1990). */
+/** Calorie targets use the Mifflin–St Jeor equation for resting energy (mifflin1990), or lean mass
+ * (cunningham1980) when the athlete gave a body fat level (D84). */
 export const ENERGY_EQUATION = "mifflin1990";
 
 /**
