@@ -124,6 +124,20 @@ export const SOURCES: Record<string, Source> = {
       "One trial in trained men found 3-minute rests gave more strength and thigh growth than 1-minute rests.",
     note: "A single small trial.",
   },
+  plotkin2022: {
+    id: "plotkin2022",
+    topic: "training",
+    authors: "Plotkin D, et al.",
+    year: 2022,
+    title:
+      "Progressive overload without progressing load? The effects of load or repetition progression on muscular adaptations",
+    journal: "PeerJ",
+    ref: "10:e14142",
+    pmid: "36199287",
+    doi: "10.7717/peerj.14142",
+    finding:
+      "In 43 trained lifters over 8 weeks, adding reps and adding weight gave similar muscle and strength gains. Arcwell counts either as progress.",
+  },
   helms2016rir: {
     id: "helms2016rir",
     topic: "training",
