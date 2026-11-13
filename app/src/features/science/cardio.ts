@@ -301,15 +301,21 @@ export function weekCardio(p: {
   const okForIntervals = (d: number) => !legDay(d) && !legDay(d + 1);
   const score = (d: number) =>
     (p.lifting[d] === null ? 2 : 1) + (legDay(d - 1) ? -0.5 : 0);
-  const candidates = allowed
-    .filter(okForIntervals)
-    .sort((a, b) => score(b) - score(a));
+  const circ = (x: number, y: number) =>
+    Math.min(Math.abs(x - y), 7 - Math.abs(x - y));
+  const candidates = allowed.filter(okForIntervals);
   const n = intervalsPerWeek[p.level];
   const picked: number[] = [];
-  for (const d of candidates) {
-    if (picked.length >= n) break;
-    if (picked.some((x) => Math.abs(x - d) < 2)) continue; // at least a day between hard sessions
-    picked.push(d);
+  // Hard sessions as far apart as the week allows, at least a day between them.
+  while (picked.length < n) {
+    const pool = candidates.filter(
+      (d) => !picked.includes(d) && picked.every((x) => circ(x, d) >= 2),
+    );
+    if (!pool.length) break;
+    const spread = (d: number) =>
+      picked.length ? Math.min(...picked.map((x) => circ(x, d))) / 3.5 : 0;
+    pool.sort((x, y) => score(y) + spread(y) - (score(x) + spread(x)) || x - y);
+    picked.push(pool[0]);
   }
   const slots: CardioSlot[] = picked
     .sort((a, b) => a - b)
@@ -323,12 +329,15 @@ export function weekCardio(p: {
         interval,
       };
     });
+  const gap = (d: number) =>
+    picked.length ? Math.min(...picked.map((x) => circ(x, d))) : 7;
   const easyDay = allowed
     .filter((d) => !picked.includes(d))
     .sort(
-      (a, b) =>
-        (legDay(a + 1) ? 1 : 0) - (legDay(b + 1) ? 1 : 0) ||
-        score(b) - score(a),
+      (x, y) =>
+        (legDay(x + 1) ? 1 : 0) - (legDay(y + 1) ? 1 : 0) ||
+        gap(y) - gap(x) ||
+        score(y) - score(x),
     )[0];
   if (easyDay !== undefined)
     slots.push({

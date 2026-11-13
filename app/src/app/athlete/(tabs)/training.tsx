@@ -34,6 +34,7 @@ import {
   useMe,
 } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
+import { CardioCard } from "@/features/cardio/CardioCard";
 import { Eyebrow, Group, GroupRow, PageHeader } from "@/features/coach/parts";
 import { todayIndex, WEEKDAYS, weekSchedule } from "@/features/coach/plans";
 import { colors, radius, space } from "@/theme";
@@ -207,6 +208,7 @@ function PlanPage() {
       </View>
 
       <View style={styles.between}>
+        <CardioCard />
         <Eyebrow>{`Your program · ${program.days.length} workouts`}</Eyebrow>
         {coached || me.formerCoach || meTier !== "pro" ? null : (
           <PressableScale

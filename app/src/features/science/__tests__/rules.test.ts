@@ -163,6 +163,20 @@ describe("cardio fitness (VO2 max)", () => {
     }
   });
 
+  test("hard sessions are spread out in an open week", () => {
+    const slots = weekCardio({
+      level: "intermediate",
+      week: 1,
+      days: [],
+      machines: ["bike"],
+      lifting: [null, null, null, null, null, null, null],
+    });
+    const hard = slots.filter((s) => s.kind === "intervals").map((s) => s.day);
+    expect(hard).toHaveLength(2);
+    const d = Math.abs(hard[0] - hard[1]);
+    expect(Math.min(d, 7 - d)).toBeGreaterThanOrEqual(3);
+  });
+
   test("respects the days the athlete allowed", () => {
     const slots = weekCardio({
       level: "intermediate",

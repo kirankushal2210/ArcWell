@@ -175,6 +175,14 @@ export function selfClient(a: Answers, plan: SelfPlan): Client {
     checkInDay: "Sunday",
     answers: [],
     weights: [weight],
+    basics: {
+      sex: a.sex === "male" || a.sex === "female" ? a.sex : "unsaid",
+      age: typeof a.age === "number" ? a.age : 27,
+      heightCm: typeof a.heightCm === "number" ? a.heightCm : 172,
+      weightKg: weight,
+      diet: plan.summary.diet,
+      injuries: ((a.injuries as string[] | undefined) ?? []).join(", "),
+    },
     targetKg: target,
     training: {
       weekDone: 0,
