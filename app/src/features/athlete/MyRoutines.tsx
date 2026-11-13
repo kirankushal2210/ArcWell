@@ -8,7 +8,7 @@ import {
   ClipboardList,
   Ellipsis,
   Plus,
-  Search,
+  ListChecks,
 } from "lucide-react-native";
 import { useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
@@ -30,7 +30,7 @@ const edit = (id: string) =>
   router.push({ pathname: "/athlete/routine/[id]", params: { id } });
 
 /** One routine: name, its exercises on one line, and a Start button. */
-function RoutineCard({
+export function RoutineCard({
   day,
   onMenu,
 }: {
@@ -96,23 +96,34 @@ function Fold({
 }
 
 /**
- * Routines on the Training tab (D83): New routine and Explore, the plan's workouts, then the
- * athlete's own routines. Each card starts in one tap.
+ * Routines on the Training tab (D83, D89): two ways in, New routine and the plan (Arcwell's plan
+ * from the athlete's answers, or the coach's), then the athlete's own routines. Each card starts
+ * in one tap.
  */
 export function MyRoutines({
   me,
-  explore = true,
+  coached = false,
 }: {
   me: Client;
-  /** Show Explore (programs); off for coached athletes, whose coach sets the program. */
-  explore?: boolean;
+  /** Coached athletes see their coach's plan and can't pick another program. */
+  coached?: boolean;
 }) {
   const { saveRoutine, deleteRoutine } = useCoachData();
   const [menu, setMenu] = useState<TrainingDay | null>(null);
-  const [planOpen, setPlanOpen] = useState(true);
   const [mineOpen, setMineOpen] = useState(true);
   const routines = me.routines ?? [];
   const plan = me.program;
+  // The plan tile: the coach's plan once there is one; otherwise Arcwell's plan, or pick one.
+  const planTile =
+    coached && !plan
+      ? null
+      : {
+          label: coached ? "Coach plan" : "Arcwell plan",
+          go: () =>
+            plan
+              ? router.push("/athlete/plan")
+              : router.push("/athlete/programs"),
+        };
 
   return (
     <>
@@ -127,31 +138,18 @@ export function MyRoutines({
           <ClipboardList size={20} color={colors.text} />
           <Text weight="semibold">New routine</Text>
         </PressableScale>
-        {explore ? (
+        {planTile ? (
           <PressableScale
-            onPress={() => router.push("/athlete/programs")}
+            onPress={planTile.go}
             accessibilityRole="button"
-            accessibilityLabel="Explore programs"
+            accessibilityLabel={planTile.label}
             style={styles.action}
           >
-            <Search size={20} color={colors.text} />
-            <Text weight="semibold">Explore</Text>
+            <ListChecks size={20} color={colors.text} />
+            <Text weight="semibold">{planTile.label}</Text>
           </PressableScale>
         ) : null}
       </View>
-
-      {plan ? (
-        <>
-          <Fold
-            title={`${plan.days.length} days`}
-            open={planOpen}
-            onToggle={() => setPlanOpen(!planOpen)}
-          />
-          {planOpen
-            ? plan.days.map((d) => <RoutineCard key={d.id} day={d} />)
-            : null}
-        </>
-      ) : null}
 
       <Fold
         title={`My routines (${routines.length})`}

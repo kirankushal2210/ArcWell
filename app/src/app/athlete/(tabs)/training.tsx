@@ -71,7 +71,7 @@ function PlanPage() {
         </View>
       ) : null}
 
-      <MyRoutines me={me} explore={!coached} />
+      <MyRoutines me={me} coached={coached} />
     </AthletePage>
   );
 }
