@@ -27,7 +27,6 @@ import {
   clock,
   cortisolDay,
   cortisolMeter,
-  followRules,
   meterLabel,
   MORNING_ITEMS,
   MORNING_WINDOW_MIN,
@@ -190,7 +189,7 @@ export function MorningStart() {
     m.phase === "morning"
       ? count === 4
         ? "All four non-negotiables done: high now, low tonight."
-        : `Do all four non-negotiables for a high morning and a low night (${count} of 4).`
+        : "Tick all four for a high morning and a low night."
       : count === 4
         ? "All four done this morning: coming down to low at night."
         : `${count} of 4 done this morning, so today's curve is flatter. Dashed: the all-four day.`;
@@ -216,56 +215,46 @@ export function MorningStart() {
       <Text variant="caption" tone="muted">
         {`${note} Illustration, not measured.`}
       </Text>
-      <View style={styles.cols}>
-        <View style={styles.col}>
-          <Text variant="caption" weight="semibold">
-            Do · morning
+      <View style={styles.todo}>
+        <View style={styles.todoHead}>
+          <Text variant="caption" weight="semibold" style={styles.flex}>
+            Morning to-do
           </Text>
-          {MORNING_ITEMS.map((i) => {
-            const on = done(i.key);
-            const Icon = ICON[i.key];
-            const canTick = m.phase === "morning";
-            return (
-              <PressableScale
-                key={i.key}
-                onPress={() => canTick && toggle(i.key)}
-                disabled={!canTick}
-                accessibilityRole="checkbox"
-                accessibilityState={{ checked: on, disabled: !canTick }}
-                accessibilityLabel={`${i.label}: ${i.hint}`}
-                style={styles.row}
-              >
-                <View style={[styles.box, on && styles.boxOn]}>
-                  {on ? (
-                    <Check size={12} strokeWidth={3} color={colors.onPillar} />
-                  ) : (
-                    <Icon size={12} color={colors.textMuted} />
-                  )}
-                </View>
+          <Text variant="caption" tone="muted">{`${count} of 4`}</Text>
+        </View>
+        {MORNING_ITEMS.map((i, k) => {
+          const on = done(i.key);
+          const Icon = ICON[i.key];
+          return (
+            <PressableScale
+              key={i.key}
+              onPress={() => toggle(i.key)}
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: on }}
+              accessibilityLabel={`${i.label}: ${i.hint}`}
+              style={[styles.row, k > 0 && styles.rowLine]}
+            >
+              <View style={[styles.box, on && styles.boxOn]}>
+                {on ? (
+                  <Check size={13} strokeWidth={3} color={colors.onPillar} />
+                ) : null}
+              </View>
+              <Icon size={15} color={on ? colors.text : colors.textMuted} />
+              <View style={styles.flex}>
                 <Text
-                  variant="caption"
-                  weight={on ? "semibold" : "regular"}
-                  style={styles.flex}
+                  variant="label"
+                  weight="semibold"
+                  style={on ? styles.doneText : undefined}
                 >
                   {i.label}
                 </Text>
-              </PressableScale>
-            );
-          })}
-        </View>
-        <View style={styles.col}>
-          <Text variant="caption" weight="semibold">
-            Follow · evening
-          </Text>
-          {followRules(rhythm).map((r) => (
-            <View key={r.key} style={styles.rule}>
-              <Text variant="caption">{r.label}</Text>
-              <Text variant="caption" tone="muted">
-                {r.detail}
-              </Text>
-            </View>
-          ))}
-        </View>
+                <Text variant="caption" tone="muted">
+                  {i.hint}
+                </Text>
+              </View>
+            </PressableScale>
+          );
+        })}
       </View>
     </View>
   );
@@ -280,22 +269,32 @@ const styles = StyleSheet.create({
     gap: space[2],
   },
   head: { flexDirection: "row", alignItems: "center", gap: space[2] },
-  cols: { flexDirection: "row", gap: space[3] },
-  col: { flex: 1, gap: space[1] },
+  todo: { gap: 0 },
+  todoHead: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingBottom: space[1],
+  },
   row: {
     flexDirection: "row",
     alignItems: "center",
     gap: space[2],
-    minHeight: controlHeightSm,
+    minHeight: controlHeightSm + space[3],
+    paddingVertical: space[1],
+  },
+  rowLine: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.border,
   },
   box: {
     width: space[4] + space[1],
     height: space[4] + space[1],
-    borderRadius: radius.full,
-    backgroundColor: colors.surfaceRaised,
+    borderRadius: radius.sm,
+    borderWidth: 1.5,
+    borderColor: colors.borderStrong,
     alignItems: "center",
     justifyContent: "center",
   },
-  boxOn: { backgroundColor: colors.success },
-  rule: { minHeight: controlHeightSm, justifyContent: "center" },
+  boxOn: { backgroundColor: colors.success, borderColor: colors.success },
+  doneText: { color: colors.textMuted, textDecorationLine: "line-through" },
 });

@@ -550,14 +550,3 @@ export function cortisolDay(done: number, r: Rhythm, n = 72) {
     return { t, v: Math.max(0, Math.min(1, v)) };
   });
 }
-
-/** The four evening rules that keep night cortisol low (the book's top sleep rules, D82). */
-export function followRules(r: Rhythm) {
-  const bed = bedAfterWake(r);
-  return [
-    { key: "caffeine", label: "Caffeine cut-off", detail: `by ${clock(caffeineCutoff(r))}` },
-    { key: "dim", label: "Dim lights, screens away", detail: `from ${clock(bed - H)}` },
-    { key: "alcohol", label: "No alcohol in the evening", detail: "it breaks up sleep" },
-    { key: "bed", label: "Same bedtime", detail: `${clock(bed)}, every night` },
-  ];
-}
