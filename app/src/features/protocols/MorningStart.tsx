@@ -1,15 +1,18 @@
-// Cortisol meter on Today (D80, founder request): a four-step morning to-do (sunlight, water,
-// caffeine, movement) and a meter that rises as they're ticked, then falls through the day to low at
-// night, ready for sleep. An estimate from the morning steps and the typical daily rhythm, never a
-// measurement. Compact: one card all day, with the to-do only in the morning window.
+// Cortisol graph on Today (D80, D82, founder request): the day's cortisol curve from waking to the
+// next waking. Four morning non-negotiables (sunlight, water, caffeine, movement) shape it: all four
+// done gives a high morning peak and a low night, ready for sleep; fewer gives a flatter curve. A faint
+// dashed line shows the all-four pattern to aim for, and a dot marks now. An illustration of the
+// pattern from the morning steps and the typical daily rhythm, never a measurement. One compact card;
+// the to-do shows only in the morning window.
 import {
+  Activity,
   Check,
   Coffee,
   Droplet,
   Footprints,
   Sun,
-  Gauge,
 } from "lucide-react-native";
+import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import Svg, { Circle, Line, Path, Text as SvgText } from "react-native-svg";
 
@@ -21,14 +24,15 @@ import { useVisibility } from "@/features/athlete/visibility";
 import { useCoachData } from "@/features/coach/CoachData";
 import {
   bedAfterWake,
-  cortisolCurve,
+  clock,
+  cortisolDay,
   cortisolMeter,
+  followRules,
   meterLabel,
   MORNING_ITEMS,
   MORNING_WINDOW_MIN,
   type MorningItem,
   type Rhythm,
-  typicalCortisol,
 } from "@/features/science/habits";
 import { WhyThis } from "@/features/science/WhyThis";
 import { colors, controlHeightSm, radius, space } from "@/theme";
@@ -36,100 +40,116 @@ import { colors, controlHeightSm, radius, space } from "@/theme";
 import { useNow } from "./useNow";
 
 const ICON = { light: Sun, water: Droplet, move: Footprints, caffeine: Coffee };
+const HEIGHT = 92;
 
-/** The small curve: waking on the left, the next waking on the right, a dot at "now". */
-export function CortisolCurve({
+/** The day's curve: waking on the left, the next waking on the right. */
+export function CortisolGraph({
   rhythm,
   now,
+  done,
   width,
-  height,
-  labels = true,
 }: {
   rhythm: Rhythm;
   now: number;
+  done: number;
   width: number;
-  height: number;
-  labels?: boolean;
 }) {
-  const pad = labels ? 12 : 3;
-  const top = 4;
-  const bottom = labels ? 14 : 3;
-  const pts = cortisolCurve(rhythm, 60);
-  const x = (t: number) => pad + ((t - rhythm.wake) / 1440) * (width - pad * 2);
-  const y = (v: number) => top + (1 - v) * (height - top - bottom);
-  const d = pts
-    .map((p, i) => `${i ? "L" : "M"}${x(p.t).toFixed(1)},${y(p.v).toFixed(1)}`)
-    .join(" ");
-  const t = now < rhythm.wake ? now + 1440 : now;
+  const left = 26;
+  const right = 6;
+  const top = 8;
+  const bottom = 16;
+  const x = (t: number) =>
+    left + ((t - rhythm.wake) / 1440) * (width - left - right);
+  const y = (v: number) => top + (1 - v) * (HEIGHT - top - bottom);
+  const path = (pts: { t: number; v: number }[]) =>
+    pts
+      .map(
+        (p, i) => `${i ? "L" : "M"}${x(p.t).toFixed(1)},${y(p.v).toFixed(1)}`,
+      )
+      .join(" ");
+  const today = cortisolDay(done, rhythm);
+  const ideal = cortisolDay(4, rhythm);
   const bed = bedAfterWake(rhythm);
+  const t = now < rhythm.wake ? now + 1440 : now;
+  const nowPt = today.reduce((a, b) =>
+    Math.abs(b.t - t) < Math.abs(a.t - t) ? b : a,
+  );
+  const night = t >= bed - 60 || t < rhythm.wake;
+  const stroke = night ? colors.recovery : colors.training;
   return (
     <View aria-hidden importantForAccessibility="no-hide-descendants">
-      <Svg width={width} height={height}>
+      <Svg width={width} height={HEIGHT}>
+        <SvgText x={0} y={top + 8} fill={colors.textMuted} fontSize={9}>
+          High
+        </SvgText>
+        <SvgText x={0} y={HEIGHT - bottom} fill={colors.textMuted} fontSize={9}>
+          Low
+        </SvgText>
         <Line
           x1={x(bed)}
           x2={x(bed)}
           y1={top}
-          y2={height - bottom}
+          y2={HEIGHT - bottom}
           stroke={colors.border}
-          strokeWidth={1}
           strokeDasharray="2,3"
         />
+        {done < 4 ? (
+          <Path
+            d={path(ideal)}
+            stroke={colors.textMuted}
+            strokeWidth={1.5}
+            strokeDasharray="3,4"
+            fill="none"
+            opacity={0.6}
+          />
+        ) : null}
         <Path
-          d={d}
-          stroke={colors.recovery}
-          strokeWidth={2}
+          d={path(today)}
+          stroke={stroke}
+          strokeWidth={2.5}
           fill="none"
           strokeLinecap="round"
         />
-        <Circle
-          cx={x(t)}
-          cy={y(typicalCortisol(t, rhythm))}
-          r={4}
-          fill={colors.text}
-        />
-        {labels ? (
-          <>
-            <SvgText
-              x={x(rhythm.wake + 40) + 6}
-              y={y(1) + 8}
-              fill={colors.textMuted}
-              fontSize={9}
-            >
-              High
-            </SvgText>
-            <SvgText
-              x={Math.min(width - pad - 18, x(bed + 180) - 8)}
-              y={height - 2}
-              fill={colors.textMuted}
-              fontSize={9}
-            >
-              Low
-            </SvgText>
-          </>
-        ) : null}
+        <Circle cx={x(nowPt.t)} cy={y(nowPt.v)} r={4.5} fill={colors.text} />
+        <SvgText
+          x={x(rhythm.wake)}
+          y={HEIGHT - 3}
+          fill={colors.textMuted}
+          fontSize={9}
+        >
+          {`Wake ${clock(rhythm.wake)}`}
+        </SvgText>
+        <SvgText
+          x={Math.min(width - right - 52, x(bed) - 24)}
+          y={HEIGHT - 3}
+          fill={colors.textMuted}
+          fontSize={9}
+        >
+          {`Bed ${clock(bed)}`}
+        </SvgText>
       </Svg>
     </View>
   );
 }
 
 const WHY = {
-  title: "Cortisol meter",
+  title: "Your cortisol curve",
   points: [
     "Cortisol follows a daily rhythm: it rises after waking, falls through the day and is lowest at night. High in the morning and low at night is the healthy pattern, and low at night helps you sleep.",
-    "Bright morning light, caffeine and exercise each raised cortisol in studies. A rhythm that is high in the morning and low at night has been linked with better health in long-term studies, which can't prove cause.",
+    "Bright morning light, caffeine and exercise each raised cortisol in studies. A steep day, high in the morning and low at night, has been linked with better health in long-term studies; a flatter day with poorer health. Those studies can't prove cause.",
     "Water is on the list because you wake up after hours without drinking. Caffeine only if you already drink it; there's no need to start.",
-    "The meter is an estimate from your morning steps and the typical daily rhythm. It doesn't measure your cortisol.",
+    "The graph is an illustration from your morning steps and the typical daily rhythm. It doesn't measure your cortisol.",
   ],
   sources: ["leproult2001", "hill2008", "lovallo2005", "adam2017", "fries2009"],
 };
 
-/** Cortisol meter on Today (D80): a small morning to-do and a meter that rises with it, then falls by night. */
 export function MorningStart() {
   const v = useVisibility();
   const rec = useRecovery();
   const water = useWater();
   const { setAthleteSettings } = useCoachData();
   const now = useNow();
+  const [width, setWidth] = useState(0);
   if (!v.me || !v.settings || !v.has("morning")) return null;
   const me = v.me;
   const rhythm: Rhythm = { wake: rec.baseline.wake, bed: rec.baseline.bed };
@@ -158,26 +178,30 @@ export function MorningStart() {
   };
   const count = MORNING_ITEMS.filter((i) => done(i.key)).length;
   const m = cortisolMeter(count, now, rhythm);
-  const label = meterLabel(m.value);
   const headline =
     m.phase === "night"
-      ? `Night cortisol: ${label}`
+      ? count === 4
+        ? "Night cortisol: low, ready for sleep"
+        : "Night cortisol"
       : m.phase === "morning"
-        ? `Morning cortisol: ${label}`
-        : `Cortisol: ${label}, coming down`;
+        ? `Morning cortisol: ${meterLabel(m.value)}`
+        : "Your cortisol curve";
   const note =
-    m.phase === "night"
-      ? "Low at night is what sleep needs."
-      : m.phase === "morning"
-        ? count === 4
-          ? "All four done. A strong start."
-          : `Tick all four to raise it (${count} of 4).`
-        : `Morning: ${count} of 4 done. It falls through the day to low at night.`;
+    m.phase === "morning"
+      ? count === 4
+        ? "All four non-negotiables done: high now, low tonight."
+        : `Do all four non-negotiables for a high morning and a low night (${count} of 4).`
+      : count === 4
+        ? "All four done this morning: coming down to low at night."
+        : `${count} of 4 done this morning, so today's curve is flatter. Dashed: the all-four day.`;
 
   return (
-    <View style={styles.card}>
+    <View
+      style={styles.card}
+      onLayout={(e) => setWidth(e.nativeEvent.layout.width - space[3] * 2)}
+    >
       <View style={styles.head}>
-        <Gauge
+        <Activity
           size={16}
           color={m.phase === "night" ? colors.recovery : colors.training}
         />
@@ -186,62 +210,42 @@ export function MorningStart() {
         </Text>
         <WhyThis {...WHY} label="Why?" />
       </View>
-      <View
-        style={styles.meter}
-        accessibilityRole="progressbar"
-        accessibilityLabel={`${headline}. Estimate, not measured.`}
-        accessibilityValue={{
-          min: 0,
-          max: 100,
-          now: Math.round(m.value * 100),
-        }}
-      >
-        <View
-          style={[
-            styles.fill,
-            {
-              width: `${Math.round(m.value * 100)}%`,
-              backgroundColor:
-                m.phase === "night" ? colors.recovery : colors.training,
-            },
-          ]}
-        />
-      </View>
-      <View style={styles.scale}>
-        <Text variant="caption" tone="muted">
-          Low
-        </Text>
-        <Text variant="caption" tone="muted" style={styles.flex}>
-          {"   "}
-          {note}
-        </Text>
-        <Text variant="caption" tone="muted">
-          High
-        </Text>
-      </View>
-      {m.phase === "morning" ? (
-        <View style={styles.ticks}>
+      {width > 0 ? (
+        <CortisolGraph rhythm={rhythm} now={now} done={count} width={width} />
+      ) : null}
+      <Text variant="caption" tone="muted">
+        {`${note} Illustration, not measured.`}
+      </Text>
+      <View style={styles.cols}>
+        <View style={styles.col}>
+          <Text variant="caption" weight="semibold">
+            Do · morning
+          </Text>
           {MORNING_ITEMS.map((i) => {
             const on = done(i.key);
             const Icon = ICON[i.key];
+            const canTick = m.phase === "morning";
             return (
               <PressableScale
                 key={i.key}
-                onPress={() => toggle(i.key)}
+                onPress={() => canTick && toggle(i.key)}
+                disabled={!canTick}
                 accessibilityRole="checkbox"
-                accessibilityState={{ checked: on }}
+                accessibilityState={{ checked: on, disabled: !canTick }}
                 accessibilityLabel={`${i.label}: ${i.hint}`}
-                style={[styles.tick, on && styles.tickOn]}
+                style={styles.row}
               >
-                {on ? (
-                  <Check size={14} strokeWidth={3} color={colors.onPillar} />
-                ) : (
-                  <Icon size={14} color={colors.textMuted} />
-                )}
+                <View style={[styles.box, on && styles.boxOn]}>
+                  {on ? (
+                    <Check size={12} strokeWidth={3} color={colors.onPillar} />
+                  ) : (
+                    <Icon size={12} color={colors.textMuted} />
+                  )}
+                </View>
                 <Text
                   variant="caption"
-                  weight="semibold"
-                  style={on ? styles.onText : undefined}
+                  weight={on ? "semibold" : "regular"}
+                  style={styles.flex}
                 >
                   {i.label}
                 </Text>
@@ -249,7 +253,20 @@ export function MorningStart() {
             );
           })}
         </View>
-      ) : null}
+        <View style={styles.col}>
+          <Text variant="caption" weight="semibold">
+            Follow · evening
+          </Text>
+          {followRules(rhythm).map((r) => (
+            <View key={r.key} style={styles.rule}>
+              <Text variant="caption">{r.label}</Text>
+              <Text variant="caption" tone="muted">
+                {r.detail}
+              </Text>
+            </View>
+          ))}
+        </View>
+      </View>
     </View>
   );
 }
@@ -263,40 +280,22 @@ const styles = StyleSheet.create({
     gap: space[2],
   },
   head: { flexDirection: "row", alignItems: "center", gap: space[2] },
-  body: { flexDirection: "row", alignItems: "center", gap: space[2] },
-  ticks: {
-    flex: 1,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: space[1] + space[1] / 2,
-  },
-  tick: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: space[1],
-    minHeight: controlHeightSm,
-    paddingHorizontal: space[2],
-    borderRadius: radius.full,
-    backgroundColor: colors.surfaceRaised,
-  },
-  tickOn: { backgroundColor: colors.success },
-  onText: { color: colors.onPillar },
-  meter: {
-    height: space[2] + space[1] / 2,
-    borderRadius: radius.full,
-    backgroundColor: colors.surfaceRaised,
-    overflow: "hidden",
-  },
-  fill: { height: "100%", borderRadius: radius.full },
-  scale: { flexDirection: "row", alignItems: "center" },
-  center: { textAlign: "center" },
-  slim: {
+  cols: { flexDirection: "row", gap: space[3] },
+  col: { flex: 1, gap: space[1] },
+  row: {
     flexDirection: "row",
     alignItems: "center",
     gap: space[2],
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    paddingHorizontal: space[3],
-    paddingVertical: space[2],
+    minHeight: controlHeightSm,
   },
+  box: {
+    width: space[4] + space[1],
+    height: space[4] + space[1],
+    borderRadius: radius.full,
+    backgroundColor: colors.surfaceRaised,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  boxOn: { backgroundColor: colors.success },
+  rule: { minHeight: controlHeightSm, justifyContent: "center" },
 });

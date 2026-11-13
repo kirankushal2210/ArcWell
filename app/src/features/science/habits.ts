@@ -532,3 +532,32 @@ export function cortisolMeter(done: number, now: number, r: Rhythm) {
 
 export const meterLabel = (v: number) =>
   v >= 0.75 ? "High" : v >= 0.45 ? "Moderate" : "Low";
+
+/**
+ * The day's cortisol curve for the graph, 0–1, from waking to the next waking. An illustration of
+ * the pattern, never a measurement: with all four morning steps done the morning peak is high and
+ * the night low (a steep day-to-night slope); with fewer, the curve is flatter (lower morning,
+ * higher night), the pattern linked with poorer health in long-term studies (adam2017).
+ */
+export function cortisolDay(done: number, r: Rhythm, n = 72) {
+  const k = Math.min(4, Math.max(0, done)) / 4;
+  const peak = 0.55 + 0.45 * k;
+  const floor = 0.3 - 0.22 * k;
+  return Array.from({ length: n + 1 }, (_, i) => {
+    const t = r.wake + (i / n) * 1440;
+    const shape = typicalCortisol(t, r); // 1 at the morning peak, about 0.08 at night
+    const v = floor + ((shape - 0.08) / 0.92) * (peak - floor);
+    return { t, v: Math.max(0, Math.min(1, v)) };
+  });
+}
+
+/** The four evening rules that keep night cortisol low (the book's top sleep rules, D82). */
+export function followRules(r: Rhythm) {
+  const bed = bedAfterWake(r);
+  return [
+    { key: "caffeine", label: "Caffeine cut-off", detail: `by ${clock(caffeineCutoff(r))}` },
+    { key: "dim", label: "Dim lights, screens away", detail: `from ${clock(bed - H)}` },
+    { key: "alcohol", label: "No alcohol in the evening", detail: "it breaks up sleep" },
+    { key: "bed", label: "Same bedtime", detail: `${clock(bed)}, every night` },
+  ];
+}

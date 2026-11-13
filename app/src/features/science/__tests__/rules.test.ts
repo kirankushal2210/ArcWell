@@ -16,6 +16,7 @@ import {
   caffeineCutoff,
   coldAllowed,
   cortisolCurve,
+  cortisolDay,
   cortisolMeter,
   meterLabel,
   defaultModules,
@@ -91,6 +92,17 @@ describe("habits", () => {
     const afternoon = cortisolMeter(4, 15 * 60, day);
     expect(afternoon.phase).toBe("day");
     expect(afternoon.value).toBeLessThan(all.value);
+  });
+
+  test("the cortisol graph: all four steps give a higher morning and a lower night", () => {
+    const all = cortisolDay(4, day);
+    const none = cortisolDay(0, day);
+    const max = (c: { v: number }[]) => Math.max(...c.map((p) => p.v));
+    const atNight = (c: { t: number; v: number }[]) =>
+      c.reduce((a, b) => (Math.abs(b.t - (23 * 60 + 30)) < Math.abs(a.t - (23 * 60 + 30)) ? b : a)).v;
+    expect(max(all)).toBeGreaterThan(max(none));
+    expect(atNight(all)).toBeLessThan(atNight(none));
+    expect(atNight(all)).toBeLessThan(0.15);
   });
 
   test("Morning start runs from waking to 3 hours after", () => {
