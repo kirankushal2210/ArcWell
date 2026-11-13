@@ -21,6 +21,7 @@ import {
 import { NotJoined, useMe } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Group, GroupRow, Page, PageHeader } from "@/features/coach/parts";
+import { planLine } from "@/features/coach/plans";
 import { colors, radius, rhythm, space } from "@/theme";
 import { isoToday } from "@/features/athlete/athleteData";
 
@@ -143,12 +144,19 @@ export default function Preview() {
                     params: { name: e.name },
                   })
                 }
-                label={`${e.name}, ${e.sets} sets of ${e.reps}`}
+                label={`${e.name}, ${planLine(e)}`}
               >
                 <View style={styles.flex}>
+                  {e.block ? (
+                    <Text variant="eyebrow" tone="muted">
+                      {e.block.kind === "station"
+                        ? "HYROX station"
+                        : "Intervals"}
+                    </Text>
+                  ) : null}
                   <Text weight="semibold">{e.name}</Text>
                   <Text variant="label" weight="regular" tone="muted" numeric>
-                    {e.sets > 1 ? `${e.sets} × ${e.reps}` : e.reps}
+                    {planLine(e)}
                     {e.restSec ? ` · rest ${clockTime(e.restSec * 1000)}` : ""}
                     {last.length ? ` · last ${setLabel(last[0], e.name)}` : ""}
                   </Text>

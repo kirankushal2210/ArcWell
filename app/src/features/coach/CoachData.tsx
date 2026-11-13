@@ -1477,9 +1477,4 @@ export function useCoachData() {
   return v;
 }
 
-/** Clients the coach should look at first (K-01): open check-ins, overdue, low adherence, unread. */
-export const needsAttention = (c: Client) =>
-  !c.isNew &&
-  !c.pending &&
-  (c.status === "active" || c.status === "leaving") &&
-  (!!c.attention || c.unread > 0);
+// Who needs attention (K-01) is worked out in ./checkins (needsAttentionNow), not stored.

@@ -1,8 +1,8 @@
-// The + button and quick log sheet (D67): a round glass button at the bottom right, next to the
-// tab bar, in the same place on every athlete tab. It opens a sheet of the things people log most:
-// colour tiles for workout, food and recovery (you pick by colour before you read), then weight in
-// one tap. The AI coach lives here and in Today's toolbar for self-guided athletes; coached athletes
-// get their weekly check-in instead and never see AI (D44).
+// The round glass button at the bottom right, next to the tab bar, on every athlete tab (D67, D97).
+// For self-guided athletes with AI on it opens the AI coach. For coached athletes (who never see AI,
+// D44) and anyone who turned AI off it is the + quick log sheet: colour tiles for workout, food and
+// recovery (you pick by colour before you read), the weekly check-in for coached athletes, then
+// weight in one tap.
 import type { Href } from "expo-router";
 import { router } from "expo-router";
 import {

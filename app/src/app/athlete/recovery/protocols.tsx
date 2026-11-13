@@ -4,6 +4,7 @@ import { router } from "expo-router";
 import { ChevronRight } from "lucide-react-native";
 import { StyleSheet, View } from "react-native";
 
+import { plusOnly } from "@/features/athlete/PlusOnly";
 import { Text } from "@/components/primitives";
 import { PROTOCOLS, type Protocol } from "@/features/athlete/recovery";
 import {
@@ -24,7 +25,9 @@ const ORDER: Protocol["category"][] = [
   "Heat and cold",
 ];
 
-export default function Protocols() {
+export default plusOnly(Protocols);
+
+function Protocols() {
   const back = () =>
     router.canGoBack() ? router.back() : router.replace("/athlete/recovery");
   return (

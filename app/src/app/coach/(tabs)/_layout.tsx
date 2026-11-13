@@ -9,6 +9,7 @@ import {
 } from "lucide-react-native";
 
 import { useCoachData } from "@/features/coach/CoachData";
+import { expectsCheckIns, isOverdue } from "@/features/coach/checkins";
 import { LoadingScreen } from "@/features/system/SystemStates";
 import { CoachTabBar } from "@/features/coach/parts";
 import { colors } from "@/theme";
@@ -18,6 +19,10 @@ export default function CoachTabs() {
   const toReview = clients
     .flatMap((c) => c.checkIns)
     .filter((k) => !k.reviewed).length;
+  // Late check-ins count too: the coach may want to send a reminder.
+  const overdue = clients.filter(
+    (c) => expectsCheckIns(c) && isOverdue(c),
+  ).length;
   const unread = clients.reduce((n, c) => n + c.unread, 0);
   if (!hydrated) return <LoadingScreen />;
   return (
@@ -41,7 +46,7 @@ export default function CoachTabs() {
         name="check-ins"
         options={{
           title: "Check-ins",
-          tabBarBadge: toReview || undefined,
+          tabBarBadge: toReview + overdue || undefined,
           tabBarIcon: ({ color }) => <ClipboardCheck size={24} color={color} />,
         }}
       />

@@ -1,13 +1,16 @@
 // Nutrition assistant (D70): what's left today, foods that close the protein gap, swaps for a plan
-// meal with similar energy and at least as much protein, eating-out guidance and photo logging.
+// meal with similar energy and at least as much protein, eating-out guidance, photo logging and
+// generating a meal plan (F5-13).
 // Sample build: built from the food database and the evidence rules, not a model.
 import { Redirect, router } from "expo-router";
-import { Camera } from "lucide-react-native";
+import { Camera, Sparkles } from "lucide-react-native";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { Button, Text } from "@/components/primitives";
 import {
+  DIET_OPTIONS,
+  dietKey,
   EATING_OUT,
   proteinIdeas,
   swapsFor,
@@ -45,6 +48,10 @@ export default function NutritionAssistant() {
   const kcalLeft = plan ? Math.max(0, plan.kcal - eaten.kcal) : 0;
   const proteinLeft = plan ? Math.max(0, plan.protein - eaten.p) : 0;
   const diet = me.basics?.diet ?? "vegetarian";
+  const dietName = (
+    DIET_OPTIONS.find((d) => d.value === dietKey(diet))?.label ?? "vegetarian"
+  ).toLowerCase();
+  const generate = () => router.push("/athlete/assistant/meal-plan");
   const meal = meals.find((m) => m.id === mealId);
   const mealMacros = meal
     ? sumMacros((meal.items ?? []).map((i) => planItemMacros(i)))
@@ -86,7 +93,7 @@ export default function NutritionAssistant() {
           <>
             <View style={styles.row}>
               <Text tone="muted" style={styles.flex}>
-                {`Foods that fit a ${diet} diet, about ${Math.min(30, Math.round(proteinLeft || 30))} g of protein at a time.`}
+                {`Foods that fit a ${dietName} diet, about ${Math.min(30, Math.round(proteinLeft || 30))} g of protein at a time.`}
               </Text>
               <WhyThis
                 title="Why protein matters"
@@ -138,10 +145,15 @@ export default function NutritionAssistant() {
             </Group>
           </>
         ) : (
-          <InfoCard>
-            Swaps work from a meal plan with exact foods. Build one in Nutrition
-            → Meal plan.
-          </InfoCard>
+          <>
+            <InfoCard>Swaps work from a meal plan with exact foods.</InfoCard>
+            <Button
+              label="Generate a meal plan"
+              icon={Sparkles}
+              fullWidth
+              onPress={generate}
+            />
+          </>
         )
       ) : null}
 
@@ -151,6 +163,15 @@ export default function NutritionAssistant() {
         </InfoCard>
       ) : null}
 
+      {meals.length ? (
+        <Button
+          label="Generate a new meal plan"
+          icon={Sparkles}
+          variant="secondary"
+          fullWidth
+          onPress={generate}
+        />
+      ) : null}
       <Button
         label="Log a meal with a photo"
         icon={Camera}

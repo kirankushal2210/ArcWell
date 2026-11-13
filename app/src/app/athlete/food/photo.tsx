@@ -5,6 +5,7 @@
 // sample builds show the sample plate, labelled as such.
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { Image } from "expo-image";
+import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import { Redirect, router, useLocalSearchParams } from "expo-router";
 import {
@@ -32,7 +33,11 @@ import {
   PressableScale,
   Text,
 } from "@/components/primitives";
-import { type ScanItem, scanMeal } from "@/features/ai/scanMeal";
+import {
+  type ScanFailure,
+  type ScanItem,
+  scanMeal,
+} from "@/features/ai/scanMeal";
 import { todayKey, useNutrition } from "@/features/athlete/FoodParts";
 import {
   findFood,
@@ -49,12 +54,32 @@ import { colors, radius, rhythm, space } from "@/theme";
 
 type Step = "camera" | "analysing" | "result";
 
-const FAILURE: Record<string, string> = {
+const FAILURE: Record<ScanFailure, string> = {
   not_food: "That doesn't look like food. Try again with the plate in frame.",
   daily_limit: "You've used today's scans. Search or quick add instead.",
   not_entitled: "Meal scans come with Arcwell Plus.",
+  too_large: "Photo too large. Try again a little further away.",
   error: "Couldn't read that one. Try again in good light.",
 };
+
+/** Long side of the photo sent to the scan: plenty to read a plate, a fraction of the upload. */
+const SCAN_SIDE = 1024;
+
+/** The photo shrunk to SCAN_SIDE on its long side and saved as JPEG, with its base64. */
+async function shrinkPhoto(uri: string, width?: number, height?: number) {
+  const wide = (width ?? 0) >= (height ?? 0);
+  const long = Math.max(width ?? 0, height ?? 0);
+  const ctx = ImageManipulator.manipulate(uri);
+  if (!long || long > SCAN_SIDE)
+    ctx.resize(wide ? { width: SCAN_SIDE } : { height: SCAN_SIDE });
+  const img = await ctx.renderAsync();
+  const out = await img.saveAsync({
+    compress: 0.7,
+    format: SaveFormat.JPEG,
+    base64: true,
+  });
+  return { uri: out.uri, base64: out.base64, mime: "image/jpeg" };
+}
 
 export default function ScanMeal() {
   const p = useLocalSearchParams<{ meal?: MealSlot; date?: string }>();
@@ -83,17 +108,23 @@ export default function ScanMeal() {
   useEffect(() => {
     if (step !== "analysing") return;
     let live = true;
-    scanMeal(shot, p.meal ?? "lunch").then((out) => {
-      if (!live) return;
-      if (out.status === "ok") {
-        setItems(out.items.map((x) => ({ ...x, keep: true, qty: 1 })));
-        setSample(out.sample);
-        setStep("result");
-      } else {
-        setFailure(FAILURE[out.status]);
+    scanMeal(shot, p.meal ?? "lunch")
+      .then((out) => {
+        if (!live) return;
+        if (out.status === "ok") {
+          setItems(out.items.map((x) => ({ ...x, keep: true, qty: 1 })));
+          setSample(out.sample);
+          setStep("result");
+        } else {
+          setFailure(FAILURE[out.status]);
+          setStep("camera");
+        }
+      })
+      .catch(() => {
+        if (!live) return;
+        setFailure(FAILURE.error);
         setStep("camera");
-      }
-    });
+      });
     return () => {
       live = false;
     };
@@ -104,26 +135,27 @@ export default function ScanMeal() {
   if (n.tier !== "pro") return <Redirect href="/athlete" />;
   const me = n.me;
 
+  // The full photo never leaves the phone: it's shrunk and compressed before the scan.
+  const prepare = async (uri: string, width?: number, height?: number) => {
+    const small = await shrinkPhoto(uri, width, height).catch(() => null);
+    if (small?.base64) {
+      setFailure(null);
+      setShot(small);
+    } else setFailure(FAILURE.error);
+  };
   const capture = async () => {
     const pic = await camera.current
-      ?.takePictureAsync({ quality: 0.5, base64: true })
+      ?.takePictureAsync({ quality: 0.8 })
       .catch(() => undefined);
-    if (pic?.uri)
-      setShot({ uri: pic.uri, base64: pic.base64, mime: "image/jpeg" });
+    if (pic?.uri) await prepare(pic.uri, pic.width, pic.height);
   };
   const pick = async () => {
     const r = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
-      quality: 0.5,
-      base64: true,
-    });
-    const a = r.assets?.[0];
-    if (a?.uri)
-      setShot({
-        uri: a.uri,
-        base64: a.base64 ?? undefined,
-        mime: a.mimeType ?? "image/jpeg",
-      });
+      quality: 1,
+    }).catch(() => null);
+    const a = r?.assets?.[0];
+    if (a?.uri) await prepare(a.uri, a.width, a.height);
   };
   const again = () => {
     setShot(null);

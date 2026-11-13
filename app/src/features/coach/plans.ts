@@ -2,7 +2,37 @@
 // (targets plus an example day) and a recovery protocol. Each client owns their own copy, so
 // editing one client's plan never changes another's.
 import { type PlanItem, planItemText } from "@/features/athlete/foods";
-import { proteinTarget } from "@/features/science/rules";
+import { type StationKey, stationOf } from "@/features/race/data";
+import {
+  isCompound,
+  proteinTarget,
+  rpeTargetFor,
+} from "@/features/science/rules";
+
+/** Target effort on the reps-in-reserve RPE scale, low to high (D83, helms2016rir). */
+export type RpeRange = [number, number];
+
+/**
+ * Endurance and HYROX blocks (D76, D79). A block is still a planned exercise, so the logger, history
+ * and volume checks treat it like any other: `sets` is the repeats, `reps` the distance or time each
+ * ("400 m", "3 min", "100"), `restSec` the rest between repeats.
+ */
+export type PlannedBlock =
+  | {
+      kind: "interval";
+      measure: "distance" | "time";
+      /** Metres or seconds per repeat. */
+      amount: number;
+      /** Target pace "m:ss", per km for runs and per 500 m on rowers and ski ergs. */
+      pace?: string;
+    }
+  | {
+      kind: "station";
+      station: StationKey;
+      /** Metres or reps for the station. */
+      amount: number;
+      unit: "m" | "reps";
+    };
 
 export type PlannedExercise = {
   id: string;
@@ -10,6 +40,10 @@ export type PlannedExercise = {
   sets: number;
   reps: string;
   restSec: number;
+  /** The coach's target effort (K-07). Unset: the athlete sees the rules range (rpeTargetFor). */
+  rpe?: RpeRange;
+  /** Set for run or erg intervals and HYROX stations. */
+  block?: PlannedBlock;
 };
 export type TrainingDay = {
   id: string;
@@ -347,10 +381,6 @@ export function weekSchedule(program: TrainingProgram, restDays: number[]) {
   });
 }
 
-/** Whole minutes since `start` (at least 1), for workout length. */
-export const minutesSince = (start: number) =>
-  Math.max(1, Math.round((Date.now() - start) / 60000));
-
 /** Monday = 0 … Sunday = 6. */
 export const todayIndex = () => (new Date().getDay() + 6) % 7;
 
@@ -362,7 +392,12 @@ export const cloneProgram = (p: TrainingProgram): TrainingProgram => ({
   days: p.days.map((d) => ({
     ...d,
     id: uid("d"),
-    exercises: d.exercises.map((e) => ({ ...e, id: uid("e") })),
+    exercises: d.exercises.map((e) => ({
+      ...e,
+      id: uid("e"),
+      rpe: e.rpe ? [e.rpe[0], e.rpe[1]] : undefined,
+      block: e.block ? { ...e.block } : undefined,
+    })),
   })),
 });
 
@@ -420,4 +455,116 @@ export function fillTemplate<
       : "Eggetarian";
   const nutrition = { ...targetsFor(kcal, protein), meals: exampleDay(diet) };
   return { ...t, nutrition, detail: mealsDetail(nutrition) };
+}
+
+// ---------- Effort and endurance blocks (K-07, D76, D79) ----------
+
+/** RPE ranges a coach can pick for an exercise. */
+export const RPE_RANGES: RpeRange[] = [
+  [6, 7],
+  [7, 8],
+  [8, 9],
+  [9, 10],
+];
+
+/** The rules range an exercise gets when the coach hasn't set one (D69). */
+export const defaultRpe = (name: string, experience = "some"): RpeRange =>
+  rpeTargetFor(experience, isCompound(name));
+
+export const rpeText = (r: RpeRange) =>
+  r[0] === r[1] ? `RPE ${r[0]}` : `RPE ${r[0]}–${r[1]}`;
+
+/** Machines for run and erg intervals; all are distance-and-time exercises in the library. */
+export const INTERVAL_EXERCISES = [
+  "Running",
+  "Treadmill",
+  "Rowing machine",
+  "Ski erg",
+  "Air bike",
+] as const;
+
+/** What a pace is measured per: km on foot, 500 m on rowers and ski ergs, none on bikes. */
+export const paceUnit = (name: string) =>
+  /row|ski/i.test(name)
+    ? "/500 m"
+    : /bike|cycl|spin/i.test(name)
+      ? null
+      : "/km";
+
+/** "m:ss" with 1–2 digit minutes; empty means no pace. */
+export const validPace = (pace: string) =>
+  /^\d{1,2}:[0-5]\d$/.test(pace.trim());
+
+export const distanceText = (m: number) =>
+  m >= 1000 ? `${Math.round(m / 10) / 100} km` : `${m} m`;
+/** Whole minutes as "3 min", anything else in seconds, so the logger can read it back. */
+const durationText = (s: number) => (s % 60 === 0 ? `${s / 60} min` : `${s} s`);
+
+/** The plan target the logger reads: metres, a time or a rep count. */
+export function blockReps(b: PlannedBlock) {
+  if (b.kind === "station")
+    return b.unit === "m" ? `${b.amount} m` : String(b.amount);
+  return b.measure === "distance" ? `${b.amount} m` : durationText(b.amount);
+}
+
+/** A planned exercise with its block changed; keeps `reps` and the name in step with it. */
+export function withBlock(
+  e: PlannedExercise,
+  block: PlannedBlock,
+): PlannedExercise {
+  return {
+    ...e,
+    block,
+    reps: blockReps(block),
+    name: block.kind === "station" ? stationOf(block.station).exercise : e.name,
+  };
+}
+
+/** Run or erg intervals, e.g. 6 × 400 m on foot or 4 × 500 m on the rower. */
+export function newInterval(name: string): PlannedExercise {
+  const erg = paceUnit(name) === "/500 m";
+  const bike = paceUnit(name) === null;
+  const block: PlannedBlock = bike
+    ? { kind: "interval", measure: "time", amount: 60 }
+    : { kind: "interval", measure: "distance", amount: erg ? 500 : 400 };
+  return withBlock(
+    { id: uid("e"), name, sets: bike ? 8 : erg ? 4 : 6, reps: "", restSec: 90 },
+    block,
+  );
+}
+
+/** One HYROX station at race distance or reps (race/data.ts). */
+export function newStation(key: StationKey): PlannedExercise {
+  const s = stationOf(key);
+  const block: PlannedBlock = s.reps
+    ? { kind: "station", station: key, amount: s.reps, unit: "reps" }
+    : { kind: "station", station: key, amount: s.metres ?? 50, unit: "m" };
+  return withBlock(
+    { id: uid("e"), name: s.exercise, sets: 1, reps: "", restSec: 60 },
+    block,
+  );
+}
+
+/**
+ * One line for a planned exercise: "3 × 8–10 · RPE 7–8", "6 × 400 m · 1:45 /km · RPE 8",
+ * "Sled push · 50 m". Rest is left to the screen.
+ */
+export function planLine(e: PlannedExercise) {
+  const b = e.block;
+  const what =
+    b?.kind === "interval" && b.measure === "distance"
+      ? distanceText(b.amount)
+      : b?.kind === "station" && b.unit === "m"
+        ? distanceText(b.amount)
+        : b?.kind === "station"
+          ? `${b.amount} reps`
+          : e.reps;
+  const unit = paceUnit(e.name);
+  return [
+    e.sets > 1 ? `${e.sets} × ${what}` : what,
+    b?.kind === "interval" && b.pace && unit ? `${b.pace} ${unit}` : null,
+    e.rpe ? rpeText(e.rpe) : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 }

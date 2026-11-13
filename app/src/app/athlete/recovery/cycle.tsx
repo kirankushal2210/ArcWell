@@ -5,6 +5,7 @@ import { Redirect } from "expo-router";
 import { X } from "lucide-react-native";
 import { StyleSheet, View } from "react-native";
 
+import { plusOnly } from "@/features/athlete/PlusOnly";
 import { Button, IconButton, Text } from "@/components/primitives";
 import { dateLabel, shiftDate } from "@/features/athlete/foods";
 import { backTo, MenuPage } from "@/features/athlete/MenuParts";
@@ -17,7 +18,9 @@ import { Eyebrow, Group, GroupRow } from "@/features/coach/parts";
 import { WhyThis } from "@/features/science/WhyThis";
 import { space } from "@/theme";
 
-export default function Cycle() {
+export default plusOnly(Cycle);
+
+function Cycle() {
   const me = useMe();
   const { settingsOf, setAthleteSettings } = useCoachData();
   if (!me) return <NotJoined />;

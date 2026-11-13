@@ -1,6 +1,8 @@
 // Gyms directory (G-01, G-02; D25, D29): read-only listing with name, area, equipment and hours.
 // Sample data only: the real directory comes from a licensed data source (PLAN.md blocker), so these
-// are made-up gyms with clearly sample names.
+// are made-up gyms with clearly sample names. Maps open in the phone's own maps app by a search
+// query, so no map SDK or API key is needed.
+import { Linking, Platform } from "react-native";
 
 export type Gym = {
   id: string;
@@ -8,6 +10,8 @@ export type Gym = {
   area: string;
   city: string;
   km: number;
+  /** Direction from you in degrees, clockwise from north (sample, for the "around you" map). */
+  bearing: number;
   equipment: string[];
   hours: string;
   dayPass?: string;
@@ -26,6 +30,7 @@ export const GYM_TAGS = [
 export const SAMPLE_GYMS: Gym[] = [
   {
     id: "g1",
+    bearing: 35,
     name: "Sample Strength Club",
     area: "Indiranagar",
     city: "Bengaluru",
@@ -41,6 +46,7 @@ export const SAMPLE_GYMS: Gym[] = [
   },
   {
     id: "g2",
+    bearing: 165,
     name: "Sample Fitness Studio",
     area: "Koramangala",
     city: "Bengaluru",
@@ -52,6 +58,7 @@ export const SAMPLE_GYMS: Gym[] = [
   },
   {
     id: "g3",
+    bearing: 200,
     name: "Sample Barbell House",
     area: "HSR Layout",
     city: "Bengaluru",
@@ -61,6 +68,7 @@ export const SAMPLE_GYMS: Gym[] = [
   },
   {
     id: "g4",
+    bearing: 245,
     name: "Sample Community Gym",
     area: "Jayanagar",
     city: "Bengaluru",
@@ -71,6 +79,7 @@ export const SAMPLE_GYMS: Gym[] = [
   },
   {
     id: "g5",
+    bearing: 80,
     name: "Sample Sports Centre",
     area: "Whitefield",
     city: "Bengaluru",
@@ -80,3 +89,16 @@ export const SAMPLE_GYMS: Gym[] = [
     dayPass: "₹500",
   },
 ];
+
+/** What the maps app searches for. Sample gyms have made-up names, so it searches the area. */
+const mapsQuery = (g: Gym) => `${g.area}, ${g.city}`;
+
+/** The phone's maps app on Android (geo:), Google Maps on the web or iPhone. No API key. */
+export function openInMaps(g: Gym) {
+  const q = encodeURIComponent(mapsQuery(g));
+  const web = `https://www.google.com/maps/search/?api=1&query=${q}`;
+  if (Platform.OS !== "android") return Linking.openURL(web).catch(() => {});
+  return Linking.openURL(`geo:0,0?q=${q}`).catch(() =>
+    Linking.openURL(web).catch(() => {}),
+  );
+}

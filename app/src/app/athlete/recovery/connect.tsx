@@ -9,6 +9,7 @@ import { useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { plusOnly } from "@/features/athlete/PlusOnly";
 import { Button, PressableScale, Text } from "@/components/primitives";
 import { DEVICE_LABEL, type DeviceBrand } from "@/features/athlete/recovery";
 import { useRecovery } from "@/features/athlete/RecoveryParts";
@@ -24,7 +25,9 @@ const READS = [
   "Steps and workouts",
 ];
 
-export default function Connect() {
+export default plusOnly(Connect);
+
+function Connect() {
   const r = useRecovery();
   const insets = useSafeAreaInsets();
   const [brand, setBrand] = useState<DeviceBrand | null>(

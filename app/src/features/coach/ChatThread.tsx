@@ -1,11 +1,12 @@
 // One conversation between a coach and a client (F7), used on both sides. Day separators, photo
 // messages, "Seen" under your last message once the other side has opened the chat, and quick
-// replies for the things people say most. Text and photos only; PDFs come with storage (Phase 4).
+// replies for the things people say most. Photos and PDFs attach from the paperclip; tapping a PDF
+// opens a preview sheet (PdfSheet) that hands it to the phone's viewer (X-06). Day headers use the
+// phone's own day, not UTC.
 import { Image } from "expo-image";
 import { FileText, Paperclip, Send, X } from "lucide-react-native";
 import { useRef, useState } from "react";
 import {
-  Linking,
   ScrollView,
   type ScrollViewInstance,
   StyleSheet,
@@ -25,12 +26,12 @@ import {
   textSizes,
 } from "@/theme";
 
-import { dayText } from "./crm";
+import { dayText, ymd } from "./crm";
+import { type PdfInfo, PdfSheet } from "./PdfSheet";
 import { choosePhoto } from "./PhotoSlot";
 import type { Message } from "./sampleData";
 import { OfflineBanner } from "@/features/system/SystemStates";
 import * as DocumentPicker from "expo-document-picker";
-import * as WebBrowser from "expo-web-browser";
 import { Sheet, SheetRow } from "@/features/athlete/Sheet";
 
 export function ChatThread({
@@ -69,6 +70,7 @@ export function ChatThread({
     if (a) setFile({ name: a.name, uri: a.uri });
   };
   const [viewing, setViewing] = useState<string | null>(null);
+  const [pdf, setPdf] = useState<PdfInfo | null>(null);
   const lastMine = messages.map((m) => m.from).lastIndexOf(me);
   const submit = (t = text) => {
     const s = t.trim();
@@ -98,8 +100,8 @@ export function ChatThread({
         ) : null}
         {messages.map((m, i) => {
           const mine = m.from === me;
-          const day = m.at?.slice(0, 10);
-          const prevDay = messages[i - 1]?.at?.slice(0, 10);
+          const day = localDay(m.at);
+          const prevDay = localDay(messages[i - 1]?.at);
           return (
             <View key={i} style={styles.item}>
               {day && day !== prevDay ? (
@@ -124,11 +126,13 @@ export function ChatThread({
                 {m.file ? (
                   <PressableScale
                     onPress={() => {
-                      const uri = m.file?.uri;
-                      if (uri)
-                        WebBrowser.openBrowserAsync(uri).catch(() =>
-                          Linking.openURL(uri),
-                        );
+                      if (!m.file) return;
+                      const d = localDay(m.at);
+                      setPdf({
+                        ...m.file,
+                        from: mine ? "You" : otherName,
+                        when: d ? `${dayText(d)}, ${m.time}` : m.time,
+                      });
                     }}
                     accessibilityRole="button"
                     accessibilityLabel={`Open ${m.file.name}`}
@@ -258,6 +262,7 @@ export function ChatThread({
         />
       </View>
       <ImageViewer uri={viewing} onClose={() => setViewing(null)} />
+      <PdfSheet pdf={pdf} onClose={() => setPdf(null)} />
       <Sheet visible={attach} onClose={() => setAttach(false)} title="Attach">
         <SheetRow
           label="Photo"
@@ -276,6 +281,9 @@ export function ChatThread({
     </>
   );
 }
+
+/** The phone's own day (YYYY-MM-DD) for an ISO time; slicing the ISO string would give the UTC day. */
+const localDay = (at?: string) => (at ? ymd(new Date(at)) : undefined);
 
 const styles = StyleSheet.create({
   fileChip: {

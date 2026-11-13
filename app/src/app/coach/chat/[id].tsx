@@ -32,7 +32,7 @@ export default function Chat() {
     >
       <PageHeader
         title={c.name}
-        sub={`Check-in ${dueText(c).toLowerCase()}`}
+        sub={`Check-in: ${dueText(c)}`}
         onBack={back}
         actions={[
           {

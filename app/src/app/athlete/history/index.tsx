@@ -1,6 +1,5 @@
-// Progressive overload page (D85, D90): the same view as Training's Overload tab, opened from the
-// menu, Today and the workout summary. Lifts from the last 2 weeks against the session before,
-// with past workouts underneath.
+// Progressive overload page (D85, D90, D99): opened from the menu (☰ → Training). Lifts from the
+// last 2 weeks against the session before, with past workouts underneath.
 import { router } from "expo-router";
 import { StyleSheet, View } from "react-native";
 

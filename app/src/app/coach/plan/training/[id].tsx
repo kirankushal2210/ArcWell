@@ -74,6 +74,7 @@ function TrainingBuilderEditor() {
               : `Note for ${first} (optional)`
           }
           history={sessions(c.id)}
+          experience={c.profile?.experience}
         />
       </Page>
       <View

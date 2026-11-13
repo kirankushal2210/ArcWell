@@ -12,12 +12,6 @@ export const PHASE_LABEL: Record<Phase, string> = {
   specific: "Specific",
   taper: "Taper",
 };
-export const PHASE_TEXT: Record<Phase, string> = {
-  base: "Building your engine and technique: mostly easy running and strength.",
-  build: "More race-pace running, stations at race weight, and half sims.",
-  specific: "Race rehearsal: compromised running, a full sim, race loads.",
-  taper: "Less volume, same intensity: arrive fresh.",
-};
 
 export const daysUntil = (date: string, today: string) =>
   Math.round(
@@ -32,12 +26,6 @@ export function phaseFor(daysToRace: number): Phase {
   if (daysToRace <= 112) return "build";
   return "base";
 }
-
-/** Taper: cut volume by about half, keep intensity and how often you train (meta-analysis). */
-export const TAPER_VOLUME = 0.5;
-
-/** About 80% of endurance time easy, 20% hard. */
-export const EASY_SHARE = 0.8;
 
 export type SessionKind = "strength" | "run_easy" | "run_hard" | "hybrid";
 /** Sessions a week by days available (3–6). */

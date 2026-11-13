@@ -6,6 +6,7 @@ import { ChevronRight } from "lucide-react-native";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
+import { plusOnly } from "@/features/athlete/PlusOnly";
 import { PressableScale, Text } from "@/components/primitives";
 import {
   outlookFor,
@@ -23,7 +24,9 @@ import { useCoachData } from "@/features/coach/CoachData";
 import { Eyebrow, Page, PageHeader } from "@/features/coach/parts";
 import { colors, radius, space } from "@/theme";
 
-export default function Outlook() {
+export default plusOnly(Outlook);
+
+function Outlook() {
   const p = useLocalSearchParams<{ date?: string }>();
   const r = useRecovery();
   const { settingsOf } = useCoachData();

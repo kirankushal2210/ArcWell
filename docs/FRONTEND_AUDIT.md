@@ -193,3 +193,75 @@ These need a server check, not just the hidden UI:
 
 - D45 says effort is rated per workout, which D83 replaced.
 - Copy-from-yesterday meals is listed as v1.1, but D96 shipped it.
+
+## 7. Front-end work still to do (recheck, 2026-11-14)
+
+**Groups A and B done 2026-11-14 (D104).** Limits: old binary .xls files can't be imported (save as .xlsx or .csv), the athlete routine editor has no effort or block fields yet, PDFs open in the phone's own viewer rather than inside the app, and the Gyms map is a drawn "around you" view, not map tiles.
+
+A second pass after D103: the design inventory (`docs/design/sitemap.md`, PLAN FE-1 to FE-9, SPEC) checked against the code, and every open finding above re-read. Items a later decision removed on purpose are left out: the Exercises tab, forgot password, the 1RM estimate, the floating AI button and the three-page welcome. Everything here can be built on sample data; nothing waits on the backend.
+
+### A. Bugs and quick fixes (small, one sitting)
+
+- [x] **Meal-scan photos aren't shrunk** before sending (section 4, item 5). Large photos fail with a generic error. Resize to about 1024 px with `expo-image-manipulator`, and show "photo too large" for a 413.
+- [x] **The meal scan can spin forever** on a network error: `food/photo.tsx` has no `.catch` (item 6).
+- [x] **Recovery's inner pages have no plan check**, so a free athlete can open them by link (item 7).
+- [x] **Out-of-date text athletes see:**
+  - `switch/[step].tsx:116` says the AI coach is "on Today and in the + menu".
+  - `:249` says "A Progress tab joins your bar".
+  - `:251` says "☰ → Training → History".
+  - `menu/help.tsx:17` says "Tap + and Log food".
+- [x] **Dates worked out in UTC** put anything from 00:00 to 05:30 IST on the day before. Affected: chat day headers (`ChatThread.tsx:101`), the cardio start date (`menu/shows.tsx:34`) and lead call dates (`BusinessPages.tsx:96`, `lead/[id].tsx:398,444`).
+- [x] **Nested buttons in the exercise list.** The info button sits inside each row's button (`ExerciseList.tsx:91/106`, `317/345`). Web logs an error; make them siblings.
+- [x] **Sign In on the welcome page does nothing** in sample builds (`app/index.tsx:31`). Open the sample account picker or hide the button.
+- [x] **Text links without a button role or hit area** (section 4, Medium).
+- [x] **Dead code and stale comments** (section 4, Low), including the unlinked `/athlete/exercises/new`.
+
+### B. Screens and states that are missing or only partly built
+
+**Athlete**
+
+- [x] **Athletes never see an overdue check-in.** `dueText` only says "Due today", "Due tomorrow" or "Due <day>"; coaches do see overdue.
+- [x] **The weekly check-in has no review step.** It is one long form; the design has measurements → photos → the week → review and send (F6-02 to F6-05).
+- [x] **AI meal plan (F5-13).** Add a "Generate a meal plan" sample flow and break the loop: an empty plan's "Plan my day with AI" opens the assistant, which says "Build one in Nutrition → Meal plan".
+- [x] **Offline banner on phones.** `useOnline()` only works on web; on Android it always says online. Use `expo-network`.
+- [x] **No map on Gyms (G-01).** It is a list and search only.
+
+**Sign-up and consent**
+
+- [x] **Photo consent isn't asked at sign-up** (F1-05). Add it as an optional step; today it is only a switch in Privacy.
+- [x] **No Google button on most sign-in screens.** Add the turned-off Google button (D62) to Sign In, coach sign-up and invite sign-up; today it is only on Save your plan.
+
+**Coach**
+
+- [x] **Coach onboarding answers are dropped.** Profile, services and the first template are never saved; the coach keeps the sample profile.
+- [x] **Spreadsheet import (D55, CO-10).** The file is picked but nothing reads it. Add a draft-template review screen and an Import entry on Plans.
+- [x] **No effort field in the plan builder (K-06/K-07).** Exercises have no RPE/RIR, though athletes log RPE (D83). Weeks are only a number.
+- [x] **No endurance or station blocks** in the coach plan builder (PLAN FE-9 "not built yet"). Runs and stations are typed as reps text.
+- [x] **Adherence is a fixed sample number, and overdue is matched from a text field.** Work both out from logs and the due day.
+- [x] **The invite page shows only a name and avatar** (F3-02, D43). It should show specialisations, bio, services, certifications and approved transformations, which the profile editor promises.
+- [x] **Approved transformations appear nowhere** on the coach profile, invite page or My coach.
+- [x] **The coach photo can't be edited** after onboarding (K-20).
+- [x] **No QR code or Instagram share** on the onboarding invite step (CO-11). The QR exists on the Business invite page.
+- [x] **Coaches are never asked for notification permission** (X-07).
+
+**Everyone**
+
+- [x] **PDFs open in the external browser,** not an in-app viewer (X-06).
+- [x] **No per-screen loading or error states.** They exist only at the root and the tab layouts. This is fine on sample data, but needed once data loads over the network.
+
+### C. Tests for logic that has none
+
+- [ ] Recovery scores (`recovery.ts`), the self-guided plan builder (`selfPlan`), `toSession` and `programWeek`, check-in due dates (`checkins.ts`) and `visibility` (D78).
+
+### D. Docs
+
+- [ ] **Update `docs/SPEC.md` to D103** (section 6). Also fix the two contradictions in `DECISIONS.md`: effort per workout vs per set, and copy-from-yesterday listed as v1.1.
+- [ ] **`DESIGN.md` §7 marks every screen "Built ✅".** Correct the partial ones listed in B.
+
+### Needs a development build, not just Expo Go
+
+These can't be finished in Expo Go:
+
+- Health Connect (steps, heart rate, sleep, watch VO2 max).
+- Live heart rate in the interval timer.
+- Exercise demo media, which also needs licensing.

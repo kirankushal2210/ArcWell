@@ -32,9 +32,32 @@ export function useNotifyPermission() {
   return { status, request };
 }
 
-/** A card on Notifications and Reminders while phone notifications aren't on. */
-export function NotifyBanner() {
+const COPY = {
+  athlete: {
+    off: "Reminders and messages won't reach you. Turn them on in your phone's settings.",
+    ask: "So your reminders, coach messages and check-in replies reach you, even with the app closed.",
+    sheet:
+      "Arcwell only sends what you've turned on: reminders, your coach's messages and replies, and plan updates. Change them any time.",
+  },
+  coach: {
+    off: "Check-ins and client messages won't reach you. Turn them on in your phone's settings.",
+    ask: "So check-ins, client messages, follow-ups and renewals reach you, even with the app closed.",
+    sheet:
+      "Arcwell only sends what you've turned on below: check-ins, client messages, lead follow-ups and renewals. Change them any time.",
+  },
+} as const;
+
+/**
+ * A card on Notifications and Reminders (athlete) or coach Settings (X-07) while phone
+ * notifications aren't on.
+ */
+export function NotifyBanner({
+  audience = "athlete",
+}: {
+  audience?: "athlete" | "coach";
+} = {}) {
   const { status, request } = useNotifyPermission();
+  const copy = COPY[audience];
   const [asking, setAsking] = useState(false);
   if (status === "granted") return null;
   return (
@@ -49,9 +72,7 @@ export function NotifyBanner() {
           </Text>
         </View>
         <Text variant="label" weight="regular" tone="muted">
-          {status === "denied"
-            ? "Reminders and messages won't reach you. Turn them on in your phone's settings."
-            : "So your reminders, coach messages and check-in replies reach you, even with the app closed."}
+          {status === "denied" ? copy.off : copy.ask}
         </Text>
         <Button
           label={status === "denied" ? "Open phone settings" : "Turn on"}
@@ -66,7 +87,7 @@ export function NotifyBanner() {
         visible={asking}
         onClose={() => setAsking(false)}
         title="Allow notifications?"
-        sub="Arcwell only sends what you've turned on: reminders, your coach's messages and replies, and plan updates. Change them any time."
+        sub={copy.sheet}
       >
         <View style={styles.buttons}>
           <Button

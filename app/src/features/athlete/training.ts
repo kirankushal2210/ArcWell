@@ -2,7 +2,13 @@
 // pre-filled from the plan or the last session; finishing turns it into a session in history.
 // Warm-up sets are marked W and left out of volume (F4-03). kg only in v1 (D45). What a set records
 // (kg, reps, time, distance) follows the exercise type in the library.
-import { type TrainingDay, uid } from "@/features/coach/plans";
+import {
+  type PlannedExercise,
+  paceUnit,
+  type RpeRange,
+  type TrainingDay,
+  uid,
+} from "@/features/coach/plans";
 
 import {
   type ExerciseType,
@@ -42,6 +48,10 @@ export type LoggedExercise = {
   skipped: boolean;
   /** Set when swapped during the workout; the coach sees it (F4-07). */
   swappedFrom?: string;
+  /** The coach's target effort; without it the logger uses the rules range (D83). */
+  rpe?: RpeRange;
+  /** Target pace for intervals, e.g. "5:00 /km". */
+  pace?: string;
   sets: LoggedSet[];
 };
 
@@ -195,29 +205,47 @@ export const defaultTarget = (name: string) => {
 export const countsVolume = (t: ExerciseType) =>
   t === "weight_reps" || t === "weighted_bodyweight";
 
+/** Distance in km for targets like "400 m" or "1.5 km"; null otherwise. */
+export function targetKm(reps: string): number | null {
+  const m = reps.match(/^(\d+(?:\.\d+)?)\s*(m|km)\b/);
+  if (!m) return null;
+  return m[2] === "km" ? Number(m[1]) : Number(m[1]) / 1000;
+}
+
 export function exerciseFrom(
   name: string,
   sets: number,
   reps: string,
   restSec: number,
   sessions: Session[],
+  /** The coach's effort and block for this exercise (K-07, D79). */
+  plan?: Pick<PlannedExercise, "rpe" | "block">,
 ): LoggedExercise {
   const secs = targetSeconds(reps);
+  const plannedKm = targetKm(reps);
   const prev = previousSets(sessions, name);
-  // A plan can time an exercise the library counts in reps ("Burpee 40 s"): then it's timed.
+  // A plan can time an exercise the library counts in reps ("Burpee 40 s"): then it's timed. One
+  // set in metres ("Burpee broad jumps 80 m") logs distance and time instead.
   const libType = typeOf(name);
   const type: ExerciseType =
     secs !== null && !fieldsOf(libType).includes("seconds")
       ? "duration"
-      : libType;
+      : plannedKm !== null && !fieldsOf(libType).includes("km")
+        ? "distance_duration"
+        : libType;
   const fields: SetField[] = fieldsOf(type);
-  const metres = reps.match(/^(\d+)\s*m\b/);
-  const plannedKm = metres ? Number(metres[1]) / 1000 : null;
+  const block = plan?.block;
+  const unit = paceUnit(name);
   return {
     id: uid("x"),
     name,
     group: groupOf(name),
     target: `${sets} × ${reps}`,
+    rpe: plan?.rpe,
+    pace:
+      block?.kind === "interval" && block.pace && unit
+        ? `${block.pace} ${unit}`
+        : undefined,
     restSec,
     type,
     timed: fields.includes("seconds"),
@@ -236,7 +264,7 @@ export function exerciseFrom(
         seconds: fields.includes("seconds")
           ? (secs ?? p?.seconds ?? null)
           : null,
-        km: fields.includes("km") ? (p?.km ?? plannedKm) : null,
+        km: fields.includes("km") ? (plannedKm ?? p?.km ?? null) : null,
         done: false,
       };
     }),
@@ -252,7 +280,7 @@ export function startFromDay(
     name: day.name,
     startedAt: now(),
     exercises: day.exercises.map((e) =>
-      exerciseFrom(e.name, e.sets, e.reps, e.restSec, sessions),
+      exerciseFrom(e.name, e.sets, e.reps, e.restSec, sessions, e),
     ),
     rest: null,
   };
@@ -266,12 +294,25 @@ export const emptyWorkout = (): ActiveWorkout => ({
   rest: null,
 });
 
-/** Rough length of a planned day: about 45 s of work per set plus its rest. */
+/** Seconds of work in one set: the planned time, about 5 min a km for distances, else 45 s. */
+const workSeconds = (reps: string) => {
+  const secs = targetSeconds(reps);
+  if (secs !== null) return secs;
+  const km = targetKm(reps);
+  return km !== null ? Math.max(30, km * 300) : 45;
+};
+
+/** Rough length of a planned day: each set's work plus its rest. */
 export const estimateMinutes = (day: TrainingDay) =>
   Math.max(
     10,
     Math.round(
-      day.exercises.reduce((n, e) => n + e.sets * (45 + e.restSec), 0) / 60 / 5,
+      day.exercises.reduce(
+        (n, e) => n + e.sets * (workSeconds(e.reps) + e.restSec),
+        0,
+      ) /
+        60 /
+        5,
     ) * 5,
   );
 

@@ -6,6 +6,7 @@ import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { plusOnly } from "@/features/athlete/PlusOnly";
 import { Button, Chip, NumberStepper, Text } from "@/components/primitives";
 import { simulatedDay, todayDate } from "@/features/athlete/recovery";
 import { Scale, TimeStepper } from "@/features/athlete/RecoveryForm";
@@ -24,7 +25,9 @@ const HABITS = [
   { key: "late_meal", label: "Late heavy meal" },
 ];
 
-export default function CheckIn() {
+export default plusOnly(CheckIn);
+
+function CheckIn() {
   const r = useRecovery();
   const insets = useSafeAreaInsets();
   const [date] = useState(todayDate);

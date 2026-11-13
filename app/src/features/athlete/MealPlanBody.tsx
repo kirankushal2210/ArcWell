@@ -1,5 +1,6 @@
 // The meal plan (F5-12): fixed meals with exact foods and quantities, from the coach (coached)
-// or built from the athlete's answers (paid; rules, not AI). "Ate this" logs the whole meal in one
+// or built from the athlete's answers (paid; rules, not AI). Plus athletes can generate a new
+// day (F5-13, /athlete/assistant/meal-plan); free athletes see the upgrade, not the AI (D44). "Ate this" logs the whole meal in one
 // tap; "Ate something else" opens search and records the swap, so adherence stays honest. Tap one
 // food to log it alone or change its portion.
 import { router } from "expo-router";
@@ -20,38 +21,41 @@ import {
 } from "@/features/athlete/foods";
 import { colors, radius, space } from "@/theme";
 
+const generate = () => router.push("/athlete/assistant/meal-plan");
+
 export function MealPlanBody({ date }: { date: string }) {
   const n = useNutrition();
   if (!n.me) return null;
   const plan = n.plan;
-  if (!plan)
-    return (
-      <Text tone="muted">
-        {n.coached
-          ? `${n.coachName} is still building your meal plan.`
-          : "Your meal plan shows here."}
-      </Text>
-    );
-  const day = n.logs.filter((l) => l.date === date);
-  if (!plan.meals.length)
+  if (!plan?.meals.length)
     return (
       <View style={styles.card}>
         <Text weight="semibold">No meals planned yet</Text>
         {n.tier === "pro" ? (
-          <Button
-            label="Plan my day with AI"
-            size="sm"
-            onPress={() => router.push("/athlete/assistant/nutrition")}
-          />
-        ) : (
+          <Button label="Plan my day with AI" size="sm" onPress={generate} />
+        ) : n.coached ? (
           <Text variant="label" tone="muted">
-            {n.coached
+            {plan
               ? `${n.coachName} adds your meals here.`
-              : "Log from search for now."}
+              : `${n.coachName} is still building your meal plan.`}
           </Text>
+        ) : (
+          <>
+            <Text variant="label" tone="muted">
+              Log from search for now. Plus builds a day of meals for your
+              targets.
+            </Text>
+            <Button
+              label="See Plus"
+              size="sm"
+              variant="secondary"
+              onPress={() => router.push("/athlete/ai")}
+            />
+          </>
         )}
       </View>
     );
+  const day = n.logs.filter((l) => l.date === date);
 
   return (
     <>
@@ -180,6 +184,13 @@ export function MealPlanBody({ date }: { date: string }) {
           ? `Swaps are fine. ${n.coachName} sees what you ate instead.`
           : "Swaps are fine if you stay near your targets."}
       </Text>
+      {n.tier === "pro" ? (
+        <Button
+          label="Generate a new meal plan"
+          variant="ghost"
+          onPress={generate}
+        />
+      ) : null}
       {n.me?.supplements?.length ? (
         <View style={styles.card}>
           <Text weight="semibold">Supplements</Text>

@@ -93,7 +93,7 @@ export function OverviewPage() {
                 <Text style={styles.flex}>Call with {l.name}</Text>
                 <Text variant="label" weight="regular" tone="muted" numeric>
                   {l.callAt
-                    ? `${dayText(l.callAt.slice(0, 10))}, ${timeText(l.callAt)}`
+                    ? `${dayText(ymd(new Date(l.callAt)))}, ${timeText(l.callAt)}`
                     : ""}
                 </Text>
               </GroupRow>

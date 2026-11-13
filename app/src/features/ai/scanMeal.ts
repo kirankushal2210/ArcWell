@@ -11,6 +11,7 @@ import {
 import { accountsEnabled, supabase } from "@/lib/supabase";
 
 import { PHOTO_SAMPLE } from "./nutritionAssist";
+import { parseScanResponse } from "./scanResponse";
 
 /** One food found on the plate, for the athlete to tick and adjust. */
 export type ScanItem = {
@@ -28,7 +29,7 @@ export type ScanItem = {
 
 export type ScanOutcome =
   | { status: "ok"; items: ScanItem[]; sample: boolean }
-  | { status: "not_food" | "daily_limit" | "not_entitled" | "error" };
+  | { status: ScanFailure };
 
 function sampleItems(): ScanItem[] {
   return PHOTO_SAMPLE.flatMap((x, i) => {
@@ -50,9 +51,11 @@ function sampleItems(): ScanItem[] {
   });
 }
 
-type ScanFailure = "not_food" | "daily_limit" | "not_entitled" | "error";
+export type ScanFailure =
+  "not_food" | "daily_limit" | "not_entitled" | "too_large" | "error";
 const STATUS_ERROR: Record<number, ScanFailure> = {
   403: "not_entitled",
+  413: "too_large",
   429: "daily_limit",
 };
 
@@ -60,32 +63,26 @@ export async function scanMeal(
   photo: { base64?: string; mime?: string } | null,
   _meal: MealSlot,
 ): Promise<ScanOutcome> {
-  if (!accountsEnabled || !supabase || !photo?.base64) {
-    // Sample build: a short pause so the screen reads like the real thing.
+  if (!accountsEnabled || !supabase || !photo) {
+    // Sample build, or "Try a sample plate": a short pause so the screen reads like the real thing.
     await new Promise((r) => setTimeout(r, 1400));
     return { status: "ok", items: sampleItems(), sample: true };
   }
-  const { data, error } = await supabase.functions.invoke("scan-meal", {
-    body: { image: photo.base64, mime: photo.mime ?? "image/jpeg" },
-  });
-  if (error) {
-    const status = (error as { context?: { status?: number } }).context?.status;
+  if (!photo.base64) return { status: "error" };
+  // Never throws: a network failure or a response in the wrong shape is a plain error.
+  const res = await supabase.functions
+    .invoke("scan-meal", {
+      body: { image: photo.base64, mime: photo.mime ?? "image/jpeg" },
+    })
+    .catch(() => null);
+  if (!res) return { status: "error" };
+  if (res.error) {
+    const status = (res.error as { context?: { status?: number } }).context
+      ?.status;
     return { status: (status && STATUS_ERROR[status]) || "error" };
   }
-  const out = data as
-    | {
-        status: "ok";
-        foods: {
-          name: string;
-          grams: number;
-          kcal: number;
-          protein: number;
-          carbs: number;
-          fat: number;
-          confidence: "high" | "check";
-        }[];
-      }
-    | { status: "not_food" };
+  const out = parseScanResponse(res.data);
+  if (!out) return { status: "error" };
   if (out.status === "not_food") return { status: "not_food" };
   return {
     status: "ok",

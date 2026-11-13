@@ -2,11 +2,23 @@
 // Enhanced for competitive clients, as section tabs (D61). Tap a template to edit it (K-06), the
 // person icon to give it to clients, or New to build one. Each client gets their own copy (D56).
 import { router } from "expo-router";
-import { ListChecks, Plus, UserPlus, Utensils } from "lucide-react-native";
+import {
+  ChevronRight,
+  FileSpreadsheet,
+  ListChecks,
+  Plus,
+  UserPlus,
+  Utensils,
+} from "lucide-react-native";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
-import { IconButton, PressableScale, Text } from "@/components/primitives";
+import {
+  Button,
+  IconButton,
+  PressableScale,
+  Text,
+} from "@/components/primitives";
 import { SectionTabs } from "@/components/SectionTabs";
 import { menuAction } from "@/features/coach/coachProfile";
 import { useCoachData } from "@/features/coach/CoachData";
@@ -32,6 +44,28 @@ const open = (t: Template | null, kind: Kind) =>
     params: { id: t?.id ?? "new" },
   });
 
+const openImport = () => router.push("/coach/template/import");
+
+/** Turn an Excel or CSV workout sheet into a template (D55, CO-10). */
+function ImportRow() {
+  return (
+    <Group>
+      <GroupRow first onPress={openImport} label="Import from spreadsheet">
+        <View style={styles.icon}>
+          <FileSpreadsheet size={20} color={colors.text} />
+        </View>
+        <View style={styles.flex}>
+          <Text weight="semibold">Import from spreadsheet</Text>
+          <Text variant="label" weight="regular" tone="muted">
+            Excel or CSV, one row per exercise
+          </Text>
+        </View>
+        <ChevronRight size={18} color={colors.textMuted} />
+      </GroupRow>
+    </Group>
+  );
+}
+
 function TemplateList({ kind }: { kind: Kind }) {
   const { templates } = useCoachData();
   const list = templates.filter((t) => t.kind === kind);
@@ -47,6 +81,14 @@ function TemplateList({ kind }: { kind: Kind }) {
           <Text tone="muted" style={styles.center}>
             Build one once and give every client their own copy.
           </Text>
+          {kind === "training" ? (
+            <Button
+              label="Import from spreadsheet"
+              icon={FileSpreadsheet}
+              variant="secondary"
+              onPress={openImport}
+            />
+          ) : null}
         </View>
       </Page>
     );
@@ -85,6 +127,7 @@ function TemplateList({ kind }: { kind: Kind }) {
           </GroupRow>
         ))}
       </Group>
+      {kind === "training" ? <ImportRow /> : null}
       <Text variant="caption" tone="muted">
         Editing a template never changes clients already on it.
       </Text>

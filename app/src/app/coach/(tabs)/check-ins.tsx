@@ -8,6 +8,11 @@ import { Avatar, Button, Text } from "@/components/primitives";
 import { menuAction } from "@/features/coach/coachProfile";
 import { useCoachData } from "@/features/coach/CoachData";
 import {
+  dueText,
+  expectsCheckIns,
+  isOverdue,
+} from "@/features/coach/checkins";
+import {
   ActionDock,
   Eyebrow,
   Group,
@@ -34,8 +39,10 @@ export default function CheckInsTab() {
   const all = clients.flatMap((c) => c.checkIns.map((k) => ({ c, k })));
   const toReview = all.filter(({ k }) => !k.reviewed);
   const reviewed = all.filter(({ k }) => k.reviewed);
-  const overdue = clients.filter((c) =>
-    c.attention?.startsWith("Check-in overdue"),
+  // Worked out from each client's check-in day and when they last sent one.
+  const now = new Date();
+  const overdue = clients.filter(
+    (c) => expectsCheckIns(c) && isOverdue(c, now),
   );
   const open = (id: string) =>
     router.push({ pathname: "/coach/check-in/[id]", params: { id } });
@@ -71,7 +78,7 @@ export default function CheckInsTab() {
                     <View style={styles.flex}>
                       <Text weight="semibold">{c.name}</Text>
                       <Text variant="label" weight="regular" tone="muted">
-                        Due {c.checkInDay}
+                        {dueText(c, now)}
                       </Text>
                     </View>
                     <Button

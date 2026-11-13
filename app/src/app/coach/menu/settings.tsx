@@ -1,4 +1,4 @@
-// Settings and privacy (D65, K-28): notifications, what's public, data export and deleting the
+// Settings and privacy (D65, K-28): notifications (with the phone-permission pre-ask, X-07), what's public, data export and deleting the
 // coach account. Deleting ends every client link at once; clients keep their history and plans
 // read-only (SPEC: relationships, D42).
 import { router } from "expo-router";
@@ -15,6 +15,7 @@ import {
   Page,
   PageHeader,
 } from "@/features/coach/parts";
+import { NotifyBanner } from "@/features/system/NotifyAsk";
 import { colors, space } from "@/theme";
 
 /** The on/off settings (billing and the client limit are set elsewhere). */
@@ -71,6 +72,7 @@ export default function SettingsScreen() {
       <PageHeader title="Settings and privacy" onBack={back} />
       <Page>
         <Eyebrow>Notifications</Eyebrow>
+        <NotifyBanner audience="coach" />
         <Group>
           {NOTIFY.map((n, i) => row(n.key, n.label, n.sub, i === 0))}
         </Group>
@@ -80,7 +82,7 @@ export default function SettingsScreen() {
           {row(
             "showTransformations",
             "Show transformations",
-            "On your invite page, only for clients who said yes",
+            "On your profile and invite page, only photos clients approved",
             true,
           )}
         </Group>

@@ -1,8 +1,9 @@
 // Coach profile (D65, sitemap §5): what clients see on the invite page and in their app. Name,
 // city, up to three specialisations, bio, Instagram, years coaching, self-reported certifications
-// (D43) and services. Transformations use client photos only with their consent (Phase 5).
+// (D43) and services. The photo can be changed or removed here (K-20). Transformations show only
+// photos clients approved for the profile (F9-05).
 import { router } from "expo-router";
-import { Plus, X } from "lucide-react-native";
+import { Camera, Plus, X } from "lucide-react-native";
 import { useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -22,11 +23,14 @@ import {
   TextField,
 } from "@/components/primitives";
 import { useCoachData } from "@/features/coach/CoachData";
+import { CoachPhoto } from "@/features/coach/CoachProfileView";
 import {
   type CoachProfile,
   SPECIALISATIONS,
 } from "@/features/coach/coachProfile";
 import { Eyebrow, Page, PageHeader } from "@/features/coach/parts";
+import { choosePhoto } from "@/features/coach/PhotoSlot";
+import { TransformationsStrip } from "@/features/coach/TransformationsStrip";
 import {
   colors,
   fontFamilyFor,
@@ -61,6 +65,26 @@ export default function CoachProfileScreen() {
     >
       <PageHeader title="Coach profile" onBack={back} />
       <Page>
+        <View style={styles.photoRow}>
+          <CoachPhoto name={p.name || "Coach"} uri={p.photo} size={72} />
+          <View style={styles.photoButtons}>
+            <Button
+              label={p.photo ? "Change photo" : "Add photo"}
+              icon={Camera}
+              size="sm"
+              variant="secondary"
+              onPress={() => choosePhoto((uri) => set({ photo: uri }))}
+            />
+            {p.photo ? (
+              <Button
+                label="Remove photo"
+                size="sm"
+                variant="ghost"
+                onPress={() => set({ photo: undefined })}
+              />
+            ) : null}
+          </View>
+        </View>
         <TextField
           label="Name clients see"
           value={p.name}
@@ -154,6 +178,7 @@ export default function CoachProfileScreen() {
             />
           </View>
         </View>
+        <TransformationsStrip title="Transformations on your profile" />
         <Text variant="caption" tone="muted">
           Shown on your invite page and to your own clients only. Certifications
           are your own statement; Arcwell doesn&apos;t check them.
@@ -183,6 +208,8 @@ const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
   flex: { flex: 1 },
   row: { flexDirection: "row", alignItems: "center", gap: space[3] },
+  photoRow: { flexDirection: "row", alignItems: "center", gap: space[4] },
+  photoButtons: { flex: 1, alignItems: "flex-start", gap: space[1] },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: space[1] },
   bio: {
     minHeight: 88,

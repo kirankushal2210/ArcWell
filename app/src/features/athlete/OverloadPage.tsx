@@ -1,5 +1,5 @@
-// Training's Overload section (D85): every lift from the last two weeks, whether its top set beat the
-// time before, and the workout history underneath.
+// Progressive overload (D85, D90): every lift from the last two weeks, whether its top set beat the
+// time before, and the workout history underneath. Shown on the menu's Progressive overload page.
 import { router } from "expo-router";
 import {
   ArrowDown,

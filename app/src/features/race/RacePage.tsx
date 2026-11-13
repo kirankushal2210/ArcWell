@@ -5,7 +5,7 @@ import { router } from "expo-router";
 import { ChevronRight, Flag, Play } from "lucide-react-native";
 import { StyleSheet, View } from "react-native";
 
-import { Text } from "@/components/primitives";
+import { PressableScale, Text } from "@/components/primitives";
 import { Eyebrow, Group, GroupRow } from "@/features/coach/parts";
 import { PHASE_LABEL } from "@/features/science/hybrid";
 import { colors, radius, space } from "@/theme";
@@ -68,13 +68,21 @@ export function RacePage() {
           <Text variant="label" tone="muted" style={styles.flex}>
             {`${PHASE_LABEL[rc.phase]} · ${div.label}`}
           </Text>
-          <Text
-            variant="label"
-            tone="muted"
+          <PressableScale
             onPress={() => router.push("/athlete/race/setup")}
+            accessibilityRole="button"
+            accessibilityLabel="Edit race"
+            hitSlop={{
+              top: space[3],
+              bottom: space[3],
+              left: space[3],
+              right: space[3],
+            }}
           >
-            Edit
-          </Text>
+            <Text variant="label" tone="muted">
+              Edit
+            </Text>
+          </PressableScale>
         </View>
         <Text style={styles.big}>
           {rc.days > 13

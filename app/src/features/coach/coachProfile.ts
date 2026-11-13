@@ -1,5 +1,5 @@
 // The coach's own profile and settings (D65), shown on the invite page and to their clients.
-// Starts from the sample coach; coach onboarding (CO-06 to CO-09) fills the same fields.
+// Starts from the sample coach; finishing coach onboarding saves its answers over it.
 import { router } from "expo-router";
 import { Menu } from "lucide-react-native";
 
@@ -28,14 +28,30 @@ export type CoachProfile = {
   certifications: string;
   /** Packages as shown on the profile, e.g. "Online coaching · ₹3,500 a month". */
   services: string[];
+  /** Profile photo (K-20). Sample build: a local URI; real builds upload through a signed URL (D72). */
+  photo?: string;
 };
+
+/**
+ * Split a service into its name and price for display: the price is everything from the first
+ * part with a rupee amount, e.g. "Fat loss · 3 months · ₹9,000" → "Fat loss · 3 months", "₹9,000".
+ */
+export function splitService(s: string): { name: string; price?: string } {
+  const parts = s.split(/\s+·\s+/);
+  const i = parts.findIndex((p) => /₹\s?\d/.test(p));
+  if (i <= 0) return { name: s };
+  return {
+    name: parts.slice(0, i).join(" · "),
+    price: parts.slice(i).join(" · "),
+  };
+}
 
 export type CoachSettings = {
   checkIns: boolean;
   messages: boolean;
   followUps: boolean;
   renewals: boolean;
-  /** Show transformation photos (with client consent) on the invite page. */
+  /** Show approved transformation photos on the profile, the invite page and My coach. */
   showTransformations: boolean;
   /** The coach's Arcwell plan (D40, D41). Sample build: previewed from Plan and billing. */
   billing?: "active" | "grace" | "lapsed";

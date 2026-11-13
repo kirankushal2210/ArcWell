@@ -1,6 +1,7 @@
-// Training (T-01 to T-03, F4-13, D83): start an empty workout, routines (the plan's workouts and the
-// athlete's own), history and the exercise library. The plan comes from the coach (coached) or from
-// the athlete's answers (self-guided, D57).
+// Training (T-01 to T-03, D83, D99): Hypertrophy (start an empty workout, then routines: the plan's
+// workouts and the athlete's own), Race while a race goal is on, and Endurance. The plan comes from
+// the coach (coached) or from the athlete's answers (self-guided, D57). Progressive overload and past
+// workouts are in the menu (D90); the exercise library opens only from Add exercise.
 import { router } from "expo-router";
 import { Play, Plus } from "lucide-react-native";
 import { useState } from "react";
@@ -128,7 +129,6 @@ export default function Training() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
-  newRow: { alignItems: "flex-end", paddingHorizontal: space[2] },
   card: {
     gap: space[2],
     padding: space[4],

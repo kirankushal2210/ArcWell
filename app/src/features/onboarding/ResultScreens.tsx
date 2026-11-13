@@ -6,10 +6,11 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Logo } from "@/components/brand";
-import { PressableScale, Text } from "@/components/primitives";
+import { Text } from "@/components/primitives";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
-import { colors, radius, rhythm, space, tapMin } from "@/theme";
+import { colors, radius, rhythm, space } from "@/theme";
 
+import { firstTemplate } from "./coachAnswers";
 import { useOnboarding } from "./OnboardingContext";
 import { NextButton } from "./parts";
 
@@ -91,24 +92,6 @@ function Title({ title, sub }: { title: string; sub?: string }) {
         </Text>
       ) : null}
     </View>
-  );
-}
-
-export function TextLink({
-  label,
-  onPress,
-}: {
-  label: string;
-  onPress: () => void;
-}) {
-  return (
-    <PressableScale
-      onPress={onPress}
-      accessibilityRole="button"
-      style={styles.link}
-    >
-      <Text weight="medium">{label}</Text>
-    </PressableScale>
   );
 }
 
@@ -278,13 +261,6 @@ const styles = StyleSheet.create({
     paddingBottom: space[2],
   },
   exercise: { paddingVertical: space[2] },
-
-  link: {
-    alignSelf: "center",
-    minHeight: tapMin,
-    justifyContent: "center",
-    paddingHorizontal: space[3],
-  },
 });
 
 // ---------- CO-12 Ready to coach ----------
@@ -294,12 +270,19 @@ export function CoachReadyScreen({ onClients }: { onClients: () => void }) {
   const services = (
     (answers.services as { name: string }[] | undefined) ?? []
   ).filter((s) => s.name.trim());
+  const first = firstTemplate(answers);
   const template =
-    answers.firstTemplate === "arcwell"
-      ? "Arcwell template · edit later"
-      : answers.firstTemplate === "scratch"
-        ? "From scratch · in Plans"
-        : "To do";
+    first.kind === "review"
+      ? `${first.draft.unmatched.length} ${first.draft.unmatched.length === 1 ? "row" : "rows"} to check next`
+      : first.kind === "ready"
+        ? answers.firstTemplate === "scratch"
+          ? "From scratch · opens next"
+          : answers.firstTemplate === "spreadsheet"
+            ? "From your spreadsheet"
+            : first.program.name
+        : answers.firstTemplate === "spreadsheet"
+          ? "Import later from Plans"
+          : "To do";
   const rows: [string, string][] = [
     ["Profile", "Done"],
     ["Services", services.length ? `${services.length} added` : "To do"],

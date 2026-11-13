@@ -9,6 +9,7 @@ import {
   Button,
   IconButton,
   NumberStepper,
+  PressableScale,
   Text,
 } from "@/components/primitives";
 import { kcalText } from "@/features/athlete/FoodParts";
@@ -150,11 +151,11 @@ export function MealPlanEditor({
                     <Text weight="medium" numberOfLines={2}>
                       {planItemText(i)}
                     </Text>
-                    <Text
-                      variant="label"
-                      weight="regular"
-                      tone="muted"
-                      numeric
+                    <PressableScale
+                      accessibilityRole="button"
+                      accessibilityHint="Switches the portion unit"
+                      hitSlop={{ top: space[3], bottom: space[3] }}
+                      style={styles.unitLink}
                       onPress={() => {
                         // Tap the portion to switch unit (katori, piece, grams…).
                         const at = units.findIndex((u) => u.key === i.unit);
@@ -173,8 +174,15 @@ export function MealPlanEditor({
                           );
                       }}
                     >
-                      {kcalText(planItemMacros(i).kcal)} · change unit
-                    </Text>
+                      <Text
+                        variant="label"
+                        weight="regular"
+                        tone="muted"
+                        numeric
+                      >
+                        {kcalText(planItemMacros(i).kcal)} · change unit
+                      </Text>
+                    </PressableScale>
                   </View>
                   <IconButton
                     icon={Minus}
@@ -282,6 +290,7 @@ export function MealPlanEditor({
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
+  unitLink: { alignSelf: "flex-start" },
   row: { flexDirection: "row", alignItems: "center", gap: space[3] },
   card: {
     gap: space[2],

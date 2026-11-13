@@ -6,6 +6,7 @@ import { BellRing } from "lucide-react-native";
 import { useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
 
+import { plusOnly } from "@/features/athlete/PlusOnly";
 import { Button, Text } from "@/components/primitives";
 import {
   clockOf,
@@ -42,7 +43,9 @@ async function remind(bed: number) {
   return true;
 }
 
-export default function Planner() {
+export default plusOnly(Planner);
+
+function Planner() {
   const p = useLocalSearchParams<{ date?: string }>();
   const r = useRecovery();
   const [today] = useState(todayDate);

@@ -72,7 +72,7 @@ import {
 import { NotJoined, useMe } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Pills } from "@/features/coach/parts";
-import { uid } from "@/features/coach/plans";
+import { rpeText, uid } from "@/features/coach/plans";
 import { alternativesFor } from "@/features/onboarding/workouts";
 import {
   colors,
@@ -615,10 +615,13 @@ function Logger({
         {rpeEx && rpeSet ? (
           <RpeScale
             value={rpeSet.rpe}
-            target={rpeTargetFor(
-              me.profile?.experience ?? "some",
-              isCompound(rpeEx.name),
-            )}
+            target={
+              rpeEx.rpe ??
+              rpeTargetFor(
+                me.profile?.experience ?? "some",
+                isCompound(rpeEx.name),
+              )
+            }
             onPick={(v) => {
               editSet(rpeEx.id, rpeSet.id, { rpe: v });
               setRpeFor(null);
@@ -1003,7 +1006,8 @@ const ExerciseCard = memo(function ExerciseCard({
   act: CardActions;
 }) {
   const prev = previousSets(history, e.name);
-  const rpeT = rpeTargetFor(experience, isCompound(e.name));
+  // The coach's target effort when set (K-07), else the rules range (D69).
+  const rpeT = e.rpe ?? rpeTargetFor(experience, isCompound(e.name));
   const rated = countsVolume(exType(e));
   const hint = suggestion(history, e, rated ? rpeT : undefined);
   if (e.skipped)
@@ -1042,8 +1046,9 @@ const ExerciseCard = memo(function ExerciseCard({
           <Text variant="label" weight="regular" tone="muted">
             {e.swappedFrom ? `Swapped for ${e.swappedFrom} · ` : ""}
             {e.group} · target {e.target}
-            {rated ? ` · RPE ${rpeT[0]}–${rpeT[1]}` : ""} · rest{" "}
-            {e.restSec ? clockTime(e.restSec * 1000) : "none"}
+            {e.pace ? ` · pace ${e.pace}` : ""}
+            {rated || e.rpe ? ` · ${rpeText(rpeT)}` : ""}
+            {` · rest ${e.restSec ? clockTime(e.restSec * 1000) : "none"}`}
           </Text>
         </PressableScale>
         <IconButton

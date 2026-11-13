@@ -6,6 +6,7 @@ import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { plusOnly } from "@/features/athlete/PlusOnly";
 import { Button, Text } from "@/components/primitives";
 import { protocolById, todayDate } from "@/features/athlete/recovery";
 import { useRecovery } from "@/features/athlete/RecoveryParts";
@@ -13,7 +14,9 @@ import { NotJoined } from "@/features/athlete/useMe";
 import { Eyebrow, Page, PageHeader } from "@/features/coach/parts";
 import { colors, radius, rhythm, space } from "@/theme";
 
-export default function ProtocolDetail() {
+export default plusOnly(ProtocolDetail);
+
+function ProtocolDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const r = useRecovery();
   const insets = useSafeAreaInsets();

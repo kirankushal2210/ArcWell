@@ -29,7 +29,11 @@ import {
   NotJoined,
   useMe,
 } from "@/features/athlete/useMe";
-import { dueText, sentThisWeek } from "@/features/coach/checkins";
+import {
+  checkInStatus,
+  dueText,
+  missedDay,
+} from "@/features/coach/checkins";
 import { useCoachData } from "@/features/coach/CoachData";
 import {
   Eyebrow,
@@ -66,7 +70,8 @@ export default function Progress() {
   const last = me.weights[me.weights.length - 1] ?? 70;
   const start = me.weights[0] ?? last;
   const k = me.checkIns[0];
-  const sent = sentThisWeek(me);
+  const status = checkInStatus(me);
+  const sent = status.kind === "sent";
   const paused = me.status === "paused";
   const photosOff = !settingsOf(me.id).photos;
 
@@ -82,7 +87,9 @@ export default function Progress() {
                 ? k?.reviewed
                   ? `${first} replied`
                   : "Check-in sent"
-                : "This week's check-in"}
+                : status.kind === "overdue"
+                  ? "Check-in overdue"
+                  : "This week's check-in"}
         </Text>
         <Text tone="muted">
           {paused
@@ -93,7 +100,7 @@ export default function Progress() {
                 ? k?.reviewed
                   ? (k.reply ?? "")
                   : `${first} will look at it and reply here.`
-                : `${dueText(me)} · weight, waist, six quick scores and how the week went.`}
+                : `${status.kind === "overdue" ? `Was due ${missedDay(me, status)}` : dueText(me)} · weight, waist, six quick scores and how the week went.`}
         </Text>
         {!paused && !sent && photosOff ? (
           <Text variant="label" weight="regular" tone="muted">

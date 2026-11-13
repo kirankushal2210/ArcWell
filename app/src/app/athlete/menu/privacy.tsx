@@ -51,7 +51,10 @@ export default function Privacy() {
           label="Progress photos"
           sub="Optional. Check-ins can be sent without photos."
           value={s.photos}
-          onChange={(v) => setAthleteSettings(me.id, { photos: v })}
+          onChange={(v) => {
+            setAthleteSettings(me.id, { photos: v });
+            void recordConsent("photos", v);
+          }}
         />
         {meTier === "pro" ? (
           <ToggleRow

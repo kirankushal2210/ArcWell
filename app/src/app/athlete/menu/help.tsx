@@ -14,7 +14,7 @@ const TOPICS: [string, string][] = [
   ],
   [
     "Logging food and portions",
-    "Tap + and Log food, search in English or Hindi, and pick a portion in katori, roti or grams. Recent foods are one tap away.",
+    "Tap the round red button above the tab bar on Today or Nutrition: a scan with Plus, or + to search. Search in English or Hindi and pick a portion in katori, roti or grams. Recent foods are one tap away.",
   ],
   [
     "Subscriptions and the trial",

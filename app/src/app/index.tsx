@@ -25,10 +25,15 @@ export default function Index() {
   return (
     <WelcomeScreen
       // Get Started opens the role choice (D44), then athlete or coach onboarding. Sign In sends an
-      // email code; it does nothing in sample builds without accounts.
+      // email code. Sample builds have no accounts: Sign In opens the sample athlete on this phone
+      // if there is one, otherwise the role choice.
       onGetStarted={() => router.push("/role")}
       onSignIn={() => {
-        if (!auth.enabled) return;
+        if (!auth.enabled) {
+          if (meId) router.replace("/athlete");
+          else router.push("/role");
+          return;
+        }
         auth.begin(null);
         router.push("/auth/email");
       }}

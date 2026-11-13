@@ -229,6 +229,8 @@ export function selfClient(a: Answers, plan: SelfPlan): Client {
     },
     athleteSettings: {
       ...defaultSettings(),
+      // Optional photo consent from Save your plan (F1-05); Privacy can change it later.
+      photos: a.photoConsent === true,
       modules: modulesFrom(a),
       race: raceGoalFrom(a)
         ? { goal: raceGoalFrom(a), status: "active", sims: [] }
@@ -306,6 +308,8 @@ export function newClientFromAnswers(a: Answers): Client {
       injuries: a.injuries as string[] | undefined,
       device: a.device as string | undefined,
     },
+    // Optional photo consent from Save your plan (F1-05).
+    athleteSettings: { ...defaultSettings(), photos: a.photoConsent === true },
   };
 }
 
@@ -318,7 +322,6 @@ const ADDON: Record<string, ModuleKey> = {
   Mobility: "mobility",
   Focus: "focus",
 };
-export const ADDON_OPTIONS = ["Just my main goal", ...Object.keys(ADDON)];
 
 /** Modules from the onboarding "Anything else?" screen, on top of the goal's defaults (D78). */
 export function modulesFrom(a: Answers): ModuleKey[] {

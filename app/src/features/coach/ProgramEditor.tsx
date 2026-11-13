@@ -1,7 +1,8 @@
 // The program editor shared by a client's training builder and the Plans tab's training templates
-// (K-06, D56): name, length, then workout days with exercises (sets, reps, rest) and an optional
-// note per day. The screen around it decides what it edits and how it's saved.
-import { Plus, Trash2 } from "lucide-react-native";
+// (K-06, D56): name, length, then workout days with exercises (sets, reps, rest, target effort),
+// run or erg intervals and HYROX stations (D76, D79), and an optional note per day. The screen
+// around it decides what it edits and how it's saved.
+import { Plus, Timer, Trash2, Trophy } from "lucide-react-native";
 import { useState } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
 
@@ -14,13 +15,19 @@ import {
 import { ExercisePicker } from "@/features/athlete/ExercisePicker";
 import { typeOf } from "@/features/athlete/library";
 import { defaultTarget, type Session } from "@/features/athlete/training";
-import { ExerciseRows } from "@/features/coach/ExerciseRows";
+import { Sheet, SheetRow } from "@/features/athlete/Sheet";
 import { Eyebrow } from "@/features/coach/parts";
+import { PlanExerciseRows } from "@/features/coach/PlanExerciseRows";
 import {
+  INTERVAL_EXERCISES,
+  newInterval,
+  newStation,
+  type PlannedExercise,
   type TrainingDay,
   type TrainingProgram,
   uid,
 } from "@/features/coach/plans";
+import { STATIONS } from "@/features/race/data";
 import { colors, fontFamilyFor, radius, space, textSizes } from "@/theme";
 import { restFor } from "@/features/science/rules";
 import { VolumePanel } from "@/features/science/VolumePanel";
@@ -35,6 +42,7 @@ export function ProgramEditor({
   namePlaceholder = "Program name, e.g. Fat loss phase 1",
   notePlaceholder = "Note for the client (optional)",
   history = [],
+  experience,
 }: {
   value: TrainingProgram;
   onChange: (fn: (p: TrainingProgram) => TrainingProgram) => void;
@@ -42,8 +50,19 @@ export function ProgramEditor({
   notePlaceholder?: string;
   /** Recent sessions, so the exercise picker can show recent exercises first. */
   history?: Session[];
+  /** The client's training experience, for each exercise's default effort. */
+  experience?: string;
 }) {
   const [picker, setPicker] = useState<string | null>(null);
+  /** Choosing a machine for intervals, or a station, for one day. */
+  const [block, setBlock] = useState<{
+    dayId: string;
+    kind: "interval" | "station";
+  } | null>(null);
+  const addTo = (dayId: string, e: PlannedExercise) => {
+    setDay(dayId, (x) => ({ ...x, exercises: [...x.exercises, e] }));
+    setBlock(null);
+  };
   const setDay = (dayId: string, patch: (d: TrainingDay) => TrainingDay) =>
     onChange((x) => ({
       ...x,
@@ -103,18 +122,33 @@ export function ProgramEditor({
             style={styles.dayNote}
             accessibilityLabel={`${d.name} note`}
           />
-          <ExerciseRows
+          <PlanExerciseRows
             exercises={d.exercises}
+            experience={experience}
             onChange={(list) =>
               setDay(d.id, (x) => ({ ...x, exercises: list }))
             }
           />
-          <Button
-            label="Add exercise"
-            icon={Plus}
-            variant="ghost"
-            onPress={() => setPicker(d.id)}
-          />
+          <View style={styles.adds}>
+            <Button
+              label="Exercise"
+              icon={Plus}
+              variant="ghost"
+              onPress={() => setPicker(d.id)}
+            />
+            <Button
+              label="Intervals"
+              icon={Timer}
+              variant="ghost"
+              onPress={() => setBlock({ dayId: d.id, kind: "interval" })}
+            />
+            <Button
+              label="HYROX station"
+              icon={Trophy}
+              variant="ghost"
+              onPress={() => setBlock({ dayId: d.id, kind: "station" })}
+            />
+          </View>
         </View>
       ))}
       <Button
@@ -161,6 +195,37 @@ export function ProgramEditor({
           setPicker(null);
         }}
       />
+      <Sheet
+        visible={block !== null}
+        onClose={() => setBlock(null)}
+        title={
+          block?.kind === "station" ? "Add a HYROX station" : "Add intervals"
+        }
+        sub={
+          block?.kind === "station"
+            ? "At race distance; change it after."
+            : "Distance or time repeats with rest. Set pace or effort after."
+        }
+      >
+        {block?.kind === "station"
+          ? STATIONS.map((s) => (
+              <SheetRow
+                key={s.key}
+                label={s.label}
+                sub={s.metres ? `${s.metres} m` : `${s.reps} reps`}
+                onPress={() => addTo(block.dayId, newStation(s.key))}
+              />
+            ))
+          : block
+            ? INTERVAL_EXERCISES.map((name) => (
+                <SheetRow
+                  key={name}
+                  label={name}
+                  onPress={() => addTo(block.dayId, newInterval(name))}
+                />
+              ))
+            : null}
+      </Sheet>
       {/* Live evidence check (D69): junk volume, missing muscles, crowded sessions. */}
       <VolumePanel days={p.days} />
     </>
@@ -187,6 +252,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
   },
   dayHead: { flexDirection: "row", alignItems: "center", gap: space[2] },
+  adds: { flexDirection: "row", flexWrap: "wrap", gap: space[1] },
   dayName: {
     flex: 1,
     fontFamily: fontFamilyFor("semibold"),

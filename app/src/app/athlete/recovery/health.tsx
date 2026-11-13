@@ -5,6 +5,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
+import { plusOnly } from "@/features/athlete/PlusOnly";
 import { Button, Text } from "@/components/primitives";
 import {
   DEVICE_LABEL,
@@ -17,7 +18,9 @@ import { WhyThis } from "@/features/science/WhyThis";
 import { Page, PageHeader } from "@/features/coach/parts";
 import { colors, radius, space } from "@/theme";
 
-export default function Health() {
+export default plusOnly(Health);
+
+function Health() {
   const p = useLocalSearchParams<{ date?: string }>();
   const r = useRecovery();
   const [today] = useState(todayDate);

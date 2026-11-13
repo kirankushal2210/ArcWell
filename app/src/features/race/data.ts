@@ -147,8 +147,3 @@ export const loadText = (l?: Load) =>
   !l
     ? ""
     : `${l.perHand ? "2 × " : ""}${l.kg} kg${l.heightM ? ` to ${l.heightM.toFixed(2)} m` : ""}`;
-
-export const segmentLabel = (s: Segment) =>
-  s.kind === "run"
-    ? `Run ${s.n}`
-    : `${stationOf(s.station).label}${s.metres ? ` ${s.metres.toLocaleString("en-IN")} m` : ` ${s.reps} reps`}`;

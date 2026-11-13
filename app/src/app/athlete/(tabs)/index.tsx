@@ -23,7 +23,11 @@ import { Ring, useRecovery } from "@/features/athlete/RecoveryParts";
 import { FoodScanButton, RoundAction } from "@/features/athlete/FoodScanButton";
 import { AthletePage, NotJoined, useMe } from "@/features/athlete/useMe";
 import { useAuth } from "@/features/auth/AuthProvider";
-import { dueText, sentThisWeek } from "@/features/coach/checkins";
+import {
+  checkInStatus,
+  dueText,
+  missedDay,
+} from "@/features/coach/checkins";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Group, GroupRow, PageHeader, PillarDot } from "@/features/coach/parts";
 import { clock } from "@/features/coach/plans";
@@ -111,7 +115,8 @@ export default function Today() {
     .reduce((s, l) => s + l.macros.p, 0);
   const checkIn = (() => {
     const k = me.checkIns[0];
-    const sent = sentThisWeek(me);
+    const status = checkInStatus(me);
+    const sent = status.kind === "sent";
     return {
       sent,
       title: !me.checkIns.length
@@ -120,14 +125,16 @@ export default function Today() {
           ? k?.reviewed
             ? `${coachName} replied to your check-in`
             : "Check-in sent"
-          : "Weekly check-in",
+          : status.kind === "overdue"
+            ? "Check-in overdue"
+            : "Weekly check-in",
       sub: !me.checkIns.length
         ? "Photos and weight, so you can see how far you come"
         : sent
           ? k?.reviewed
             ? (k.reply ?? "")
             : `${coachName} will reply soon`
-          : `${dueText(me)} · photos, weight and 6 questions`,
+          : `${status.kind === "overdue" ? `Was due ${missedDay(me, status)}` : dueText(me)} · photos, weight and 6 questions`,
     };
   })();
   const openToday = () =>

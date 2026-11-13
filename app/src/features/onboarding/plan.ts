@@ -132,9 +132,3 @@ export function buildPlan(a: Answers): Plan {
     },
   };
 }
-
-export const formatKcal = (kcal: number) => kcal.toLocaleString("en-IN");
-export const formatWeekly = (kg: number) =>
-  Math.abs(kg) < 0.05
-    ? "Steady"
-    : `${kg < 0 ? "−" : "+"}${Math.abs(kg).toFixed(1)} kg`;
