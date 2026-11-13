@@ -10,8 +10,13 @@ import {
 } from "@/features/coach/plans";
 import type { Client } from "@/features/coach/sampleData";
 import type { Answers } from "@/features/onboarding/OnboardingContext";
-import { defaultSettings, isoDate } from "@/features/athlete/athleteData";
-import type { DivisionKey } from "@/features/race/data";
+import {
+  defaultSettings,
+  isoDate,
+  type RaceLevel,
+  type WeakArea,
+} from "@/features/athlete/athleteData";
+import type { DivisionKey, StationKey } from "@/features/race/data";
 import { defaultModules, type ModuleKey } from "@/features/science/habits";
 import { daysUntil, hybridProgram } from "@/features/science/hybrid";
 import { buildPlan } from "@/features/onboarding/plan";
@@ -104,6 +109,7 @@ export function selfPlan(a: Answers): SelfPlan {
     const hp = hybridProgram(
       p.daysPerWeek,
       daysUntil(race.date, isoDate(new Date())),
+      race,
     );
     program.name = hp.name;
     program.weeks = hp.weeks;
@@ -328,16 +334,61 @@ export function modulesFrom(a: Answers): ModuleKey[] {
 }
 
 /** The race goal from the HYROX branch, if the athlete chose it. */
+const STATION_BY_LABEL: Record<string, StationKey> = {
+  SkiErg: "skierg",
+  "Sled push": "sled_push",
+  "Sled pull": "sled_pull",
+  "Burpee broad jumps": "burpee_broad_jumps",
+  Row: "row",
+  "Farmers carry": "farmers_carry",
+  "Sandbag lunges": "sandbag_lunges",
+  "Wall balls": "wall_balls",
+};
+const WEAK_BY_LABEL: Record<string, WeakArea> = {
+  ...STATION_BY_LABEL,
+  Running: "running",
+  "Slowing down on later runs": "fade",
+  "Roxzone transitions": "roxzone",
+};
+const num = (v: unknown) => (typeof v === "number" ? v : undefined);
+
 export function raceGoalFrom(a: Answers) {
   if (a.goal !== "hyrox") return undefined;
-  const weeks = typeof a.raceWeeks === "number" ? a.raceWeeks : 12;
+  const weeks = num(a.raceWeeks) ?? 12;
   const d = new Date();
   d.setDate(d.getDate() + weeks * 7);
+  const level = (a.raceLevel as RaceLevel | undefined) ?? "first";
+  const aim = a.raceAim as "finish" | "nowalk" | "time" | undefined;
+  const weeklyKm = Number(a.weeklyKm ?? 5);
   return {
     date: isoDate(d),
     division: ((a.raceDivision as string | undefined) ??
       "open_women") as DivisionKey,
-    recent5kSec: typeof a.recent5k === "number" ? a.recent5k * 60 : undefined,
+    recent5kSec:
+      weeklyKm > 0 && num(a.recent5k) ? num(a.recent5k)! * 60 : undefined,
     kit: (a.raceKit as string[] | undefined) ?? [],
+    level,
+    weeklyKm,
+    aim,
+    prevSec:
+      level !== "first" && num(a.prevMin) ? num(a.prevMin)! * 60 : undefined,
+    prevDivision: a.prevDivision as "open" | "pro" | "doubles" | undefined,
+    weak: ((a.weakAreas as string[] | undefined) ?? [])
+      .map((x) => WEAK_BY_LABEL[x])
+      .filter(Boolean),
+    stationsTried: ((a.stationsTried as string[] | undefined) ?? [])
+      .map((x) => STATION_BY_LABEL[x])
+      .filter(Boolean),
+    targetSec:
+      level === "first" && aim !== "time"
+        ? undefined
+        : num(a.targetMin)
+          ? num(a.targetMin)! * 60
+          : undefined,
+    racePaceSec: level === "advanced" ? num(a.racePaceSec) : undefined,
+    seasonGoal:
+      level === "advanced"
+        ? (a.seasonGoal as "pb" | "podium" | "worlds" | undefined)
+        : undefined,
   };
 }

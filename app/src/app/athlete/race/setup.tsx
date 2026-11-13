@@ -4,8 +4,12 @@
 import { router } from "expo-router";
 import { useState } from "react";
 
-import { Button, Chip, Text } from "@/components/primitives";
-import { isoDate } from "@/features/athlete/athleteData";
+import { Button, Chip, Text, TextField } from "@/components/primitives";
+import {
+  isoDate,
+  type RaceLevel,
+  type WeakArea,
+} from "@/features/athlete/athleteData";
 import { backTo, InfoCard, MenuPage } from "@/features/athlete/MenuParts";
 import { NotJoined } from "@/features/athlete/useMe";
 import { Eyebrow, Pills } from "@/features/coach/parts";
@@ -16,6 +20,26 @@ import { StyleSheet, View } from "react-native";
 
 const KIT = ["Sled", "SkiErg", "Rower", "Wall-ball target", "Sandbag"];
 const WEEKS = ["6", "8", "10", "12", "16", "20", "24"];
+const WEAK: [WeakArea, string][] = [
+  ["running", "Running"],
+  ["fade", "Slowing on later runs"],
+  ["roxzone", "Roxzone"],
+  ["skierg", "SkiErg"],
+  ["sled_push", "Sled push"],
+  ["sled_pull", "Sled pull"],
+  ["burpee_broad_jumps", "Burpee broad jumps"],
+  ["row", "Row"],
+  ["farmers_carry", "Farmers carry"],
+  ["sandbag_lunges", "Sandbag lunges"],
+  ["wall_balls", "Wall balls"],
+];
+const hm = (sec: number) =>
+  `${Math.floor(sec / 3600)}:${String(Math.round((sec % 3600) / 60)).padStart(2, "0")}`;
+/** "1:32" → seconds; anything else → undefined. */
+const parseHm = (t: string) => {
+  const m = t.trim().match(/^(\d):(\d{2})$/);
+  return m ? Number(m[1]) * 3600 + Number(m[2]) * 60 : undefined;
+};
 
 export default function RaceSetup() {
   const rc = useRace();
@@ -28,17 +52,26 @@ export default function RaceSetup() {
   );
   const [kit, setKit] = useState<string[]>(g?.kit ?? []);
   const [days, setDays] = useState("4");
+  const [level, setLevel] = useState<RaceLevel>(g?.level ?? "first");
+  const [km, setKm] = useState(String(g?.weeklyKm ?? 5));
+  const [best, setBest] = useState(g?.prevSec ? hm(g.prevSec) : "");
+  const [target, setTarget] = useState(g?.targetSec ? hm(g.targetSec) : "");
+  const [weak, setWeak] = useState<WeakArea[]>(g?.weak ?? []);
   if (!rc.me) return <NotJoined />;
   const coached = rc.v.coached;
   const save = (switchPlan: boolean) => {
     const d = new Date();
     d.setDate(d.getDate() + Number(weeks) * 7);
     rc.setGoal({
+      ...g,
       date: isoDate(d),
       division,
       kit,
-      targetSec: g?.targetSec,
-      recent5kSec: g?.recent5kSec,
+      level,
+      weeklyKm: Number(km),
+      prevSec: level === "first" ? undefined : parseHm(best),
+      targetSec: parseHm(target),
+      weak: level === "first" ? [] : weak,
     });
     if (switchPlan) rc.switchPlan(Number(days));
     router.replace("/athlete/training");
@@ -56,6 +89,67 @@ export default function RaceSetup() {
           changes for anyone else.
         </InfoCard>
       ) : null}
+      <Eyebrow>Your race experience</Eyebrow>
+      <Pills
+        value={level}
+        onChange={setLevel}
+        options={[
+          { value: "first", label: "First race" },
+          { value: "returning", label: "Raced before" },
+          { value: "advanced", label: "Pro or qualifying" },
+        ]}
+      />
+      <Eyebrow>Running now, a week</Eyebrow>
+      <Pills
+        value={km}
+        onChange={setKm}
+        options={[
+          { value: "0", label: "Not yet" },
+          { value: "5", label: "Under 10 km" },
+          { value: "15", label: "10–20 km" },
+          { value: "28", label: "20–35 km" },
+          { value: "40", label: "35 km +" },
+        ]}
+      />
+      {level !== "first" ? (
+        <>
+          <TextField
+            label="Best finish time (h:mm)"
+            value={best}
+            onChangeText={setBest}
+            placeholder="1:32"
+          />
+          <Eyebrow>Where you lost the most time (up to 3)</Eyebrow>
+          <View style={styles.wrap}>
+            {WEAK.map(([k, label]) => (
+              <Chip
+                key={k}
+                label={label}
+                selected={weak.includes(k)}
+                onPress={() =>
+                  setWeak((xs) =>
+                    xs.includes(k)
+                      ? xs.filter((x) => x !== k)
+                      : xs.length < 3
+                        ? [...xs, k]
+                        : xs,
+                  )
+                }
+              />
+            ))}
+          </View>
+        </>
+      ) : null}
+      <TextField
+        label={
+          level === "first"
+            ? "Target time, if you have one (h:mm)"
+            : "Target time (h:mm)"
+        }
+        value={target}
+        onChangeText={setTarget}
+        placeholder="1:25"
+      />
       <Eyebrow>Weeks until your race</Eyebrow>
       <Pills
         value={weeks}

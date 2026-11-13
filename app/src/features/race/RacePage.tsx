@@ -12,7 +12,19 @@ import { WhyThis } from "@/features/science/WhyThis";
 import { PHASE_LABEL, PHASE_TEXT } from "@/features/science/hybrid";
 import { colors, radius, space } from "@/theme";
 
-import { divisionOf, loadText, STATIONS } from "./data";
+import {
+  divisionOf,
+  loadText,
+  type StationKey,
+  stationOf,
+  STATIONS,
+} from "./data";
+
+const WEAK_LABEL: Record<string, string> = {
+  running: "running speed",
+  fade: "holding pace on later runs",
+  roxzone: "Roxzone transitions",
+};
 import { breakdown, fmtTime, predict, stationBests } from "./sim";
 import { useRace } from "./useRace";
 
@@ -63,7 +75,7 @@ export function RacePage() {
         <View style={styles.row}>
           <Flag size={16} color={colors.training} />
           <Text variant="label" weight="semibold" style={styles.flex}>
-            {`${PHASE_LABEL[rc.phase]} phase · ${div.label}`}
+            {`${PHASE_LABEL[rc.phase]} phase · ${div.label}${rc.goal.level === "first" ? " · first race" : rc.goal.level === "advanced" ? " · advanced" : ""}`}
           </Text>
           <Text
             variant="caption"
@@ -88,6 +100,25 @@ export function RacePage() {
               : "log a sim to see a predicted time",
           ].join(" · ")}
         </Text>
+        {rc.goal.prevSec || rc.goal.targetSec ? (
+          <Text variant="label" weight="semibold" numeric>
+            {[
+              rc.goal.prevSec ? `Best ${fmtTime(rc.goal.prevSec)}` : null,
+              rc.goal.targetSec ? `target ${fmtTime(rc.goal.targetSec)}` : null,
+            ]
+              .filter(Boolean)
+              .join(" → ")}
+          </Text>
+        ) : null}
+        {rc.goal.weak?.length ? (
+          <Text variant="caption" tone="muted">
+            {`Your plan works on: ${rc.goal.weak.map((w) => WEAK_LABEL[w] ?? stationOf(w as StationKey).label).join(", ")}`}
+          </Text>
+        ) : rc.goal.level === "first" ? (
+          <Text variant="caption" tone="muted">
+            First race: station technique early, running built up gradually.
+          </Text>
+        ) : null}
         <Text variant="caption" tone="muted">
           {PHASE_TEXT[rc.phase]}
         </Text>

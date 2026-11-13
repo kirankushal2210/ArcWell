@@ -71,7 +71,8 @@
       "**/__tests__/**/*.test.ts?(x)"
     ],
     "moduleNameMapper": {
-      "^@/(.*)$": "<rootDir>/src/$1"
+      "^@/(.*)$": "<rootDir>/src/$1",
+      "^lucide-react-native$": "<rootDir>/jest/lucide-stub.js"
     }
   }
 }
