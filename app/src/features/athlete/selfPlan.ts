@@ -23,10 +23,8 @@ import { buildPlan } from "@/features/onboarding/plan";
 import {
   balanceVolume,
   timesPerWeek,
-  PROGRESSION,
   proteinTarget,
   restFor,
-  rirFor,
   weeklyMin,
 } from "@/features/science/rules";
 
@@ -119,10 +117,7 @@ export function selfPlan(a: Answers): SelfPlan {
       min: weeklyMin(goalKey, experience),
       minutes: parseInt(String(a.sessionLength ?? "45"), 10),
       timesPerWeek: timesPerWeek(program.days.length, restDaysFor(a)),
-    }).map((d) => ({
-      ...d,
-      note: `Leave ${rirFor(experience, true)} reps in reserve on big lifts and ${rirFor(experience, false)} on the rest. ${PROGRESSION}`,
-    }));
+    });
 
   const protein = proteinTarget(
     weight,

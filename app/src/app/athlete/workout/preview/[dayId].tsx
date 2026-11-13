@@ -119,7 +119,8 @@ export default function Preview() {
           {sets} sets
           {routine ? " · your routine" : coached ? ` · from ${coachName}` : ""}
         </Text>
-        {day.note?.trim() ? (
+        {/* Only notes a person wrote: the coach's, or the athlete's own on a routine (D88). */}
+        {day.note?.trim() && (routine || coached) ? (
           <View style={styles.note}>
             <Text variant="label" tone="muted">
               {coached && !routine ? `From ${coachName}` : "Your note"}
@@ -155,11 +156,6 @@ export default function Preview() {
             );
           })}
         </Group>
-        <Text variant="caption" tone="muted">
-          {coached
-            ? `${coachName} set this session. If equipment is busy, swap an exercise during the workout.`
-            : "Change anything with Edit, or swap an exercise during the workout."}
-        </Text>
       </Page>
       <View
         style={[

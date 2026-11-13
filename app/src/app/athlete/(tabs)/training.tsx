@@ -6,7 +6,7 @@ import { Play, Plus } from "lucide-react-native";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
-import { Button, PressableScale, Text } from "@/components/primitives";
+import { Button, Text } from "@/components/primitives";
 import { SectionTabs } from "@/components/SectionTabs";
 import {
   useSetActive,
@@ -40,25 +40,12 @@ function PlanPage() {
 
   return (
     <AthletePage>
-      <PressableScale
+      <Button
+        label={active ? `Resume ${active.name}` : "Start an empty workout"}
+        icon={active ? Play : Plus}
+        fullWidth
         onPress={startEmpty}
-        accessibilityRole="button"
-        accessibilityLabel={
-          active ? `Resume ${active.name}` : "Start an empty workout"
-        }
-        style={styles.quick}
-      >
-        <View style={styles.quickIcon}>
-          {active ? (
-            <Play size={20} color={colors.onBrand} fill={colors.onBrand} />
-          ) : (
-            <Plus size={22} strokeWidth={2.4} color={colors.onBrand} />
-          )}
-        </View>
-        <Text weight="semibold" style={styles.flex}>
-          {active ? `Resume ${active.name}` : "Start empty workout"}
-        </Text>
-      </PressableScale>
+      />
 
       {!program && coached ? (
         <Text variant="label" tone="muted">
@@ -134,23 +121,6 @@ export default function Training() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
-  flex: { flex: 1 },
-  quick: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: space[3],
-    padding: space[3],
-    borderRadius: radius.lg,
-    backgroundColor: colors.surface,
-  },
-  quickIcon: {
-    width: space[8] + space[1],
-    height: space[8] + space[1],
-    borderRadius: radius.sm,
-    backgroundColor: colors.brand,
-    alignItems: "center",
-    justifyContent: "center",
-  },
   newRow: { alignItems: "flex-end", paddingHorizontal: space[2] },
   card: {
     gap: space[2],
