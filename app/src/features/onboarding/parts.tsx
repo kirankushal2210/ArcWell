@@ -690,7 +690,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: space[1],
-    height: 36,
+    minHeight: 36,
     paddingHorizontal: space[4],
     borderRadius: radius.full,
     backgroundColor: colors.surface,

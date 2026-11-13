@@ -168,7 +168,7 @@ export default function ClientsTab() {
                 >
                   <Avatar name={c.name} />
                   <View style={styles.flex}>
-                    <Text weight="semibold" numberOfLines={1}>
+                    <Text weight="semibold">
                       {c.name}
                     </Text>
                     <Text variant="label" weight="regular" tone="muted">
@@ -199,7 +199,7 @@ export default function ClientsTab() {
                 >
                   <Avatar name={c.name} />
                   <View style={styles.flex}>
-                    <Text weight="semibold" numberOfLines={1}>
+                    <Text weight="semibold">
                       {c.name}
                     </Text>
                     <Text variant="label" weight="regular" tone="muted">
@@ -249,7 +249,6 @@ export default function ClientsTab() {
                   <View style={styles.nameRow}>
                     <Text
                       weight="semibold"
-                      numberOfLines={1}
                       style={styles.shrink}
                     >
                       {c.name}

@@ -52,7 +52,8 @@ export function Chip({ label, selected, onPress, count, testID }: ChipProps) {
 const styles = StyleSheet.create({
   hit: { minHeight: tapMin, minWidth: tapMin, justifyContent: "center" },
   chip: {
-    height: 32,
+    minHeight: 32,
+    paddingVertical: space[1] / 2,
     flexDirection: "row",
     alignItems: "center",
     gap: space[1],

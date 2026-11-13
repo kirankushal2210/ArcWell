@@ -39,6 +39,7 @@ import {
 } from "@/features/athlete/athleteData";
 import { Tip } from "@/features/athlete/Tip";
 import { TodaySuggestion } from "@/features/ai/TodaySuggestion";
+import { SAMPLE_TOOLS } from "@/features/system/store";
 
 const dateLabel = () =>
   new Date().toLocaleDateString("en-IN", {
@@ -274,7 +275,6 @@ export default function Today() {
                     variant="label"
                     weight="regular"
                     tone="muted"
-                    numberOfLines={2}
                   >
                     {checkIn.sub}
                   </Text>
@@ -478,28 +478,30 @@ export default function Today() {
             }
           />
         ) : null}
-        <Button
-          label="Sample build: reset this phone"
-          variant="ghost"
-          fullWidth
-          onPress={() =>
-            Alert.alert(
-              "Reset this phone?",
-              "Clears your plan, workouts and history from this sample build.",
-              [
-                { text: "Cancel", style: "cancel" },
-                {
-                  text: "Reset",
-                  style: "destructive",
-                  onPress: () => {
-                    resetSample();
-                    router.replace("/");
+        {SAMPLE_TOOLS ? (
+          <Button
+            label="Sample build: reset this phone"
+            variant="ghost"
+            fullWidth
+            onPress={() =>
+              Alert.alert(
+                "Reset this phone?",
+                "Clears your plan, workouts and history from this sample build.",
+                [
+                  { text: "Cancel", style: "cancel" },
+                  {
+                    text: "Reset",
+                    style: "destructive",
+                    onPress: () => {
+                      resetSample();
+                      router.replace("/");
+                    },
                   },
-                },
-              ],
-            )
-          }
-        />
+                ],
+              )
+            }
+          />
+        ) : null}
       </AthletePage>
       {today && !doneToday ? (
         <AthleteDock

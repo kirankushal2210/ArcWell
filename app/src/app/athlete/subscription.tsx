@@ -21,6 +21,7 @@ import { NotJoined, useMe } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Eyebrow, KeyValues, Pills } from "@/features/coach/parts";
 import { colors, radius, space } from "@/theme";
+import { openPlaySubscriptions, SAMPLE_TOOLS } from "@/features/system/store";
 
 export default function SubscriptionDetails() {
   const me = useMe();
@@ -78,7 +79,7 @@ export default function SubscriptionDetails() {
           }
           variant={sub.status === "grace" ? "primary" : "secondary"}
           fullWidth
-          onPress={() => {}}
+          onPress={openPlaySubscriptions}
         />
       }
     >
@@ -140,18 +141,22 @@ export default function SubscriptionDetails() {
         Privacy doesn&apos;t cancel your subscription.
       </Text>
 
-      <Eyebrow>Sample build: preview states</Eyebrow>
-      <Pills
-        value={sub.status}
-        onChange={set}
-        options={[
-          { value: "trial", label: "Trial" },
-          { value: "active", label: "Active" },
-          { value: "grace", label: "Payment problem" },
-          { value: "cancelled", label: "Cancelled" },
-          { value: "expired", label: "Ended" },
-        ]}
-      />
+      {SAMPLE_TOOLS ? (
+        <>
+          <Eyebrow>Sample build: preview states</Eyebrow>
+          <Pills
+            value={sub.status}
+            onChange={set}
+            options={[
+              { value: "trial", label: "Trial" },
+              { value: "active", label: "Active" },
+              { value: "grace", label: "Payment problem" },
+              { value: "cancelled", label: "Cancelled" },
+              { value: "expired", label: "Ended" },
+            ]}
+          />
+        </>
+      ) : null}
     </MenuPage>
   );
 }

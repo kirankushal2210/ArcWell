@@ -130,7 +130,13 @@ export type Client = {
     injuries?: string[];
     /** Tracker named in onboarding (AO-15b), connected later in Recovery (D60). */
     device?: string;
+    /** Edit profile (AC-07): training experience and schedule, used for the next plan. */
+    experience?: "new" | "some" | "experienced";
+    daysPerWeek?: number;
+    sessionMinutes?: number;
   };
+  /** Profile photo (AC-07), shown on the menu and to the coach. */
+  photo?: string;
   /** When the current training program started, for "Week 3 of 8" (ISO date). */
   programStart?: string;
   /** The athlete's own routines, outside the program: extra sessions they plan themselves. */

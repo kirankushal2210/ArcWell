@@ -2,7 +2,7 @@
 // rules (D69) with its weekly volume, ready to review and accept. Nothing changes until "Use this
 // plan". If the answers leave too few exercises, it says so instead of guessing (X-02).
 // Sample build: the same rules engine as onboarding stands in for the AI.
-import { router } from "expo-router";
+import { Redirect, router } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
@@ -28,11 +28,15 @@ export default function BuildPlan() {
   const me = useMe();
   const { meTier, startProgram } = useCoachData();
   const [goal, setGoal] = useState<Goal>("build_muscle");
-  const [days, setDays] = useState("4");
-  const [minutes, setMinutes] = useState("60");
+  const [days, setDays] = useState(String(me?.profile?.daysPerWeek ?? 4));
+  const [minutes, setMinutes] = useState(
+    String(me?.profile?.sessionMinutes ?? 60),
+  );
   const [kit, setKit] = useState(equipmentCode(me?.profile?.equipment));
   const [built, setBuilt] = useState<ReturnType<typeof selfPlan> | null>(null);
-  if (!me || meTier !== "pro") return <NotJoined />;
+  if (!me) return <NotJoined />;
+  // AI is Plus-only and coached athletes never see it (D44): a direct link goes back to Today.
+  if (meTier !== "pro") return <Redirect href="/athlete" />;
   const back = backTo("/athlete/ai");
 
   const build = () =>
@@ -46,7 +50,7 @@ export default function BuildPlan() {
         injuries: me.profile?.injuries,
         weightKg: me.basics?.weightKg,
         heightCm: me.basics?.heightCm,
-        experience: "some",
+        experience: me.profile?.experience ?? "some",
       }),
     );
 

@@ -1,7 +1,7 @@
 // Photo food logging (F5-09 to F5-11; D70): take or choose a photo of the plate, the AI finds the
 // foods and portions, and nothing is logged until the athlete checks and confirms each one.
 // Sample build: there's no AI yet, so the "found" foods are a fixed sample thali, labelled as such.
-import { router, useLocalSearchParams } from "expo-router";
+import { Redirect, router, useLocalSearchParams } from "expo-router";
 import { Camera, Check, ScanSearch } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
@@ -28,6 +28,7 @@ import { Group, GroupRow } from "@/features/coach/parts";
 import { choosePhoto } from "@/features/coach/PhotoSlot";
 import { uid } from "@/features/coach/plans";
 import { colors, radius, space } from "@/theme";
+import { NotJoined } from "@/features/athlete/useMe";
 
 type Step = "take" | "analysing" | "confirm";
 
@@ -53,7 +54,10 @@ export default function PhotoLog() {
     return () => clearTimeout(t);
   }, [step]);
 
-  if (!n.me) return null;
+  // Photo logging is AI: Plus only; coached athletes never see it, even from a link (D44).
+  if (!n.me) return <NotJoined />;
+  // AI is Plus-only and coached athletes never see it (D44): a direct link goes back to Today.
+  if (n.tier !== "pro") return <Redirect href="/athlete" />;
   const me = n.me;
 
   if (step === "take")

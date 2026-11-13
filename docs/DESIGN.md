@@ -420,13 +420,15 @@ New with D52: AO-02, AO-06, AO-07, AO-13 to AO-15, AO-17, AO-18, AO-20, CO-04, C
 
 ## 8. Accessibility and quality checklist
 
-- [ ] WCAG AA contrast for all text
-- [ ] 48dp tap targets
-- [ ] Works at 130% system font size
-- [ ] Screen-reader labels on all icons and controls
-- [ ] Never rely on colour alone (add icon or text)
-- [ ] Every list has empty, loading and error states
-- [ ] Reduce-motion respected
+Checked 2026-11-13 on the web build at phone size; still to repeat on a real Android phone with TalkBack before launch.
+
+- [x] WCAG AA contrast for all text. Muted text is 5.2:1 at worst (on the sheet fallback); every pillar colour is at least 5.7:1 on every surface; dark text on soft-white and Honey fills is 15.3:1 and 9.9:1.
+- [x] 48dp tap targets. 40 dp and 32 dp buttons get `hitSlop` up to 48 dp; icon buttons, chips and section actions use `tapMin`.
+- [x] Works at 130% system font size. A sweep of the main coach and athlete tabs at 1.3× text found nothing clipped. Fixed heights that held text (chips, recovery cells, onboarding tokens) became minimum heights, and names, titles and row subtitles wrap instead of truncating (D67). Exception: tab bar labels stay at 100% so five fit the 60 dp bar, as Material and iOS tab bars do. Message previews, links and file names stay one line by design.
+- [x] Screen-reader labels on all icons and controls. Every pressable has a role and label; photos carry labels or sit inside a labelled button.
+- [x] Never rely on colour alone. Unread dots come with bold text or a count; pillar colours always sit next to their label; warnings and errors carry an icon and text.
+- [x] Every list has empty, loading and error states. Empty states are on every list; loading skeletons, offline and error screens come from FE-7 (`SystemStates`, `ErrorBoundary`). Real loading only starts with the backend, so recheck each list in B1–B8.
+- [x] Reduce-motion respected. `useReducedMotion` gates press scaling, confetti, the breathing animation and the result screens.
 
 ## 9. Decision log
 

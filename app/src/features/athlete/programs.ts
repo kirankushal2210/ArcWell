@@ -57,7 +57,12 @@ type Me = {
     injuries: string;
     diet: string;
   };
-  profile?: { equipment?: string; homeKit?: string[]; injuries?: string[] };
+  profile?: {
+    equipment?: string;
+    homeKit?: string[];
+    injuries?: string[];
+    experience?: string;
+  };
 };
 
 /** Profile equipment may be an onboarding code ("gym") or an edited label ("Gym"). */
@@ -77,7 +82,7 @@ const base = (me: Me): Answers => ({
   injuries: me.profile?.injuries,
   weightKg: me.basics?.weightKg,
   heightCm: me.basics?.heightCm,
-  experience: "some",
+  experience: me.profile?.experience ?? "some",
 });
 
 export function buildProgram(preset: ProgramPreset, me: Me) {

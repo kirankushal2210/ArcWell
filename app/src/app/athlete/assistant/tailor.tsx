@@ -1,6 +1,6 @@
 // Tailor today's workout (D70): say what's different today, see exactly what would change and why,
 // then apply it to today only. Sample build: the changes come from fixed rules, not a model.
-import { router } from "expo-router";
+import { Redirect, router } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
@@ -25,7 +25,9 @@ export default function TailorToday() {
   const { meTier, setAthleteSettings } = useCoachData();
   const today = useTodayWorkout();
   const [kind, setKind] = useState<TailorKind | null>(null);
-  if (!me || meTier !== "pro") return <NotJoined />;
+  if (!me) return <NotJoined />;
+  // AI is Plus-only and coached athletes never see it (D44): a direct link goes back to Today.
+  if (meTier !== "pro") return <Redirect href="/athlete" />;
   const back = backTo("/athlete/ai");
   const day = today.day;
 

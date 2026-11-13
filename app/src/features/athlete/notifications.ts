@@ -31,7 +31,7 @@ export function useNotifications(): { items: Note[]; unread: number } {
   if (coached && on.messages && me.coachUnread) {
     const last = [...me.messages].reverse().find((m) => m.from === "coach");
     items.push({
-      id: "msg",
+      id: `msg-${last?.at ?? last?.time ?? ""}-${me.coachUnread}`,
       title: `New message from ${coachName}`,
       sub: last?.text ?? "",
       when: last?.time ?? "now",
@@ -97,5 +97,11 @@ export function useNotifications(): { items: Note[]; unread: number } {
       isNew: false,
     });
 
-  return { items, unread: items.filter((n) => n.isNew).length };
+  // Opened notifications stop counting as new (N-06).
+  const read = settingsOf(me.id).notesRead ?? [];
+  const out = items.map((n) => ({
+    ...n,
+    isNew: n.isNew && !read.includes(n.id),
+  }));
+  return { items: out, unread: out.filter((n) => n.isNew).length };
 }

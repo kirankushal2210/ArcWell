@@ -9,6 +9,7 @@ import { Avatar, Text, TextField } from "@/components/primitives";
 import { menuAction } from "@/features/coach/coachProfile";
 import { useCoachData } from "@/features/coach/CoachData";
 import {
+  ActionDock,
   Eyebrow,
   Group,
   GroupRow,
@@ -46,18 +47,8 @@ export default function MessagesTab() {
 
   return (
     <View style={styles.root}>
-      <PageHeader
-        title="Messages"
-        actions={[
-          {
-            icon: Megaphone,
-            label: "Message several clients",
-            onPress: () => router.push("/coach/broadcast"),
-          },
-          menuAction,
-        ]}
-      />
-      <Page>
+      <PageHeader title="Messages" actions={[menuAction]} />
+      <Page clearDock>
         <TextField
           value={q}
           onChangeText={setQ}
@@ -147,6 +138,11 @@ export default function MessagesTab() {
           </>
         ) : null}
       </Page>
+      <ActionDock
+        label="Message several clients"
+        icon={Megaphone}
+        onPress={() => router.push("/coach/broadcast")}
+      />
     </View>
   );
 }

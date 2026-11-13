@@ -45,7 +45,7 @@ export function PageHeader({
         <Text
           variant={onBack ? "heading" : "display"}
           accessibilityRole="header"
-          numberOfLines={1}
+          // Titles wrap rather than truncate (D67: text never shrinks or cuts off).
           style={[styles.flex, !onBack && styles.titlePad]}
         >
           {title}
@@ -393,6 +393,9 @@ export function CoachTabBar({
                 weight={on ? "semibold" : "medium"}
                 tone={on ? "default" : "muted"}
                 numberOfLines={1}
+                // Tab labels stay at 100% so five fit the 60 dp bar at large text sizes (as
+                // Material and iOS tab bars do); every other label still scales.
+                maxFontSizeMultiplier={1}
               >
                 {label}
               </Text>

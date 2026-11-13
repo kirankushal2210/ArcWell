@@ -270,7 +270,9 @@ type CoachData = {
   /** Edit profile (AC-07): name, goal, diet and injuries; shared with the coach. */
   updateProfile: (
     clientId: string,
-    patch: Partial<Pick<Client, "name" | "goal" | "basics" | "profile">>,
+    patch: Partial<
+      Pick<Client, "name" | "goal" | "basics" | "profile" | "photo">
+    >,
   ) => void;
   /** Transformation photos (F9): the coach requests, the athlete decides. */
   requestTransformation: (clientId: string, t: Transformation) => void;

@@ -80,6 +80,8 @@ export type AthleteSettings = {
   dayPlan?: DayPlan;
   /** The date a recovery suggestion was declined, so it isn't asked again that day. */
   dayDeclined?: string;
+  /** Notifications already opened (N-06), so they stop showing as new. */
+  notesRead?: string[];
   /** AI questions asked today, for the daily cap (X-01). */
   aiUsage?: { date: string; n: number };
 };

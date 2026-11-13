@@ -1,11 +1,12 @@
 // Force update (S-05) and maintenance (S-06). Shown at start when the remote config says so.
 import { useLocalSearchParams } from "expo-router";
 import { Download, Wrench } from "lucide-react-native";
-import { Linking, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Button, Text } from "@/components/primitives";
 import { colors, rhythm, space } from "@/theme";
+import { openPlayListing } from "@/features/system/store";
 
 export default function SystemState() {
   const { state } = useLocalSearchParams<{ state: string }>();
@@ -39,11 +40,7 @@ export default function SystemState() {
         <Button
           label="Update in the Play Store"
           fullWidth
-          onPress={() =>
-            Linking.openURL("market://details?id=com.arcwell.app").catch(
-              () => {},
-            )
-          }
+          onPress={openPlayListing}
         />
       ) : null}
     </View>

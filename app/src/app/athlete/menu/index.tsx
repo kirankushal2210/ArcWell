@@ -44,7 +44,7 @@ export default function AthleteMenu() {
   return (
     <MenuPage title="Menu" back={backTo("/athlete")}>
       <View style={styles.card}>
-        <Avatar name={me.name} size={48} />
+        <Avatar name={me.name} uri={me.photo} size={48} />
         <View style={styles.flex}>
           <Text variant="title">{me.name}</Text>
           <Text variant="label" weight="regular" tone="muted">

@@ -5,7 +5,7 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
-import { Button, Text } from "@/components/primitives";
+import { Button } from "@/components/primitives";
 import {
   backTo,
   InfoCard,
@@ -18,6 +18,7 @@ import { NotJoined, useMe } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Eyebrow, Group } from "@/features/coach/parts";
 import { space } from "@/theme";
+import { openPlaySubscriptions } from "@/features/system/store";
 
 export default function Privacy() {
   const me = useMe();
@@ -103,7 +104,10 @@ export default function Privacy() {
             label="Manage subscription in Play Store"
             variant="secondary"
             fullWidth
-            onPress={() => setConfirmAi(false)}
+            onPress={() => {
+              setConfirmAi(false);
+              openPlaySubscriptions();
+            }}
           />
           <Button
             label="Keep AI on"
@@ -112,9 +116,6 @@ export default function Privacy() {
             onPress={() => setConfirmAi(false)}
           />
         </View>
-        <Text variant="caption" tone="muted">
-          Sample build: the Play Store link opens once billing is connected.
-        </Text>
       </Sheet>
     </MenuPage>
   );

@@ -54,15 +54,20 @@ export function choosePhoto(onPicked: (uri: string) => void) {
   ]);
 }
 
-/** A 3:4 frame: the photo, or an outline with a label. Tap to add when `onPress` is given; otherwise a photo opens full screen (X-05). */
+/**
+ * A 3:4 frame: the photo, or an outline with a label. Tap to add when `onPress` is given;
+ * otherwise a photo opens full screen (X-05). `still` turns taps off, for a parent that handles them.
+ */
 export function PhotoSlot({
   uri,
   label,
   onPress,
+  still,
 }: {
   uri?: string;
   label: string;
   onPress?: () => void;
+  still?: boolean;
 }) {
   const [viewing, setViewing] = useState(false);
   const body = uri ? (
@@ -83,7 +88,9 @@ export function PhotoSlot({
   );
   return (
     <View style={styles.slot}>
-      {!onPress && uri ? (
+      {still ? (
+        <View style={styles.frame}>{body}</View>
+      ) : !onPress && uri ? (
         <PressableScale
           onPress={() => setViewing(true)}
           accessibilityRole="imagebutton"
@@ -109,7 +116,7 @@ export function PhotoSlot({
       <Text variant="caption" weight="semibold" style={styles.center}>
         {label}
       </Text>
-      {uri && !onPress ? (
+      {uri && !onPress && !still ? (
         <ImageViewer
           uri={viewing ? uri : null}
           label={label}

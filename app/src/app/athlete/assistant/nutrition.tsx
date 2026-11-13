@@ -1,7 +1,7 @@
 // Nutrition assistant (D70): what's left today, foods that close the protein gap, swaps for a plan
 // meal with similar energy and at least as much protein, eating-out guidance and photo logging.
 // Sample build: built from the food database and the evidence rules, not a model.
-import { router } from "expo-router";
+import { Redirect, router } from "expo-router";
 import { Camera } from "lucide-react-native";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
@@ -34,7 +34,10 @@ export default function NutritionAssistant() {
   const plan = me?.nutritionPlan;
   const meals = plan?.meals.filter((m) => m.items?.length) ?? [];
   const [mealId, setMealId] = useState(meals[0]?.id ?? "");
+  // AI is Plus only; coached athletes never see it, even from a link (D44).
   if (!me || !n.me) return <NotJoined />;
+  // AI is Plus-only and coached athletes never see it (D44): a direct link goes back to Today.
+  if (n.tier !== "pro") return <Redirect href="/athlete" />;
   const back = backTo("/athlete/ai");
   const eaten = sumMacros(
     n.logs.filter((l) => l.date === todayKey()).map((l) => l.macros),

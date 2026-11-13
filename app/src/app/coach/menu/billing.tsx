@@ -11,6 +11,7 @@ import { useCoachLimits } from "@/features/coach/limits";
 import { Eyebrow, Page, PageHeader, Pills } from "@/features/coach/parts";
 import { sampleCoach } from "@/features/coach/sampleData";
 import { colors, radius, space } from "@/theme";
+import { SAMPLE_TOOLS } from "@/features/system/store";
 
 export default function Billing() {
   const { clients, settings, saveSettings } = useCoachData();
@@ -100,29 +101,33 @@ export default function Billing() {
           Payments switch on with billing (PLAN Phase 6).
         </Text>
 
-        <Eyebrow>Sample build: preview states</Eyebrow>
-        <Pills
-          value={billing}
-          onChange={(v) => saveSettings({ ...settings, billing: v })}
-          options={[
-            { value: "active", label: "Paid" },
-            { value: "grace", label: "Payment failed" },
-            { value: "lapsed", label: "Lapsed" },
-          ]}
-        />
-        <Pills
-          value={full ? "full" : "room"}
-          onChange={(v) =>
-            saveSettings({
-              ...settings,
-              clientLimit: v === "full" ? used : undefined,
-            })
-          }
-          options={[
-            { value: "room", label: `Limit ${sampleCoach.clientLimit}` },
-            { value: "full", label: "At the limit" },
-          ]}
-        />
+        {SAMPLE_TOOLS ? (
+          <>
+            <Eyebrow>Sample build: preview states</Eyebrow>
+            <Pills
+              value={billing}
+              onChange={(v) => saveSettings({ ...settings, billing: v })}
+              options={[
+                { value: "active", label: "Paid" },
+                { value: "grace", label: "Payment failed" },
+                { value: "lapsed", label: "Lapsed" },
+              ]}
+            />
+            <Pills
+              value={full ? "full" : "room"}
+              onChange={(v) =>
+                saveSettings({
+                  ...settings,
+                  clientLimit: v === "full" ? used : undefined,
+                })
+              }
+              options={[
+                { value: "room", label: `Limit ${sampleCoach.clientLimit}` },
+                { value: "full", label: "At the limit" },
+              ]}
+            />
+          </>
+        ) : null}
       </Page>
     </View>
   );

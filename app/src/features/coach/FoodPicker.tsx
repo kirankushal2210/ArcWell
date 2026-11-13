@@ -52,7 +52,7 @@ export function FoodPicker({
       <View style={styles.root}>
         <View style={styles.head}>
           <IconButton icon={X} accessibilityLabel="Close" onPress={onClose} />
-          <Text variant="heading" style={styles.flex} numberOfLines={1}>
+          <Text variant="heading" style={styles.flex}>
             {title}
           </Text>
         </View>

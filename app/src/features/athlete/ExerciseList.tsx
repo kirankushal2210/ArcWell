@@ -97,7 +97,6 @@ function FilterButton({
         variant="label"
         weight="medium"
         tone={active ? "onBrand" : "default"}
-        numberOfLines={1}
         style={styles.flexShrink}
       >
         {label}
@@ -167,7 +166,6 @@ function FilterSheet<T extends string>({
                     <Text
                       weight="medium"
                       tone={on ? "onBrand" : "default"}
-                      numberOfLines={1}
                       style={styles.flexShrink}
                     >
                       {label(o)}

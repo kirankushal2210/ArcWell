@@ -39,9 +39,9 @@ Everything design-related lives in [DESIGN.md](DESIGN.md); mockups in `docs/desi
 - [x] Wireframes for all v1 flows F1–F18 (199 screens; decisions in DECISIONS.md D1–D45)
 - [ ] Founder review of the applied defaults D25–D45 and a screen-by-screen pass
 - [ ] Usability test of the core flows (onboarding, workout logging, food logging, check-in) with 3–5 people
-- [ ] Finalise tokens (incl. light theme) and build them in `app/src/theme/`
-- [ ] Build core components in `app/src/components/`
-- [ ] High-fidelity mockups for the 5–6 most important screens
+- [x] Finalise tokens and build them in `app/src/theme/` (dark only; the light theme is deferred by D67)
+- [x] Build core components in `app/src/components/`
+- [x] ~~High-fidelity mockups for the 5–6 most important screens~~ (skipped by D48: built straight from the wireframes)
 
 After this, every phase starts by designing its screens with these components before writing code.
 

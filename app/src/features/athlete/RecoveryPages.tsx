@@ -301,7 +301,7 @@ export function Overview({
                 {a.strain.toFixed(1)}
               </Text>
             </View>
-            <Text weight="semibold" style={styles.flex} numberOfLines={1}>
+            <Text weight="semibold" style={styles.flex}>
               {a.name}
             </Text>
             <Text variant="label" weight="regular" tone="muted" numeric>

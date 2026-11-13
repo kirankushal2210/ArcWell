@@ -27,6 +27,7 @@ import { useMe } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
 import { KeyValues } from "@/features/coach/parts";
 import { space } from "@/theme";
+import { openPlaySubscriptions } from "@/features/system/store";
 
 const home = () => {
   if (router.canDismiss()) router.dismissAll();
@@ -201,7 +202,10 @@ export default function Switch() {
                 : "Manage subscription in Play Store"
             }
             onConfirm={() => {
-              if (!cancelled) return setCancelled(true);
+              if (!cancelled) {
+                openPlaySubscriptions();
+                return setCancelled(true);
+              }
               joinCoachFromPro();
               router.replace({
                 pathname: "/athlete/switch/[step]",

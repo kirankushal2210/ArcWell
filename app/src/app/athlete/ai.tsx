@@ -3,7 +3,7 @@
 // review) and a chat; Free members see the trial offer with the AI permission step (D35). Coached
 // athletes never reach this screen (D44). Front end only: answers come from the evidence rules and
 // sample text until the server AI service exists (supabase/functions/_shared/ai).
-import { type Href, router } from "expo-router";
+import { type Href, Redirect, router } from "expo-router";
 import {
   Camera,
   ChartLine,
@@ -51,7 +51,9 @@ export default function AICoach() {
   const [consent, setConsent] = useState(false);
   const back = () =>
     router.canGoBack() ? router.back() : router.replace("/athlete");
-  if (!me || meTier === "coached") return <NotJoined />;
+  if (!me) return <NotJoined />;
+  // Coached athletes never see AI (D44): a direct link goes back to Today.
+  if (meTier === "coached") return <Redirect href="/athlete" />;
 
   if (meTier === "free")
     return (

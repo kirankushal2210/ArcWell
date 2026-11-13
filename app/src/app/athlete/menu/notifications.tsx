@@ -40,7 +40,13 @@ export default function Notifications() {
             <GroupRow
               key={n.id}
               first={i === 0}
-              onPress={() => router.push(n.href)}
+              onPress={() => {
+                if (n.isNew)
+                  setAthleteSettings(me.id, {
+                    notesRead: [...(s.notesRead ?? []), n.id],
+                  });
+                router.push(n.href);
+              }}
               label={n.title}
             >
               {n.isNew ? <View style={styles.new} /> : null}

@@ -1,7 +1,7 @@
 // Weekly review (D70): the last 7 days of training, food and recovery against your plan, then a few
 // suggestions, each with its reason and sources. Suggestions open the tool to act on them; nothing
 // changes by itself. Sample build: worked out by the evidence rules, not a model.
-import { type Href, router } from "expo-router";
+import { Redirect, router, type Href } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
@@ -32,7 +32,9 @@ export default function WeeklyReview() {
   const r = useRecovery();
   const { meTier, sessions } = useCoachData();
   const [now] = useState(() => Date.now());
-  if (!me || !n.me || meTier !== "pro") return <NotJoined />;
+  if (!me || !n.me) return <NotJoined />;
+  // AI is Plus-only and coached athletes never see it (D44): a direct link goes back to Today.
+  if (meTier !== "pro") return <Redirect href="/athlete" />;
   const back = backTo("/athlete/ai");
 
   const weekAgo = now - 7 * 864e5;

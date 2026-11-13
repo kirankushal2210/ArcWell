@@ -212,6 +212,7 @@ export function ChatThread({
             source={{ uri: image }}
             style={styles.thumb}
             contentFit="cover"
+            accessibilityLabel="Photo to send"
           />
           <Text
             variant="label"
