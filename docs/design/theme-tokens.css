@@ -197,8 +197,9 @@
   /* Touch: Android, 48dp minimum (DESIGN.md §5). Kept in px: a fixed target,
      not text-relative. */
   --tap-min:           48px;
-  --control-height:    40px;   /* main buttons, inputs; the tap area stays 48 (D67) */
-  --control-height-sm: 32px;   /* small buttons */
+  --control-height:    36px;   /* main buttons; the tap area stays 48 (D81) */
+  --input-height:      40px;   /* text inputs */
+  --control-height-sm: 28px;   /* small buttons (D81) */
 
   /* ===========================================================================
      5. RADII, BORDERS, ELEVATION

@@ -71,8 +71,8 @@ const pillarFill: Record<ButtonPillar, string> = {
 };
 
 /**
- * DESIGN.md §6 button (D67): 40 dp tall (32 dp small), 12 dp corners (10 small), label
- * 16/600 at full size. The tap area is always at least 48 dp: the shape is smaller, the
+ * DESIGN.md §6 button (D81): 36 dp tall (28 dp small), 12 dp corners (10 small), label
+ * 14/600. The tap area is always at least 48 dp: the shape is smaller, the
  * finger target is not. Labels never truncate; the button grows to fit. One coloured
  * button per screen. Disabled is a raised fill with disabled text, never opacity alone.
  */
@@ -117,7 +117,8 @@ export function Button({
             {
               minHeight: height,
               borderRadius: size === "sm" ? radius.sm : radius.md,
-              paddingHorizontal: size === "sm" ? space[3] : space[4],
+              paddingHorizontal:
+                size === "sm" ? space[2] + space[1] / 2 : space[3] + space[1] / 2,
             },
             inactive
               ? styles.inactive
@@ -133,13 +134,13 @@ export function Button({
         >
           {Icon && (
             <Icon
-              size={size === "sm" ? 16 : 18}
+              size={size === "sm" ? 14 : 16}
               color={inactive ? colors.textDisabled : fg}
               strokeWidth={2.2}
             />
           )}
           <Text
-            variant="body"
+            variant="label"
             weight="semibold"
             tone={tone}
             style={!inactive ? { color: fg } : undefined}
