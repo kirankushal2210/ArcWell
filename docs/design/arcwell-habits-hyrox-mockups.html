@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Habits, VO2 and HYROX</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<style>
+/* Mockups for docs/huberman_hyrox_integration_plan.md. Stone palette, Liquid Glass on the
+   functional layer only (D67), thumb layout (D68). Design files only: nothing here is app code. */
+:root {
+  color-scheme: dark;
+  --bg: #141416; --surface: #1D1E21; --raised: #26272B; --glass-solid: #2A2B30; --divider: #303136;
+  --outline: #77787F; --muted: #9C9CA6; --text: #ECEDF0; --primary: #E8EAEE; --on: #141416;
+  --honey: #E8B65E; --sage: #A9C79E; --slate: #9FB4DC; --rose: #E79AA8; --coral: #F2877F;
+  --page: #0E0E10;
+  --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--text); font: 400 16px/1.5 var(--font); -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 48px 16px 120px; }
+h1, h2, h3, p { margin: 0; }
+h1 { font-size: clamp(2rem, 5vw, 3rem); line-height: 1.05; letter-spacing: -0.035em; font-weight: 800; }
+h2 { font-size: clamp(1.5rem, 3.4vw, 2.1rem); line-height: 1.1; letter-spacing: -0.03em; font-weight: 800; }
+.lede { color: var(--muted); max-width: 64ch; margin-top: 14px; font-size: 1.05rem; }
+.lede b { color: var(--text); font-weight: 600; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.chips span { font: 600 .78rem/1 var(--font); padding: 8px 12px; border-radius: 99px; background: var(--surface); color: var(--muted); }
+section { margin-top: 72px; display: grid; gap: 26px; }
+.sec-head p { color: var(--muted); max-width: 70ch; margin-top: 8px; }
+.phones { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 34px 26px; justify-items: center; }
+.pcol { display: grid; gap: 12px; justify-items: center; width: 100%; max-width: 320px; }
+.cap { font-size: .86rem; color: var(--muted); text-align: center; max-width: 36ch; }
+.cap b { color: var(--text); }
+
+/* ---------- Phone ---------- */
+.phone { width: 300px; max-width: 100%; height: 640px; border-radius: 46px; position: relative; overflow: hidden; background: var(--bg);
+  box-shadow: 0 0 0 9px #0A0A0B, 0 0 0 10px #2E2F33, 0 30px 70px rgba(0,0,0,.6); font-family: var(--font); }
+.sb { position: absolute; inset: 0 0 auto; height: 44px; display: flex; justify-content: space-between; align-items: center; padding: 0 26px 0 32px; font: 600 .78rem/1 var(--font); z-index: 9; }
+.di { width: 88px; height: 26px; border-radius: 99px; background: #000; }
+.scroll { position: absolute; inset: 0; padding: 50px 14px 160px; display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
+.scroll > * { flex-shrink: 0; }
+.scroll.nodock { padding-bottom: 96px; }
+.scroll.full { padding-bottom: 20px; }
+.row { display: flex; align-items: center; gap: 10px; }
+.sp { flex: 1; min-width: 0; }
+svg.lucide { width: 18px; height: 18px; stroke-width: 2; flex: none; }
+.title { font: 800 1.6rem/1.05 var(--font); letter-spacing: -0.035em; }
+.sub { font: 500 .76rem/1.3 var(--font); color: var(--muted); }
+.eyebrow { font: 700 .64rem/1 var(--font); letter-spacing: .07em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* Glass: functional layer only */
+.glass { background: rgba(48,49,54,.5); backdrop-filter: blur(22px) saturate(170%); -webkit-backdrop-filter: blur(22px) saturate(170%);
+  box-shadow: inset 0 0 0 .5px rgba(255,255,255,.18), inset 0 1px 0 rgba(255,255,255,.16), 0 10px 28px rgba(0,0,0,.45); }
+.gbtn { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none; color: var(--text); }
+.tabbar { position: absolute; left: 12px; right: 80px; bottom: 16px; height: 60px; border-radius: 99px; display: flex; align-items: center; justify-content: space-around; padding: 0 6px; z-index: 7; }
+.tab { display: grid; justify-items: center; gap: 3px; font: 600 .56rem/1 var(--font); color: var(--muted); }
+.tab i { width: 40px; height: 26px; border-radius: 99px; display: grid; place-items: center; }
+.tab svg.lucide { width: 19px; height: 19px; }
+.tab.on { color: var(--text); }
+.tab.on i { background: rgba(255,255,255,.14); }
+.fab { position: absolute; right: 12px; bottom: 16px; width: 60px; height: 60px; border-radius: 50%; display: grid; place-items: center; z-index: 7; color: var(--text); }
+.fab svg.lucide { width: 24px; height: 24px; }
+.dock { position: absolute; left: 12px; right: 12px; bottom: 88px; height: 44px; border-radius: 14px; display: flex; gap: 8px; align-items: center; justify-content: center; background: var(--primary); color: var(--on); font: 700 .9rem/1 var(--font); z-index: 7; }
+
+/* Content: solid, never glass */
+.card { background: var(--surface); border-radius: 18px; padding: 14px; display: grid; gap: 8px; }
+.hero { border-radius: 20px; padding: 14px; display: grid; gap: 6px; background: var(--surface); }
+.hero .k { font: 700 .62rem/1 var(--font); letter-spacing: .07em; text-transform: uppercase; }
+.hero .t { font: 800 1.3rem/1.15 var(--font); letter-spacing: -0.025em; }
+.hero .m { font: 500 .76rem/1.35 var(--font); color: var(--muted); }
+.btn { height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; font: 700 .82rem/1 var(--font); padding: 0 14px; }
+.btn.sm { height: 32px; border-radius: 10px; font-size: .74rem; padding: 0 12px; }
+.btn.primary { background: var(--primary); color: var(--on); }
+.btn.secondary { background: var(--raised); color: var(--text); }
+.btn.ghost { color: var(--text); }
+.chip { width: 26px; height: 26px; border-radius: 9px; display: grid; place-items: center; flex: none; }
+.chip svg.lucide { width: 16px; height: 16px; }
+.bento { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.tile { background: var(--surface); border-radius: 18px; padding: 12px; display: grid; gap: 6px; align-content: start; min-height: 80px; position: relative; }
+.tile.wide { grid-column: span 2; min-height: 0; }
+.tile .k { font: 600 .72rem/1.25 var(--font); }
+.tile .v { font: 800 1.3rem/1 var(--font); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.tile .v small { font: 600 .66rem/1 var(--font); color: var(--muted); letter-spacing: 0; margin-left: 2px; }
+.tile .s { font: 500 .68rem/1.3 var(--font); color: var(--muted); }
+.tick { position: absolute; right: 10px; top: 10px; width: 26px; height: 26px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--outline); display: grid; place-items: center; }
+.tick.done { background: var(--sage); box-shadow: none; color: var(--on); }
+.tick svg.lucide { width: 14px; height: 14px; stroke-width: 3; }
+.bar { height: 6px; border-radius: 99px; background: var(--raised); overflow: hidden; display: flex; }
+.bar i { display: block; height: 100%; }
+.later { background: var(--surface); border-radius: 14px; padding: 9px 12px; display: flex; align-items: center; gap: 10px; }
+.later b { font: 600 .76rem/1.2 var(--font); }
+.later span { font: 500 .7rem/1.3 var(--font); color: var(--muted); display: block; }
+.group { background: var(--surface); border-radius: 16px; overflow: hidden; }
+.gr { display: flex; align-items: center; gap: 10px; padding: 8px 12px; position: relative; }
+.gr + .gr::before { content: ""; position: absolute; top: 0; left: 52px; right: 0; height: 1px; background: var(--divider); }
+.gr b { font: 600 .8rem/1.25 var(--font); display: block; }
+.gr span { font: 500 .68rem/1.3 var(--font); color: var(--muted); display: block; }
+.gr .badge, .badge { display: inline-block; font: 700 .58rem/1 var(--font); padding: 4px 6px; border-radius: 6px; letter-spacing: .02em; white-space: nowrap; }
+.b-strong { background: rgba(169,199,158,.16); color: var(--sage); }
+.b-mod { background: rgba(159,180,220,.16); color: var(--slate); }
+.b-early { background: rgba(231,154,168,.14); color: var(--rose); }
+.b-practice { background: var(--raised); color: var(--muted); }
+.add { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--raised); flex: none; }
+.add svg.lucide { width: 15px; height: 15px; }
+.pills { display: flex; gap: 6px; flex-wrap: wrap; }
+.pill { height: 32px; padding: 0 11px; border-radius: 99px; display: flex; align-items: center; font: 600 .72rem/1 var(--font); background: var(--raised); color: var(--text); }
+.pill.on { background: var(--primary); color: var(--on); }
+.seg { display: flex; gap: 4px; background: var(--surface); border-radius: 99px; padding: 4px; }
+.seg span { flex: 1; text-align: center; padding: 8px 0; border-radius: 99px; font: 600 .7rem/1 var(--font); color: var(--muted); }
+.seg span.on { background: var(--raised); color: var(--text); }
+.dim { position: absolute; inset: 0; background: rgba(0,0,0,.5); z-index: 8; }
+.sheet { position: absolute; left: 8px; right: 8px; bottom: 8px; border-radius: 30px; padding: 10px 14px 16px; z-index: 9; display: grid; gap: 11px; background: rgba(42,43,48,.92); }
+.grab { width: 36px; height: 5px; border-radius: 99px; background: rgba(255,255,255,.3); justify-self: center; }
+ul.how { margin: 0; padding-left: 16px; display: grid; gap: 4px; font: 500 .72rem/1.35 var(--font); color: var(--muted); }
+.radio { width: 20px; height: 20px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--outline); flex: none; }
+.radio.on { box-shadow: inset 0 0 0 6px var(--primary); }
+.opt { background: var(--surface); border-radius: 14px; padding: 12px; display: flex; gap: 10px; align-items: center; }
+.opt.on { box-shadow: inset 0 0 0 1.5px var(--primary); }
+.opt b { font: 600 .82rem/1.25 var(--font); display: block; }
+.opt span { font: 500 .68rem/1.3 var(--font); color: var(--muted); display: block; }
+.prog { height: 4px; border-radius: 99px; background: var(--raised); overflow: hidden; }
+.prog i { display: block; height: 100%; background: var(--primary); }
+.yn { display: flex; gap: 6px; }
+.yn span { height: 30px; min-width: 46px; padding: 0 10px; border-radius: 99px; display: grid; place-items: center; font: 600 .7rem/1 var(--font); background: var(--raised); }
+.yn span.on { background: var(--primary); color: var(--on); }
+.legend { display: flex; gap: 10px; flex-wrap: wrap; font: 500 .64rem/1 var(--font); color: var(--muted); }
+.legend i { width: 8px; height: 8px; border-radius: 2px; display: inline-block; margin-right: 4px; vertical-align: -1px; }
+.split { display: grid; grid-template-columns: 18px 1fr auto auto; gap: 8px; align-items: center; padding: 8px 12px; font: 500 .72rem/1.25 var(--font); }
+.split + .split { border-top: 1px solid var(--divider); }
+.split .t { font-weight: 700; font-variant-numeric: tabular-nums; }
+.split .d { font: 600 .66rem/1 var(--font); font-variant-numeric: tabular-nums; min-width: 40px; text-align: right; }
+.dot { width: 8px; height: 8px; border-radius: 50%; }
+.up { color: var(--sage); } .downc { color: var(--rose); }
+.strip { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; }
+.strip i { height: 8px; border-radius: 3px; background: var(--raised); display: block; }
+.big { font: 800 3.4rem/1 var(--font); letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+.nextbtn { position: absolute; left: 12px; right: 12px; bottom: 16px; height: 230px; border-radius: 30px; background: var(--honey); color: var(--on); display: grid; place-items: center; text-align: center; z-index: 7; }
+.nextbtn b { font: 800 1.6rem/1.1 var(--font); letter-spacing: -0.03em; display: block; }
+.nextbtn span { font: 600 .8rem/1.3 var(--font); opacity: .75; display: block; margin-top: 6px; }
+.bars { display: flex; align-items: flex-end; gap: 10px; height: 92px; padding: 0 4px; }
+.bars div { flex: 1; display: grid; gap: 4px; justify-items: center; font: 600 .58rem/1 var(--font); color: var(--muted); }
+.bars i { width: 100%; border-radius: 6px 6px 3px 3px; background: var(--honey); display: block; }
+.note { font: 500 .66rem/1.35 var(--font); color: var(--muted); }
+.rule { background: var(--surface); border-radius: 18px; padding: 16px 18px; display: grid; gap: 6px; }
+.rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.rule b { font-size: .95rem; }
+.rule p { color: var(--muted); font-size: .88rem; }
+.toggle { width: 42px; height: 26px; border-radius: 99px; background: var(--raised); position: relative; flex: none; box-shadow: inset 0 0 0 1px var(--outline); }
+.toggle::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--muted); }
+.toggle.on { background: var(--primary); box-shadow: none; }
+.toggle.on::after { left: 19px; background: var(--on); }
+.cchip { height: 34px; padding: 0 12px; border-radius: 99px; display: inline-flex; align-items: center; gap: 6px; font: 600 .74rem/1 var(--font); background: var(--surface); color: var(--text); box-shadow: inset 0 0 0 1px var(--divider); }
+.cchip.on { background: var(--primary); color: var(--on); box-shadow: none; }
+.cchip svg.lucide { width: 14px; height: 14px; }
+.cwrap { display: flex; flex-wrap: wrap; gap: 8px; }
+.phase { position: absolute; left: 12px; right: 12px; bottom: 16px; height: 250px; border-radius: 30px; background: var(--honey); color: var(--on); display: grid; place-items: center; text-align: center; z-index: 7; }
+.phase .big { color: var(--on); }
+.phase b { font: 800 1rem/1 var(--font); letter-spacing: .08em; text-transform: uppercase; display: block; margin-bottom: 6px; }
+.phase span { font: 600 .8rem/1.3 var(--font); opacity: .75; display: block; margin-top: 8px; }
+.spark { display: flex; align-items: flex-end; gap: 5px; height: 40px; }
+.spark i { flex: 1; border-radius: 3px; background: var(--slate); opacity: .9; display: block; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Habits, VO2 max and HYROX, as they would look</h1>
+  <p class="lede">Mockups for <b>docs/huberman_hyrox_integration_plan.md</b>. Stone palette with Liquid Glass on the tab bar, + button and sheets only (D67), and one dock above the tab bar (D68). Sample athlete: wakes 06:30, bed 22:30, Mumbai. <b>Design files only: nothing is built.</b></p>
+  <div class="chips"><span>Only modules you turned on</span><span>Max 1 hero + 3 tiles on Today</span><span>Habits only inside their time window</span><span>Max 5 habits</span><span>No new tabs</span><span>HYROX hidden without a race goal</span></div>
+
+  <!-- ================= TODAY ================= -->
+  <section>
+    <div class="sec-head">
+      <h2>1. Today changes through the day</h2>
+      <p>The same screen at three times. Each habit appears only in its window and leaves when the window closes; anything not due yet waits in one "Later today" row. Ticked habits turn sage; nothing missed ever turns red.</p>
+    </div>
+    <div class="phones">
+
+      <!-- Morning -->
+      <div class="pcol">
+        <div class="phone">
+          <div class="sb"><span class="num">06:45</span><span class="di"></span><span>5G</span></div>
+          <div class="scroll">
+            <div class="row"><div class="sp"><div class="title">Today</div><div class="sub">Thursday, 13 November</div></div><div class="gbtn glass"><i data-lucide="menu"></i></div></div>
+            <div class="hero">
+              <div class="row"><span class="chip" style="background:rgba(159,180,220,.16);color:var(--slate)"><i data-lucide="sunrise"></i></span><span class="k" style="color:var(--slate)">Morning check-in</span></div>
+              <div class="t">How did you sleep?</div>
+              <div class="m">7 h 10 min from your watch</div>
+              <div class="btn sm primary" style="justify-self:start">Check in</div>
+            </div>
+            <div class="bento">
+              <div class="tile"><span class="chip" style="background:rgba(232,182,94,.14);color:var(--honey)"><i data-lucide="sun"></i></span><span class="tick"></span><div class="k">Morning daylight</div><div class="s">10 min outside · until 07:30</div></div>
+              <div class="tile"><span class="chip" style="background:rgba(169,199,158,.14);color:var(--sage)"><i data-lucide="droplet"></i></span><div class="k">Water</div><div class="v">0.3<small>of 2.0 L</small></div></div>
+              <div class="tile wide"><div class="row"><span class="chip" style="background:rgba(159,180,220,.16);color:var(--slate)"><i data-lucide="wind"></i></span><div class="sp"><div class="k">5-minute meditation</div><div class="s">Before 08:30</div></div><div class="btn sm secondary">Start</div></div></div>
+            </div>
+            <div class="later"><i data-lucide="clock-3" style="color:var(--muted)"></i><div class="sp"><b>Later today</b><span>Upper body · Caffeine cut-off 13:30 · Afternoon daylight</span></div><i data-lucide="chevron-down" style="color:var(--muted)"></i></div>
+          </div>
+          <div class="dock"><i data-lucide="dumbbell"></i>Start workout</div>
+          <div class="tabbar glass"><div class="tab on"><i><svg data-lucide="house"></svg></i>Today</div><div class="tab"><i><svg data-lucide="dumbbell"></svg></i>Training</div><div class="tab"><i><svg data-lucide="utensils"></svg></i>Nutrition</div><div class="tab"><i><svg data-lucide="moon"></svg></i>Recovery</div></div>
+          <div class="fab glass"><i data-lucide="plus"></i></div>
+        </div>
+        <p class="cap"><b>06:45, morning.</b> The check-in leads. Morning daylight shows only from waking until 07:30, with its target from today's sky. The workout waits under "Later today".</p>
+      </div>
+
+      <!-- Afternoon -->
+      <div class="pcol">
+        <div class="phone">
+          <div class="sb"><span class="num">13:10</span><span class="di"></span><span>5G</span></div>
+          <div class="scroll">
+            <div class="row"><div class="sp"><div class="title">Today</div><div class="sub">Thursday, 13 November</div></div><div class="gbtn glass"><i data-lucide="menu"></i></div></div>
+            <div class="hero">
+              <div class="row"><span class="chip" style="background:rgba(232,182,94,.14);color:var(--honey)"><i data-lucide="dumbbell"></i></span><span class="k" style="color:var(--honey)">Training · 18:00</span></div>
+              <div class="t">Upper body</div>
+              <div class="m">6 exercises · about 55 min · bench press, rows, overhead press</div>
+            </div>
+            <div class="bento">
+              <div class="tile"><span class="chip" style="background:rgba(232,182,94,.14);color:var(--honey)"><i data-lucide="coffee"></i></span><div class="k">Caffeine cut-off</div><div class="v num">13:30</div><div class="s">Last coffee 10:40 ✓</div></div>
+              <div class="tile"><span class="chip" style="background:rgba(169,199,158,.14);color:var(--sage)"><i data-lucide="footprints"></i></span><span class="tick done"><i data-lucide="check"></i></span><div class="k">Walk after lunch</div><div class="s">12 min · done</div></div>
+              <div class="tile wide"><div class="row"><span class="chip" style="background:rgba(169,199,158,.14);color:var(--sage)"><i data-lucide="activity"></i></span><div class="sp"><div class="k">Steps</div><div class="s num">5,840 of 8,000 · from your watch</div></div></div><div class="bar"><i style="width:73%;background:var(--sage)"></i></div></div>
+            </div>
+            <div class="later"><i data-lucide="clock-3" style="color:var(--muted)"></i><div class="sp"><b>Later today</b><span>Afternoon daylight · Wind-down from 21:30</span></div><i data-lucide="chevron-down" style="color:var(--muted)"></i></div>
+          </div>
+          <div class="dock"><i data-lucide="dumbbell"></i>Start workout</div>
+          <div class="tabbar glass"><div class="tab on"><i><svg data-lucide="house"></svg></i>Today</div><div class="tab"><i><svg data-lucide="dumbbell"></svg></i>Training</div><div class="tab"><i><svg data-lucide="utensils"></svg></i>Nutrition</div><div class="tab"><i><svg data-lucide="moon"></svg></i>Recovery</div></div>
+          <div class="fab glass"><i data-lucide="plus"></i></div>
+        </div>
+        <p class="cap"><b>13:10, afternoon.</b> The caffeine cut-off appears from 12:30 (9 h before bed). Walk after lunch ticked itself from the watch; steps come from Health Connect. Finished morning habits have left the screen.</p>
+      </div>
+
+      <!-- Evening -->
+      <div class="pcol">
+        <div class="phone">
+          <div class="sb"><span class="num">21:40</span><span class="di"></span><span>5G</span></div>
+          <div class="scroll nodock">
+            <div class="row"><div class="sp"><div class="title">Tonight</div><div class="sub">Bed at 22:30 · alarm 06:30</div></div><div class="gbtn glass"><i data-lucide="menu"></i></div></div>
+            <div class="hero" style="background:#1B1F27">
+              <div class="row"><span class="chip" style="background:rgba(159,180,220,.18);color:var(--slate)"><i data-lucide="moon"></i></span><span class="k" style="color:var(--slate)">Wind-down · 50 min to bed</span></div>
+              <div class="t">Lights low, screens away</div>
+              <div class="m">Use lamps instead of ceiling lights and put the phone outside the bedroom. Room around 19 °C.</div>
+              <div class="row" style="gap:8px"><div class="btn sm primary">I'm winding down</div><div class="btn sm ghost">Why this?</div></div>
+            </div>
+            <div class="bento">
+              <div class="tile"><span class="chip" style="background:rgba(232,182,94,.14);color:var(--honey)"><i data-lucide="calendar"></i></span><div class="k">Tomorrow</div><div class="s">Easy run 30 min · rest from lifting</div></div>
+              <div class="tile"><span class="chip" style="background:rgba(159,180,220,.16);color:var(--slate)"><i data-lucide="bed-double"></i></span><div class="k">Bedtime</div><div class="v num">22:30</div><div class="s">For "Perform" sleep</div></div>
+            </div>
+            <div class="card"><div class="row"><i data-lucide="check-circle-2" style="color:var(--sage)"></i><div class="sp"><b style="font:600 .8rem/1.2 var(--font)">5 of 6 habits today</b><div class="sub">Afternoon daylight was skipped. That's fine.</div></div></div></div>
+          </div>
+          <div class="tabbar glass"><div class="tab on"><i><svg data-lucide="house"></svg></i>Today</div><div class="tab"><i><svg data-lucide="dumbbell"></svg></i>Training</div><div class="tab"><i><svg data-lucide="utensils"></svg></i>Nutrition</div><div class="tab"><i><svg data-lucide="moon"></svg></i>Recovery</div></div>
+          <div class="fab glass"><i data-lucide="plus"></i></div>
+        </div>
+        <p class="cap"><b>21:40, evening mode.</b> From an hour before bed, Today calms down: one wind-down card, tomorrow and bedtime. No dock, no numbers to chase. A skipped habit gets a neutral note, never red.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= HABITS ================= -->
+  <section>
+    <div class="sec-head">
+      <h2>2. Habits: one tap on Today, one more for detail</h2>
+      <p>Tapping a tile ticks it; a long press opens its sheet. The library holds everything else, with an evidence badge on every habit. Risky habits ask a short safety check once.</p>
+    </div>
+    <div class="phones">
+
+      <!-- Habit sheet -->
+      <div class="pcol">
+        <div class="phone">
+          <div class="sb"><span class="num">06:46</span><span class="di"></span><span>5G</span></div>
+          <div class="scroll">
+            <div class="row"><div class="sp"><div class="title">Today</div><div class="sub">Thursday, 13 November</div></div><div class="gbtn glass"><i data-lucide="menu"></i></div></div>
+            <div class="hero"><div class="t">How did you sleep?</div></div>
+            <div class="bento"><div class="tile"></div><div class="tile"></div></div>
+          </div>
+          <div class="dim"></div>
+          <div class="sheet glass">
+            <div class="grab"></div>
+            <div class="row"><span class="chip" style="background:rgba(232,182,94,.14);color:var(--honey)"><i data-lucide="sun"></i></span><div class="sp"><b style="font:700 1rem/1.2 var(--font)">Morning daylight</b><div class="sub">Until 07:30 · sunrise was 06:48</div></div></div>
+            <div class="eyebrow" style="margin:0">Sky right now</div>
+            <div class="pills"><span class="pill on">Clear · 10 min</span><span class="pill">Some cloud · 20</span><span class="pill">Overcast · 30</span></div>
+            <ul class="how"><li>Outside, facing the sky. Glass windows block most of it.</li><li>Sunglasses off; your normal glasses are fine.</li><li>Never look straight at the sun.</li></ul>
+            <div class="btn primary"><i data-lucide="timer"></i>Start 10-minute timer</div>
+            <div class="btn secondary">I've done it</div>
+            <div class="row" style="padding:2px 2px 0"><span class="badge b-strong">Strong evidence</span><span class="sp"></span><span class="sub" style="color:var(--text);font-weight:600">Why this?</span></div>
+          </div>
+        </div>
+        <p class="cap"><b>Habit sheet.</b> The target adapts to the sky; the timer logs itself. "Why this?" opens the sources (existing D69 sheet). No brands, no author names.</p>
+      </div>
+
+      <!-- Library -->
+      <div class="pcol">
+        <div class="phone">
+          <div class="sb"><span class="num">09:20</span><span class="di"></span><span>5G</span></div>
+          <div class="scroll full">
+            <div class="row"><div class="gbtn glass"><i data-lucide="arrow-left"></i></div><b style="font:700 .95rem/1 var(--font)">Daily habits</b></div>
+            <div class="card" style="gap:6px"><div class="row"><b class="sp" style="font:700 .9rem/1.2 var(--font)">3 of 5 active</b><span class="sub">2 more after 14 days</span></div><div class="bar"><i style="width:60%;background:var(--primary)"></i></div><div class="note">Starting small works better: fewer habits stick.</div></div>
+            <div class="eyebrow">Active</div>
+            <div class="group">
+              <div class="gr"><span class="chip" style="background:rgba(232,182,94,.14);color:var(--honey)"><i data-lucide="sun"></i></span><div class="sp"><b>Morning daylight</b><span>6 of 7 days this week</span></div><i data-lucide="chevron-right" style="color:var(--muted)"></i></div>
+              <div class="gr"><span class="chip" style="background:rgba(232,182,94,.14);color:var(--honey)"><i data-lucide="coffee"></i></span><div class="sp"><b>Caffeine cut-off</b><span>7 of 7 days</span></div><i data-lucide="chevron-right" style="color:var(--muted)"></i></div>
+              <div class="gr"><span class="chip" style="background:rgba(169,199,158,.14);color:var(--sage)"><i data-lucide="footprints"></i></span><div class="sp"><b>Daily steps</b><span>4 of 7 days over 8,000</span></div><i data-lucide="chevron-right" style="color:var(--muted)"></i></div>
+            </div>
+            <div class="eyebrow">Movement</div>
+            <div class="group">
+              <div class="gr"><span class="chip" style="background:var(--raised)"><i data-lucide="utensils"></i></span><div class="sp"><b>Walk after a meal</b><div class="row" style="gap:6px;margin-top:4px"><span class="badge b-strong">Strong</span></div></div><span class="add"><i data-lucide="plus"></i></span></div>
+              <div class="gr"><span class="chip" style="background:var(--raised)"><i data-lucide="heart-pulse"></i></span><div class="sp"><b>Weekly cardio</b><div class="row" style="gap:6px;margin-top:4px"><span class="badge b-strong">Strong</span></div></div><span class="add"><i data-lucide="plus"></i></span></div>
+              <div class="gr"><span class="chip" style="background:var(--raised)"><i data-lucide="move"></i></span><div class="sp"><b>Mobility, 10 min</b><div class="row" style="gap:6px;margin-top:4px"><span class="badge b-practice">Practice, not trial-tested</span></div></div><span class="add"><i data-lucide="plus"></i></span></div>
+            </div>
+            <div class="eyebrow">Calm</div>
+            <div class="group">
+              <div class="gr"><span class="chip" style="background:var(--raised)"><i data-lucide="wind"></i></span><div class="sp"><b>Long-exhale breathing</b><div class="row" style="gap:6px;margin-top:4px"><span class="badge b-mod">Moderate</span></div></div><span class="add"><i data-lucide="plus"></i></span></div>
+              <div class="gr"><span class="chip" style="background:var(--raised)"><i data-lucide="snowflake"></i></span><div class="sp"><b>Cold shower</b><div class="row" style="gap:6px;margin-top:4px"><span class="badge b-early">Early evidence</span><span>Quick safety check first</span></div></div><span class="add"><i data-lucide="plus"></i></span></div>
+            </div>
+          </div>
+        </div>
+        <p class="cap"><b>Library</b> (side menu and Recovery). Active habits on top with weekly consistency, not streaks. Every habit carries its evidence level; the cap is visible and explained.</p>
+      </div>
+
+      <!-- Safety -->
+      <div class="pcol">
+        <div class="phone">
+          <div class="sb"><span class="num">09:22</span><span class="di"></span><span>5G</span></div>
+          <div class="scroll full">
+            <div class="row"><div class="gbtn glass"><i data-lucide="x"></i></div></div>
+            <div class="title" style="font-size:1.45rem">Before you add cold showers</div>
+            <div class="sub" style="font-size:.8rem">Three quick questions, asked once. If any answer is yes, we'll leave this one out and suggest checking with a doctor.</div>
+            <div class="card"><div class="row"><b class="sp" style="font:600 .8rem/1.3 var(--font)">A heart condition or high blood pressure?</b><div class="yn"><span>Yes</span><span class="on">No</span></div></div></div>
+            <div class="card"><div class="row"><b class="sp" style="font:600 .8rem/1.3 var(--font)">Pregnant right now?</b><div class="yn"><span>Yes</span><span class="on">No</span></div></div></div>
+            <div class="card"><div class="row"><b class="sp" style="font:600 .8rem/1.3 var(--font)">Hands or skin react badly to cold (Raynaud's, cold hives)?</b><div class="yn"><span>Yes</span><span>No</span></div></div></div>
+            <div class="card" style="background:var(--raised)"><div class="row" style="align-items:flex-start"><i data-lucide="info" style="color:var(--slate)"></i><div class="note" style="font-size:.7rem">We'll only suggest it at least 6 hours away from your strength sessions: cold straight after lifting reduces muscle gain.</div></div></div>
+            <div style="flex:1"></div>
+            <div class="btn primary" style="opacity:.45">Add cold showers</div>
+          </div>
+        </div>
+        <p class="cap"><b>Safety check</b> for cold exposure (also breath holds, naps with insomnia, the fitness test). The 6-hour guard after lifting is built into its window.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= HYROX ================= -->
+  <section>
+    <div class="sec-head">
+      <h2>3. HYROX: only for athletes who choose it</h2>
+      <p>Picking a race goal is the only door in. It switches the plan to a hybrid-race plan, adds a Race section to Training, and a race simulator. Everyone else never sees any of this. Sample: Women Open, race on Sunday 18 January.</p>
+    </div>
+    <div class="phones">
+
+      <!-- Goal picker -->
+      <div class="pcol">
+        <div class="phone">
+          <div class="sb"><span class="num">19:05</span><span class="di"></span><span>5G</span></div>
+          <div class="scroll full">
+            <div class="row"><div class="gbtn glass"><i data-lucide="arrow-left"></i></div><div class="sp prog"><i style="width:34%"></i></div></div>
+            <div class="eyebrow">Your goal</div>
+            <div class="title" style="font-size:1.45rem">What's your main goal?</div>
+            <div class="opt"><span class="radio"></span><div><b>Lose fat</b></div></div>
+            <div class="opt"><span class="radio"></span><div><b>Build muscle</b></div></div>
+            <div class="opt"><span class="radio"></span><div><b>Get stronger</b></div></div>
+            <div class="opt"><span class="radio"></span><div><b>Body recomposition</b></div></div>
+            <div class="opt"><span class="radio"></span><div><b>General fitness</b></div></div>
+            <div class="opt on"><span class="radio on"></span><div><b>Train for a HYROX race</b><span>We'll plan back from your race date: running, strength and stations</span></div></div>
+            <div style="flex:1"></div>
+            <div class="note" style="text-align:center">Next: race date, division, a recent 5 km time and the kit you can use</div>
+            <div class="btn primary">Continue</div>
+          </div>
+        </div>
+        <p class="cap"><b>The way in.</b> One extra goal in onboarding (also in Profile, Programs, or set by a coach). Four extra questions appear only if it's picked.</p>
+      </div>
+
+      <!-- Race tab -->
+      <div class="pcol">
+        <div class="phone">
+          <div class="sb"><span class="num">07:30</span><span class="di"></span><span>5G</span></div>
+          <div class="scroll">
+            <div class="row"><div class="sp"><div class="title">Training</div></div><div class="gbtn glass"><i data-lucide="menu"></i></div></div>
+            <div class="seg"><span>Plan</span><span>History</span><span>Exercises</span><span class="on">Race</span></div>
+            <div class="hero">
+              <div class="row"><span class="chip" style="background:rgba(232,182,94,.14);color:var(--honey)"><i data-lucide="flag"></i></span><span class="k" style="color:var(--honey)">Sun 18 Jan · Specific phase</span></div>
+              <div class="t">9 weeks to race day</div>
+              <div class="m">Women Open · predicted 1:29–1:35</div>
+            </div>
+            <div class="group">
+              <div class="gr"><span class="chip" style="background:var(--raised)"><i data-lucide="gauge"></i></span><div class="sp"><b>Tue · Threshold run</b><span>5 × 1 km at 5:05/km</span></div></div>
+              <div class="gr"><span class="chip" style="background:var(--raised)"><i data-lucide="dumbbell"></i></span><div class="sp"><b>Thu · Strength, lower body</b><span>2 reps in reserve</span></div></div>
+              <div class="gr"><span class="chip" style="background:var(--raised)"><i data-lucide="repeat"></i></span><div class="sp"><b>Sat · Compromised running</b><span>4 × (1 km + a station)</span></div></div>
+            </div>
+            <div class="card">
+              <div class="row"><b class="sp" style="font:600 .8rem/1.2 var(--font)">Last half sim · 47:12</b><span class="sub up" style="font-weight:600">1:38 faster</span></div>
+              <div class="bar" style="height:10px"><i style="width:52%;background:var(--honey)"></i><i style="width:39%;background:var(--slate)"></i><i style="width:9%;background:var(--muted)"></i></div>
+              <div class="legend"><span><i style="background:var(--honey)"></i>Runs 24:30</span><span><i style="background:var(--slate)"></i>Stations 18:20</span><span><i style="background:var(--muted)"></i>Roxzone 4:22</span></div>
+            </div>
+          </div>
+          <div class="dock"><i data-lucide="flag"></i>Start race sim</div>
+          <div class="tabbar glass"><div class="tab"><i><svg data-lucide="house"></svg></i>Today</div><div class="tab on"><i><svg data-lucide="dumbbell"></svg></i>Training</div><div class="tab"><i><svg data-lucide="utensils"></svg></i>Nutrition</div><div class="tab"><i><svg data-lucide="moon"></svg></i>Recovery</div></div>
+          <div class="fab glass"><i data-lucide="plus"></i></div>
+        </div>
+        <p class="cap"><b>Race section</b>, the 4th section tab, only with a race goal. Countdown and phase, this week's three key sessions, the last sim split into runs, stations and Roxzone, and the predicted time as a range.</p>
+      </div>
+
+      <!-- Race mode -->
+      <div class="pcol">
+        <div class="phone">
+          <div class="sb"><span class="num">08:24</span><span class="di"></span><span>5G</span></div>
+          <div class="scroll full" style="gap:12px">
+            <div class="row"><div class="gbtn glass"><i data-lucide="x"></i></div><div class="sp" style="text-align:center"><b style="font:700 .82rem/1 var(--font)">Half sim · Women Open</b></div><div class="gbtn glass"><i data-lucide="undo-2"></i></div></div>
+            <div style="text-align:center"><div class="sub">Total</div><div class="big">24:37</div></div>
+            <div class="strip"><i style="background:var(--honey)"></i><i style="background:var(--slate)"></i><i style="background:var(--honey)"></i><i style="background:var(--slate)"></i><i style="background:var(--honey);box-shadow:0 0 0 2px var(--text)"></i><i></i><i></i><i></i></div>
+            <div class="card" style="gap:4px">
+              <div class="row"><span class="dot" style="background:var(--honey)"></span><b class="sp" style="font:700 .9rem/1.2 var(--font)">Run 3 of 4 · 1 km</b><span class="sub up" style="font-weight:700">18 s ahead</span></div>
+              <div class="row"><span class="big" style="font-size:2rem">4:52</span><span class="sub sp" style="text-align:right">target 5:10</span></div>
+            </div>
+            <div class="row" style="padding:0 4px"><span class="sub">Next</span><b class="sp" style="font:600 .8rem/1.2 var(--font);text-align:right">Burpee broad jumps · 80 m</b></div>
+          </div>
+          <div class="nextbtn"><div><b>Split</b><span>End run 3 · start burpee broad jumps</span></div></div>
+        </div>
+        <p class="cap"><b>Race mode.</b> Full screen, no tab bar. The whole lower half is one Split button (gloves and sweat). Gap to target live; undo top right. Times come from saved timestamps, so a locked phone or app kill loses nothing.</p>
+      </div>
+
+      <!-- Results -->
+      <div class="pcol">
+        <div class="phone">
+          <div class="sb"><span class="num">08:52</span><span class="di"></span><span>5G</span></div>
+          <div class="scroll full">
+            <div class="row"><div class="gbtn glass"><i data-lucide="arrow-left"></i></div><b style="font:700 .95rem/1 var(--font)">Half sim · 13 Nov</b></div>
+            <div class="row"><div class="sp"><div class="big" style="font-size:2.3rem">47:12</div><div class="sub up" style="font-weight:600">1:38 faster than 23 Oct</div></div></div>
+            <div class="bar" style="height:10px"><i style="width:52%;background:var(--honey)"></i><i style="width:39%;background:var(--slate)"></i><i style="width:9%;background:var(--muted)"></i></div>
+            <div class="group">
+              <div class="split"><span class="dot" style="background:var(--honey)"></span><span>Run 1</span><span class="t">5:41</span><span class="d up">−0:12</span></div>
+              <div class="split"><span class="dot" style="background:var(--slate)"></span><span>SkiErg 1,000 m</span><span class="t">4:58</span><span class="d up">−0:09</span></div>
+              <div class="split"><span class="dot" style="background:var(--honey)"></span><span>Run 2</span><span class="t">6:02</span><span class="d up">−0:20</span></div>
+              <div class="split"><span class="dot" style="background:var(--slate)"></span><span>Sled push 50 m · 102 kg</span><span class="t">4:31</span><span class="d downc">+0:14</span></div>
+              <div class="split"><span class="dot" style="background:var(--honey)"></span><span>Run 3</span><span class="t">6:10</span><span class="d up">−0:25</span></div>
+              <div class="split"><span class="dot" style="background:var(--slate)"></span><span>Sled pull* 50 m</span><span class="t">5:20</span><span class="d" style="color:var(--muted)">n/a</span></div>
+            </div>
+            <div class="eyebrow">Run pace fade</div>
+            <div class="bars"><div>5:41<i style="height:22px"></i>Run 1</div><div>6:02<i style="height:38px"></i>Run 2</div><div>6:10<i style="height:44px"></i>Run 3</div><div>6:24<i style="height:54px"></i>Run 4</div></div><div class="note">Pace per km: taller is slower. You faded 43 s from run 1 to run 4.</div>
+            <div class="note">* Done as a heavy dumbbell walk (no sled), so it's not compared with real sled pulls.</div>
+          </div>
+        </div>
+        <p class="cap"><b>Results.</b> Total, the runs/stations/Roxzone split, every segment against the last sim, and how much the run pace fades. Substituted stations are marked and never compared.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= PREFERENCES ================= -->
+  <section>
+    <div class="sec-head">
+      <h2>4. Only what you chose</h2>
+      <p>Everything beyond the main goal is a module the athlete turns on. A module that's off leaves no trace: no cards, no tabs, no sessions, no reminders. Asked once in onboarding, changed any time in "What Arcwell shows".</p>
+    </div>
+    <div class="phones">
+
+      <!-- Onboarding add-ons -->
+      <div class="pcol">
+        <div class="phone">
+          <div class="sb"><span class="num">19:06</span><span class="di"></span><span>5G</span></div>
+          <div class="scroll full">
+            <div class="row"><div class="gbtn glass"><i data-lucide="arrow-left"></i></div><div class="sp prog"><i style="width:40%"></i></div></div>
+            <div class="eyebrow">Optional</div>
+            <div class="title" style="font-size:1.4rem">Anything else you'd like help with?</div>
+            <div class="sub" style="font-size:.78rem">Your plan is built for <b style="color:var(--text)">building muscle</b>. Add only what you want. You can change this any time.</div>
+            <div class="cwrap" style="margin-top:4px">
+              <span class="cchip on"><i data-lucide="check"></i>Just my main goal</span>
+              <span class="cchip"><i data-lucide="heart-pulse"></i>Cardio fitness</span>
+              <span class="cchip"><i data-lucide="footprints"></i>Running</span>
+              <span class="cchip"><i data-lucide="activity"></i>Daily steps</span>
+              <span class="cchip"><i data-lucide="sun"></i>Sleep and energy habits</span>
+              <span class="cchip"><i data-lucide="wind"></i>Calm and breathing</span>
+              <span class="cchip"><i data-lucide="move"></i>Mobility</span>
+              <span class="cchip"><i data-lucide="target"></i>Focus</span>
+            </div>
+            <div class="card" style="background:var(--raised);margin-top:4px"><div class="row" style="align-items:flex-start"><i data-lucide="info" style="color:var(--slate)"></i><div class="note" style="font-size:.7rem">Cardio fitness is closely linked to long-term health. It doesn't have to mean running: a bike or rower works too.</div></div></div>
+            <div style="flex:1"></div>
+            <div class="btn primary">Continue</div>
+          </div>
+        </div>
+        <p class="cap"><b>Onboarding, one optional screen.</b> "Just my main goal" is selected by default. One honest line about cardio, shown here only; Arcwell never brings it up again on its own.</p>
+      </div>
+
+      <!-- What Arcwell shows -->
+      <div class="pcol">
+        <div class="phone">
+          <div class="sb"><span class="num">20:15</span><span class="di"></span><span>5G</span></div>
+          <div class="scroll full">
+            <div class="row"><div class="gbtn glass"><i data-lucide="arrow-left"></i></div><b style="font:700 .95rem/1 var(--font)">What Arcwell shows</b></div>
+            <div class="sub" style="font-size:.76rem">Off means it's gone from Today, your plan and reminders. Your history is kept.</div>
+            <div class="group">
+              <div class="gr"><span class="chip" style="background:rgba(232,182,94,.14);color:var(--honey)"><i data-lucide="dumbbell"></i></span><div class="sp"><b>Build muscle</b><span>Your main goal · always on</span></div></div>
+            </div>
+            <div class="eyebrow">Add-ons</div>
+            <div class="group">
+              <div class="gr"><span class="chip" style="background:var(--raised)"><i data-lucide="heart-pulse"></i></span><div class="sp"><b>Cardio fitness</b><span>Bike, rower · Thu and Sat</span></div><span class="toggle on"></span></div>
+              <div class="gr"><span class="chip" style="background:var(--raised)"><i data-lucide="footprints"></i></span><div class="sp"><b>Running</b></div><span class="toggle"></span></div>
+              <div class="gr"><span class="chip" style="background:var(--raised)"><i data-lucide="activity"></i></span><div class="sp"><b>Daily steps</b></div><span class="toggle"></span></div>
+              <div class="gr"><span class="chip" style="background:var(--raised)"><i data-lucide="sun"></i></span><div class="sp"><b>Sleep and energy habits</b></div><span class="toggle"></span></div>
+              <div class="gr"><span class="chip" style="background:var(--raised)"><i data-lucide="wind"></i></span><div class="sp"><b>Calm and breathing</b></div><span class="toggle"></span></div>
+              <div class="gr"><span class="chip" style="background:var(--raised)"><i data-lucide="move"></i></span><div class="sp"><b>Mobility</b></div><span class="toggle"></span></div>
+              <div class="gr"><span class="chip" style="background:var(--raised)"><i data-lucide="target"></i></span><div class="sp"><b>Focus</b></div><span class="toggle"></span></div>
+            </div>
+            <div class="group"><div class="gr"><div class="sp"><b>Habit reminders a day</b><span>Never between bedtime and waking</span></div><div class="yn"><span>0</span><span class="on">1</span><span>2</span></div></div></div>
+          </div>
+        </div>
+        <p class="cap"><b>"What Arcwell shows"</b> (side menu). One switch per module. Here the athlete added cardio fitness on a bike and rower only, on the days they picked, and left everything else off.</p>
+      </div>
+
+      <!-- Hypertrophy-only Today -->
+      <div class="pcol">
+        <div class="phone">
+          <div class="sb"><span class="num">13:10</span><span class="di"></span><span>5G</span></div>
+          <div class="scroll">
+            <div class="row"><div class="sp"><div class="title">Today</div><div class="sub">Thursday, 13 November</div></div><div class="gbtn glass"><i data-lucide="menu"></i></div></div>
+            <div class="hero">
+              <div class="row"><span class="chip" style="background:rgba(232,182,94,.14);color:var(--honey)"><i data-lucide="dumbbell"></i></span><span class="k" style="color:var(--honey)">Week 3 · day 2</span></div>
+              <div class="t">Pull · back and biceps</div>
+              <div class="m">6 exercises · 18 hard sets · about 60 min</div>
+            </div>
+            <div class="bento">
+              <div class="tile"><span class="chip" style="background:rgba(169,199,158,.14);color:var(--sage)"><i data-lucide="flame"></i></span><div class="k">Calories</div><div class="v">1,240<small>of 2,650</small></div></div>
+              <div class="tile"><span class="chip" style="background:rgba(169,199,158,.14);color:var(--sage)"><i data-lucide="beef"></i></span><div class="k">Protein</div><div class="v">72<small>of 145 g</small></div></div>
+              <div class="tile wide"><div class="row"><span class="chip" style="background:var(--raised)"><i data-lucide="scale"></i></span><div class="sp"><div class="k">Weight</div><div class="s">74.2 kg · up 0.3 kg this week, on pace</div></div></div></div>
+            </div>
+          </div>
+          <div class="dock"><i data-lucide="dumbbell"></i>Start workout</div>
+          <div class="tabbar glass"><div class="tab on"><i><svg data-lucide="house"></svg></i>Today</div><div class="tab"><i><svg data-lucide="dumbbell"></svg></i>Training</div><div class="tab"><i><svg data-lucide="utensils"></svg></i>Nutrition</div><div class="tab"><i><svg data-lucide="moon"></svg></i>Recovery</div></div>
+          <div class="fab glass"><i data-lucide="plus"></i></div>
+        </div>
+        <p class="cap"><b>A hypertrophy-only athlete's Today.</b> The workout, food and weight. No habits, no steps, no cardio, no "Later today" row because nothing else is due. Same time of day as the busier example above.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= VO2 MAX ================= -->
+  <section>
+    <div class="sec-head">
+      <h2>5. VO2 max training, for athletes who turn on cardio fitness</h2>
+      <p>A starting estimate, interval sessions fitted around the lifting plan (non-leg days, at least 6 h from a leg session), the athlete's own machines, and a retest every 6 to 8 weeks. Running is never required.</p>
+    </div>
+    <div class="phones">
+
+      <!-- Training plan with cardio card -->
+      <div class="pcol">
+        <div class="phone">
+          <div class="sb"><span class="num">07:30</span><span class="di"></span><span>5G</span></div>
+          <div class="scroll">
+            <div class="row"><div class="sp"><div class="title">Training</div></div><div class="gbtn glass"><i data-lucide="menu"></i></div></div>
+            <div class="seg"><span class="on">Plan</span><span>History</span><span>Exercises</span></div>
+            <div class="card">
+              <div class="row"><span class="chip" style="background:rgba(159,180,220,.16);color:var(--slate)"><i data-lucide="heart-pulse"></i></span><b class="sp" style="font:700 .82rem/1.2 var(--font)">Cardio fitness</b><span class="sub">Retest in 2 weeks</span></div>
+              <div class="row" style="align-items:flex-end"><div class="sp"><div class="v num" style="font:800 1.6rem/1 var(--font);letter-spacing:-.03em">41<small style="font:600 .7rem/1 var(--font);color:var(--muted)"> ml/kg/min</small></div><div class="sub up" style="font-weight:600;margin-top:4px">+3 since Sept · 60th percentile</div></div>
+                <div class="spark" style="width:84px"><i style="height:40%"></i><i style="height:52%"></i><i style="height:60%"></i><i style="height:74%"></i><i style="height:86%"></i></div></div>
+            </div>
+            <div class="eyebrow">This week</div>
+            <div class="group">
+              <div class="gr"><span class="chip" style="background:rgba(232,182,94,.14);color:var(--honey)"><i data-lucide="dumbbell"></i></span><div class="sp"><b>Mon · Push</b><span>Done</span></div><i data-lucide="check" style="color:var(--sage)"></i></div>
+              <div class="gr"><span class="chip" style="background:rgba(232,182,94,.14);color:var(--honey)"><i data-lucide="dumbbell"></i></span><div class="sp"><b>Tue · Legs</b><span>Done · intervals kept 2 days away</span></div><i data-lucide="check" style="color:var(--sage)"></i></div>
+              <div class="gr"><span class="chip" style="background:rgba(159,180,220,.16);color:var(--slate)"><i data-lucide="bike"></i></span><div class="sp"><b>Thu · Intervals on the bike</b><span>Today · 4 × 4 min hard, 3 min easy · 32 min</span></div><i data-lucide="chevron-right" style="color:var(--muted)"></i></div>
+              <div class="gr"><span class="chip" style="background:rgba(159,180,220,.16);color:var(--slate)"><i data-lucide="waves"></i></span><div class="sp"><b>Sat · Easy row</b><span>30 min, able to talk</span></div><i data-lucide="chevron-right" style="color:var(--muted)"></i></div>
+            </div>
+          </div>
+          <div class="dock"><i data-lucide="bike"></i>Start intervals</div>
+          <div class="tabbar glass"><div class="tab"><i><svg data-lucide="house"></svg></i>Today</div><div class="tab on"><i><svg data-lucide="dumbbell"></svg></i>Training</div><div class="tab"><i><svg data-lucide="utensils"></svg></i>Nutrition</div><div class="tab"><i><svg data-lucide="moon"></svg></i>Recovery</div></div>
+          <div class="fab glass"><i data-lucide="plus"></i></div>
+        </div>
+        <p class="cap"><b>Training plan with cardio on.</b> One cardio card (estimate, trend, percentile, retest date), and two cardio sessions placed around the lifting: intervals on Thursday, two days after Tuesday's legs, on the machines the athlete chose.</p>
+      </div>
+
+      <!-- Interval timer -->
+      <div class="pcol">
+        <div class="phone">
+          <div class="sb"><span class="num">18:12</span><span class="di"></span><span>5G</span></div>
+          <div class="scroll full" style="gap:12px">
+            <div class="row"><div class="gbtn glass"><i data-lucide="x"></i></div><div class="sp" style="text-align:center"><b style="font:700 .82rem/1 var(--font)">Intervals · bike</b><div class="sub">4 × 4 min</div></div><div class="gbtn glass"><i data-lucide="pause"></i></div></div>
+            <div class="strip" style="grid-template-columns:repeat(4,1fr)"><i style="background:var(--honey)"></i><i style="background:var(--honey);box-shadow:0 0 0 2px var(--text)"></i><i></i><i></i></div>
+            <div class="card" style="gap:6px">
+              <div class="row"><i data-lucide="heart" style="color:var(--rose)"></i><b class="sp num" style="font:800 1.5rem/1 var(--font)">168 <small style="font:600 .7rem/1 var(--font);color:var(--muted)">bpm</small></b><span class="badge b-strong">In zone · 91%</span></div>
+              <div class="note">Target 85–95% of your max (184). Without a watch: effort 8–9 out of 10, only a few words at a time.</div>
+            </div>
+            <div class="row" style="padding:0 4px"><span class="sub">Next</span><b class="sp" style="font:600 .8rem/1.2 var(--font);text-align:right">3 min easy spin</b></div>
+          </div>
+          <div class="phase"><div><b>Hard · round 2 of 4</b><div class="big">2:41</div><span>left in this interval</span></div></div>
+        </div>
+        <p class="cap"><b>Live interval timer.</b> Full screen, the phase in big type with a haptic at each change. Heart-rate zone from the watch, or an effort cue without one. Saved as an endurance session that counts toward strain.</p>
+      </div>
+
+      <!-- Fitness test -->
+      <div class="pcol">
+        <div class="phone">
+          <div class="sb"><span class="num">08:02</span><span class="di"></span><span>5G</span></div>
+          <div class="scroll full">
+            <div class="row"><div class="gbtn glass"><i data-lucide="x"></i></div><b style="font:700 .95rem/1 var(--font)">Check your cardio fitness</b></div>
+            <div class="sub" style="font-size:.78rem">Pick one. We'll turn it into a VO2 max estimate and compare it with people your age.</div>
+            <div class="opt on"><span class="radio on"></span><div><b>Use my watch's estimate</b><span>41 ml/kg/min, measured this week</span></div></div>
+            <div class="opt"><span class="radio"></span><div><b>12-minute run</b><span>Go as far as you can in 12 minutes</span></div></div>
+            <div class="opt"><span class="radio"></span><div><b>1-mile walk</b><span>Brisk walk, gentler; good for starting out</span></div></div>
+            <div class="opt"><span class="radio"></span><div><b>Answer 4 questions</b><span>A rough estimate, no exercise needed</span></div></div>
+            <div class="card" style="background:var(--raised)"><div class="row" style="align-items:flex-start"><i data-lucide="shield-check" style="color:var(--slate)"></i><div class="note" style="font-size:.7rem">The run and walk start with a short health check (PAR-Q+). We'll suggest a retest every 6–8 weeks.</div></div></div>
+            <div style="flex:1"></div>
+            <div class="btn primary">Continue</div>
+          </div>
+        </div>
+        <p class="cap"><b>Fitness test.</b> The watch estimate, a 12-minute run, a gentler 1-mile walk, or a no-exercise estimate. The tests need a health check first. Results show as a percentile for age and sex.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= RULES ================= -->
+  <section>
+    <div class="sec-head"><h2>The clutter rules these screens follow</h2></div>
+    <div class="rules">
+      <div class="rule"><b>Only what you chose</b><p>Every add-on is a module the athlete turns on. Off means no trace anywhere.</p></div>
+      <div class="rule"><b>1 hero + 3 tiles</b><p>Today never shows more. Anything else waits in one "Later today" row.</p></div>
+      <div class="rule"><b>Habits keep their hours</b><p>Each one appears only in its window, worked out from your own wake time and bedtime, then leaves.</p></div>
+      <div class="rule"><b>Five habits at most</b><p>New athletes start with three, picked from their onboarding answers.</p></div>
+      <div class="rule"><b>Two nudges a day</b><p>At most, chosen by the athlete. Quiet from bedtime to wake time.</p></div>
+      <div class="rule"><b>No new tabs</b><p>Habits live inside Today, Recovery and Nutrition. Race is a 4th section tab only for race athletes.</p></div>
+      <div class="rule"><b>No guilt</b><p>Weekly consistency, not streaks. A missed habit is never red.</p></div>
+    </div>
+  </section>
+</div>
+<script>
+  try { lucide.createIcons(); } catch (e) {}
+</script>
+</body>
+</html>

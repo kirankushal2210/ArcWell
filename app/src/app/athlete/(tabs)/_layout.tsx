@@ -1,6 +1,9 @@
-// Athlete tabs. Self-guided (D57): Today · Training · Nutrition · Recovery plus the floating AI button.
-// Coached (sitemap): the same four plus Progress, and never the AI button (D44).
+// Athlete tabs. Self-guided (D57): Today · Training · Nutrition · Recovery. Coached (sitemap): the
+// same four plus Progress. The glass + button sits at the bottom right beside the tab bar (D67); the
+// AI coach is reached from it and from Today, and coached athletes never see AI (D44).
+import { router } from "expo-router";
 import { Tabs } from "expo-router/tabs";
+import { useEffect } from "react";
 import {
   Dumbbell,
   House,
@@ -11,19 +14,36 @@ import {
 
 import { View } from "react-native";
 
-import { AIButton } from "@/features/athlete/AIButton";
+import { PLUS_RESERVE, QuickLog } from "@/features/athlete/QuickLog";
+import { useMe } from "@/features/athlete/useMe";
 import { WorkoutBar } from "@/features/athlete/WorkoutBar";
 import { useCoachData } from "@/features/coach/CoachData";
+import { LoadingScreen } from "@/features/system/SystemStates";
 import { CoachTabBar } from "@/features/coach/parts";
 import { colors } from "@/theme";
 
 export default function AthleteTabs() {
-  const { meTier, active } = useCoachData();
+  const { meTier, leaveCoach, hydrated } = useCoachData();
+  const me = useMe();
   const coached = meTier === "coached";
+  const ended = coached ? me?.endedBy : undefined;
+  // The coach completed this client (K-30) or closed their account (K-28): coaching ends here too,
+  // and the athlete sees what changed once (L-03, K-29). Photos go with a closed coach account.
+  useEffect(() => {
+    if (!ended) return;
+    leaveCoach(ended === "closed", ended);
+    router.push({
+      pathname: "/athlete/switch/[step]",
+      params: { step: "left" },
+    });
+  }, [ended, leaveCoach]);
+  if (!hydrated) return <LoadingScreen />;
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
       <Tabs
-        tabBar={(props) => <CoachTabBar {...props} />}
+        tabBar={(props) => (
+          <CoachTabBar {...props} reserveRight={PLUS_RESERVE} />
+        )}
         screenOptions={{
           headerShown: false,
           sceneStyle: { backgroundColor: colors.bg },
@@ -67,9 +87,7 @@ export default function AthleteTabs() {
         />
       </Tabs>
       <WorkoutBar />
-      {coached ? null : (
-        <AIButton locked={meTier === "free"} raised={!!active} />
-      )}
+      <QuickLog />
     </View>
   );
 }

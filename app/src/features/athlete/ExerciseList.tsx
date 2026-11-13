@@ -21,6 +21,7 @@ import {
 import { useCoachData } from "@/features/coach/CoachData";
 import {
   colors,
+  controlHeight,
   fontFamilyFor,
   radius,
   rhythm,
@@ -97,7 +98,6 @@ function FilterButton({
         variant="label"
         weight="medium"
         tone={active ? "onBrand" : "default"}
-        numberOfLines={1}
         style={styles.flexShrink}
       >
         {label}
@@ -167,7 +167,6 @@ function FilterSheet<T extends string>({
                     <Text
                       weight="medium"
                       tone={on ? "onBrand" : "default"}
-                      numberOfLines={1}
                       style={styles.flexShrink}
                     >
                       {label(o)}
@@ -414,7 +413,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     gap: space[1],
-    minHeight: 44,
+    minHeight: controlHeight,
     paddingHorizontal: space[3],
     borderRadius: radius.full,
     backgroundColor: colors.surface,

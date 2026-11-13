@@ -4,7 +4,7 @@ import { Play } from "lucide-react-native";
 import { Image, StyleSheet, View } from "react-native";
 
 import { Text } from "@/components/primitives";
-import { Bars, Eyebrow } from "@/features/coach/parts";
+import { Bars, Eyebrow, WeightChart } from "@/features/coach/parts";
 import { colors, radius, space } from "@/theme";
 
 import {
@@ -14,6 +14,8 @@ import {
   typeLabel,
 } from "./library";
 import { type Session, setLabel } from "./training";
+import { bestE1rm } from "@/features/science/strength";
+import { WhyThis } from "@/features/science/WhyThis";
 
 function Chip({ label }: { label: string }) {
   return (
@@ -26,9 +28,12 @@ function Chip({ label }: { label: string }) {
 export function ExerciseFacts({
   e,
   history,
+  showHistory = true,
 }: {
   e: Exercise;
   history: Session[];
+  /** Coaches browsing the library have no history of their own. */
+  showHistory?: boolean;
 }) {
   const logs = history
     .map((s) => ({
@@ -44,6 +49,12 @@ export function ExerciseFacts({
     ? weighted.reduce((a, b) => ((b.kg ?? 0) > (a.kg ?? 0) ? b : a))
     : undefined;
   const last = logs[0];
+  // Estimated 1RM per session, oldest first (Epley; sets of 10 reps or fewer).
+  const strength = [...logs]
+    .reverse()
+    .map((l) => bestE1rm(l.sets))
+    .filter((v): v is number => v !== null)
+    .slice(-12);
   const tops = [...logs]
     .reverse()
     .slice(-8)
@@ -86,8 +97,8 @@ export function ExerciseFacts({
         {e.custom ? <Chip label="Your exercise" /> : null}
       </View>
 
-      <Eyebrow>Your history</Eyebrow>
-      {best || last ? (
+      {!showHistory ? null : <Eyebrow>Your history</Eyebrow>}
+      {!showHistory ? null : best || last ? (
         <View style={styles.card}>
           {best ? (
             <Text weight="semibold" numeric>
@@ -102,6 +113,28 @@ export function ExerciseFacts({
                 month: "short",
               })}
             </Text>
+          ) : null}
+          {strength.length ? (
+            <View style={styles.e1rm}>
+              <View style={styles.head}>
+                <Text weight="semibold" numeric style={styles.grow}>
+                  Estimated 1-rep max:{" "}
+                  {strength[strength.length - 1].toFixed(1)} kg
+                </Text>
+                <WhyThis
+                  title="Estimated 1-rep max"
+                  points={[
+                    "Worked out from your best working set with the Epley formula: weight × (1 + reps ÷ 30).",
+                    "It's an estimate, most accurate from sets of 10 reps or fewer, so higher-rep sets aren't used.",
+                    "Watch the trend over weeks rather than any single day.",
+                  ]}
+                  sources={[]}
+                />
+              </View>
+              {strength.length > 1 ? (
+                <WeightChart values={strength} height={100} />
+              ) : null}
+            </View>
           ) : null}
           {tops.length > 1 && tops.some(Boolean) ? (
             <Bars
@@ -122,6 +155,9 @@ export function ExerciseFacts({
 }
 
 const styles = StyleSheet.create({
+  e1rm: { gap: space[2] },
+  head: { flexDirection: "row", alignItems: "center", gap: space[2] },
+  grow: { flex: 1 },
   root: { gap: space[3] },
   demo: {
     height: 200,

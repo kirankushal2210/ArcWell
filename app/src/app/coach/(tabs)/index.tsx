@@ -7,7 +7,6 @@ import { StyleSheet, View } from "react-native";
 
 import {
   Avatar,
-  Button,
   PressableScale,
   StatusChip,
   Text,
@@ -16,6 +15,7 @@ import { menuAction } from "@/features/coach/coachProfile";
 import { needsAttention, useCoachData } from "@/features/coach/CoachData";
 import { plansReady } from "@/features/coach/PlanRows";
 import {
+  ActionDock,
   Eyebrow,
   Group,
   GroupRow,
@@ -25,6 +25,8 @@ import {
 } from "@/features/coach/parts";
 import { sampleCoach } from "@/features/coach/sampleData";
 import { colors, radius, space } from "@/theme";
+import { BillingBanner } from "@/features/coach/limits";
+import { Tip } from "@/features/athlete/Tip";
 
 type Filter =
   "attention" | "active" | "paused" | "leaving" | "completed" | "all";
@@ -98,7 +100,13 @@ export default function ClientsTab() {
           },
         ]}
       />
-      <Page>
+      <Page clearDock>
+        <BillingBanner />
+        <Tip
+          coach
+          id="clients-dock"
+          text="The button above the tab bar is always your next most useful step, like reviewing check-ins."
+        />
         {!setupHidden && done < setup.length ? (
           <View style={styles.setup}>
             <View style={styles.between}>
@@ -147,14 +155,6 @@ export default function ClientsTab() {
           </View>
         ) : null}
 
-        <Button
-          label="Add a client and build their plan"
-          icon={UserPlus}
-          variant="secondary"
-          fullWidth
-          onPress={() => router.push("/coach/add-client")}
-        />
-
         {pending.length > 0 ? (
           <>
             <Eyebrow>{`Added by you · ${pending.length}`}</Eyebrow>
@@ -168,7 +168,7 @@ export default function ClientsTab() {
                 >
                   <Avatar name={c.name} />
                   <View style={styles.flex}>
-                    <Text weight="semibold" numberOfLines={1}>
+                    <Text weight="semibold">
                       {c.name}
                     </Text>
                     <Text variant="label" weight="regular" tone="muted">
@@ -199,7 +199,7 @@ export default function ClientsTab() {
                 >
                   <Avatar name={c.name} />
                   <View style={styles.flex}>
-                    <Text weight="semibold" numberOfLines={1}>
+                    <Text weight="semibold">
                       {c.name}
                     </Text>
                     <Text variant="label" weight="regular" tone="muted">
@@ -249,7 +249,6 @@ export default function ClientsTab() {
                   <View style={styles.nameRow}>
                     <Text
                       weight="semibold"
-                      numberOfLines={1}
                       style={styles.shrink}
                     >
                       {c.name}
@@ -282,6 +281,29 @@ export default function ClientsTab() {
           and check-ins done.
         </Text>
       </Page>
+      {(() => {
+        // D67 action dock: review waiting check-ins first, otherwise add a client.
+        const waiting = clients
+          .flatMap((c) => c.checkIns)
+          .filter((k) => !k.reviewed);
+        return waiting.length ? (
+          <ActionDock
+            label={`Review ${waiting.length} check-in${waiting.length === 1 ? "" : "s"}`}
+            onPress={() =>
+              router.push({
+                pathname: "/coach/check-in/[id]",
+                params: { id: waiting[0].id },
+              })
+            }
+          />
+        ) : (
+          <ActionDock
+            label="Add a client"
+            icon={UserPlus}
+            onPress={() => router.push("/coach/add-client")}
+          />
+        );
+      })()}
     </View>
   );
 }

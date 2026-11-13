@@ -1,16 +1,18 @@
 /**
  * Radius and border tokens. Mirrors docs/design/theme-tokens.css §5.
- * Depth comes from surface steps only: there are no shadow or elevation tokens (C2).
+ * Depth comes from surface steps; glass controls float above content (D67).
  */
 
 export const radius = {
-  /** Inputs, chips, set cells. */
-  sm: 8,
-  /** Cards, buttons. */
+  /** Chips, small buttons, set cells. */
+  sm: 10,
+  /** Buttons, inputs. */
   md: 12,
-  /** Bottom sheets, drawer edge. */
-  lg: 20,
-  /** Pills, avatars, status chips. */
+  /** Cards. */
+  lg: 16,
+  /** Sheets, the floating tab bar. */
+  xl: 28,
+  /** Avatars, round glass buttons, status chips. */
   full: 9999,
 } as const;
 

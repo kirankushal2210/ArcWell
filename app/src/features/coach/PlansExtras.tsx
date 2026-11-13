@@ -24,7 +24,7 @@ export function SupplementsPage() {
     (c) => c.status !== "completed" && c.supplements?.length,
   );
   return (
-    <Page>
+    <Page clearDock>
       <Text tone="muted">
         Optional for any client. Build a stack once and give each client their
         own copy.
@@ -127,7 +127,7 @@ export function EnhancedPage() {
   const open = (id: string) =>
     router.push({ pathname: "/coach/enhanced/[id]", params: { id } });
   return (
-    <Page>
+    <Page clearDock>
       <View style={styles.note}>
         <ShieldAlert size={20} color={colors.text} />
         <Text variant="label" weight="regular" style={styles.flex}>

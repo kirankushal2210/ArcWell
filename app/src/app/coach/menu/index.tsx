@@ -2,9 +2,12 @@
 // settings and privacy, help, then sign out.
 import { router } from "expo-router";
 import {
+  BookOpen,
   ChevronRight,
   CircleHelp,
   CreditCard,
+  Dumbbell,
+  Images,
   LogOut,
   type LucideIcon,
   Settings,
@@ -19,6 +22,9 @@ import { Group, GroupRow, Page, PageHeader } from "@/features/coach/parts";
 import { colors, radius, space } from "@/theme";
 
 type Href =
+  | "/coach/exercises"
+  | "/science"
+  | "/coach/transformations"
   | "/coach/menu/profile"
   | "/coach/menu/billing"
   | "/coach/menu/settings"
@@ -31,6 +37,12 @@ const ITEMS: { icon: LucideIcon; label: string; sub: string; href: Href }[] = [
     href: "/coach/menu/profile",
   },
   {
+    icon: Images,
+    label: "Transformations",
+    sub: "Before-and-after photos clients approved",
+    href: "/coach/transformations",
+  },
+  {
     icon: CreditCard,
     label: "Plan and billing",
     sub: "Client spots and your Arcwell plan",
@@ -41,6 +53,18 @@ const ITEMS: { icon: LucideIcon; label: string; sub: string; href: Href }[] = [
     label: "Settings and privacy",
     sub: "Notifications, data and your account",
     href: "/coach/menu/settings",
+  },
+  {
+    icon: Dumbbell,
+    label: "Exercise library",
+    sub: "Browse exercises and add your own",
+    href: "/coach/exercises",
+  },
+  {
+    icon: BookOpen,
+    label: "The science behind Arcwell",
+    sub: "Research behind the volume checks and targets",
+    href: "/science",
   },
   {
     icon: CircleHelp,

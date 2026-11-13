@@ -12,8 +12,9 @@ import { Avatar, Button, Text } from "@/components/primitives";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Group, GroupRow, Page, PageHeader } from "@/features/coach/parts";
 import { colors, radius, rhythm, space } from "@/theme";
+import { useBillingGate } from "@/features/coach/limits";
 
-export default function AssignTemplate() {
+function AssignTemplateEditor() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { templates, clients, assignTemplate } = useCoachData();
   const insets = useSafeAreaInsets();
@@ -147,3 +148,9 @@ const styles = StyleSheet.create({
     paddingTop: space[2],
   },
 });
+
+/** Locked while the coach's billing is lapsed (K-27). */
+export default function AssignTemplate() {
+  const gate = useBillingGate();
+  return gate ?? <AssignTemplateEditor />;
+}

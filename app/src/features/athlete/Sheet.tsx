@@ -1,8 +1,18 @@
-// Bottom sheet over a dimmed screen (scrim dims, never blurs — DESIGN.md). Tap outside to close.
+// Bottom sheet over a dimmed screen (scrim dims, never blurs — DESIGN.md). The sheet itself is glass,
+// part of the functional layer (D67), in its solid form so what's behind never bleeds into the
+// content. Tap outside to close.
 import type { ReactNode } from "react";
-import { Modal, Pressable, StyleSheet, View } from "react-native";
+import {
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { GlassSurface } from "@/components/GlassSurface";
 import { PressableScale, Text } from "@/components/primitives";
 import { colors, radius, rhythm, space } from "@/theme";
 
@@ -20,6 +30,7 @@ export function Sheet({
   children: ReactNode;
 }) {
   const insets = useSafeAreaInsets();
+  const { height } = useWindowDimensions();
   return (
     <Modal
       visible={visible}
@@ -32,7 +43,8 @@ export function Sheet({
         onPress={onClose}
         accessibilityLabel="Close"
       />
-      <View
+      <GlassSurface
+        solid
         style={[
           styles.sheet,
           { paddingBottom: Math.max(insets.bottom, space[4]) },
@@ -44,9 +56,18 @@ export function Sheet({
             {title}
           </Text>
         ) : null}
-        {sub ? <Text tone="muted">{sub}</Text> : null}
-        {children}
-      </View>
+        {/* Tall content scrolls inside the sheet instead of running off the screen. */}
+        <ScrollView
+          style={{ maxHeight: height * 0.75 }}
+          contentContainerStyle={styles.body}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+        >
+          {sub ? <Text tone="muted">{sub}</Text> : null}
+          {children}
+        </ScrollView>
+      </GlassSurface>
     </Modal>
   );
 }
@@ -82,29 +103,30 @@ export function SheetRow({
 }
 
 const styles = StyleSheet.create({
+  body: { gap: space[2] },
   scrim: { flex: 1, backgroundColor: colors.scrim },
   sheet: {
     gap: space[2],
     paddingHorizontal: rhythm.gutter,
     paddingTop: space[2],
-    borderTopLeftRadius: radius.lg,
-    borderTopRightRadius: radius.lg,
-    backgroundColor: colors.surface,
+    borderTopLeftRadius: radius.xl,
+    borderTopRightRadius: radius.xl,
+    borderBottomWidth: 0,
   },
   grabber: {
     alignSelf: "center",
     width: 40,
     height: 4,
     borderRadius: radius.full,
-    backgroundColor: colors.border,
+    backgroundColor: colors.glassEdge,
     marginBottom: space[2],
   },
   row: {
-    minHeight: 52,
+    minHeight: 44,
     justifyContent: "center",
     gap: space[1] / 2,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    paddingVertical: space[2],
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.glassEdge,
+    paddingVertical: space[1] + space[1] / 2,
   },
 });

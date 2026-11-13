@@ -2,6 +2,7 @@
 // (targets plus an example day) and a recovery protocol. Each client owns their own copy, so
 // editing one client's plan never changes another's.
 import { type PlanItem, planItemText } from "@/features/athlete/foods";
+import { proteinTarget } from "@/features/science/rules";
 
 export type PlannedExercise = {
   id: string;
@@ -218,9 +219,11 @@ export function suggestTargets(p: {
   else if (p.goal.startsWith("Build muscle")) kcal += 250;
   else if (p.goal.startsWith("Get stronger")) kcal += 150;
   kcal = Math.max(p.sex === "male" ? 1500 : 1200, Math.round(kcal / 50) * 50);
-  const protein =
-    Math.round((p.weightKg * (p.goal.startsWith("Lose fat") ? 2 : 1.8)) / 5) *
-    5;
+  const protein = proteinTarget(
+    p.weightKg,
+    p.heightCm ?? 170,
+    p.goal.startsWith("Lose fat") ? "lose_fat" : "other",
+  ).grams;
   const fat = Math.round((kcal * 0.27) / 9 / 5) * 5;
   const carbs = Math.max(
     0,

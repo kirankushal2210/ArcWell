@@ -1,17 +1,19 @@
 // The coach's general link (arcwell.app/c/<coach>): for leads and walk-ins (D56). Unlike a personal
 // invite there's no plan yet, so the athlete answers the standard onboarding and the coach builds
 // their plan afterwards (CO-14, AO-21b).
-import { router } from "expo-router";
+import { Redirect, router } from "expo-router";
 import { ClipboardCheck, MessageCircle, Users } from "lucide-react-native";
 import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Avatar, Button, Text } from "@/components/primitives";
+import { backTo, MenuPage } from "@/features/athlete/MenuParts";
 import { useCoachData } from "@/features/coach/CoachData";
+import { useCoachLimits } from "@/features/coach/limits";
 import { Page, PageHeader } from "@/features/coach/parts";
 import { colors, radius, rhythm, space } from "@/theme";
 
-export default function JoinCoach() {
+function JoinCoachScreen() {
   const { coachName, setJoiningCoach } = useCoachData();
   const insets = useSafeAreaInsets();
   const first = coachName.replace(/^Coach\s+/, "");
@@ -102,3 +104,47 @@ const styles = StyleSheet.create({
     paddingTop: space[2],
   },
 });
+
+/**
+ * Before the invite: an athlete who already has a coach sees how switching works (F3-03, one coach
+ * at a time), and a coach at their client limit isn't taking new clients (K-26, D40).
+ */
+export default function JoinCoach() {
+  const { meTier, coachName } = useCoachData();
+  const { full } = useCoachLimits();
+  if (meTier === "coached")
+    return (
+      <Redirect
+        href={{
+          pathname: "/athlete/switch/[step]",
+          params: { step: "already" },
+        }}
+      />
+    );
+  if (full)
+    return (
+      <MenuPage title="" back={backTo("/")}>
+        <View style={styles.hero}>
+          <Avatar name={coachName.replace(/^Coach\s+/, "")} size={48} />
+          <Text variant="display" style={styles.center}>
+            {coachName} isn&apos;t taking new clients right now
+          </Text>
+          <Text tone="muted" style={styles.center}>
+            Their coaching is full. You can still use Arcwell on your own: track
+            workouts, food and progress for free.
+          </Text>
+          <Button
+            label="Use Arcwell on my own"
+            fullWidth
+            onPress={() =>
+              router.replace({
+                pathname: "/onboarding/[step]",
+                params: { step: "0" },
+              })
+            }
+          />
+        </View>
+      </MenuPage>
+    );
+  return <JoinCoachScreen />;
+}

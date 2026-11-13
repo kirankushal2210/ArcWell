@@ -169,7 +169,7 @@ export function ZoneDot({ zone }: { zone: Zone }) {
   return <View style={[styles.dot, { backgroundColor: ZONE_COLOR[zone] }]} />;
 }
 
-/** A progress ring with a big value inside. `share` is 0–1. */
+/** A progress ring with a big value inside, in the Recovery colour (D67). `share` is 0–1. */
 export function Ring({
   share,
   value,
@@ -202,7 +202,7 @@ export function Ring({
             cx={size / 2}
             cy={size / 2}
             r={r}
-            stroke={colors.brand}
+            stroke={colors.recovery}
             strokeWidth={stroke}
             fill="none"
             strokeLinecap="round"

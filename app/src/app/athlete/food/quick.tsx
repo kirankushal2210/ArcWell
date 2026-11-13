@@ -5,7 +5,6 @@ import { router, useLocalSearchParams } from "expo-router";
 import { Trash2 } from "lucide-react-native";
 import { useState } from "react";
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -99,18 +98,11 @@ export default function QuickAdd() {
                 {
                   icon: Trash2,
                   label: "Delete from log",
-                  onPress: () =>
-                    Alert.alert("Remove this entry?", undefined, [
-                      { text: "Cancel", style: "cancel" },
-                      {
-                        text: "Remove",
-                        style: "destructive",
-                        onPress: () => {
-                          n.remove(log.id);
-                          back();
-                        },
-                      },
-                    ]),
+                  onPress: () => {
+                    // Removed at once with Undo on the day (X-04), not a confirm dialog.
+                    n.remove(log.id);
+                    back();
+                  },
                 },
               ]
             : []

@@ -19,6 +19,8 @@ export {
   rhythm,
   tapMin,
   controlHeight,
+  controlHeightSm,
+  inputHeight,
   type SpaceStep,
 } from "./spacing";
 export { radius, borderWidth, focusRingWidth } from "./radius";

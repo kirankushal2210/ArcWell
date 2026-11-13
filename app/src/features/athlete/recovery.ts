@@ -626,7 +626,7 @@ export const PROTOCOLS: Protocol[] = [
       "In through the nose for 4, hold for 4.",
       "Out slowly for 4, hold for 4. Repeat.",
     ],
-    why: "Slow breathing calms the nervous system and is a quick way to bring stress down.",
+    why: "Slow, paced breathing can lower stress and heart rate within minutes.",
     guided: "breathing",
   },
   {
@@ -640,7 +640,7 @@ export const PROTOCOLS: Protocol[] = [
       "Breathe slowly; move your attention from feet to head.",
       "If your mind wanders, come back to the breath.",
     ],
-    why: "Deep rest without sleep, like yoga nidra, helps you feel restored on low-sleep days.",
+    why: "Deep rest without sleep, like yoga nidra, can help you feel calmer on low-sleep days. The evidence is early; it doesn't replace sleep.",
     guided: "nsdr",
   },
   {
@@ -714,7 +714,7 @@ export const PROTOCOLS: Protocol[] = [
       "Start with a cold shower before trying a plunge.",
       "2 to 5 minutes is enough.",
     ],
-    why: "Cold water can ease soreness after hard sessions.",
+    why: "Cold water can ease soreness, but straight after strength training it can blunt muscle gains. Use it after cardio or on rest days, not after lifting.",
     caution:
       "Avoid it in the hours after strength or muscle-building workouts: it may blunt muscle growth.",
   },

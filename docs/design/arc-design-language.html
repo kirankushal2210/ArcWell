@@ -1,0 +1,695 @@
+<title>Arcwell Arc Language</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: one long reading column of numbered proposal sections, with phone mockups that break wide. Dark-first, the way the app would be. */
+:root {
+  color-scheme: dark;
+  /* Ink: near-black neutrals biased toward the dusk violet */
+  --ink-0: #0B0B0F;  /* app background */
+  --ink-1: #15151C;  /* cards */
+  --ink-2: #1F1F29;  /* raised, inputs, pressed */
+  --ink-3: #2A2A36;  /* sheets, elevated */
+  --line: #2E2E3B;
+  --fg: #F4F3F8;
+  --fg-muted: #A6A4B5;
+  --fg-faint: #6E6C7C;
+  /* The three pillars: the arc of a day */
+  --saffron: #FFB547; /* Nutrition */
+  --flame: #FF6A3D;   /* Training */
+  --dusk: #8F7DFF;    /* Recovery */
+  /* Status */
+  --mint: #3DDC97;
+  --amber: #FFCC4D;
+  --rose: #FF4F6D;
+  --arc: linear-gradient(120deg, var(--saffron) 0%, var(--flame) 48%, var(--dusk) 100%);
+  --arc-warm: linear-gradient(120deg, var(--saffron), var(--flame));
+  --hi: rgba(255,255,255,.06); /* top highlight on raised surfaces */
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--ink-0); color: var(--fg);
+  font: 400 16px/1.6 var(--font); -webkit-font-smoothing: antialiased;
+}
+.wrap {
+  max-width: 1080px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 32px 96px;
+}
+.prose { max-width: 68ch; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); line-height: 1.02; letter-spacing: -0.035em; font-weight: 800; }
+h2 { font-size: clamp(1.6rem, 3.4vw, 2.2rem); line-height: 1.1; letter-spacing: -0.025em; font-weight: 800; }
+h3 { font-size: 1.15rem; line-height: 1.3; letter-spacing: -0.01em; font-weight: 700; }
+p { margin: 0; }
+.eyebrow { font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--fg-muted); }
+.muted { color: var(--fg-muted); }
+.arc-text { background: var(--arc); -webkit-background-clip: text; background-clip: text; color: transparent; }
+section { display: grid; gap: 20px; padding-top: 72px; }
+.sec-head { display: grid; gap: 10px; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* Hero */
+.hero { display: grid; gap: 22px; padding-top: 24px; }
+.hero-arc { height: 6px; border-radius: 99px; background: var(--arc); width: min(420px, 70%); }
+.lede { font-size: 1.2rem; line-height: 1.55; color: var(--fg-muted); max-width: 60ch; }
+.lede strong { color: var(--fg); font-weight: 600; }
+
+/* Generic card */
+.card { background: var(--ink-1); border-radius: 22px; padding: 22px; box-shadow: inset 0 1px 0 var(--hi); }
+.grid { display: grid; gap: 14px; }
+.g2 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.g3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.g4 { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+.card p + p { margin-top: 8px; }
+.card ul { margin: 8px 0 0; padding-left: 18px; color: var(--fg-muted); }
+.card li + li { margin-top: 4px; }
+
+/* Pillars */
+.pillar { border-radius: 22px; padding: 22px; min-height: 190px; display: grid; align-content: space-between; gap: 18px; position: relative; overflow: hidden; background: var(--ink-1); box-shadow: inset 0 1px 0 var(--hi); }
+.pillar::after { content: ""; position: absolute; inset: auto -30% -60% auto; width: 220px; height: 220px; border-radius: 50%; filter: blur(30px); opacity: .28; background: var(--c); }
+.pillar .dot { width: 44px; height: 44px; border-radius: 14px; background: var(--c); }
+.pillar .hex { font: 600 .82rem/1 var(--font); color: var(--fg-muted); letter-spacing: .02em; }
+.pillar h3 { color: var(--c); }
+
+/* Swatches */
+.sw { display: grid; gap: 8px; }
+.sw .chip { height: 64px; border-radius: 16px; box-shadow: inset 0 0 0 1px var(--line); }
+.sw b { font-weight: 600; font-size: .92rem; }
+.sw span { font-size: .8rem; color: var(--fg-muted); }
+.light-board { background: #F6F5F9; color: #14131A; border-radius: 22px; padding: 22px; display: grid; gap: 14px; }
+.light-board .muted { color: #5E5C6B; }
+.light-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.light-row div { flex: 1 1 110px; border-radius: 14px; padding: 12px; font-size: .78rem; font-weight: 600; min-height: 70px; display: flex; align-items: flex-end; }
+
+/* Type specimen */
+.type-row { display: grid; grid-template-columns: 120px 1fr; gap: 16px; align-items: baseline; padding: 14px 0; border-top: 1px solid var(--line); }
+.type-row:first-child { border-top: 0; }
+.type-row code { font: 500 .78rem/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--fg-muted); }
+@media (max-width: 520px) { .type-row { grid-template-columns: 1fr; gap: 4px; } }
+
+/* Buttons */
+.btns { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.btn { appearance: none; border: 0; cursor: pointer; font: 700 1rem/1 var(--font); letter-spacing: -0.01em; height: 56px; padding: 0 28px; border-radius: 999px; display: inline-flex; align-items: center; gap: 10px; color: var(--ink-0); transition: transform 140ms cubic-bezier(.2,0,0,1), filter 140ms; }
+.btn:active { transform: scale(.96); filter: brightness(.94); }
+.btn:focus-visible { outline: 3px solid var(--fg); outline-offset: 3px; }
+.btn.arc { background: var(--arc); }
+.btn.flame { background: var(--flame); }
+.btn.saffron { background: var(--saffron); }
+.btn.dusk { background: var(--dusk); }
+.btn.tonal { background: var(--ink-3); color: var(--fg); box-shadow: inset 0 1px 0 var(--hi); }
+.btn.ghost { background: transparent; color: var(--fg); padding: 0 14px; }
+.btn.sm { height: 40px; padding: 0 18px; font-size: .9rem; }
+.btn.icon { width: 56px; padding: 0; justify-content: center; }
+.btn svg { width: 20px; height: 20px; }
+.btn.danger { background: transparent; color: var(--rose); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--rose) 55%, transparent); }
+
+/* Chips & tags */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.pchip { height: 36px; padding: 0 14px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; font: 600 .86rem/1 var(--font); background: var(--ink-2); color: var(--fg); }
+.pchip.on { background: var(--fg); color: var(--ink-0); }
+.tag { height: 26px; padding: 0 10px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; font: 700 .74rem/1 var(--font); background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--c); }
+.tag::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--c); }
+
+/* Phones */
+.phones { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; justify-items: center; }
+.phone-col { display: grid; gap: 12px; justify-items: center; max-width: 320px; width: 100%; }
+.phone-col p { font-size: .88rem; color: var(--fg-muted); text-align: center; }
+.phone { width: 300px; max-width: 100%; height: 620px; border-radius: 44px; background: var(--ink-0); box-shadow: 0 0 0 10px #050507, 0 0 0 11px #2a2a33, 0 30px 80px rgba(0,0,0,.6); overflow: hidden; position: relative; display: flex; flex-direction: column; }
+.status { height: 40px; flex: none; display: flex; justify-content: space-between; align-items: center; padding: 0 26px; font: 600 .74rem/1 var(--font); }
+.island { width: 84px; height: 24px; border-radius: 99px; background: #000; }
+.screen { flex: 1; overflow: hidden; padding: 4px 16px 0; display: flex; flex-direction: column; gap: 12px; }
+.s-head { display: flex; justify-content: space-between; align-items: center; }
+.s-title { font: 800 1.55rem/1.05 var(--font); letter-spacing: -0.03em; }
+.s-sub { font-size: .72rem; color: var(--fg-muted); }
+.avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--ink-3); display: grid; place-items: center; font: 700 .7rem/1 var(--font); color: var(--fg); flex: none; }
+.ringed { padding: 2px; border-radius: 50%; background: var(--arc); }
+.ringed .avatar { box-shadow: 0 0 0 2px var(--ink-0); }
+
+.stories { display: flex; gap: 12px; }
+.story { display: grid; justify-items: center; gap: 5px; font-size: .62rem; color: var(--fg-muted); font-weight: 600; }
+.story svg { width: 52px; height: 52px; }
+
+.billboard { border-radius: 24px; padding: 16px; position: relative; overflow: hidden; background: radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--flame) 55%, transparent), transparent 60%), var(--ink-1); box-shadow: inset 0 1px 0 var(--hi); display: grid; gap: 8px; }
+.billboard .k { font: 700 .62rem/1 var(--font); letter-spacing: .12em; text-transform: uppercase; color: var(--flame); }
+.billboard .t { font: 800 1.45rem/1.05 var(--font); letter-spacing: -0.03em; }
+.billboard .m { font-size: .72rem; color: var(--fg-muted); }
+.billboard .go { height: 44px; border-radius: 99px; background: var(--flame); color: var(--ink-0); font: 800 .88rem/44px var(--font); text-align: center; margin-top: 4px; }
+
+.week { display: flex; justify-content: space-between; background: var(--ink-1); border-radius: 18px; padding: 10px 12px; box-shadow: inset 0 1px 0 var(--hi); }
+.wd { display: grid; justify-items: center; gap: 5px; font: 600 .6rem/1 var(--font); color: var(--fg-muted); }
+.wd i { width: 22px; height: 22px; border-radius: 50%; background: var(--ink-3); display: block; }
+.wd i.done { background: var(--arc-warm); }
+.wd i.rest { background: transparent; box-shadow: inset 0 0 0 2px var(--dusk); }
+.wd i.today { box-shadow: 0 0 0 2px var(--fg); background: var(--ink-3); }
+
+.shelf { display: flex; gap: 10px; }
+.meal { flex: 1; border-radius: 18px; padding: 10px; background: var(--ink-1); box-shadow: inset 0 1px 0 var(--hi); display: grid; gap: 4px; min-width: 0; }
+.meal .ph { height: 54px; border-radius: 12px; background: radial-gradient(circle at 30% 30%, color-mix(in srgb, var(--saffron) 70%, transparent), transparent 70%), var(--ink-2); }
+.meal b { font-size: .72rem; }
+.meal span { font-size: .62rem; color: var(--fg-muted); }
+
+.tabbar { flex: none; margin: 8px 12px 14px; height: 62px; border-radius: 24px; background: rgba(31,31,41,.78); backdrop-filter: blur(18px) saturate(160%); -webkit-backdrop-filter: blur(18px) saturate(160%); box-shadow: inset 0 1px 0 var(--hi); display: flex; align-items: center; justify-content: space-around; }
+.tab { display: grid; justify-items: center; gap: 3px; font: 600 .56rem/1 var(--font); color: var(--fg-faint); }
+.tab svg { width: 20px; height: 20px; }
+.tab.on { color: var(--fg); }
+.tab.on svg { color: var(--c, var(--fg)); }
+.plus { width: 50px; height: 50px; border-radius: 18px; background: var(--arc); display: grid; place-items: center; color: var(--ink-0); margin-top: -2px; }
+.plus svg { width: 24px; height: 24px; }
+
+/* Logging mockup */
+.ex-head { display: grid; gap: 4px; }
+.ex-head .k { font: 700 .62rem/1 var(--font); letter-spacing: .12em; text-transform: uppercase; color: var(--flame); }
+.ex-head .t { font: 800 1.35rem/1.1 var(--font); letter-spacing: -0.025em; }
+.setrow { display: grid; grid-template-columns: 26px 1fr 1fr 40px; gap: 8px; align-items: center; background: var(--ink-1); border-radius: 16px; padding: 10px; font-variant-numeric: tabular-nums; box-shadow: inset 0 1px 0 var(--hi); }
+.setrow .n { font: 700 .72rem/1 var(--font); color: var(--fg-muted); text-align: center; }
+.setrow .v { font: 800 1.05rem/1 var(--font); letter-spacing: -0.02em; }
+.setrow .v small { font: 600 .6rem/1 var(--font); color: var(--fg-muted); margin-left: 3px; }
+.setrow .ck { width: 36px; height: 36px; border-radius: 12px; background: var(--ink-3); display: grid; place-items: center; color: var(--fg-faint); }
+.setrow.done { background: color-mix(in srgb, var(--flame) 14%, var(--ink-1)); }
+.setrow.done .ck { background: var(--flame); color: var(--ink-0); }
+.setrow.pr { box-shadow: inset 0 0 0 1.5px var(--saffron); }
+.prv { font: 600 .6rem/1 var(--font); color: var(--fg-muted); display: block; margin-top: 4px; }
+.rest { margin-top: auto; margin-bottom: 14px; border-radius: 24px; background: var(--ink-2); padding: 12px 14px; display: flex; align-items: center; gap: 12px; box-shadow: inset 0 1px 0 var(--hi); }
+.rest svg { width: 46px; height: 46px; flex: none; }
+.rest b { font: 800 1.4rem/1 var(--font); font-variant-numeric: tabular-nums; }
+.pr-toast { border-radius: 16px; padding: 10px 12px; background: color-mix(in srgb, var(--saffron) 16%, var(--ink-1)); display: flex; gap: 10px; align-items: center; font-size: .72rem; }
+.pr-toast b { color: var(--saffron); }
+
+/* Coach mockup */
+.queue { border-radius: 24px; padding: 14px; background: radial-gradient(120% 100% at 0% 0%, color-mix(in srgb, var(--dusk) 45%, transparent), transparent 60%), var(--ink-1); display: grid; gap: 10px; box-shadow: inset 0 1px 0 var(--hi); }
+.queue .big { font: 800 2.2rem/1 var(--font); letter-spacing: -0.04em; }
+.qcard { background: var(--ink-2); border-radius: 16px; padding: 10px; display: flex; gap: 10px; align-items: center; }
+.qcard .tx { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.qcard b { font-size: .78rem; }
+.qcard span { font-size: .64rem; color: var(--fg-muted); }
+.qbtn { height: 30px; padding: 0 12px; border-radius: 99px; background: var(--fg); color: var(--ink-0); font: 700 .66rem/30px var(--font); flex: none; }
+.crow { display: flex; gap: 10px; align-items: center; padding: 8px 2px; border-bottom: 1px solid var(--line); }
+.crow .tx { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.crow b { font-size: .8rem; }
+.crow span { font-size: .64rem; color: var(--fg-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.trio svg { width: 40px; height: 40px; display: block; }
+
+/* Check-in review mockup */
+.compare { position: relative; height: 230px; border-radius: 22px; overflow: hidden; background: var(--ink-1); }
+.compare .half { position: absolute; inset: 0; display: grid; place-items: center; font: 700 .7rem/1 var(--font); color: var(--fg-muted); }
+.compare .before { background: linear-gradient(160deg, #2A2A36, #1A1A22); clip-path: inset(0 50% 0 0); }
+.compare .after { background: linear-gradient(160deg, #3A2B3A, #22202C); clip-path: inset(0 0 0 50%); }
+.compare .handle { position: absolute; top: 0; bottom: 0; left: 50%; width: 3px; margin-left: -1.5px; background: var(--fg); }
+.compare .knob { position: absolute; top: 50%; left: 50%; width: 34px; height: 34px; margin: -17px 0 0 -17px; border-radius: 50%; background: var(--fg); color: var(--ink-0); display: grid; place-items: center; font: 800 .7rem/1 var(--font); }
+.compare .lbl { position: absolute; bottom: 10px; font: 700 .6rem/1 var(--font); letter-spacing: .1em; text-transform: uppercase; background: rgba(0,0,0,.45); padding: 5px 8px; border-radius: 99px; }
+.metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.metric { background: var(--ink-1); border-radius: 14px; padding: 10px; display: grid; gap: 4px; }
+.metric span { font-size: .58rem; color: var(--fg-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
+.metric b { font: 800 1rem/1 var(--font); font-variant-numeric: tabular-nums; }
+.metric em { font-style: normal; font-size: .62rem; font-weight: 700; }
+.progressline { display: flex; gap: 4px; }
+.progressline i { flex: 1; height: 4px; border-radius: 99px; background: var(--ink-3); }
+.progressline i.on { background: var(--fg); }
+.quick { display: flex; gap: 6px; flex-wrap: wrap; }
+.quick span { height: 30px; padding: 0 10px; border-radius: 99px; background: var(--ink-2); font: 600 .62rem/30px var(--font); }
+.nextbar { margin-top: auto; margin-bottom: 14px; height: 52px; border-radius: 99px; background: var(--arc); color: var(--ink-0); font: 800 .9rem/52px var(--font); text-align: center; }
+
+/* Motion demo */
+.motion-demo { display: flex; gap: 18px; flex-wrap: wrap; align-items: center; }
+.ring-demo { width: 120px; height: 120px; cursor: pointer; }
+.ring-demo circle.fg { transition: stroke-dashoffset 900ms cubic-bezier(.2,.9,.2,1.05); }
+.ring-demo:focus-visible { outline: 3px solid var(--fg); outline-offset: 4px; border-radius: 50%; }
+
+/* Loop diagram */
+.loop { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; counter-reset: step; }
+.loop .card { position: relative; }
+.loop .card .eyebrow { color: var(--c); }
+
+/* Guardrails */
+.rules { display: grid; gap: 10px; }
+.rule { display: grid; grid-template-columns: 26px 1fr; gap: 12px; align-items: start; }
+.rule .x { width: 26px; height: 26px; border-radius: 9px; display: grid; place-items: center; font: 800 .8rem/1 var(--font); }
+.rule .x.no { background: color-mix(in srgb, var(--rose) 18%, transparent); color: var(--rose); }
+.rule .x.yes { background: color-mix(in srgb, var(--mint) 18%, transparent); color: var(--mint); }
+
+/* Roadmap */
+.phase { display: grid; grid-template-columns: 64px 1fr; gap: 16px; padding: 18px 0; border-top: 1px solid var(--line); }
+.phase:first-child { border-top: 0; }
+.phase .pn { font: 800 2rem/1 var(--font); letter-spacing: -0.04em; }
+.phase ul { margin: 8px 0 0; padding-left: 18px; color: var(--fg-muted); }
+
+/* Decisions */
+.decide { display: grid; gap: 12px; }
+.q { background: var(--ink-1); border-radius: 18px; padding: 18px; display: grid; gap: 6px; box-shadow: inset 0 0 0 1px var(--line); }
+.q b { font-size: 1rem; }
+.q .rec { font-size: .86rem; color: var(--mint); font-weight: 600; }
+
+table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+.tablewrap { overflow-x: auto; }
+th, td { text-align: left; padding: 10px 12px; border-top: 1px solid var(--line); vertical-align: top; }
+th { color: var(--fg-muted); font-weight: 600; font-size: .78rem; letter-spacing: .04em; }
+td:first-child { font-weight: 600; white-space: nowrap; }
+
+@media (prefers-reduced-motion: reduce) {
+  .btn, .ring-demo circle.fg { transition: none; }
+}
+</style>
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="hero-arc" aria-hidden="true"></div>
+    <p class="eyebrow">Design language proposal · v2 · for founder review</p>
+    <h1>Arc: the colour of<br><span class="arc-text">a day well lived.</span></h1>
+    <p class="lede">Arcwell moves from black and white to a dark, warm, alive look built on one idea: <strong>your day has an arc</strong>. You fuel up in the morning (saffron), push through effort (flame) and recover at night (dusk). Each pillar keeps one colour everywhere, and together they make the Arcwell gradient: <strong>training, nutrition and recovery, coached as one.</strong></p>
+    <p class="lede">The goal is an app people want to open, because opening it shows them their real progress. Not because it tricks them into staying.</p>
+  </header>
+
+  <!-- 1 -->
+  <section aria-labelledby="s1">
+    <div class="sec-head">
+      <p class="eyebrow">01 · The concept</p>
+      <h2 id="s1">Three pillars, one arc</h2>
+      <p class="muted prose">Colour stops being decoration and becomes navigation. Whatever pillar you're in, its colour fills the main button, the rings and the highlights, so you always know where you are without reading a label.</p>
+    </div>
+    <div class="grid g3">
+      <div class="pillar" style="--c: var(--saffron)">
+        <div class="dot" aria-hidden="true"></div>
+        <div>
+          <h3>Saffron · Nutrition</h3>
+          <p class="muted">Fuel. Warm like turmeric, marigold and a morning chai. Meals, macros, water.</p>
+          <p class="hex">#FFB547</p>
+        </div>
+      </div>
+      <div class="pillar" style="--c: var(--flame)">
+        <div class="dot" aria-hidden="true"></div>
+        <div>
+          <h3>Flame · Training</h3>
+          <p class="muted">Effort and heat. Workouts, sets, bests, strain.</p>
+          <p class="hex">#FF6A3D</p>
+        </div>
+      </div>
+      <div class="pillar" style="--c: var(--dusk)">
+        <div class="dot" aria-hidden="true"></div>
+        <div>
+          <h3>Dusk · Recovery</h3>
+          <p class="muted">Night and calm. Sleep, recovery score, stress, wind-down.</p>
+          <p class="hex">#8F7DFF</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section aria-labelledby="s2">
+    <div class="sec-head">
+      <p class="eyebrow">02 · See it</p>
+      <h2 id="s2">Four screens in the new language</h2>
+      <p class="muted prose">Mockups of the key screens with sample data. They show placement, colour and hierarchy; the real build follows the same rules on every screen.</p>
+    </div>
+    <div class="phones">
+
+      <!-- Today -->
+      <div class="phone-col">
+        <div class="phone" role="img" aria-label="Athlete Today screen mockup">
+          <div class="status"><span class="num">7:42</span><span class="island"></span><span>●●●</span></div>
+          <div class="screen">
+            <div class="s-head">
+              <div><div class="s-sub">Friday, 13 November</div><div class="s-title">Morning, Priya</div></div>
+              <div class="ringed"><div class="avatar">AK</div></div>
+            </div>
+            <div class="stories" aria-hidden="true">
+              <div class="story"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="22" fill="none" stroke="#2A2A36" stroke-width="5"/><circle cx="26" cy="26" r="22" fill="none" stroke="#FF6A3D" stroke-width="5" stroke-linecap="round" stroke-dasharray="138" stroke-dashoffset="46" transform="rotate(-90 26 26)"/><text x="26" y="30" text-anchor="middle" fill="#F4F3F8" font-size="11" font-weight="800" font-family="Inter">2/3</text></svg>Training</div>
+              <div class="story"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="22" fill="none" stroke="#2A2A36" stroke-width="5"/><circle cx="26" cy="26" r="22" fill="none" stroke="#FFB547" stroke-width="5" stroke-linecap="round" stroke-dasharray="138" stroke-dashoffset="90" transform="rotate(-90 26 26)"/><text x="26" y="30" text-anchor="middle" fill="#F4F3F8" font-size="10" font-weight="800" font-family="Inter">35%</text></svg>Fuel</div>
+              <div class="story"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="22" fill="none" stroke="#2A2A36" stroke-width="5"/><circle cx="26" cy="26" r="22" fill="none" stroke="#8F7DFF" stroke-width="5" stroke-linecap="round" stroke-dasharray="138" stroke-dashoffset="24" transform="rotate(-90 26 26)"/><text x="26" y="30" text-anchor="middle" fill="#F4F3F8" font-size="10" font-weight="800" font-family="Inter">82%</text></svg>Recovery</div>
+              <div class="story"><svg viewBox="0 0 52 52"><defs><linearGradient id="ag" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFB547"/><stop offset=".5" stop-color="#FF6A3D"/><stop offset="1" stop-color="#8F7DFF"/></linearGradient></defs><circle cx="26" cy="26" r="23" fill="none" stroke="url(#ag)" stroke-width="3"/><circle cx="26" cy="26" r="18" fill="#2A2A36"/><text x="26" y="30" text-anchor="middle" fill="#F4F3F8" font-size="10" font-weight="800" font-family="Inter">AK</text></svg>Coach</div>
+            </div>
+            <div class="billboard">
+              <div class="k">Up next · Week 3 of 8</div>
+              <div class="t">Lower body B</div>
+              <div class="m num">5 exercises · 16 sets · about 45 min</div>
+              <div class="go">Start workout</div>
+            </div>
+            <div class="week" aria-hidden="true">
+              <div class="wd"><i class="done"></i>M</div><div class="wd"><i class="done"></i>T</div><div class="wd"><i class="rest"></i>W</div><div class="wd"><i class="done"></i>T</div><div class="wd"><i class="today"></i>F</div><div class="wd"><i></i>S</div><div class="wd"><i class="rest"></i>S</div>
+            </div>
+            <div class="shelf">
+              <div class="meal"><div class="ph"></div><b>Breakfast</b><span>Moong chilla · logged</span></div>
+              <div class="meal"><div class="ph"></div><b>Lunch</b><span>Phulka, paneer · 1:30</span></div>
+            </div>
+          </div>
+          <div class="tabbar">
+            <div class="tab on" style="--c: var(--fg)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5 12 3l9 7.5V21H3z"/></svg>Today</div>
+            <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6v12M18 6v12M3 9v6M21 9v6M6 12h12"/></svg>Train</div>
+            <div class="plus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
+            <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M17 3c-2 2-2 6 0 8v10"/></svg>Fuel</div>
+            <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>Recover</div>
+          </div>
+        </div>
+        <p><b>Today.</b> Story-style rings up top, the coach's latest note ringed in the Arcwell gradient, then one big "billboard" action. The centre + logs anything in one tap.</p>
+      </div>
+
+      <!-- Logging -->
+      <div class="phone-col">
+        <div class="phone" role="img" aria-label="Workout logging screen mockup">
+          <div class="status"><span class="num">18:06</span><span class="island"></span><span>●●●</span></div>
+          <div class="screen">
+            <div class="s-head"><div class="s-sub num">Lower body B · 24:10</div><div class="s-sub num">3 of 5</div></div>
+            <div class="progressline" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>
+            <div class="ex-head"><div class="k">Exercise 3</div><div class="t">Romanian deadlift</div><div class="s-sub">Barbell · last time 50 kg × 8</div></div>
+            <div class="setrow done"><div class="n">1</div><div class="v">50<small>kg</small></div><div class="v">8<small>reps</small></div><div class="ck">✓</div></div>
+            <div class="setrow done pr"><div class="n">2</div><div class="v">55<small>kg</small><span class="prv">New best</span></div><div class="v">8<small>reps</small></div><div class="ck">✓</div></div>
+            <div class="setrow"><div class="n">3</div><div class="v">55<small>kg</small></div><div class="v">8<small>reps</small></div><div class="ck">✓</div></div>
+            <div class="pr-toast"><span aria-hidden="true">★</span><span><b>New best on RDL.</b> +5 kg on last week. Your coach sees it too.</span></div>
+            <div class="rest">
+              <svg viewBox="0 0 46 46" aria-hidden="true"><circle cx="23" cy="23" r="19" fill="none" stroke="#2A2A36" stroke-width="5"/><circle cx="23" cy="23" r="19" fill="none" stroke="#FF6A3D" stroke-width="5" stroke-linecap="round" stroke-dasharray="119" stroke-dashoffset="40" transform="rotate(-90 23 23)"/></svg>
+              <div><div class="s-sub">Rest</div><b>1:12</b></div>
+              <span style="margin-left:auto" class="btn sm tonal">+30 s</span>
+            </div>
+          </div>
+        </div>
+        <p><b>Logging.</b> A focused, full-screen flame mode. Big numbers, last time shown, a satisfying tick with a haptic. A new best gets a saffron outline and a moment of celebration.</p>
+      </div>
+
+      <!-- Coach clients -->
+      <div class="phone-col">
+        <div class="phone" role="img" aria-label="Coach Clients screen mockup">
+          <div class="status"><span class="num">9:15</span><span class="island"></span><span>●●●</span></div>
+          <div class="screen">
+            <div class="s-head"><div class="s-title">Clients</div><div class="avatar">≡</div></div>
+            <div class="queue">
+              <div class="s-sub">Today's queue</div>
+              <div style="display:flex;align-items:baseline;gap:8px"><span class="big num">4</span><span class="s-sub">clients need you</span></div>
+              <div class="qcard"><div class="ringed"><div class="avatar">PS</div></div><div class="tx"><b>Priya · Week 4 check-in</b><span>−0.6 kg · 4/4 workouts</span></div><span class="qbtn">Review</span></div>
+              <div class="qcard"><div class="avatar">RV</div><div class="tx"><b>Rahul · 2 of 4 workouts</b><span>Knee sore after Tuesday</span></div><span class="qbtn">Nudge</span></div>
+            </div>
+            <div>
+              <div class="crow"><div class="trio" aria-hidden="true"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="none" stroke="#2A2A36" stroke-width="3"/><circle cx="20" cy="20" r="17" fill="none" stroke="#FF6A3D" stroke-width="3" stroke-linecap="round" stroke-dasharray="107" stroke-dashoffset="10" transform="rotate(-90 20 20)"/><circle cx="20" cy="20" r="12.5" fill="none" stroke="#2A2A36" stroke-width="3"/><circle cx="20" cy="20" r="12.5" fill="none" stroke="#FFB547" stroke-width="3" stroke-linecap="round" stroke-dasharray="78" stroke-dashoffset="18" transform="rotate(-90 20 20)"/><circle cx="20" cy="20" r="8" fill="none" stroke="#2A2A36" stroke-width="3"/><circle cx="20" cy="20" r="8" fill="none" stroke="#8F7DFF" stroke-width="3" stroke-linecap="round" stroke-dasharray="50" stroke-dashoffset="8" transform="rotate(-90 20 20)"/></svg></div><div class="tx"><b>Karan Singh</b><span>Contest prep · 8 weeks</span></div><span class="tag" style="--c: var(--mint)">96%</span></div>
+              <div class="crow"><div class="trio" aria-hidden="true"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="none" stroke="#2A2A36" stroke-width="3"/><circle cx="20" cy="20" r="17" fill="none" stroke="#FF6A3D" stroke-width="3" stroke-linecap="round" stroke-dasharray="107" stroke-dashoffset="20" transform="rotate(-90 20 20)"/><circle cx="20" cy="20" r="12.5" fill="none" stroke="#2A2A36" stroke-width="3"/><circle cx="20" cy="20" r="12.5" fill="none" stroke="#FFB547" stroke-width="3" stroke-linecap="round" stroke-dasharray="78" stroke-dashoffset="30" transform="rotate(-90 20 20)"/><circle cx="20" cy="20" r="8" fill="none" stroke="#2A2A36" stroke-width="3"/><circle cx="20" cy="20" r="8" fill="none" stroke="#8F7DFF" stroke-width="3" stroke-linecap="round" stroke-dasharray="50" stroke-dashoffset="14" transform="rotate(-90 20 20)"/></svg></div><div class="tx"><b>Ananya Iyer</b><span>Check-in sent yesterday</span></div><span class="tag" style="--c: var(--mint)">88%</span></div>
+              <div class="crow"><div class="trio" aria-hidden="true"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="none" stroke="#2A2A36" stroke-width="3"/><circle cx="20" cy="20" r="17" fill="none" stroke="#FF6A3D" stroke-width="3" stroke-linecap="round" stroke-dasharray="107" stroke-dashoffset="56" transform="rotate(-90 20 20)"/><circle cx="20" cy="20" r="12.5" fill="none" stroke="#2A2A36" stroke-width="3"/><circle cx="20" cy="20" r="12.5" fill="none" stroke="#FFB547" stroke-width="3" stroke-linecap="round" stroke-dasharray="78" stroke-dashoffset="40" transform="rotate(-90 20 20)"/><circle cx="20" cy="20" r="8" fill="none" stroke="#2A2A36" stroke-width="3"/><circle cx="20" cy="20" r="8" fill="none" stroke="#8F7DFF" stroke-width="3" stroke-linecap="round" stroke-dasharray="50" stroke-dashoffset="22" transform="rotate(-90 20 20)"/></svg></div><div class="tx"><b>Rahul Verma</b><span>Low adherence this week</span></div><span class="tag" style="--c: var(--amber)">48%</span></div>
+            </div>
+          </div>
+          <div class="tabbar">
+            <div class="tab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6 6 0 0 1 3.5 5.5"/></svg>Clients</div>
+            <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="m9 13 2 2 4-4"/></svg>Check-ins</div>
+            <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h10M4 12h16M4 18h12"/></svg>Plans</div>
+            <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-11.5 7.2L4 21l1.8-5.5A8 8 0 1 1 21 12z"/></svg>Chat</div>
+            <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Business</div>
+          </div>
+        </div>
+        <p><b>Coach Clients.</b> A "queue" that shows exactly who needs you, with one action per row. Every client avatar becomes a triple ring of their week, so the coach reads 40 clients at a glance.</p>
+      </div>
+
+      <!-- Check-in review -->
+      <div class="phone-col">
+        <div class="phone" role="img" aria-label="Coach check-in review mockup">
+          <div class="status"><span class="num">9:18</span><span class="island"></span><span>●●●</span></div>
+          <div class="screen">
+            <div class="s-head"><div class="s-sub">Reviewing 1 of 4</div><div class="s-sub">Skip</div></div>
+            <div class="progressline" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></div>
+            <div><div class="s-title">Priya · Week 4</div></div>
+            <div class="compare" aria-hidden="true">
+              <div class="half before">Start</div>
+              <div class="half after">Week 4</div>
+              <div class="handle"></div><div class="knob">⇆</div>
+              <span class="lbl" style="left:10px">Start</span><span class="lbl" style="right:10px">Week 4</span>
+            </div>
+            <div class="metrics">
+              <div class="metric"><span>Weight</span><b>66.2</b><em style="color: var(--mint)">−0.6 kg</em></div>
+              <div class="metric"><span>Waist</span><b>83.0</b><em style="color: var(--mint)">−1.0 cm</em></div>
+              <div class="metric"><span>Sessions</span><b>4/4</b><em style="color: var(--fg-muted)">steady</em></div>
+            </div>
+            <div class="quick"><span>Great week, keep it going</span><span>+20 g protein</span><span>Let's talk</span></div>
+            <div class="nextbar">Send and next client</div>
+          </div>
+        </div>
+        <p><b>Check-in review.</b> Drag to compare photos, see the numbers that moved, send a quick reply and roll straight into the next client. Clearing the queue feels like inbox zero.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section aria-labelledby="s3">
+    <div class="sec-head">
+      <p class="eyebrow">03 · Colour system</p>
+      <h2 id="s3">Dark first, with a warm light theme</h2>
+      <p class="muted prose">Dark suits gyms, evenings and the OLED Android phones most of your users have, and it makes the three pillar colours glow. Neutrals lean slightly violet so they belong to the dusk end of the arc instead of looking like default grey. Text on bright buttons is dark ink, which keeps every pair above the WCAG AA contrast level.</p>
+    </div>
+    <div class="grid g4">
+      <div class="sw"><div class="chip" style="background: var(--ink-0)"></div><b>Ink 0 · background</b><span>#0B0B0F</span></div>
+      <div class="sw"><div class="chip" style="background: var(--ink-1)"></div><b>Ink 1 · cards</b><span>#15151C</span></div>
+      <div class="sw"><div class="chip" style="background: var(--ink-2)"></div><b>Ink 2 · raised, inputs</b><span>#1F1F29</span></div>
+      <div class="sw"><div class="chip" style="background: var(--ink-3)"></div><b>Ink 3 · sheets</b><span>#2A2A36</span></div>
+      <div class="sw"><div class="chip" style="background: var(--fg)"></div><b>Text</b><span>#F4F3F8 · 17.8:1 on bg</span></div>
+      <div class="sw"><div class="chip" style="background: var(--fg-muted)"></div><b>Text muted</b><span>#A6A4B5 · 7.4:1 on cards</span></div>
+      <div class="sw"><div class="chip" style="background: var(--arc)"></div><b>Arc gradient</b><span>Brand moments only</span></div>
+      <div class="sw"><div class="chip" style="background: var(--arc-warm)"></div><b>Arc warm</b><span>Done days, streak dots</span></div>
+      <div class="sw"><div class="chip" style="background: var(--mint)"></div><b>Mint · success</b><span>#3DDC97</span></div>
+      <div class="sw"><div class="chip" style="background: var(--amber)"></div><b>Amber · needs attention</b><span>#FFCC4D</span></div>
+      <div class="sw"><div class="chip" style="background: var(--rose)"></div><b>Rose · errors, destructive</b><span>#FF4F6D</span></div>
+      <div class="sw"><div class="chip" style="background: var(--line)"></div><b>Line · dividers</b><span>#2E2E3B</span></div>
+    </div>
+    <div class="light-board">
+      <p class="eyebrow" style="color:#5E5C6B">Light theme</p>
+      <p>Same structure, warm white base, with the pillar colours one step deeper so text and icons still pass AA on white. Buttons keep the bright fills with dark text.</p>
+      <div class="light-row">
+        <div style="background:#F6F5F9;box-shadow:inset 0 0 0 1px #E2E0EA">bg #F6F5F9</div>
+        <div style="background:#FFFFFF;box-shadow:inset 0 0 0 1px #E2E0EA">surface #FFFFFF</div>
+        <div style="background:#9E5C00;color:#fff">Nutrition text #9E5C00</div>
+        <div style="background:#BF3A14;color:#fff">Training text #BF3A14</div>
+        <div style="background:#5B47E0;color:#fff">Recovery text #5B47E0</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Rules for using colour</h3>
+      <ul>
+        <li><b>The pillar you're in owns the primary button.</b> Start workout is flame, Log meal is saffron, Start wind-down is dusk. Screens that belong to no pillar (onboarding, coach tools, paywall) use the Arc gradient.</li>
+        <li><b>One primary per screen.</b> Everything else is tonal (raised ink) or a text button. Colour means "do this now".</li>
+        <li><b>The gradient is earned.</b> It appears on the logo, the centre + button, unseen coach stories, celebrations and the coach's queue. Never as a page background.</li>
+        <li><b>Status never relies on colour alone</b> (C11 stays): every status tag has a dot and a word, every alert an icon.</li>
+        <li><b>No shaming red.</b> Eating over target, a missed workout or a low recovery score are amber or plain text, never rose. Rose is only for errors and destructive actions.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section aria-labelledby="s4">
+    <div class="sec-head">
+      <p class="eyebrow">04 · Type</p>
+      <h2 id="s4">Inter, but with a voice</h2>
+      <p class="muted prose">We keep Inter (D46), but stop setting everything at polite sizes. Big numbers are the hero of a fitness app, so they get a heavy weight, tight tracking and tabular figures. Large text tightens, small text opens up.</p>
+    </div>
+    <div class="card">
+      <div class="type-row"><code>hero 56/56 · 800 · −0.04em</code><span class="num" style="font: 800 3.5rem/1 var(--font); letter-spacing: -0.04em">142.5<span style="font-size:1.2rem;color:var(--fg-muted);letter-spacing:0"> kg</span></span></div>
+      <div class="type-row"><code>display 34/38 · 800 · −0.03em</code><span style="font: 800 2.1rem/1.1 var(--font); letter-spacing: -0.03em">Morning, Priya</span></div>
+      <div class="type-row"><code>title 24/30 · 700 · −0.02em</code><span style="font: 700 1.5rem/1.25 var(--font); letter-spacing: -0.02em">Lower body B</span></div>
+      <div class="type-row"><code>heading 18/24 · 700</code><span style="font: 700 1.125rem/1.35 var(--font)">This week</span></div>
+      <div class="type-row"><code>body 16/24 · 400</code><span>Keep two reps in reserve on the last set today.</span></div>
+      <div class="type-row"><code>label 14/20 · 600</code><span style="font: 600 .875rem/1.4 var(--font)">4 exercises · 45 min</span></div>
+      <div class="type-row"><code>eyebrow 11 · 700 · +0.12em caps</code><span class="eyebrow">Up next · Week 3 of 8</span></div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section aria-labelledby="s5">
+    <div class="sec-head">
+      <p class="eyebrow">05 · Buttons and controls</p>
+      <h2 id="s5">Pills you can hit with a sweaty thumb</h2>
+      <p class="muted prose">Primary buttons become full pills, 56dp tall, filled with the pillar colour. They respond on press-in with a spring squash and a light haptic, not on release. Try pressing them.</p>
+    </div>
+    <div class="card" style="display:grid;gap:18px">
+      <div class="btns">
+        <button class="btn flame" type="button" id="b-flame">Start workout</button>
+        <button class="btn saffron" type="button" id="b-saffron">Log meal</button>
+        <button class="btn dusk" type="button" id="b-dusk">Start wind-down</button>
+        <button class="btn arc" type="button" id="b-arc">Send invite</button>
+      </div>
+      <div class="btns">
+        <button class="btn tonal" type="button" id="b-tonal">Swap exercise</button>
+        <button class="btn ghost" type="button" id="b-ghost">Skip for today</button>
+        <button class="btn danger" type="button" id="b-danger">Delete template</button>
+        <button class="btn icon arc" type="button" id="b-plus" aria-label="Log something"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+      </div>
+      <div class="chips">
+        <span class="pchip on">Needs attention · 4</span><span class="pchip">Active · 5</span><span class="pchip">Paused · 1</span>
+        <span class="tag" style="--c: var(--mint)">Paid</span><span class="tag" style="--c: var(--amber)">Due</span><span class="tag" style="--c: var(--rose)">Overdue</span><span class="tag" style="--c: var(--dusk)">Recovering</span>
+      </div>
+    </div>
+    <div class="tablewrap card">
+      <table>
+        <thead><tr><th>Element</th><th>Today</th><th>Arc</th></tr></thead>
+        <tbody>
+          <tr><td>Primary button</td><td>Black rectangle, 48dp</td><td>Pillar-coloured pill, 56dp, ink text, spring press + haptic</td></tr>
+          <tr><td>Secondary</td><td>White with grey outline</td><td>Tonal pill (raised ink), no outline</td></tr>
+          <tr><td>Cards</td><td>White, radius 12, flat</td><td>Ink 1, radius 22–24, 1px top highlight for depth</td></tr>
+          <tr><td>Section tabs</td><td>Underline</td><td>Same placement, active label in pillar colour with a short glowing bar</td></tr>
+          <tr><td>Tab bar</td><td>Flat strip with icons</td><td>Floating, translucent, rounded; centre + for quick logging (athletes)</td></tr>
+          <tr><td>Rings and bars</td><td>Black on grey</td><td>Pillar colour, rounded caps, spring fill, soft glow behind hero rings only</td></tr>
+          <tr><td>Avatars</td><td>Grey circle</td><td>Gradient ring when there's something new (coach note, unread, check-in)</td></tr>
+          <tr><td>Inputs</td><td>Grey fill, outline</td><td>Ink 2 fill, radius 14, focus ring in pillar colour</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section aria-labelledby="s6">
+    <div class="sec-head">
+      <p class="eyebrow">06 · Motion and feel</p>
+      <h2 id="s6">Things move like they have weight</h2>
+      <p class="muted prose">All motion uses springs (Reanimated), so anything can be grabbed and reversed mid-way. Default springs settle without bounce. Only moves that follow a flick, or a real achievement, get a little overshoot.</p>
+    </div>
+    <div class="grid g2">
+      <div class="card motion-demo">
+        <svg class="ring-demo" viewBox="0 0 120 120" role="button" tabindex="0" id="ringdemo" aria-label="Tap to fill the ring">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="#2A2A36" stroke-width="12"/>
+          <circle class="fg" cx="60" cy="60" r="50" fill="none" stroke="#FF6A3D" stroke-width="12" stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="314" transform="rotate(-90 60 60)"/>
+          <text x="60" y="68" text-anchor="middle" fill="#F4F3F8" font-size="24" font-weight="800" font-family="Inter" id="ringtxt">0%</text>
+        </svg>
+        <div style="flex:1;min-width:180px">
+          <h3>Rings fill, numbers roll</h3>
+          <p class="muted">Tap the ring. When a set is logged or a meal is eaten, the ring springs forward and the number counts up, with a light haptic in the same frame.</p>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Where motion goes</h3>
+        <ul>
+          <li><b>Press:</b> squash to 96% on press-in, light haptic. 120 ms.</li>
+          <li><b>Set done:</b> tick fills, row tints flame, success haptic.</li>
+          <li><b>New best:</b> saffron outline, star burst, heavy haptic. Once per exercise.</li>
+          <li><b>Workout finished:</b> the one full-screen moment. Rings close, volume rolls up, bests slide in, share card ready.</li>
+          <li><b>Sheets:</b> rise from the button that opened them, follow your finger, flick to dismiss.</li>
+          <li><b>Reduced motion on:</b> everything cross-fades instead; haptics stay.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section aria-labelledby="s7">
+    <div class="sec-head">
+      <p class="eyebrow">07 · Why people come back</p>
+      <h2 id="s7">The habit loop, done honestly</h2>
+      <p class="muted prose">Instagram and Netflix keep people with a clear loop: a trigger, a fast action, a reward and something you've built. Arcwell uses the same loop, but every reward is real progress you made. This is the part that makes an app feel hard to put down.</p>
+    </div>
+    <div class="loop">
+      <div class="card" style="--c: var(--saffron)"><p class="eyebrow">Trigger</p><h3>A reason to open</h3><p class="muted">Your coach replied. Your recovery score is ready. It's check-in day. One useful notification at a time, never "we miss you".</p></div>
+      <div class="card" style="--c: var(--flame)"><p class="eyebrow">Action</p><h3>One tap to the thing</h3><p class="muted">The notification opens the exact screen. The centre + logs a set, meal, weight or sleep in two taps.</p></div>
+      <div class="card" style="--c: var(--dusk)"><p class="eyebrow">Reward</p><h3>Visible progress</h3><p class="muted">A ring closes. A new best. The trend line dips. Your coach says "great week". Rewards you can't fake.</p></div>
+      <div class="card" style="--c: var(--mint)"><p class="eyebrow">Investment</p><h3>Something you've built</h3><p class="muted">Weeks of consistency, a photo timeline, milestones, a shareable progress card for Instagram.</p></div>
+    </div>
+    <div class="grid g3">
+      <div class="card"><h3>Weekly consistency, not daily streaks</h3><p class="muted">Hit your planned sessions for the week and the week turns gold. Rest days count as kept. Miss one and the week is still yours to save. No streak resets at midnight.</p></div>
+      <div class="card"><h3>Milestones</h3><p class="muted">Earned, private and quiet: first 10 workouts, 100 kg total lifted in a session, 4 check-ins in a row, a 5 kg trend change. Shown on Progress; shareable if you choose.</p></div>
+      <div class="card"><h3>Share cards</h3><p class="muted">After a workout, a best or a check-in, one tap makes a story-sized card in the Arc gradient. Athletes show off; coaches get free marketing on Instagram, where their leads come from.</p></div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section aria-labelledby="s8">
+    <div class="sec-head">
+      <p class="eyebrow">08 · Guardrails</p>
+      <h2 id="s8">Pull, never trap</h2>
+      <p class="muted prose">This is a health app, used by people working on their bodies, sometimes during hard times. These rules sit above any engagement goal.</p>
+    </div>
+    <div class="card rules">
+      <div class="rule"><span class="x no">✕</span><p><b>No endless feeds.</b> Every screen has an end. There's nothing to scroll for its own sake.</p></div>
+      <div class="rule"><span class="x no">✕</span><p><b>No guilt or fake urgency.</b> No "you'll lose your streak", no countdowns, no "only 2 spots left" in the athlete app.</p></div>
+      <div class="rule"><span class="x no">✕</span><p><b>No shaming food or weight.</b> No red for eating over target, no "bad" days, no body comparisons with other people.</p></div>
+      <div class="rule"><span class="x yes">✓</span><p><b>Quiet hours by default</b> (10 pm to 7 am), and at most one non-coach notification a day.</p></div>
+      <div class="rule"><span class="x yes">✓</span><p><b>Photos and shares are opt-in,</b> every time. Share cards never include body photos unless the athlete picks them.</p></div>
+      <div class="rule"><span class="x yes">✓</span><p><b>Coached athletes still never see AI.</b> The new + menu and Today keep that rule.</p></div>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section aria-labelledby="s9">
+    <div class="sec-head">
+      <p class="eyebrow">09 · What changes where</p>
+      <h2 id="s9">Screen by screen</h2>
+    </div>
+    <div class="grid g2">
+      <div class="card"><h3>Athlete</h3><ul>
+        <li><b>Tab bar:</b> Today · Train · + · Fuel · Recover. The + opens a quick-log sheet.</li>
+        <li><b>Today:</b> pillar story rings, coach story, billboard for the next action, week strip, meals shelf, tonight card.</li>
+        <li><b>Training:</b> program as poster cards; logging in full-screen flame mode with swipe-to-complete sets and a live rest island.</li>
+        <li><b>Nutrition:</b> saffron day ring, meal cards with one-tap "Ate this", Indian portions as chips.</li>
+        <li><b>Recovery:</b> dusk mode, calmer motion, rings with a soft glow, wind-down as one button.</li>
+        <li><b>Progress:</b> drag-to-compare photos, milestones shelf, share cards.</li>
+        <li><b>Check-in:</b> a guided, one-question-per-screen flow that ends in a "sent" moment.</li>
+      </ul></div>
+      <div class="card"><h3>Coach</h3><ul>
+        <li><b>Clients:</b> "Today's queue" hero with one action per client; avatars become triple pillar rings.</li>
+        <li><b>Check-ins:</b> review as a flow: compare, reply, "Send and next" until the queue is clear.</li>
+        <li><b>Plans:</b> templates as covers in pillar colours; builders keep the shared editors.</li>
+        <li><b>Messages:</b> your bubbles in the Arc gradient, theirs in ink; quick replies as chips.</li>
+        <li><b>Business:</b> big rolling numbers with sparklines; funnel bars in the gradient; Instagram tab gets its own warm accent.</li>
+        <li><b>Menu:</b> a sheet that rises from the hamburger, not a separate page.</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section aria-labelledby="s10">
+    <div class="sec-head">
+      <p class="eyebrow">10 · Plan</p>
+      <h2 id="s10">How we roll it out</h2>
+      <p class="muted prose">The app already reads every colour, size and radius from one theme folder, so changing the tokens restyles most screens at once. Then the components, then each screen in turn.</p>
+    </div>
+    <div class="card">
+      <div class="phase"><span class="pn arc-text">1</span><div><h3>Foundations</h3><p class="muted">Record the decision (replacing D50 monochrome, "no gradients, glows or badges" and the glass ban for the tab bar). New tokens in DESIGN.md, theme-tokens.css and app/src/theme: dark palette, pillar colours, type scale, radii, spring presets, haptics. Dark ships first; the light theme follows once screens read colours through a theme hook.</p></div></div>
+      <div class="phase"><span class="pn arc-text">2</span><div><h3>Components</h3><ul><li>Button (pillar pills, tonal, ghost, danger), IconButton, Chip, Tag, Card, ListRow and Group</li><li>Ring and bars with spring fill, number roll, story ring, triple ring avatar</li><li>Floating translucent tab bar with the centre +, bottom sheet, toast, celebration, share card</li></ul></div></div>
+      <div class="phase"><span class="pn arc-text">3</span><div><h3>Athlete screens</h3><p class="muted">Today first (it's opened most), then workout logging and the summary, Nutrition, Recovery, Progress, the weekly check-in, chat.</p></div></div>
+      <div class="phase"><span class="pn arc-text">4</span><div><h3>Coach screens</h3><p class="muted">Clients and the queue, the check-in review flow, Plans, Messages, Business, the menu sheet.</p></div></div>
+      <div class="phase"><span class="pn arc-text">5</span><div><h3>Onboarding, welcome and polish</h3><p class="muted">Welcome, sign-in and both onboarding flows; then a pass on contrast, 130% text, reduced motion and real-phone testing in Expo Go.</p></div></div>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section aria-labelledby="s11">
+    <div class="sec-head">
+      <p class="eyebrow">11 · Your call</p>
+      <h2 id="s11">Four decisions before we build</h2>
+    </div>
+    <div class="decide">
+      <div class="q"><b>Dark first?</b><p class="muted">You moved the app to light, then black and white, earlier. Arc works best dark, with a light theme to follow.</p><p class="rec">Recommended: dark first, light theme in Phase 5.</p></div>
+      <div class="q"><b>The Arc palette: saffron, flame and dusk?</b><p class="muted">It replaces the current small cyan, amber and violet dots. Alternatives would be a cooler set (electric blue, lime, violet) or a premium set (indigo and gold).</p><p class="rec">Recommended: Arc, for its Indian warmth and the "day" story.</p></div>
+      <div class="q"><b>Centre + on the athlete tab bar?</b><p class="muted">Fastest logging, but it moves the Pro AI button from a floating bubble into the + sheet and the Today header.</p><p class="rec">Recommended: yes.</p></div>
+      <div class="q"><b>Weekly consistency, milestones and share cards?</b><p class="muted">This changes the brand line "not gamified, no streaks" to "earned, honest rewards", within the guardrails above.</p><p class="rec">Recommended: yes, all three.</p></div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function () {
+  var ring = document.getElementById('ringdemo');
+  var txt = document.getElementById('ringtxt');
+  if (!ring) return;
+  var fg = ring.querySelector('circle.fg');
+  var steps = [0, 34, 67, 100];
+  var i = 0, raf = null;
+  function roll(from, to) {
+    var start = performance.now(), dur = 700;
+    if (raf) cancelAnimationFrame(raf);
+    function f(t) {
+      var p = Math.min(1, (t - start) / dur);
+      var e = 1 - Math.pow(1 - p, 3);
+      txt.textContent = Math.round(from + (to - from) * e) + '%';
+      if (p < 1) raf = requestAnimationFrame(f);
+    }
+    raf = requestAnimationFrame(f);
+  }
+  function next() {
+    var from = steps[i];
+    i = (i + 1) % steps.length;
+    var to = steps[i];
+    fg.setAttribute('stroke-dashoffset', String(314 - 314 * to / 100));
+    roll(from, to);
+  }
+  ring.addEventListener('click', next);
+  ring.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); next(); } });
+  setTimeout(next, 600);
+})();
+</script>

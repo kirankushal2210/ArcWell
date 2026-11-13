@@ -23,14 +23,9 @@ import {
   shiftDate,
   slotLabel,
 } from "@/features/athlete/foods";
+import { ClientHabits } from "@/features/coach/ClientHabits";
 import { useCoachData } from "@/features/coach/CoachData";
-import {
-  accountOf,
-  dayInline,
-  dayText,
-  inr,
-  renewsOn,
-} from "@/features/coach/crm";
+import { accountOf, dayInline, inr, renewsOn } from "@/features/coach/crm";
 import { PaidTag } from "@/features/coach/CrmParts";
 import {
   Bars,
@@ -46,6 +41,7 @@ import { PhotoSlot } from "@/features/coach/PhotoSlot";
 import { PlanRows, plansReady } from "@/features/coach/PlanRows";
 import type { Client } from "@/features/coach/sampleData";
 import { colors, fontFamilyFor, radius, space, textSizes } from "@/theme";
+import { dayAdjustment } from "@/features/science/rules";
 
 export type ClientTab = "overview" | "training" | "nutrition" | "recovery";
 
@@ -220,8 +216,22 @@ export function Overview({ c, go }: { c: Client; go: (s: ClientTab) => void }) {
       | "/coach/client/status/[id]"
       | "/coach/account/[id]",
   ) => router.push({ pathname, params: { id: c.id } });
+  // A plain low-recovery flag for the coach (D70): no AI for coached clients (D44); the coach decides.
+  const flag = dayAdjustment(today.sleep.minutes / 60, today.recovery.score);
   return (
     <>
+      {flag.kind !== "none" ? (
+        <View style={styles.flag}>
+          <Text weight="semibold">
+            {`${first} slept ${(today.sleep.minutes / 60).toFixed(1)} h · recovery ${today.recovery.score}%`}
+          </Text>
+          <Text variant="label" weight="regular" tone="muted">
+            {flag.kind === "halve"
+              ? "A much lighter session today may be wise. You could message them, or leave the plan as it is."
+              : "Maybe go a little lighter today. Your call."}
+          </Text>
+        </View>
+      ) : null}
       <View style={styles.tiles}>
         <StatTile
           label="Adherence"
@@ -372,7 +382,7 @@ export function Overview({ c, go }: { c: Client; go: (s: ClientTab) => void }) {
         </View>
         <Text variant="label" weight="regular" tone="muted">
           {c.historyFrom
-            ? `${first} shared their history from ${dayText(c.historyFrom)}.`
+            ? `${first} shared their history from before they joined, so you see everything they've logged.`
             : `You see ${first}'s data from the day they joined (${c.joined}). They can share earlier history from their app.`}
         </Text>
         <Button
@@ -692,6 +702,7 @@ export function Recovery({ c }: { c: Client }) {
               .join(", ")
           : `${first} hasn't marked any recovery protocols done this week.`}
       </Text>
+      <ClientHabits c={c} />
     </>
   );
 }
@@ -750,9 +761,23 @@ export function Progress({ c }: { c: Client }) {
       ) : (
         <Text tone="muted">No photos shared yet.</Text>
       )}
+      {c.photoWeeks.length > 1 ? (
+        <Button
+          label="Ask to share as a transformation"
+          variant="secondary"
+          fullWidth
+          onPress={() =>
+            router.push({
+              pathname: "/coach/transformations/request/[id]",
+              params: { id: c.id },
+            })
+          }
+        />
+      ) : null}
       <Text variant="caption" tone="muted">
         You see data from the day {c.name.split(" ")[0]} joined you, unless they
-        share their earlier history. Photos stay private to you and them.
+        share their earlier history. Photos stay private to you and them unless
+        they approve sharing one.
       </Text>
     </>
   );
@@ -825,6 +850,14 @@ export function Notes({ c }: { c: Client }) {
 }
 
 const styles = StyleSheet.create({
+  flag: {
+    gap: space[1],
+    padding: space[3],
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.recovery,
+    backgroundColor: colors.surface,
+  },
   root: { flex: 1, backgroundColor: colors.bg },
   pad: { padding: space[4] },
   flex: { flex: 1, gap: space[1] / 2 },

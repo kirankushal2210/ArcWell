@@ -35,6 +35,7 @@ import {
   space,
   textSizes,
 } from "@/theme";
+import { useBillingGate } from "@/features/coach/limits";
 
 function TimeStepper({
   label,
@@ -73,7 +74,7 @@ function TimeStepper({
   );
 }
 
-export default function RecoveryBuilder() {
+function RecoveryBuilderEditor() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { client, saveProtocol } = useCoachData();
   const c = client(id);
@@ -207,3 +208,9 @@ const styles = StyleSheet.create({
   },
   footer: { paddingHorizontal: rhythm.gutter, paddingTop: space[2] },
 });
+
+/** Locked while the coach's billing is lapsed (K-27). */
+export default function RecoveryBuilder() {
+  const gate = useBillingGate();
+  return gate ?? <RecoveryBuilderEditor />;
+}

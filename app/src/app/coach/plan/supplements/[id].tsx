@@ -14,8 +14,9 @@ import {
 } from "@/features/coach/SupplementEditor";
 import { cloneItems, type Supplement } from "@/features/coach/supplements";
 import { colors, rhythm, space } from "@/theme";
+import { useBillingGate } from "@/features/coach/limits";
 
-export default function ClientSupplements() {
+function ClientSupplementsEditor() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { client, stacks, setSupplements } = useCoachData();
   const c = client(id);
@@ -80,3 +81,9 @@ const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
   footer: { paddingHorizontal: rhythm.gutter, paddingTop: space[2] },
 });
+
+/** Locked while the coach's billing is lapsed (K-27). */
+export default function ClientSupplements() {
+  const gate = useBillingGate();
+  return gate ?? <ClientSupplementsEditor />;
+}

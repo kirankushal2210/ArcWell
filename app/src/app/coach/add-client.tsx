@@ -15,6 +15,7 @@ import { type NewClient, useCoachData } from "@/features/coach/CoachData";
 import { Eyebrow, Page, PageHeader, Pills } from "@/features/coach/parts";
 import { Segmented } from "@/features/onboarding/parts";
 import { colors, rhythm, space } from "@/theme";
+import { InviteBlocked, useCoachLimits } from "@/features/coach/limits";
 
 const GOALS = [
   "Lose fat",
@@ -30,7 +31,7 @@ const SEX: Record<string, NewClient["sex"]> = {
   "Prefer not to say": "unsaid",
 };
 
-export default function AddClient() {
+function AddClientScreen() {
   const { addClient, leads } = useCoachData();
   const { leadId } = useLocalSearchParams<{ leadId?: string }>();
   // Joined from a lead (D63): their details carry over.
@@ -203,3 +204,9 @@ const styles = StyleSheet.create({
   label: { flex: 1 },
   footer: { paddingHorizontal: rhythm.gutter, paddingTop: space[2] },
 });
+
+/** At the client limit (K-25) or with billing lapsed (K-27), new clients can't be added. */
+export default function AddClient() {
+  const { blocked } = useCoachLimits();
+  return blocked ? <InviteBlocked title="Add a client" /> : <AddClientScreen />;
+}

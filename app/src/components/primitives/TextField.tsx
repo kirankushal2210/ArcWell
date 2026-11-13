@@ -5,7 +5,7 @@ import { StyleSheet, TextInput, View, type TextInputProps } from "react-native";
 import {
   borderWidth,
   colors,
-  controlHeight,
+  inputHeight,
   focusRingWidth,
   radius,
   rhythm,
@@ -124,7 +124,7 @@ export function TextField({
 const styles = StyleSheet.create({
   field: { gap: rhythm.inGroup },
   box: {
-    minHeight: controlHeight,
+    minHeight: inputHeight,
     flexDirection: "row",
     alignItems: "center",
     gap: rhythm.inline,

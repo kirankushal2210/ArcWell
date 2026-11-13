@@ -21,6 +21,7 @@ import { useOnboarding } from "@/features/onboarding/OnboardingContext";
 import { NextButton } from "@/features/onboarding/parts";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { colors, radius, rhythm, space } from "@/theme";
+import { WhyThis } from "@/features/science/WhyThis";
 
 export default function Ready() {
   const { answers } = useOnboarding();
@@ -91,9 +92,18 @@ export default function Ready() {
         <View style={styles.card}>
           <View style={styles.head}>
             <PillarDot pillar="nutrition" />
-            <Text variant="eyebrow" tone="muted">
+            <Text variant="eyebrow" tone="muted" style={styles.grow}>
               Daily calorie target
             </Text>
+            <WhyThis
+              title="How your targets are set"
+              points={[
+                "Resting energy from the Mifflin–St Jeor equation, times your daily activity.",
+                "Then a small change for your goal: losing fat stays at about 0.5–1% of bodyweight a week, so you keep muscle.",
+                "Protein of about 1.8–2.0 g per kg a day. Muscle gains level off around 1.6 g on average.",
+              ]}
+              sources={["mifflin1990", "helms2014", "morton2018"]}
+            />
           </View>
           <Text variant="display" numeric>
             {n.kcal.toLocaleString("en-IN")}{" "}
@@ -150,6 +160,7 @@ export default function Ready() {
 }
 
 const styles = StyleSheet.create({
+  grow: { flex: 1 },
   root: { flex: 1, backgroundColor: colors.bg },
   body: {
     paddingHorizontal: rhythm.gutter,

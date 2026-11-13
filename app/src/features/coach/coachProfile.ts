@@ -37,6 +37,13 @@ export type CoachSettings = {
   renewals: boolean;
   /** Show transformation photos (with client consent) on the invite page. */
   showTransformations: boolean;
+  /** The coach's Arcwell plan (D40, D41). Sample build: previewed from Plan and billing. */
+  billing?: "active" | "grace" | "lapsed";
+  clientLimit?: number;
+  /** First-run tips already dismissed. */
+  tipsSeen?: string[];
+  /** One data export at a time (K-21, X-09). */
+  export?: { status: "preparing" | "failed"; requestedAt: string };
 };
 
 export const defaultCoachProfile = (): CoachProfile => ({

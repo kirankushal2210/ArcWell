@@ -14,7 +14,7 @@ import {
   LeadsPage,
   OverviewPage,
 } from "@/features/coach/BusinessPages";
-import { PageHeader } from "@/features/coach/parts";
+import { ActionDock, PageHeader } from "@/features/coach/parts";
 import { colors } from "@/theme";
 
 type Tab = "overview" | "leads" | "instagram" | "clients";
@@ -38,15 +38,6 @@ export default function BusinessTab() {
             label: "Invite link and QR code",
             onPress: () => router.push("/coach/invite-link"),
           },
-          {
-            icon: Plus,
-            label: "Add a lead",
-            onPress: () =>
-              router.push({
-                pathname: "/coach/lead/[id]",
-                params: { id: "new" },
-              }),
-          },
         ]}
       />
       <SectionTabs
@@ -60,6 +51,21 @@ export default function BusinessTab() {
           <ClientsPage key="c" />,
         ]}
       />
+      {tab === "clients" ? null : (
+        <ActionDock
+          label={tab === "instagram" ? "Add an Instagram lead" : "Add a lead"}
+          icon={Plus}
+          onPress={() =>
+            router.push({
+              pathname: "/coach/lead/[id]",
+              params:
+                tab === "instagram"
+                  ? { id: "new", source: "instagram" }
+                  : { id: "new" },
+            })
+          }
+        />
+      )}
     </View>
   );
 }

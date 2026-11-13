@@ -1,0 +1,651 @@
+<title>Arcwell Design Directions</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: an Apple-style product page. Big centred statements, wide sections, three directions each shown on the same three phone screens. Single light page by choice; each phone carries its own theme. */
+:root {
+  color-scheme: light;
+  --page: #F5F5F7;
+  --card: #FFFFFF;
+  --ink: #1D1D1F;
+  --ink-2: #6C6C70;
+  --hair: #D2D2D7;
+  --link: #1E6EF4;
+  /* Pillars, Apple system colours. Light uses increased-contrast values so text passes AA. */
+  --train-l: #C55300; --fuel-l: #008932; --rest-l: #6155F5;
+  --train-d: #FF9230; --fuel-d: #30D158; --rest-d: #6D7CFF;
+  --blue-l: #1E6EF4; --blue-d: #0091FF;
+  --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink); font: 400 17px/1.47 var(--font); letter-spacing: -0.011em; -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 56px 120px; }
+h1, h2, h3, p { margin: 0; }
+h1, h2 { text-wrap: balance; }
+h1 { font-size: clamp(2.5rem, 6.4vw, 4.5rem); line-height: 1.05; letter-spacing: -0.035em; font-weight: 700; text-align: center; }
+h2 { font-size: clamp(2rem, 4.4vw, 3rem); line-height: 1.08; letter-spacing: -0.03em; font-weight: 700; }
+h3 { font-size: 1.3rem; line-height: 1.25; letter-spacing: -0.02em; font-weight: 700; }
+.kicker { font-size: .95rem; font-weight: 600; color: var(--ink-2); }
+.center { text-align: center; }
+.intro { display: grid; gap: 20px; justify-items: center; padding-block: 24px 8px; }
+.intro .lede { max-width: 40ch; text-align: center; font-size: clamp(1.15rem, 2.2vw, 1.4rem); line-height: 1.4; color: var(--ink-2); font-weight: 500; }
+.intro .lede b { color: var(--ink); font-weight: 600; }
+
+section { padding-top: 104px; display: grid; gap: 28px; }
+.sec-head { display: grid; gap: 12px; max-width: 760px; }
+.sec-head p { color: var(--ink-2); font-size: 1.08rem; }
+
+.tiles { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.tile { background: var(--card); border-radius: 24px; padding: 26px; display: grid; gap: 8px; align-content: start; }
+.tile p { color: var(--ink-2); font-size: .98rem; }
+.tile .n { font-size: .8rem; font-weight: 700; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+
+.found { background: var(--card); border-radius: 28px; padding: 28px; display: grid; gap: 28px; }
+.found-row { display: grid; gap: 14px; }
+.found-row > b { font-size: .8rem; font-weight: 700; color: var(--ink-2); letter-spacing: .02em; }
+.pill-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.pillar { display: flex; gap: 14px; align-items: center; }
+.sq { width: 44px; height: 44px; border-radius: 11px; display: grid; place-items: center; flex: none; }
+.sq svg { width: 24px; height: 24px; }
+.pillar .t { display: grid; gap: 2px; }
+.pillar .t b { font-size: 1rem; }
+.pillar .t span { font-size: .82rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.type-spec { display: grid; gap: 0; }
+.ts { display: grid; grid-template-columns: 150px 1fr; gap: 16px; align-items: baseline; padding: 10px 0; border-top: .5px solid var(--hair); }
+.ts:first-child { border-top: 0; }
+.ts code { font: 500 .78rem/1.3 ui-monospace, Menlo, monospace; color: var(--ink-2); }
+@media (max-width: 560px) { .ts { grid-template-columns: 1fr; gap: 2px; } }
+.btn-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.b { appearance: none; border: 0; font: 600 1.06rem/1 var(--font); letter-spacing: -0.015em; height: 50px; padding: 0 24px; border-radius: 999px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: transform 110ms ease-out, opacity 110ms; }
+.b:active { transform: scale(.97); opacity: .85; }
+.b:focus-visible { outline: 3px solid var(--link); outline-offset: 3px; }
+.b.prom { background: var(--blue-l); color: #fff; }
+.b.tint { background: #E3ECFE; color: #1650C4; }
+.b.gray { background: #E9E9EE; color: var(--ink); }
+.b.plain { background: transparent; color: var(--link); padding: 0 6px; }
+.b.sm { height: 34px; padding: 0 14px; font-size: .9rem; }
+
+/* Direction block */
+.dir { display: grid; gap: 28px; }
+.dir-head { display: grid; gap: 14px; grid-template-columns: 1fr; }
+.dir-meta { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.dir-meta .tile { background: var(--card); }
+.tag { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 12px; border-radius: 99px; background: #E9E9EE; font-size: .82rem; font-weight: 600; justify-self: start; }
+.tag.rec { background: #DDF5E4; color: #00692A; }
+.phones { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 28px; justify-items: center; padding-block: 8px; }
+.pcol { display: grid; gap: 14px; justify-items: center; width: 100%; max-width: 320px; }
+.pcol p { font-size: .88rem; color: var(--ink-2); text-align: center; max-width: 34ch; }
+
+/* ---------- Phone shell ---------- */
+.phone { width: 300px; max-width: 100%; height: 640px; border-radius: 48px; position: relative; overflow: hidden; box-shadow: 0 0 0 9px #1D1D1F, 0 0 0 10px #3A3A3C, 0 24px 60px rgba(0,0,0,.22); font-family: var(--font); }
+.sb { position: absolute; inset: 0 0 auto; height: 46px; display: flex; justify-content: space-between; align-items: center; padding: 0 28px 0 34px; font: 600 .82rem/1 var(--font); z-index: 5; }
+.di { width: 92px; height: 27px; border-radius: 99px; background: #000; }
+.scroll { position: absolute; inset: 0; padding: 50px 14px 110px; display: flex; flex-direction: column; gap: 12px; }
+.lt { font: 700 1.95rem/1.1 var(--font); letter-spacing: -0.03em; }
+.date { font: 600 .78rem/1 var(--font); text-transform: uppercase; letter-spacing: .02em; }
+.row { display: flex; align-items: center; gap: 10px; }
+.sp { flex: 1; min-width: 0; }
+.num { font-variant-numeric: tabular-nums; }
+.av { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font: 700 .68rem/1 var(--font); flex: none; }
+.ic { width: 20px; height: 20px; flex: none; }
+.chev { width: 8px; height: 13px; flex: none; }
+
+/* Glass, per HIG: functional layer only */
+.glass { backdrop-filter: blur(22px) saturate(180%); -webkit-backdrop-filter: blur(22px) saturate(180%); }
+.tabbar { position: absolute; left: 14px; right: 14px; bottom: 18px; height: 62px; border-radius: 99px; display: flex; align-items: center; justify-content: space-around; padding: 0 6px; z-index: 6; }
+.tab { display: grid; justify-items: center; gap: 3px; font: 600 .58rem/1 var(--font); padding: 7px 8px; border-radius: 99px; white-space: nowrap; }
+.tab svg { width: 22px; height: 22px; }
+
+/* ---------- Direction A: Health (light, grouped) ---------- */
+.A { background: #F2F2F7; color: #000; }
+.A .sb { color: #000; }
+.A .date { color: #6C6C70; }
+.A .card { background: #fff; border-radius: 16px; padding: 12px 14px; display: grid; gap: 6px; }
+.A .cat { font: 600 .82rem/1 var(--font); display: flex; align-items: center; gap: 6px; }
+.A .cat .sqs { width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; }
+.A .cat .sqs svg { width: 14px; height: 14px; }
+.A .time { font: 500 .72rem/1 var(--font); color: #6C6C70; }
+.A .big { font: 700 1.5rem/1.1 var(--font); letter-spacing: -0.02em; }
+.A .big small { font: 600 .8rem/1 var(--font); color: #6C6C70; letter-spacing: 0; margin-left: 2px; }
+.A .sub { font-size: .76rem; color: #6C6C70; }
+.A .bar { height: 6px; border-radius: 99px; background: #E5E5EA; overflow: hidden; }
+.A .bar i { display: block; height: 100%; border-radius: 99px; }
+.A .hdr { font: 700 1.05rem/1 var(--font); letter-spacing: -0.015em; padding: 6px 4px 0; display: flex; justify-content: space-between; align-items: baseline; }
+.A .hdr a { font: 500 .8rem/1 var(--font); color: var(--blue-l); }
+.A .btnp { height: 34px; padding: 0 16px; border-radius: 99px; background: var(--blue-l); color: #fff; font: 600 .8rem/34px var(--font); }
+.A .btnt { height: 30px; padding: 0 12px; border-radius: 99px; background: #E3ECFE; color: #1650C4; font: 600 .72rem/30px var(--font); }
+.A .tabbar { background: rgba(255,255,255,.62); box-shadow: 0 6px 24px rgba(0,0,0,.10), inset 0 0 0 .5px rgba(255,255,255,.9); }
+.A .tab { color: #3C3C43; }
+.A .tab.on { color: var(--blue-l); background: rgba(0,0,0,.05); }
+.A .list { background: #fff; border-radius: 16px; overflow: hidden; }
+.A .li { display: flex; align-items: center; gap: 10px; padding: 9px 12px; position: relative; }
+.A .li + .li::before { content: ""; position: absolute; top: 0; left: 54px; right: 0; height: .5px; background: #C6C6C8; }
+.A .li b { font-size: .84rem; font-weight: 600; display: block; }
+.A .li span { font-size: .7rem; color: #6C6C70; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.A .seg { background: #E3E3E8; border-radius: 9px; padding: 2px; display: flex; }
+.A .seg span { flex: 1; text-align: center; font: 600 .7rem/28px var(--font); border-radius: 7px; color: #000; }
+.A .seg span.on { background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+.A .search { height: 36px; border-radius: 10px; background: #E3E3E8; display: flex; align-items: center; gap: 6px; padding: 0 10px; font-size: .8rem; color: #6C6C70; }
+.A .setr { display: grid; grid-template-columns: 24px 1fr 1fr 34px; gap: 6px; align-items: center; padding: 10px 12px; position: relative; font-variant-numeric: tabular-nums; }
+.A .setr + .setr::before { content: ""; position: absolute; top: 0; left: 12px; right: 0; height: .5px; background: #C6C6C8; }
+.A .setr .k { font: 600 .72rem/1 var(--font); color: #6C6C70; }
+.A .setr .v { font: 700 1rem/1 var(--font); }
+.A .setr .v small { font: 500 .66rem/1 var(--font); color: #6C6C70; margin-left: 2px; }
+.A .chk { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #C7C7CC; display: grid; place-items: center; }
+.A .chk.on { background: var(--fuel-l); border-color: var(--fuel-l); }
+.A .restpill { position: absolute; left: 50%; bottom: 96px; transform: translateX(-50%); height: 46px; border-radius: 99px; padding: 0 8px 0 16px; display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,.66); box-shadow: 0 6px 24px rgba(0,0,0,.12), inset 0 0 0 .5px rgba(255,255,255,.9); z-index: 6; white-space: nowrap; }
+
+/* ---------- Direction B: Fitness (dark, data first) ---------- */
+.B { background: #000; color: #fff; }
+.B .sb { color: #fff; }
+.B .date { color: #AEAEB2; }
+.B .card { background: #1C1C1E; border-radius: 18px; padding: 14px; display: grid; gap: 8px; }
+.B .lbl { font: 600 .74rem/1 var(--font); color: #AEAEB2; }
+.B .val { font: 700 1.25rem/1 var(--font); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.B .val small { font: 700 .68rem/1 var(--font); letter-spacing: .02em; margin-left: 2px; }
+.B .hdr { font: 700 1.05rem/1 var(--font); letter-spacing: -0.015em; padding: 8px 2px 0; display: flex; justify-content: space-between; align-items: baseline; }
+.B .hdr a { font: 500 .8rem/1 var(--font); color: var(--fuel-d); }
+.B .go { height: 46px; border-radius: 99px; background: var(--train-d); color: #000; font: 700 .92rem/46px var(--font); text-align: center; }
+.B .tabbar { background: rgba(44,44,46,.62); box-shadow: 0 6px 24px rgba(0,0,0,.5), inset 0 0 0 .5px rgba(255,255,255,.14); }
+.B .tab { color: #AEAEB2; }
+.B .tab.on { color: #fff; background: rgba(255,255,255,.12); }
+.B .trend { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.B .trend div { display: grid; gap: 4px; }
+.B .arrow { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font: 800 .7rem/1 var(--font); color: #000; }
+.B .huge { font: 700 3.1rem/1 var(--font); letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+.B .huge small { font-size: 1.1rem; letter-spacing: 0; color: #AEAEB2; margin-left: 4px; }
+.B .done-c { width: 76px; height: 76px; border-radius: 50%; background: var(--fuel-d); display: grid; place-items: center; color: #000; }
+.B .circ { width: 52px; height: 52px; border-radius: 50%; background: #2C2C2E; display: grid; place-items: center; color: #fff; }
+.B .li { display: flex; align-items: center; gap: 10px; padding: 10px 2px; border-bottom: .5px solid #38383A; }
+.B .li b { font-size: .84rem; display: block; }
+.B .li span { font-size: .7rem; color: #AEAEB2; display: block; }
+
+/* ---------- Direction C: Liquid Glass (content edge to edge, glass controls) ---------- */
+.C { background: #FFFFFF; color: #000; }
+.C .sb { color: #000; }
+.C .gbtn { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,.55); box-shadow: 0 4px 16px rgba(0,0,0,.10), inset 0 0 0 .5px rgba(255,255,255,.95), inset 0 1px 1px rgba(255,255,255,.9); }
+.C .panel { border-radius: 26px; padding: 16px; display: grid; gap: 6px; }
+.C .panel .k { font: 600 .74rem/1 var(--font); }
+.C .panel .v { font: 700 2.2rem/1 var(--font); letter-spacing: -0.035em; font-variant-numeric: tabular-nums; }
+.C .panel .s { font-size: .76rem; }
+.C .mini { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.C .tabbar { right: 76px; background: rgba(255,255,255,.55); box-shadow: 0 6px 24px rgba(0,0,0,.12), inset 0 0 0 .5px rgba(255,255,255,.95), inset 0 1px 1px rgba(255,255,255,.9); }
+.C .fab { position: absolute; right: 14px; bottom: 18px; width: 62px; height: 62px; border-radius: 50%; display: grid; place-items: center; z-index: 6; background: rgba(255,255,255,.55); box-shadow: 0 6px 24px rgba(0,0,0,.12), inset 0 0 0 .5px rgba(255,255,255,.95), inset 0 1px 1px rgba(255,255,255,.9); color: #000; }
+.C .tab { color: #3C3C43; }
+.C .tab.on { color: var(--blue-l); background: rgba(0,0,0,.06); }
+.C .tinted { height: 44px; border-radius: 99px; background: var(--blue-l); color: #fff; font: 600 .86rem/44px var(--font); text-align: center; box-shadow: inset 0 1px 1px rgba(255,255,255,.35), 0 4px 12px rgba(30,110,244,.25); }
+.C .sheet { position: absolute; left: 8px; right: 8px; bottom: 8px; border-radius: 36px; padding: 14px 16px 18px; z-index: 6; display: grid; gap: 12px; background: rgba(255,255,255,.62); box-shadow: 0 -4px 30px rgba(0,0,0,.12), inset 0 0 0 .5px rgba(255,255,255,.95), inset 0 1px 1px rgba(255,255,255,.9); }
+.C .grab { width: 36px; height: 5px; border-radius: 99px; background: rgba(60,60,67,.3); justify-self: center; }
+.C .setc { display: flex; gap: 8px; }
+.C .setc div { flex: 1; border-radius: 18px; padding: 10px; display: grid; gap: 4px; background: #F2F2F7; }
+.C .setc div.on { background: color-mix(in srgb, var(--train-l) 14%, #fff); }
+.C .setc b { font: 700 1.05rem/1 var(--font); font-variant-numeric: tabular-nums; }
+.C .setc span { font-size: .62rem; color: #6C6C70; font-weight: 600; }
+.C .li { display: flex; align-items: center; gap: 10px; padding: 10px 2px; border-bottom: .5px solid #E5E5EA; }
+.C .li b { font-size: .84rem; display: block; }
+.C .li span { font-size: .7rem; color: #6C6C70; display: block; }
+.C .gsearch { position: absolute; left: 14px; right: 76px; bottom: 90px; height: 46px; border-radius: 99px; display: flex; align-items: center; gap: 8px; padding: 0 16px; z-index: 6; font-size: .82rem; color: #3C3C43; background: rgba(255,255,255,.55); box-shadow: 0 6px 24px rgba(0,0,0,.12), inset 0 0 0 .5px rgba(255,255,255,.95), inset 0 1px 1px rgba(255,255,255,.9); }
+
+/* Compare */
+.tablewrap { overflow-x: auto; background: var(--card); border-radius: 24px; }
+table { border-collapse: collapse; width: 100%; min-width: 620px; font-size: .94rem; }
+th, td { padding: 14px 18px; text-align: left; vertical-align: top; border-top: .5px solid var(--hair); }
+thead th { border-top: 0; font-size: .8rem; color: var(--ink-2); font-weight: 600; }
+td:first-child { font-weight: 600; white-space: nowrap; }
+
+.recbox { background: var(--card); border-radius: 28px; padding: 32px; display: grid; gap: 14px; }
+.recbox p { color: var(--ink-2); max-width: 70ch; }
+.recbox ul { margin: 0; padding-left: 20px; color: var(--ink-2); display: grid; gap: 6px; }
+.recbox li b { color: var(--ink); }
+.note { font-size: .86rem; color: var(--ink-2); max-width: 80ch; }
+.src { font-size: .86rem; color: var(--ink-2); display: grid; gap: 4px; }
+.src a { color: var(--link); text-decoration: none; }
+.src a:hover { text-decoration: underline; }
+@media (prefers-reduced-motion: reduce) { .b { transition: none; } }
+</style>
+
+<!-- Inline icon sprite (stroke icons, drawn for this page) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-dumbbell" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" d="M6.5 6.5v11M17.5 6.5v11M3.5 9.5v5M20.5 9.5v5M6.5 12h11"/></symbol>
+    <symbol id="i-fork" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M7 3v8M4.5 3v5a2.5 2.5 0 0 0 5 0V3M7 11v10M17.5 3c-2.2 2.2-2.2 6.5 0 8.5V21"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M3.5 10.5 12 3.5l8.5 7V20a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z"/></symbol>
+    <symbol id="i-people" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.6a6 6 0 0 1 3.5 5.4"/></g></symbol>
+    <symbol id="i-clip" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="m9 13 2 2 4-4"/></g></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M4 6h10M4 12h16M4 18h12"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M20.5 12a8.5 8.5 0 0 1-12.2 7.6L3.5 21l1.4-4.6A8.5 8.5 0 1 1 20.5 12z"/></symbol>
+    <symbol id="i-case" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M8.5 7V5.5a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2V7"/></g></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></g></symbol>
+    <symbol id="i-chev" viewBox="0 0 8 13"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m1.5 1.5 5 5-5 5"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path fill="currentColor" d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></symbol>
+  </defs>
+</svg>
+
+<div class="wrap">
+
+  <header class="intro">
+    <p class="kicker">Arcwell · Design directions · for review</p>
+    <h1>Three ways Arcwell<br>could feel like Apple made it.</h1>
+    <p class="lede">Each direction follows Apple's current Human Interface Guidelines and borrows from one family of Apple's own apps. <b>Same screens, same data, three treatments,</b> so you can compare them side by side.</p>
+  </header>
+
+  <!-- What Apple does -->
+  <section aria-labelledby="h-rules">
+    <div class="sec-head">
+      <p class="kicker">What Apple's own apps have in common</p>
+      <h2 id="h-rules">Content first. Glass for controls. Colour with a job.</h2>
+      <p>These come from Apple's guidelines for colour and materials and from Health, Fitness, Settings and the iOS 26 apps. Every direction below keeps them.</p>
+    </div>
+    <div class="tiles">
+      <div class="tile"><span class="n">1</span><h3>Glass is for controls, never content</h3><p>Tab bars, toolbars and floating buttons sit on glass, so content scrolls and shows through. Cards and backgrounds stay solid. Glass is never stacked on glass.</p></div>
+      <div class="tile"><span class="n">2</span><h3>One coloured button per screen</h3><p>Apple puts the accent on the background of the single most important action, like Done. Everything else is grey, tinted or plain text.</p></div>
+      <div class="tile"><span class="n">3</span><h3>Colour labels categories</h3><p>In Health, each category owns a colour (activity, nutrition, sleep) on a small rounded square and its title. Colour tells you where you are; it is not decoration.</p></div>
+      <div class="tile"><span class="n">4</span><h3>Big titles, big numbers</h3><p>Large titles name the screen. Numbers are bold and tabular, with small units beside them. Hierarchy comes from weight and size, not boxes and borders.</p></div>
+      <div class="tile"><span class="n">5</span><h3>Grouped lists for structure</h3><p>Grey background, white inset groups, hairline separators, a chevron where a row opens something. Instantly readable, and coaches scan it fast.</p></div>
+      <div class="tile"><span class="n">6</span><h3>No ornament</h3><p>No gradients, glows or decorative blobs. Depth comes from materials, spacing and a soft shadow under floating controls only.</p></div>
+    </div>
+  </section>
+
+  <!-- Shared foundations -->
+  <section aria-labelledby="h-found">
+    <div class="sec-head">
+      <p class="kicker">Shared by every direction</p>
+      <h2 id="h-found">The foundations</h2>
+      <p>The pillar colours are Apple's own system colours, as Health uses them: orange for activity, green for nutrition, indigo for sleep. Light mode uses Apple's increased-contrast shades, so white text on them passes AA.</p>
+    </div>
+    <div class="found">
+      <div class="found-row">
+        <b>PILLARS</b>
+        <div class="pill-row">
+          <div class="pillar"><div class="sq" style="background: var(--train-l); color:#fff"><svg><use href="#i-dumbbell"/></svg></div><div class="t"><b>Training</b><span>Orange · #C55300 light · #FF9230 dark</span></div></div>
+          <div class="pillar"><div class="sq" style="background: var(--fuel-l); color:#fff"><svg><use href="#i-fork"/></svg></div><div class="t"><b>Nutrition</b><span>Green · #008932 light · #30D158 dark</span></div></div>
+          <div class="pillar"><div class="sq" style="background: var(--rest-l); color:#fff"><svg><use href="#i-moon"/></svg></div><div class="t"><b>Recovery</b><span>Indigo · #6155F5 light · #6D7CFF dark</span></div></div>
+          <div class="pillar"><div class="sq" style="background: var(--blue-l); color:#fff"><svg><use href="#i-check"/></svg></div><div class="t"><b>Actions</b><span>Blue · #1E6EF4 light · #0091FF dark</span></div></div>
+        </div>
+      </div>
+      <div class="found-row">
+        <b>TYPE · APPLE'S DEFAULT TEXT SIZES, SET IN INTER</b>
+        <div class="type-spec">
+          <div class="ts"><code>Large Title · 34 bold</code><span style="font: 700 2.1rem/1.1 var(--font); letter-spacing:-0.03em">Today</span></div>
+          <div class="ts"><code>Title 2 · 22 bold</code><span style="font: 700 1.38rem/1.2 var(--font); letter-spacing:-0.02em">Lower body B</span></div>
+          <div class="ts"><code>Headline · 17 semibold</code><span style="font-weight:600">Romanian deadlift</span></div>
+          <div class="ts"><code>Body · 17 regular</code><span>Keep two reps in reserve on the last set.</span></div>
+          <div class="ts"><code>Subheadline · 15</code><span style="font-size:.94rem;color:var(--ink-2)">5 exercises · 45 min</span></div>
+          <div class="ts"><code>Data · 34 bold, tabular</code><span class="num" style="font: 700 2.1rem/1 var(--font); letter-spacing:-0.03em">55<span style="font-size:.95rem;color:var(--ink-2);letter-spacing:0"> kg</span> × 8</span></div>
+        </div>
+      </div>
+      <div class="found-row">
+        <b>BUTTONS · APPLE'S FOUR STYLES</b>
+        <div class="btn-row">
+          <button class="b prom" type="button" id="bp">Start workout</button>
+          <button class="b tint" type="button" id="bt">Swap exercise</button>
+          <button class="b gray" type="button" id="bg">Skip for today</button>
+          <button class="b plain" type="button" id="bl">See all</button>
+        </div>
+        <p class="note">Prominent (the one coloured action), tinted (a pale wash of the accent), grey and plain text. All capsules, 50 pt tall, dimming slightly on press.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== A ===================== -->
+  <section aria-labelledby="h-a" class="dir">
+    <div class="dir-head">
+      <span class="tag">Direction A</span>
+      <h2 id="h-a">Health. Calm, light and structured.</h2>
+      <p class="muted" style="color:var(--ink-2);font-size:1.08rem;max-width:760px">Learns from Health and Settings: a grey page, white grouped cards, category icons and colour-labelled titles. Quiet and trustworthy; it reads like a medical-grade tool.</p>
+    </div>
+    <div class="phones">
+
+      <div class="pcol">
+        <div class="phone A" role="img" aria-label="Direction A, athlete Today">
+          <div class="sb"><span class="num">9:41</span><span class="di"></span><span>●●●</span></div>
+          <div class="scroll">
+            <div class="row"><div class="sp"><div class="date">Friday, 13 November</div><div class="lt">Today</div></div><div class="av" style="background:#E3E3E8;color:#000">PS</div></div>
+            <div class="card">
+              <div class="row"><div class="cat" style="color: var(--train-l)"><span class="sqs" style="background: var(--train-l); color:#fff"><svg><use href="#i-dumbbell"/></svg></span>Training</div><div class="sp"></div><span class="time">Week 3 of 8</span></div>
+              <div class="row"><div class="sp"><div style="font:700 1.15rem/1.2 var(--font);letter-spacing:-0.02em">Lower body B</div><div class="sub">5 exercises · 16 sets · 45 min</div></div><span class="btnp">Start</span></div>
+            </div>
+            <div class="card">
+              <div class="row"><div class="cat" style="color: var(--fuel-l)"><span class="sqs" style="background: var(--fuel-l); color:#fff"><svg><use href="#i-fork"/></svg></span>Nutrition</div><div class="sp"></div><span class="time">1:30 pm</span></div>
+              <div class="big num">1,294<small>of 2,490 kcal</small></div>
+              <div class="bar"><i style="width:52%;background:var(--fuel-l)"></i></div>
+              <div class="sub">Next: Lunch · phulka, paneer bhurji, dal</div>
+            </div>
+            <div class="card">
+              <div class="row"><div class="cat" style="color: var(--rest-l)"><span class="sqs" style="background: var(--rest-l); color:#fff"><svg><use href="#i-moon"/></svg></span>Recovery</div><div class="sp"></div><span class="time">7:02 am</span></div>
+              <div class="row"><div class="big num">82<small>%</small></div><div class="sp sub" style="padding-left:6px">Ready to train · 7 h 20 min sleep</div></div>
+            </div>
+            <div class="hdr">From your coach <a>Reply</a></div>
+            <div class="card"><div class="row"><div class="av" style="background:#E3E3E8;color:#000">AK</div><div class="sp sub" style="color:#000;font-size:.8rem">Keep it light on your back today: goblet squats, 3 × 12.</div></div></div>
+          </div>
+          <div class="tabbar glass">
+            <div class="tab on"><svg><use href="#i-home"/></svg>Today</div>
+            <div class="tab"><svg><use href="#i-dumbbell"/></svg>Training</div>
+            <div class="tab"><svg><use href="#i-fork"/></svg>Nutrition</div>
+            <div class="tab"><svg><use href="#i-moon"/></svg>Recovery</div>
+          </div>
+        </div>
+        <p><b>Today.</b> One card per pillar, coloured title and icon, a single blue Start. The coach's note sits below the three pillars.</p>
+      </div>
+
+      <div class="pcol">
+        <div class="phone A" role="img" aria-label="Direction A, workout logging">
+          <div class="sb"><span class="num">6:12</span><span class="di"></span><span>●●●</span></div>
+          <div class="scroll">
+            <div class="row"><span style="color:var(--blue-l);font:500 .85rem/1 var(--font)">Close</span><div class="sp"></div><span class="num" style="font:600 .85rem/1 var(--font)">24:10</span><div class="sp"></div><span style="color:var(--blue-l);font:600 .85rem/1 var(--font)">Finish</span></div>
+            <div><div class="date" style="color:var(--train-l)">Exercise 3 of 5</div><div style="font:700 1.5rem/1.15 var(--font);letter-spacing:-0.025em">Romanian deadlift</div><div class="sub">Barbell · last time 50 kg × 8</div></div>
+            <div class="list">
+              <div class="setr"><span class="k">SET</span><span class="k">KG</span><span class="k">REPS</span><span></span></div>
+              <div class="setr"><span class="k">1</span><span class="v">50</span><span class="v">8</span><span class="chk on"><svg class="ic" style="width:14px;height:14px;color:#fff"><use href="#i-check"/></svg></span></div>
+              <div class="setr"><span class="k">2</span><span class="v">55<small>best</small></span><span class="v">8</span><span class="chk on"><svg class="ic" style="width:14px;height:14px;color:#fff"><use href="#i-check"/></svg></span></div>
+              <div class="setr"><span class="k">3</span><span class="v">55</span><span class="v">8</span><span class="chk"></span></div>
+            </div>
+            <div class="row" style="gap:8px"><span class="btnt">+ Add set</span><span class="btnt">Swap</span><span class="btnt">Note</span></div>
+            <div class="hdr">Up next</div>
+            <div class="list">
+              <div class="li"><span class="sqs" style="width:30px;height:30px;border-radius:8px;background:var(--train-l);display:grid;place-items:center;color:#fff"><svg class="ic" style="width:16px;height:16px"><use href="#i-dumbbell"/></svg></span><div class="sp"><b>Walking lunge</b><span>3 × 10 each leg</span></div><svg class="chev" style="color:#C7C7CC"><use href="#i-chev"/></svg></div>
+              <div class="li"><span class="sqs" style="width:30px;height:30px;border-radius:8px;background:var(--train-l);display:grid;place-items:center;color:#fff"><svg class="ic" style="width:16px;height:16px"><use href="#i-dumbbell"/></svg></span><div class="sp"><b>Standing calf raise</b><span>3 × 12–15</span></div><svg class="chev" style="color:#C7C7CC"><use href="#i-chev"/></svg></div>
+            </div>
+          </div>
+          <div class="restpill glass"><span class="num" style="font:600 .95rem/1 var(--font)">Rest 1:12</span><span class="btnt">+30 s</span><span class="btnt">Skip</span></div>
+          <div class="tabbar glass" style="justify-content:center"><span style="font:600 .82rem/1 var(--font);color:#3C3C43">Lower body B · 3 of 5</span></div>
+        </div>
+        <p><b>Logging.</b> A plain grouped table of sets, like Health's data tables. The rest timer floats on glass so it never hides the sets.</p>
+      </div>
+
+      <div class="pcol">
+        <div class="phone A" role="img" aria-label="Direction A, coach clients">
+          <div class="sb"><span class="num">9:15</span><span class="di"></span><span>●●●</span></div>
+          <div class="scroll">
+            <div class="row"><div class="lt sp">Clients</div><div class="av" style="background:#E3E3E8;color:var(--blue-l)"><svg class="ic" style="width:16px;height:16px"><use href="#i-plus"/></svg></div></div>
+            <div class="search"><svg class="ic" style="width:15px;height:15px"><use href="#i-search"/></svg>Search 8 clients</div>
+            <div class="seg"><span class="on">Needs you · 4</span><span>Active</span><span>All</span></div>
+            <div class="list">
+              <div class="li"><div class="av" style="background:#E3E3E8;color:#000">PS</div><div class="sp"><b>Priya Sharma</b><span>Week 4 check-in to review</span></div><span class="btnt">Review</span></div>
+              <div class="li"><div class="av" style="background:#E3E3E8;color:#000">RV</div><div class="sp"><b>Rahul Verma</b><span>2 of 4 workouts this week</span></div><span class="time" style="color:var(--train-l);font-weight:600">48%</span><svg class="chev" style="color:#C7C7CC"><use href="#i-chev"/></svg></div>
+              <div class="li"><div class="av" style="background:#E3E3E8;color:#000">KS</div><div class="sp"><b>Karan Singh</b><span>Check-in overdue · due Sunday</span></div><span class="btnt">Nudge</span></div>
+              <div class="li"><div class="av" style="background:#E3E3E8;color:#000">AI</div><div class="sp"><b>Ananya Iyer</b><span>New message</span></div><svg class="chev" style="color:#C7C7CC"><use href="#i-chev"/></svg></div>
+            </div>
+            <div class="hdr">This week</div>
+            <div class="list">
+              <div class="li"><span class="sqs" style="width:30px;height:30px;border-radius:8px;background:var(--fuel-l);display:grid;place-items:center;color:#fff"><svg class="ic" style="width:16px;height:16px"><use href="#i-check"/></svg></span><div class="sp"><b>Check-ins reviewed</b><span>3 of 7</span></div><svg class="chev" style="color:#C7C7CC"><use href="#i-chev"/></svg></div>
+            </div>
+          </div>
+          <div class="tabbar glass">
+            <div class="tab on"><svg><use href="#i-people"/></svg>Clients</div>
+            <div class="tab"><svg><use href="#i-clip"/></svg>Check-ins</div>
+            <div class="tab"><svg><use href="#i-list"/></svg>Plans</div>
+            <div class="tab"><svg><use href="#i-chat"/></svg>Messages</div>
+            <div class="tab"><svg><use href="#i-case"/></svg>Business</div>
+          </div>
+        </div>
+        <p><b>Coach Clients.</b> Search, a segmented control and an inset list, like Mail or Reminders. Each row offers one action.</p>
+      </div>
+    </div>
+    <div class="dir-meta">
+      <div class="tile"><h3>Best for</h3><p>Coaches at a desk or between sessions, data-heavy screens, building trust with first-time users.</p></div>
+      <div class="tile"><h3>Trade-off</h3><p>The calmest of the three. It may feel less energetic to a 25-year-old gym-goer than B.</p></div>
+      <div class="tile"><h3>Build effort</h3><p>Lowest. Very close to the current structure; mostly new colours, type and tab bar.</p></div>
+    </div>
+  </section>
+
+  <!-- ===================== B ===================== -->
+  <section aria-labelledby="h-b" class="dir">
+    <div class="dir-head">
+      <span class="tag">Direction B</span>
+      <h2 id="h-b">Fitness. Black, bold, numbers first.</h2>
+      <p style="color:var(--ink-2);font-size:1.08rem;max-width:760px">Learns from Fitness and the Workout app: true black, rings, and very large bold numbers in each pillar's colour. Energetic and athletic, and easy on the eyes in a dim gym.</p>
+    </div>
+    <div class="phones">
+
+      <div class="pcol">
+        <div class="phone B" role="img" aria-label="Direction B, athlete Today">
+          <div class="sb"><span class="num">9:41</span><span class="di"></span><span>●●●</span></div>
+          <div class="scroll">
+            <div class="row"><div class="sp"><div class="date">Friday, 13 November</div><div class="lt">Summary</div></div><div class="av" style="background:#2C2C2E;color:#fff">PS</div></div>
+            <div class="card">
+              <div class="row" style="gap:16px">
+                <svg viewBox="0 0 120 120" style="width:112px;height:112px;flex:none" aria-hidden="true">
+                  <circle cx="60" cy="60" r="50" fill="none" stroke="#3A2A1A" stroke-width="13"/><circle cx="60" cy="60" r="50" fill="none" stroke="#FF9230" stroke-width="13" stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="105" transform="rotate(-90 60 60)"/>
+                  <circle cx="60" cy="60" r="35" fill="none" stroke="#123A1F" stroke-width="13"/><circle cx="60" cy="60" r="35" fill="none" stroke="#30D158" stroke-width="13" stroke-linecap="round" stroke-dasharray="220" stroke-dashoffset="106" transform="rotate(-90 60 60)"/>
+                  <circle cx="60" cy="60" r="20" fill="none" stroke="#22254A" stroke-width="13"/><circle cx="60" cy="60" r="20" fill="none" stroke="#6D7CFF" stroke-width="13" stroke-linecap="round" stroke-dasharray="126" stroke-dashoffset="23" transform="rotate(-90 60 60)"/>
+                </svg>
+                <div style="display:grid;gap:10px">
+                  <div><div class="lbl">Training</div><div class="val" style="color:var(--train-d)">2/3<small>SESSIONS</small></div></div>
+                  <div><div class="lbl">Nutrition</div><div class="val" style="color:var(--fuel-d)">1,294<small>KCAL</small></div></div>
+                  <div><div class="lbl">Recovery</div><div class="val" style="color:var(--rest-d)">82<small>%</small></div></div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="lbl" style="color:var(--train-d)">Up next · Week 3 of 8</div>
+              <div style="font:700 1.3rem/1.15 var(--font);letter-spacing:-0.025em">Lower body B</div>
+              <div class="lbl" style="font-weight:500">5 exercises · 16 sets · 45 min</div>
+              <div class="go">Start workout</div>
+            </div>
+            <div class="hdr">Trends <a>Show more</a></div>
+            <div class="card trend">
+              <div><div class="row" style="gap:6px"><span class="arrow" style="background:var(--train-d)">↑</span><span class="lbl">Volume</span></div><div class="val num" style="color:var(--train-d)">8,420<small>KG/WK</small></div></div>
+              <div><div class="row" style="gap:6px"><span class="arrow" style="background:var(--fuel-d)">↓</span><span class="lbl">Weight</span></div><div class="val num" style="color:var(--fuel-d)">66.2<small>KG</small></div></div>
+            </div>
+          </div>
+          <div class="tabbar glass">
+            <div class="tab on"><svg><use href="#i-home"/></svg>Today</div>
+            <div class="tab"><svg><use href="#i-dumbbell"/></svg>Training</div>
+            <div class="tab"><svg><use href="#i-fork"/></svg>Nutrition</div>
+            <div class="tab"><svg><use href="#i-moon"/></svg>Recovery</div>
+          </div>
+        </div>
+        <p><b>Today.</b> A three-pillar ring summary with coloured numbers, then one orange Start. Trends show direction at a glance.</p>
+      </div>
+
+      <div class="pcol">
+        <div class="phone B" role="img" aria-label="Direction B, workout logging">
+          <div class="sb"><span class="num">6:12</span><span class="di"></span><span>●●●</span></div>
+          <div class="scroll" style="gap:14px">
+            <div class="row"><div class="circ" style="width:36px;height:36px"><svg class="ic" style="width:16px;height:16px"><use href="#i-x"/></svg></div><div class="sp"></div><span class="lbl num" style="font-size:.85rem;color:#fff">24:10</span><div class="sp"></div><div class="circ" style="width:36px;height:36px"><svg class="ic" style="width:16px;height:16px"><use href="#i-pause"/></svg></div></div>
+            <div><div class="lbl" style="color:var(--train-d)">EXERCISE 3 OF 5</div><div style="font:700 1.45rem/1.15 var(--font);letter-spacing:-0.025em;margin-top:4px">Romanian deadlift</div></div>
+            <div class="card" style="gap:4px">
+              <div class="lbl">SET 3 · LAST TIME 50 × 8</div>
+              <div class="huge" style="color:var(--train-d)">55<small>kg</small></div>
+              <div class="huge">8<small>reps</small></div>
+            </div>
+            <div class="row" style="justify-content:center;gap:22px">
+              <div class="circ">−</div><div class="done-c"><svg class="ic" style="width:32px;height:32px"><use href="#i-check"/></svg></div><div class="circ">+</div>
+            </div>
+            <div class="card" style="grid-template-columns:auto 1fr;align-items:center">
+              <svg viewBox="0 0 46 46" style="width:44px;height:44px" aria-hidden="true"><circle cx="23" cy="23" r="19" fill="none" stroke="#3A2A1A" stroke-width="5"/><circle cx="23" cy="23" r="19" fill="none" stroke="#FF9230" stroke-width="5" stroke-linecap="round" stroke-dasharray="119" stroke-dashoffset="44" transform="rotate(-90 23 23)"/></svg>
+              <div><div class="lbl">Rest</div><div class="val num">1:12</div></div>
+            </div>
+            <div class="lbl center">New best on set 2 · 55 kg × 8</div>
+          </div>
+        </div>
+        <p><b>Logging.</b> Workout-app style: huge numbers you can read at arm's length, a big round Done in the middle, and a rest ring.</p>
+      </div>
+
+      <div class="pcol">
+        <div class="phone B" role="img" aria-label="Direction B, coach clients">
+          <div class="sb"><span class="num">9:15</span><span class="di"></span><span>●●●</span></div>
+          <div class="scroll">
+            <div class="row"><div class="lt sp">Clients</div><div class="circ" style="width:34px;height:34px"><svg class="ic" style="width:16px;height:16px"><use href="#i-plus"/></svg></div></div>
+            <div class="card trend">
+              <div><div class="lbl">Need you</div><div class="val" style="font-size:1.9rem;color:#fff">4</div></div>
+              <div><div class="lbl">Adherence</div><div class="val" style="font-size:1.9rem;color:var(--fuel-d)">81<small>%</small></div></div>
+            </div>
+            <div>
+              <div class="li"><div class="av" style="background:#2C2C2E;color:#fff">PS</div><div class="sp"><b>Priya Sharma</b><span>Week 4 check-in to review</span></div><span class="lbl" style="color:var(--fuel-d)">92%</span></div>
+              <div class="li"><div class="av" style="background:#2C2C2E;color:#fff">RV</div><div class="sp"><b>Rahul Verma</b><span>2 of 4 workouts</span></div><span class="lbl" style="color:var(--train-d)">48%</span></div>
+              <div class="li"><div class="av" style="background:#2C2C2E;color:#fff">KS</div><div class="sp"><b>Karan Singh</b><span>Check-in overdue</span></div><span class="lbl" style="color:var(--fuel-d)">96%</span></div>
+              <div class="li"><div class="av" style="background:#2C2C2E;color:#fff">AI</div><div class="sp"><b>Ananya Iyer</b><span>New message</span></div><span class="lbl" style="color:var(--fuel-d)">88%</span></div>
+            </div>
+          </div>
+          <div class="tabbar glass">
+            <div class="tab on"><svg><use href="#i-people"/></svg>Clients</div>
+            <div class="tab"><svg><use href="#i-clip"/></svg>Check-ins</div>
+            <div class="tab"><svg><use href="#i-list"/></svg>Plans</div>
+            <div class="tab"><svg><use href="#i-chat"/></svg>Messages</div>
+            <div class="tab"><svg><use href="#i-case"/></svg>Business</div>
+          </div>
+        </div>
+        <p><b>Coach Clients.</b> Two headline numbers, then a dark list with adherence coloured by how each client is doing.</p>
+      </div>
+    </div>
+    <div class="dir-meta">
+      <div class="tile"><h3>Best for</h3><p>The athlete app and workout logging: gym lighting, OLED Android phones, people who love their numbers.</p></div>
+      <div class="tile"><h3>Trade-off</h3><p>Dense coach admin (leads, accounts, templates) is harder to read on black all day.</p></div>
+      <div class="tile"><h3>Build effort</h3><p>Medium. New ring summary and a reworked logging screen; the rest restyles through tokens.</p></div>
+    </div>
+  </section>
+
+  <!-- ===================== C ===================== -->
+  <section aria-labelledby="h-c" class="dir">
+    <div class="dir-head">
+      <span class="tag">Direction C</span>
+      <h2 id="h-c">Liquid Glass. Content edge to edge.</h2>
+      <p style="color:var(--ink-2);font-size:1.08rem;max-width:760px">Learns from the iOS 26 apps (Music, Photos, Weather): content runs to the edges, and controls float above it on glass: round toolbar buttons, a floating tab bar, sheets that rise from the bottom. The most current and the most "Apple" of the three.</p>
+    </div>
+    <div class="phones">
+
+      <div class="pcol">
+        <div class="phone C" role="img" aria-label="Direction C, athlete Today">
+          <div class="sb"><span class="num">9:41</span><span class="di"></span><span>●●●</span></div>
+          <div class="scroll">
+            <div class="row"><div class="gbtn glass" style="font:700 .7rem/1 var(--font)">PS</div><div class="sp"></div><div class="gbtn glass"><svg class="ic" style="width:18px;height:18px"><use href="#i-chat"/></svg></div></div>
+            <div><div class="date" style="color:#6C6C70">Friday, 13 November</div><div class="lt">Morning, Priya</div></div>
+            <div class="panel" style="background: var(--train-l); color:#fff">
+              <div class="k">UP NEXT · WEEK 3 OF 8</div>
+              <div style="font:700 1.5rem/1.1 var(--font);letter-spacing:-0.03em">Lower body B</div>
+              <div class="s" style="opacity:.92">5 exercises · 16 sets · 45 min</div>
+              <div style="height:44px;border-radius:99px;background:#fff;color:var(--train-l);font:700 .88rem/44px var(--font);text-align:center;margin-top:6px">Start workout</div>
+            </div>
+            <div class="mini">
+              <div class="panel" style="background:#EAF6EE"><div class="k" style="color:var(--fuel-l)">Nutrition</div><div class="v num" style="font-size:1.6rem">1,294</div><div class="s" style="color:#3C3C43">of 2,490 kcal</div></div>
+              <div class="panel" style="background:#EEECFE"><div class="k" style="color:var(--rest-l)">Recovery</div><div class="v num" style="font-size:1.6rem">82%</div><div class="s" style="color:#3C3C43">Ready to train</div></div>
+            </div>
+            <div class="panel" style="background:#F2F2F7"><div class="row"><div class="av" style="background:#fff;color:#000">AK</div><div class="sp" style="font-size:.8rem">Keep it light on your back today: goblet squats, 3 × 12.</div></div></div>
+          </div>
+          <div class="tabbar glass">
+            <div class="tab on"><svg><use href="#i-home"/></svg>Today</div>
+            <div class="tab"><svg><use href="#i-dumbbell"/></svg>Train</div>
+            <div class="tab"><svg><use href="#i-fork"/></svg>Fuel</div>
+            <div class="tab"><svg><use href="#i-moon"/></svg>Rest</div>
+          </div>
+          <div class="fab glass"><svg class="ic" style="width:24px;height:24px"><use href="#i-plus"/></svg></div>
+        </div>
+        <p><b>Today.</b> The next workout is a solid orange panel, the one bold block on screen. Round glass buttons sit at the top, and the glass + beside the tab bar logs anything.</p>
+      </div>
+
+      <div class="pcol">
+        <div class="phone C" role="img" aria-label="Direction C, workout logging">
+          <div class="sb"><span class="num">6:12</span><span class="di"></span><span>●●●</span></div>
+          <div class="scroll">
+            <div class="row"><div class="gbtn glass"><svg class="ic" style="width:16px;height:16px"><use href="#i-x"/></svg></div><div class="sp"></div><span class="num" style="font:600 .85rem/1 var(--font)">24:10</span><div class="sp"></div><div class="gbtn glass"><svg class="ic" style="width:16px;height:16px"><use href="#i-pause"/></svg></div></div>
+            <div><div class="date" style="color:var(--train-l)">Exercise 3 of 5</div><div style="font:700 1.6rem/1.1 var(--font);letter-spacing:-0.03em">Romanian deadlift</div><div style="font-size:.8rem;color:#6C6C70">Barbell · last time 50 kg × 8</div></div>
+            <div class="panel" style="background:#F2F2F7;gap:4px"><div class="k" style="color:#6C6C70">KEY CUE</div><div style="font-size:.82rem">Push hips back, bar close to the legs, stop when you feel the hamstrings.</div></div>
+            <div class="panel" style="background:#F2F2F7;gap:6px"><div class="k" style="color:#6C6C70">THIS EXERCISE</div><div class="row"><span style="font-size:.82rem" class="sp">Best set today</span><b class="num" style="font-size:.9rem">55 kg × 8</b></div><div class="row"><span style="font-size:.82rem" class="sp">Volume</span><b class="num" style="font-size:.9rem">840 kg</b></div></div>
+          </div>
+          <div class="sheet glass">
+            <div class="grab"></div>
+            <div class="row"><b style="font-size:1rem" class="sp">Sets</b><span style="font:600 .78rem/1 var(--font);color:var(--blue-l)">Add set</span></div>
+            <div class="setc">
+              <div class="on"><span>SET 1</span><b>50 × 8</b></div>
+              <div class="on"><span>SET 2 · BEST</span><b>55 × 8</b></div>
+              <div><span>SET 3</span><b>55 × 8</b></div>
+            </div>
+            <div class="tinted">Log set 3</div>
+            <div class="row" style="justify-content:center;font:600 .78rem/1 var(--font);color:#3C3C43">Rest after · 1:30</div>
+          </div>
+        </div>
+        <p><b>Logging.</b> The exercise fills the screen; the sets live in a glass sheet you can drag up. One tinted Log button.</p>
+      </div>
+
+      <div class="pcol">
+        <div class="phone C" role="img" aria-label="Direction C, coach clients">
+          <div class="sb"><span class="num">9:15</span><span class="di"></span><span>●●●</span></div>
+          <div class="scroll">
+            <div class="row"><div class="lt sp">Clients</div><div class="gbtn glass"><svg class="ic" style="width:18px;height:18px"><use href="#i-plus"/></svg></div></div>
+            <div class="mini">
+              <div class="panel" style="background: var(--blue-l); color:#fff"><div class="k">Need you</div><div class="v">4</div><div class="s">Review now</div></div>
+              <div class="panel" style="background:#F2F2F7"><div class="k" style="color:#6C6C70">Adherence</div><div class="v">81%</div><div class="s" style="color:#6C6C70">this week</div></div>
+            </div>
+            <div>
+              <div class="li"><div class="av" style="background:#F2F2F7;color:#000">PS</div><div class="sp"><b>Priya Sharma</b><span>Week 4 check-in to review</span></div><svg class="chev" style="color:#C7C7CC"><use href="#i-chev"/></svg></div>
+              <div class="li"><div class="av" style="background:#F2F2F7;color:#000">RV</div><div class="sp"><b>Rahul Verma</b><span>2 of 4 workouts this week</span></div><svg class="chev" style="color:#C7C7CC"><use href="#i-chev"/></svg></div>
+              <div class="li"><div class="av" style="background:#F2F2F7;color:#000">KS</div><div class="sp"><b>Karan Singh</b><span>Check-in overdue</span></div><svg class="chev" style="color:#C7C7CC"><use href="#i-chev"/></svg></div>
+              <div class="li"><div class="av" style="background:#F2F2F7;color:#000">AI</div><div class="sp"><b>Ananya Iyer</b><span>New message</span></div><svg class="chev" style="color:#C7C7CC"><use href="#i-chev"/></svg></div>
+              <div class="li"><div class="av" style="background:#F2F2F7;color:#000">AM</div><div class="sp"><b>Arjun Mehta</b><span>Paused</span></div><svg class="chev" style="color:#C7C7CC"><use href="#i-chev"/></svg></div>
+            </div>
+          </div>
+          <div class="gsearch glass"><svg class="ic" style="width:16px;height:16px"><use href="#i-search"/></svg>Search clients</div>
+          <div class="tabbar glass">
+            <div class="tab on"><svg><use href="#i-people"/></svg>Clients</div>
+            <div class="tab"><svg><use href="#i-clip"/></svg>Check-ins</div>
+            <div class="tab"><svg><use href="#i-list"/></svg>Plans</div>
+            <div class="tab"><svg><use href="#i-chat"/></svg>Chat</div>
+          </div>
+          <div class="fab glass"><svg class="ic" style="width:22px;height:22px"><use href="#i-case"/></svg></div>
+        </div>
+        <p><b>Coach Clients.</b> Search floats at the bottom where the thumb is, as in iOS 26. The list scrolls under the glass controls.</p>
+      </div>
+    </div>
+    <div class="dir-meta">
+      <div class="tile"><h3>Best for</h3><p>The most modern, premium first impression. Strong on screens with one clear focus: Today, logging, check-in review.</p></div>
+      <div class="tile"><h3>Trade-off</h3><p>Arcwell is an Android app. True Liquid Glass (lensing, live refraction) exists only on iOS 26. On Android we can match the frosted look with blur, but not the bending of light, and heavy blur costs battery on cheaper phones.</p></div>
+      <div class="tile"><h3>Build effort</h3><p>Highest. New floating chrome, sheets and per-screen layouts.</p></div>
+    </div>
+  </section>
+
+  <!-- Compare -->
+  <section aria-labelledby="h-cmp">
+    <div class="sec-head">
+      <p class="kicker">Side by side</p>
+      <h2 id="h-cmp">How they differ</h2>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th></th><th>A · Health</th><th>B · Fitness</th><th>C · Liquid Glass</th></tr></thead>
+        <tbody>
+          <tr><td>Feel</td><td>Calm, clinical, trustworthy</td><td>Athletic, energetic, focused</td><td>Premium, current, airy</td></tr>
+          <tr><td>Base</td><td>Light grey, white groups</td><td>True black, dark grey cards</td><td>White, edge-to-edge content</td></tr>
+          <tr><td>Colour</td><td>On icons and section titles</td><td>On numbers and rings</td><td>On one bold panel per screen</td></tr>
+          <tr><td>Glass</td><td>Tab bar and rest timer</td><td>Tab bar</td><td>Tab bar, toolbar buttons, search, sheets</td></tr>
+          <tr><td>Main button</td><td>Small blue capsule in the card</td><td>Large pillar-coloured capsule</td><td>Tinted capsule or white on the panel</td></tr>
+          <tr><td>Logging</td><td>Grouped table</td><td>Huge numbers, round Done</td><td>Exercise view and a glass sheet</td></tr>
+          <tr><td>Coach side</td><td>Strongest</td><td>Weakest for long admin</td><td>Strong</td></tr>
+          <tr><td>Android fit</td><td>Excellent</td><td>Excellent</td><td>Good (frosted, not liquid)</td></tr>
+          <tr><td>Effort</td><td>Low</td><td>Medium</td><td>High</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Recommendation -->
+  <section aria-labelledby="h-rec">
+    <div class="recbox">
+      <span class="tag rec">My recommendation</span>
+      <h2 id="h-rec">Glass chrome over Health structure, with Fitness for workouts.</h2>
+      <p>This mix is how Apple's own apps already behave: Health is light and grouped, the Workout app is black, and both sit under iOS 26 glass controls.</p>
+      <ul>
+        <li><b>Everywhere:</b> C's floating glass tab bar, round toolbar buttons and bottom sheets.</li>
+        <li><b>Content:</b> A's grouped cards and category colours for Today, Nutrition, Recovery and every coach screen.</li>
+        <li><b>During a workout:</b> B's black screen with huge numbers, because people read it at arm's length mid-set.</li>
+        <li><b>Dark mode:</b> follows the phone's setting, using the dark values of the same colours.</li>
+      </ul>
+    </div>
+    <p class="note">Two notes. The mockups use Inter: Apple's San Francisco font is licensed only for Apple platforms, so it can't ship in an Android app, and Inter is the closest free match. The rings here use our own pillar colours rather than Apple's red, green and blue Activity rings, which Apple asks apps not to imitate.</p>
+    <div class="src">
+      <span>Sources</span>
+      <a href="https://developer.apple.com/design/human-interface-guidelines/materials">Apple HIG · Materials (Liquid Glass)</a>
+      <a href="https://developer.apple.com/design/human-interface-guidelines/color">Apple HIG · Color (system colours, Liquid Glass colour)</a>
+      <a href="https://developer.apple.com/design/human-interface-guidelines/tab-bars">Apple HIG · Tab bars</a>
+      <a href="https://www.macstories.net/stories/watchos-26-the-macstories-review/3/">MacStories · watchOS 26 review (Workout app redesign)</a>
+    </div>
+  </section>
+
+</div>

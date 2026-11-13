@@ -41,7 +41,7 @@ export function ListRow({
     <>
       {leading}
       <View style={styles.text}>
-        <Text variant="body" weight="medium" numberOfLines={1}>
+        <Text variant="body" weight="medium">
           {title}
         </Text>
         {subtitle && (
@@ -50,7 +50,6 @@ export function ListRow({
             weight="regular"
             tone="muted"
             numeric
-            numberOfLines={2}
           >
             {subtitle}
           </Text>

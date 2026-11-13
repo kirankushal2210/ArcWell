@@ -8,6 +8,7 @@ import { Avatar, Button, Text } from "@/components/primitives";
 import { menuAction } from "@/features/coach/coachProfile";
 import { useCoachData } from "@/features/coach/CoachData";
 import {
+  ActionDock,
   Eyebrow,
   Group,
   GroupRow,
@@ -48,7 +49,7 @@ export default function CheckInsTab() {
         sub={`Week of ${weekStart()}`}
         actions={[menuAction]}
       />
-      <Page>
+      <Page clearDock>
         <Pills<Filter>
           value={filter}
           onChange={setFilter}
@@ -152,6 +153,12 @@ export default function CheckInsTab() {
           </>
         ) : null}
       </Page>
+      {toReview.length ? (
+        <ActionDock
+          label={`Start review · ${toReview.length} to go`}
+          onPress={() => open(toReview[0].k.id)}
+        />
+      ) : null}
     </View>
   );
 }

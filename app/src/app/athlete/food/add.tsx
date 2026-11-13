@@ -37,7 +37,6 @@ import {
   slotLabel,
   sumMacros,
 } from "@/features/athlete/foods";
-import { Sheet, SheetRow } from "@/features/athlete/Sheet";
 import { Pills } from "@/features/coach/parts";
 import {
   colors,
@@ -192,7 +191,14 @@ export default function AddFood() {
           <IconButton
             icon={Camera}
             accessibilityLabel="Log with a photo"
-            onPress={() => setCamera(true)}
+            onPress={() =>
+              n.tier === "pro"
+                ? router.push({
+                    pathname: "/athlete/food/photo",
+                    params: { meal, date: params.date ?? "" },
+                  })
+                : setCamera(true)
+            }
           />
         )}
       </View>
@@ -364,16 +370,7 @@ export default function AddFood() {
           title="Snap a photo, we'll do the logging"
           onClose={() => setCamera(false)}
         />
-      ) : (
-        <Sheet
-          visible={camera}
-          onClose={() => setCamera(false)}
-          title="Photo logging is coming"
-          sub="Snap your plate and check what we found before anything is logged. It arrives with the AI update; search works for now."
-        >
-          <SheetRow label="Search instead" onPress={() => setCamera(false)} />
-        </Sheet>
-      )}
+      ) : null}
     </View>
   );
 }

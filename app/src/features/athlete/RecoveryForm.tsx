@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   row: { flexDirection: "row", gap: space[2] },
   cell: {
     flex: 1,
-    height: 48,
+    minHeight: 48,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: radius.md,

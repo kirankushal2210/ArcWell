@@ -4,7 +4,10 @@
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { Camera, User } from "lucide-react-native";
-import { Alert, StyleSheet, View } from "react-native";
+import { useState } from "react";
+import { Alert, Linking, StyleSheet, View } from "react-native";
+
+import { ImageViewer } from "@/components/ImageViewer";
 
 import { PressableScale, Text } from "@/components/primitives";
 import { colors, radius, space } from "@/theme";
@@ -16,7 +19,11 @@ async function pick(camera: boolean): Promise<string | null> {
   if (!perm.granted) {
     Alert.alert(
       camera ? "Camera is off for Arcwell" : "Photos are off for Arcwell",
-      "You can turn access on in Settings. Photos are optional.",
+      "Photos are optional and everything else keeps working. To add one, turn access on in your phone's settings.",
+      [
+        { text: "Not now", style: "cancel" },
+        { text: "Open phone settings", onPress: () => Linking.openSettings() },
+      ],
     );
     return null;
   }
@@ -47,16 +54,22 @@ export function choosePhoto(onPicked: (uri: string) => void) {
   ]);
 }
 
-/** A 3:4 frame: the photo, or an outline with a label. Tap to add when `onPress` is given. */
+/**
+ * A 3:4 frame: the photo, or an outline with a label. Tap to add when `onPress` is given;
+ * otherwise a photo opens full screen (X-05). `still` turns taps off, for a parent that handles them.
+ */
 export function PhotoSlot({
   uri,
   label,
   onPress,
+  still,
 }: {
   uri?: string;
   label: string;
   onPress?: () => void;
+  still?: boolean;
 }) {
+  const [viewing, setViewing] = useState(false);
   const body = uri ? (
     <Image
       source={{ uri }}
@@ -75,7 +88,18 @@ export function PhotoSlot({
   );
   return (
     <View style={styles.slot}>
-      {onPress ? (
+      {still ? (
+        <View style={styles.frame}>{body}</View>
+      ) : !onPress && uri ? (
+        <PressableScale
+          onPress={() => setViewing(true)}
+          accessibilityRole="imagebutton"
+          accessibilityLabel={`Open ${label} photo`}
+          style={styles.frame}
+        >
+          {body}
+        </PressableScale>
+      ) : onPress ? (
         <PressableScale
           onPress={onPress}
           accessibilityRole="button"
@@ -92,6 +116,13 @@ export function PhotoSlot({
       <Text variant="caption" weight="semibold" style={styles.center}>
         {label}
       </Text>
+      {uri && !onPress && !still ? (
+        <ImageViewer
+          uri={viewing ? uri : null}
+          label={label}
+          onClose={() => setViewing(false)}
+        />
+      ) : null}
     </View>
   );
 }

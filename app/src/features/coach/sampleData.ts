@@ -2,6 +2,14 @@
 // accounts or database yet (PLAN.md Phases 1–2). Screens read this through CoachDataProvider so the
 // real queries can replace it later without changing the screens.
 import type { ClientStatus } from "@/components/primitives";
+import type {
+  AthleteSettings,
+  CoachingEnd,
+  MeasureEntry,
+  ProgressPhoto,
+  Transformation,
+  WeighIn,
+} from "@/features/athlete/athleteData";
 
 import type { ClientAccount, LeadSource } from "./crm";
 import type { Enhanced } from "./enhanced";
@@ -57,6 +65,8 @@ export type Message = {
   at?: string;
   /** Local photo URI (F7: image attachments). */
   image?: string;
+  /** A PDF attachment (F7-02); opens in the phone's viewer (X-06). */
+  file?: { name: string; uri: string };
 };
 
 export type Client = {
@@ -120,7 +130,13 @@ export type Client = {
     injuries?: string[];
     /** Tracker named in onboarding (AO-15b), connected later in Recovery (D60). */
     device?: string;
+    /** Edit profile (AC-07): training experience and schedule, used for the next plan. */
+    experience?: "new" | "some" | "experienced";
+    daysPerWeek?: number;
+    sessionMinutes?: number;
   };
+  /** Profile photo (AC-07), shown on the menu and to the coach. */
+  photo?: string;
   /** When the current training program started, for "Week 3 of 8" (ISO date). */
   programStart?: string;
   /** The athlete's own routines, outside the program: extra sessions they plan themselves. */
@@ -135,10 +151,27 @@ export type Client = {
   competitive?: boolean;
   /** Enhanced-athlete record, only after the client's own consent (D64). */
   enhanced?: Enhanced;
-  /** Earliest date the client shared history from (YYYY-MM-DD); absent = join date (SPEC). */
+  /** Set when the client shares history from before they joined (AC-10, D37); absent = join date (SPEC). The athlete's one switch shares everything earlier. */
   historyFrom?: string;
   /** Where the client came from, when they joined from a lead. */
   source?: LeadSource;
+  /** Paused until, or leaving on (as the coach typed it, e.g. "20 Nov"), with a short note the client sees (CS-01, CS-02, D39). */
+  statusUntil?: string;
+  statusNote?: string;
+  /** Physique (D9): dated weigh-ins, measurements and progress photos. */
+  weighIns?: WeighIn[];
+  measureLog?: MeasureEntry[];
+  progressPhotos?: ProgressPhoto[];
+  /** The athlete's own account settings and consents (AC-02, AC-08, N-06). */
+  athleteSettings?: AthleteSettings;
+  /** Transformation photo requests and approvals (F9). */
+  transformations?: Transformation[];
+  /** Water drunk per day in ml (YYYY-MM-DD → ml). */
+  water?: Record<string, number>;
+  /** How the coach ended coaching, so the athlete's app can follow (K-29, K-30). */
+  endedBy?: "completed" | "closed";
+  /** Set once coaching has ended: the plan stays, read-only (D21). */
+  formerCoach?: CoachingEnd;
 };
 
 export type Template = {

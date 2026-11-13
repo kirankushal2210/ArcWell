@@ -32,6 +32,7 @@ import { ExercisePicker } from "@/features/athlete/ExercisePicker";
 import {
   type ExerciseType,
   fieldHead,
+  findExercise,
   LIBRARY,
   type SetField,
   typeOf,
@@ -66,6 +67,7 @@ import {
   space,
   textSizes,
 } from "@/theme";
+import { OfflineBanner } from "@/features/system/SystemStates";
 
 const REST_STEPS = [0, 30, 60, 90, 120, 180];
 
@@ -212,6 +214,18 @@ export default function Workout() {
     .map((e) => ({ name: e.name, n: e.sets.filter((s) => !s.done).length }))
     .filter((x) => x.n > 0);
 
+  // The dock's set (D67): the first set not yet ticked, so logging is one thumb tap at the bottom.
+  const nextEx = active.exercises.find(
+    (e) => !e.skipped && e.sets.some((s) => !s.done),
+  );
+  const nextSet = nextEx?.sets.find((s) => !s.done);
+  const nextLabel =
+    nextEx && nextSet
+      ? nextSet.warmup
+        ? `Log warm-up · ${nextEx.name}`
+        : `Log set ${nextEx.sets.filter((x) => !x.warmup).indexOf(nextSet) + 1} · ${nextEx.name}`
+      : null;
+
   const startRest = (e: LoggedExercise, afterSetId: string) => {
     if (e.restSec <= 0) return;
     const idx = e.sets.findIndex((s) => s.id === afterSetId);
@@ -350,6 +364,8 @@ export default function Workout() {
         </View>
         <Button
           label="Finish"
+          size="sm"
+          variant="secondary"
           onPress={() => (missing.length ? setFinishing(true) : finish(false))}
           disabled={ticked === 0}
         />
@@ -359,6 +375,7 @@ export default function Workout() {
         contentContainerStyle={styles.body}
         keyboardShouldPersistTaps="handled"
       >
+        <OfflineBanner what="Your workout is saved on this phone and syncs when you're back." />
         <Text
           variant="label"
           weight="regular"
@@ -660,7 +677,7 @@ export default function Workout() {
                       <Check
                         size={20}
                         strokeWidth={3}
-                        color={s.done ? colors.onBrand : colors.textMuted}
+                        color={s.done ? colors.onPillar : colors.textMuted}
                       />
                     </PressableScale>
                   </View>
@@ -726,6 +743,33 @@ export default function Workout() {
           }
         />
       </ScrollView>
+
+      {rest ? null : (
+        <View
+          style={[
+            styles.dock,
+            { paddingBottom: Math.max(insets.bottom, space[3]) },
+          ]}
+        >
+          {nextEx && nextSet && nextLabel ? (
+            <Button
+              label={nextLabel}
+              icon={Check}
+              pillar="training"
+              fullWidth
+              onPress={() => tick(nextEx, nextSet)}
+            />
+          ) : (
+            <Button
+              label="Finish workout"
+              pillar="training"
+              fullWidth
+              disabled={ticked === 0}
+              onPress={() => finish(false)}
+            />
+          )}
+        </View>
+      )}
 
       {rest ? (
         <View
@@ -992,6 +1036,7 @@ export default function Workout() {
       {pad && padEx && padSet ? (
         <Keypad
           key={`${pad.setId}-${pad.field}`}
+          barbell={findExercise(padEx.name)?.equipment === "barbell"}
           visible
           title={`${padEx.name} · ${padSet.warmup ? "warm-up" : `set ${padEx.sets.filter((x) => !x.warmup).indexOf(padSet) + 1}`}`}
           field={pad.field}
@@ -1052,6 +1097,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bg,
   },
   body: { padding: rhythm.gutter, gap: space[3], paddingBottom: space[12] },
+  dock: { paddingHorizontal: rhythm.gutter, paddingTop: space[2] },
   saved: { paddingHorizontal: space[1] },
   card: {
     gap: space[1],
@@ -1122,7 +1168,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  tickOn: { backgroundColor: colors.brand, borderColor: colors.brand },
+  tickOn: { backgroundColor: colors.training, borderColor: colors.training },
   rest: {
     gap: space[3],
     paddingHorizontal: rhythm.gutter,
@@ -1140,7 +1186,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceRaised,
     overflow: "hidden",
   },
-  fill: { height: 6, backgroundColor: colors.brand },
+  fill: { height: 6, backgroundColor: colors.training },
   restRow: { flexDirection: "row", gap: space[2] },
   sheetList: { maxHeight: 360 },
 });

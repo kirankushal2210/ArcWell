@@ -16,8 +16,9 @@ import {
 } from "@/features/coach/plans";
 import { ProgramEditor, programReady } from "@/features/coach/ProgramEditor";
 import { colors, rhythm, space } from "@/theme";
+import { useBillingGate } from "@/features/coach/limits";
 
-export default function TrainingBuilder() {
+function TrainingBuilderEditor() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { client, templates, saveProgram, sessions } = useCoachData();
   const c = client(id);
@@ -102,3 +103,9 @@ const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
   footer: { paddingHorizontal: rhythm.gutter, paddingTop: space[2] },
 });
+
+/** Locked while the coach's billing is lapsed (K-27). */
+export default function TrainingBuilder() {
+  const gate = useBillingGate();
+  return gate ?? <TrainingBuilderEditor />;
+}

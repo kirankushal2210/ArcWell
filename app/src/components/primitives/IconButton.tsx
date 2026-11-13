@@ -1,11 +1,11 @@
 import type { LucideIcon } from "lucide-react-native";
 import { StyleSheet, View } from "react-native";
 
-import { borderWidth, colors, radius, tapMin } from "@/theme";
+import { borderWidth, colors, controlHeight, radius, tapMin } from "@/theme";
 
 import { PressableScale } from "./PressableScale";
 
-export type IconButtonVariant = "plain" | "outline" | "filled";
+export type IconButtonVariant = "plain" | "outline" | "filled" | "glass";
 
 export type IconButtonProps = {
   icon: LucideIcon;
@@ -19,7 +19,10 @@ export type IconButtonProps = {
   testID?: string;
 };
 
-/** 48 × 48 dp icon-only button (C5). The glyph is centred in its box (C6 exception). */
+/**
+ * Icon-only button: a 40 dp round shape inside a 48 × 48 dp tap area (C5, D67). The glyph is
+ * centred in its box (C6 exception). "glass" is for floating toolbar buttons (functional layer).
+ */
 export function IconButton({
   icon: Icon,
   accessibilityLabel,
@@ -45,11 +48,12 @@ export function IconButton({
             styles.box,
             variant === "outline" && styles.outline,
             variant === "filled" && styles.filled,
+            variant === "glass" && styles.glass,
             pressed && !disabled && styles.pressed,
           ]}
         >
           <Icon
-            size={24}
+            size={20}
             strokeWidth={2}
             color={disabled ? colors.textDisabled : (color ?? colors.text)}
           />
@@ -62,15 +66,17 @@ export function IconButton({
 const styles = StyleSheet.create({
   hit: { width: tapMin, height: tapMin },
   box: {
-    width: tapMin,
-    height: tapMin,
+    width: controlHeight,
+    height: controlHeight,
+    margin: (tapMin - controlHeight) / 2,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: radius.md,
+    borderRadius: radius.full,
     borderWidth,
     borderColor: "transparent",
   },
   outline: { borderColor: colors.borderStrong },
-  filled: { backgroundColor: colors.surface },
+  filled: { backgroundColor: colors.surfaceRaised },
+  glass: { backgroundColor: colors.glassSolid, borderColor: colors.glassEdge },
   pressed: { backgroundColor: colors.surfaceRaised },
 });

@@ -148,7 +148,7 @@ export function Overview({
   const brand = r.store.device?.brand;
 
   return (
-    <AthletePage>
+    <AthletePage dock>
       {r.pendingDevice ? (
         <LinkRow
           icon={Watch}
@@ -169,6 +169,8 @@ export function Overview({
           </View>
           <Button
             label="Check in"
+            size="sm"
+            variant="secondary"
             onPress={() => go("/athlete/recovery/check-in")}
           />
         </View>
@@ -299,7 +301,7 @@ export function Overview({
                 {a.strain.toFixed(1)}
               </Text>
             </View>
-            <Text weight="semibold" style={styles.flex} numberOfLines={1}>
+            <Text weight="semibold" style={styles.flex}>
               {a.name}
             </Text>
             <Text variant="label" weight="regular" tone="muted" numeric>
@@ -377,7 +379,7 @@ export function SleepPage({ r, day }: { r: R; day: Day }) {
   const st = day.device?.stages;
 
   return (
-    <AthletePage>
+    <AthletePage dock>
       <View style={styles.hero}>
         <Text variant="caption" tone="muted">
           SLEEP PERFORMANCE
@@ -446,7 +448,7 @@ export function SleepPage({ r, day }: { r: R; day: Day }) {
                       flex: v,
                       backgroundColor:
                         k === "deep"
-                          ? colors.brand
+                          ? colors.recovery
                           : k === "rem"
                             ? colors.textMuted
                             : k === "light"
@@ -572,7 +574,7 @@ export function RecoveryPage({ r, day }: { r: R; day: Day }) {
     .filter((x): x is { label: string; diff: number } => !!x && x.diff !== 0);
 
   return (
-    <AthletePage>
+    <AthletePage dock>
       <View style={styles.hero}>
         <Ring
           share={rec.score / 100}
@@ -662,7 +664,7 @@ export function StrainPage({
   const { active, setActive } = useCoachData();
 
   return (
-    <AthletePage>
+    <AthletePage dock>
       <View style={styles.hero}>
         <Ring
           share={s.score / 21}

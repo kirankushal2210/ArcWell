@@ -10,7 +10,20 @@ import {
 } from "@/features/coach/plans";
 import type { Client } from "@/features/coach/sampleData";
 import type { Answers } from "@/features/onboarding/OnboardingContext";
+import { defaultSettings, isoDate } from "@/features/athlete/athleteData";
+import type { DivisionKey } from "@/features/race/data";
+import { defaultModules, type ModuleKey } from "@/features/science/habits";
+import { daysUntil, hybridProgram } from "@/features/science/hybrid";
 import { buildPlan } from "@/features/onboarding/plan";
+import {
+  balanceVolume,
+  timesPerWeek,
+  PROGRESSION,
+  proteinTarget,
+  restFor,
+  rirFor,
+  weeklyMin,
+} from "@/features/science/rules";
 
 const GOAL: Record<string, string> = {
   lose_fat: "Lose fat",
@@ -18,7 +31,12 @@ const GOAL: Record<string, string> = {
   get_stronger: "Get stronger",
   recomposition: "Body recomposition",
   general_fitness: "General fitness",
+  hyrox: "HYROX race",
 };
+/** The onboarding goal key for a goal label ("Build muscle" → "build_muscle"). */
+export const goalKeyOf = (label?: string) =>
+  Object.entries(GOAL).find(([, v]) => v === label)?.[0];
+
 const DIET: Record<string, string> = {
   veg: "Vegetarian",
   egg: "Eggetarian",
@@ -46,6 +64,16 @@ export type SelfPlan = {
   summary: { training: string; equipment: string; goal: string; diet: string };
 };
 
+/** Rest days from the athlete's chosen days, or a sensible spread for their days per week. */
+function restDaysFor(a: Answers) {
+  const picked = ((a.preferredDays as number[] | undefined) ?? [])
+    .slice()
+    .sort();
+  const days = Number(a.daysPerWeek ?? 4);
+  const training = picked.length ? picked : (SPREAD[days] ?? SPREAD[4]);
+  return [0, 1, 2, 3, 4, 5, 6].filter((d) => !training.includes(d));
+}
+
 export function selfPlan(a: Answers): SelfPlan {
   const p = buildPlan(a);
   const goalKey = (a.goal as string | undefined) ?? "general_fitness";
@@ -64,13 +92,37 @@ export function selfPlan(a: Answers): SelfPlan {
         name: e.name,
         sets: e.sets,
         reps: e.reps,
-        restSec: 90,
+        restSec: restFor(e.name),
       })),
     })),
   };
+  // Evidence pass (D69): weekly sets per muscle into range, effort and rest by the rules.
+  const experience = (a.experience as string | undefined) ?? "some";
+  // HYROX (D76): a hybrid-race plan built back from race day instead of the muscle plan.
+  const race = goalKey === "hyrox" ? raceGoalFrom(a) : undefined;
+  if (race) {
+    const hp = hybridProgram(
+      p.daysPerWeek,
+      daysUntil(race.date, isoDate(new Date())),
+    );
+    program.name = hp.name;
+    program.weeks = hp.weeks;
+    program.days = hp.days;
+  } else
+    program.days = balanceVolume(program.days, {
+      min: weeklyMin(goalKey, experience),
+      minutes: parseInt(String(a.sessionLength ?? "45"), 10),
+      timesPerWeek: timesPerWeek(program.days.length, restDaysFor(a)),
+    }).map((d) => ({
+      ...d,
+      note: `Leave ${rirFor(experience, true)} reps in reserve on big lifts and ${rirFor(experience, false)} on the rest. ${PROGRESSION}`,
+    }));
 
-  const protein =
-    Math.round((weight * (goalKey === "lose_fat" ? 2 : 1.8)) / 5) * 5;
+  const protein = proteinTarget(
+    weight,
+    typeof a.heightCm === "number" ? a.heightCm : 172,
+    goalKey,
+  ).grams;
   const fat = Math.round((p.kcal * 0.27) / 9 / 5) * 5;
   const carbs = Math.max(
     0,
@@ -86,17 +138,11 @@ export function selfPlan(a: Answers): SelfPlan {
     meals: meals <= 3 ? day.filter((m) => m.name !== "Snack") : day,
   };
 
-  const picked = ((a.preferredDays as number[] | undefined) ?? [])
-    .slice()
-    .sort();
-  const training = picked.length
-    ? picked
-    : (SPREAD[p.daysPerWeek] ?? SPREAD[4]);
   const protocol: RecoveryProtocol = {
     sleepH: p.sleepTargetHours,
     bed: typeof a.bedTime === "number" ? a.bedTime : 22 * 60 + 30,
     wake: typeof a.wakeTime === "number" ? a.wakeTime : 6 * 60 + 30,
-    restDays: [0, 1, 2, 3, 4, 5, 6].filter((d) => !training.includes(d)),
+    restDays: restDaysFor(a),
     note: "",
   };
 
@@ -129,6 +175,14 @@ export function selfClient(a: Answers, plan: SelfPlan): Client {
     checkInDay: "Sunday",
     answers: [],
     weights: [weight],
+    basics: {
+      sex: a.sex === "male" || a.sex === "female" ? a.sex : "unsaid",
+      age: typeof a.age === "number" ? a.age : 27,
+      heightCm: typeof a.heightCm === "number" ? a.heightCm : 172,
+      weightKg: weight,
+      diet: plan.summary.diet,
+      injuries: ((a.injuries as string[] | undefined) ?? []).join(", "),
+    },
     targetKg: target,
     training: {
       weekDone: 0,
@@ -170,6 +224,13 @@ export function selfClient(a: Answers, plan: SelfPlan): Client {
       homeKit: a.homeKit as string[] | undefined,
       injuries: a.injuries as string[] | undefined,
       device: a.device as string | undefined,
+    },
+    athleteSettings: {
+      ...defaultSettings(),
+      modules: modulesFrom(a),
+      race: raceGoalFrom(a)
+        ? { goal: raceGoalFrom(a), status: "active", sims: [] }
+        : undefined,
     },
   };
 }
@@ -243,5 +304,40 @@ export function newClientFromAnswers(a: Answers): Client {
       injuries: a.injuries as string[] | undefined,
       device: a.device as string | undefined,
     },
+  };
+}
+
+const ADDON: Record<string, ModuleKey> = {
+  "Cardio fitness": "cardio_fitness",
+  Running: "running",
+  "Daily steps": "daily_movement",
+  "Sleep and energy habits": "sleep_light",
+  "Calm and breathing": "calm",
+  Mobility: "mobility",
+  Focus: "focus",
+};
+export const ADDON_OPTIONS = ["Just my main goal", ...Object.keys(ADDON)];
+
+/** Modules from the onboarding "Anything else?" screen, on top of the goal's defaults (D78). */
+export function modulesFrom(a: Answers): ModuleKey[] {
+  const base = defaultModules(a.goal as string | undefined);
+  const picked = ((a.addons as string[] | undefined) ?? [])
+    .map((x) => ADDON[x])
+    .filter(Boolean);
+  return [...new Set([...base, ...picked])];
+}
+
+/** The race goal from the HYROX branch, if the athlete chose it. */
+export function raceGoalFrom(a: Answers) {
+  if (a.goal !== "hyrox") return undefined;
+  const weeks = typeof a.raceWeeks === "number" ? a.raceWeeks : 12;
+  const d = new Date();
+  d.setDate(d.getDate() + weeks * 7);
+  return {
+    date: isoDate(d),
+    division: ((a.raceDivision as string | undefined) ??
+      "open_women") as DivisionKey,
+    recent5kSec: typeof a.recent5k === "number" ? a.recent5k * 60 : undefined,
+    kit: (a.raceKit as string[] | undefined) ?? [],
   };
 }

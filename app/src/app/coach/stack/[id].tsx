@@ -29,8 +29,9 @@ import {
   space,
   textSizes,
 } from "@/theme";
+import { useBillingGate } from "@/features/coach/limits";
 
-export default function StackScreen() {
+function StackScreenEditor() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { stacks, saveStack, deleteStack } = useCoachData();
   const insets = useSafeAreaInsets();
@@ -146,3 +147,9 @@ const styles = StyleSheet.create({
     paddingTop: space[2],
   },
 });
+
+/** Locked while the coach's billing is lapsed (K-27). */
+export default function StackScreen() {
+  const gate = useBillingGate();
+  return gate ?? <StackScreenEditor />;
+}

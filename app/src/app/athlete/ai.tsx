@@ -1,26 +1,39 @@
-// AI coach (D57), opened from the floating button. Plus members ask about training, food or recovery;
-// Free members see the trial offer with the AI permission step (D35). Coached athletes never reach
-// this screen (D44). Replies come from the server AI service (supabase/functions/_shared/ai, Phase 7);
-// until then the suggestions below are written by rules from the athlete's plan and say so.
-import { router } from "expo-router";
+// AI coach (D57, D68, D70), opened from Today's toolbar and the + menu. Plus members get today's
+// recovery-aware suggestion, the tools (tailor today, build a plan, nutrition assistant, weekly
+// review) and a chat; Free members see the trial offer with the AI permission step (D35). Coached
+// athletes never reach this screen (D44). Front end only: answers come from the evidence rules and
+// sample text until the server AI service exists (supabase/functions/_shared/ai).
+import { type Href, Redirect, router } from "expo-router";
 import {
   Camera,
+  ChartLine,
   Dumbbell,
   Moon,
   Send,
   Sparkles,
   Utensils,
+  Wand2,
 } from "lucide-react-native";
 import { useState } from "react";
-import { StyleSheet, TextInput, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  TextInput,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Button, IconButton, Text } from "@/components/primitives";
+import { Button, Chip, IconButton, Text } from "@/components/primitives";
+import { type Answer, answer, PROMPTS } from "@/features/ai/answers";
+import { TodaySuggestion } from "@/features/ai/TodaySuggestion";
+import { AI_DAILY_LIMIT, isoToday } from "@/features/athlete/athleteData";
+import { NavRow } from "@/features/athlete/MenuParts";
+import { shortCite, SOURCES } from "@/features/science/sources";
 import { AIConsentPoints } from "@/features/athlete/AIConsent";
 import { NotJoined, useMe } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
-import { Eyebrow, Page, PageHeader, PillarDot } from "@/features/coach/parts";
-import { clock } from "@/features/coach/plans";
+import { Eyebrow, Group, Page, PageHeader } from "@/features/coach/parts";
 import {
   colors,
   fontFamilyFor,
@@ -29,15 +42,18 @@ import {
   space,
   textSizes,
 } from "@/theme";
+import { TrialTimeline } from "@/features/athlete/TrialTimeline";
 
 export default function AICoach() {
   const me = useMe();
-  const { meTier, startSelf } = useCoachData();
+  const { meTier, startPlus, settingsOf } = useCoachData();
   const insets = useSafeAreaInsets();
   const [consent, setConsent] = useState(false);
   const back = () =>
     router.canGoBack() ? router.back() : router.replace("/athlete");
-  if (!me || meTier === "coached") return <NotJoined />;
+  if (!me) return <NotJoined />;
+  // Coached athletes never see AI (D44): a direct link goes back to Today.
+  if (meTier === "coached") return <Redirect href="/athlete" />;
 
   if (meTier === "free")
     return (
@@ -87,6 +103,7 @@ export default function AICoach() {
                   </View>
                 );
               })}
+              {settingsOf(me.id).sub ? null : <TrialTimeline />}
             </>
           )}
         </Page>
@@ -101,13 +118,21 @@ export default function AICoach() {
               label="Allow and start free trial"
               fullWidth
               onPress={() => {
-                startSelf(me, "pro");
+                startPlus("yearly");
                 setConsent(false);
+                router.replace({
+                  pathname: "/athlete/switch/[step]",
+                  params: { step: "upgraded" },
+                });
               }}
             />
           ) : (
             <Button
-              label="Start 7-day free trial"
+              label={
+                settingsOf(me.id).sub
+                  ? "Restart Arcwell Plus"
+                  : "Start 7-day free trial"
+              }
               fullWidth
               onPress={() => setConsent(true)}
             />
@@ -119,59 +144,167 @@ export default function AICoach() {
       </View>
     );
 
-  const p = me.program;
-  const n = me.nutritionPlan;
-  const r = me.protocol;
-  const suggestions = [
-    p && {
-      pillar: "training" as const,
+  return <AIHub />;
+}
+
+type Msg = {
+  from: "me" | "ai";
+  text: string;
+  kind?: Answer["kind"];
+  sources?: string[];
+};
+
+/** The AI coach for Plus members (D70): today's suggestion, tools, and a chat. Sample answers only. */
+function AIHub() {
+  const me = useMe();
+  const { settingsOf, setAthleteSettings } = useCoachData();
+  const insets = useSafeAreaInsets();
+  const [msgs, setMsgs] = useState<Msg[]>([]);
+  const [text, setText] = useState("");
+  const back = () =>
+    router.canGoBack() ? router.back() : router.replace("/athlete");
+  if (!me) return <NotJoined />;
+  const s = settingsOf(me.id);
+
+  // AI-02: AI turned off in Privacy. Nothing AI shows until it's back on.
+  if (!s.ai)
+    return (
+      <View style={styles.root}>
+        <PageHeader title="AI coach" onBack={back} />
+        <Page>
+          <View style={styles.offHero}>
+            <Sparkles size={32} strokeWidth={1.6} color={colors.text} />
+            <Text variant="title" style={styles.center}>
+              AI features are off
+            </Text>
+            <Text tone="muted" style={styles.center}>
+              You turned them off in Privacy. Your plan, logs and everything
+              else keep working. Turning AI off doesn&apos;t cancel your
+              subscription.
+            </Text>
+            <Button
+              label="Turn AI back on"
+              fullWidth
+              onPress={() => setAthleteSettings(me.id, { ai: true })}
+            />
+          </View>
+        </Page>
+      </View>
+    );
+
+  const today = isoToday();
+  const used = s.aiUsage?.date === today ? s.aiUsage.n : 0;
+  const limited = used >= AI_DAILY_LIMIT;
+  const ask = (q: string) => {
+    const question = q.trim();
+    if (!question || limited) return;
+    const a = answer(question, {
+      protein: me.nutritionPlan?.protein,
+      kcal: me.nutritionPlan?.kcal,
+    });
+    setMsgs((m) => [
+      ...m,
+      { from: "me", text: question },
+      { from: "ai", text: a.text, kind: a.kind, sources: a.sources },
+    ]);
+    setAthleteSettings(me.id, { aiUsage: { date: today, n: used + 1 } });
+    setText("");
+  };
+  const tools: {
+    icon: typeof Sparkles;
+    label: string;
+    sub: string;
+    href: Href;
+  }[] = [
+    {
+      icon: Wand2,
+      label: "Tailor today's workout",
+      sub: "Short on time, sore, or no barbell",
+      href: "/athlete/assistant/tailor",
+    },
+    {
       icon: Dumbbell,
-      title: "Training",
-      text: `${r ? 7 - r.restDays.length : p.days.length} workouts a week. Add 1–2 reps each session until you hit the top of the range, then add weight.`,
+      label: "Build a new plan",
+      sub: "From your goal, days and equipment",
+      href: "/athlete/assistant/plan",
     },
-    n && {
-      pillar: "nutrition" as const,
+    {
       icon: Utensils,
-      title: "Nutrition",
-      text: `Aim for ${n.protein} g protein: spread it over ${n.meals.length} meals, about ${Math.round(n.protein / n.meals.length)} g each.`,
+      label: "Nutrition assistant",
+      sub: "Hit protein, swap a meal, eating out",
+      href: "/athlete/assistant/nutrition",
     },
-    r && {
-      pillar: "recovery" as const,
-      icon: Moon,
-      title: "Recovery",
-      text: `Your ${r.sleepH} h target means lights out by ${clock(r.wake - r.sleepH * 60)} for a ${clock(r.wake)} alarm.`,
+    {
+      icon: ChartLine,
+      label: "Weekly review",
+      sub: "Training, food and recovery this week",
+      href: "/athlete/assistant/review",
     },
-  ].filter(Boolean) as {
-    pillar: "training" | "nutrition" | "recovery";
-    icon: typeof Dumbbell;
-    title: string;
-    text: string;
-  }[];
+  ];
 
   return (
-    <View style={styles.root}>
-      <PageHeader title="AI coach" onBack={back} />
+    <KeyboardAvoidingView
+      style={styles.root}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
+      <PageHeader title="AI coach" sub="Sample answers for now" onBack={back} />
       <Page>
-        <Text tone="muted">
-          Ask about your training, food or recovery. I see your plan and what
-          you log.
-        </Text>
-        <Eyebrow>Starter suggestions from your plan</Eyebrow>
-        {suggestions.map((s) => (
-          <View key={s.title} style={styles.card}>
-            <View style={styles.head}>
-              <PillarDot pillar={s.pillar} />
-              <Text variant="label" tone="muted">
-                {s.title}
+        <TodaySuggestion />
+        <Group>
+          {tools.map((t, i) => (
+            <NavRow
+              key={t.label}
+              first={i === 0}
+              icon={t.icon}
+              label={t.label}
+              sub={t.sub}
+              onPress={() => router.push(t.href)}
+            />
+          ))}
+        </Group>
+        <Eyebrow>Ask</Eyebrow>
+        {msgs.length ? (
+          msgs.map((m, i) => (
+            <View
+              key={i}
+              style={[
+                styles.bubble,
+                m.from === "me" ? styles.mine : styles.theirs,
+              ]}
+            >
+              <Text tone={m.from === "me" ? "onBrand" : "default"}>
+                {m.text}
               </Text>
+              {m.sources?.length ? (
+                <Text variant="caption" tone="muted">
+                  Based on{" "}
+                  {m.sources
+                    .map((id) => SOURCES[id])
+                    .filter(Boolean)
+                    .map((src) => shortCite(src))
+                    .join("; ")}
+                </Text>
+              ) : null}
             </View>
-            <Text>{s.text}</Text>
+          ))
+        ) : (
+          <View style={styles.prompts}>
+            {PROMPTS.map((q) => (
+              <Chip key={q} label={q} onPress={() => ask(q)} />
+            ))}
           </View>
-        ))}
-        <Text variant="caption" tone="muted">
-          Sample build: answers to your questions connect when the AI service is
-          live.
-        </Text>
+        )}
+        {limited ? (
+          <View style={styles.card}>
+            <Text weight="semibold">
+              That&apos;s today&apos;s {AI_DAILY_LIMIT} questions
+            </Text>
+            <Text tone="muted">
+              Your AI coach is back tomorrow. Your plan, logging and Recovery
+              keep working as normal.
+            </Text>
+          </View>
+        ) : null}
       </Page>
       <View
         style={[
@@ -180,24 +313,41 @@ export default function AICoach() {
         ]}
       >
         <TextInput
-          editable={false}
-          placeholder="Ask about training, food or sleep"
+          value={text}
+          onChangeText={setText}
+          editable={!limited}
+          placeholder={
+            limited ? "Back tomorrow" : "Ask about training, food or sleep"
+          }
           placeholderTextColor={colors.textMuted}
           style={styles.input}
-          accessibilityLabel="Ask the AI coach (not available yet)"
+          accessibilityLabel="Ask the AI coach"
+          onSubmitEditing={() => ask(text)}
+          returnKeyType="send"
         />
         <IconButton
           icon={Send}
           variant="filled"
-          disabled
+          disabled={!text.trim() || limited}
           accessibilityLabel="Send"
+          onPress={() => ask(text)}
         />
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
+  offHero: { alignItems: "center", gap: space[3], paddingTop: space[6] },
+  prompts: { flexDirection: "row", flexWrap: "wrap", gap: space[2] },
+  bubble: {
+    gap: space[1],
+    padding: space[3],
+    borderRadius: radius.lg,
+    maxWidth: "88%",
+  },
+  mine: { alignSelf: "flex-end", backgroundColor: colors.brand },
+  theirs: { alignSelf: "flex-start", backgroundColor: colors.surface },
   root: { flex: 1, backgroundColor: colors.bg },
   flex: { flex: 1, gap: space[1] / 2 },
   center: { textAlign: "center" },

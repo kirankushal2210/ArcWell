@@ -7,18 +7,21 @@ import { StyleSheet, View } from "react-native";
 import { Button, Text } from "@/components/primitives";
 import { useCoachData } from "@/features/coach/CoachData";
 import { StatGrid } from "@/features/coach/CrmParts";
-import { Eyebrow, Page, PageHeader } from "@/features/coach/parts";
+import { useCoachLimits } from "@/features/coach/limits";
+import { Eyebrow, Page, PageHeader, Pills } from "@/features/coach/parts";
 import { sampleCoach } from "@/features/coach/sampleData";
 import { colors, radius, space } from "@/theme";
+import { SAMPLE_TOOLS } from "@/features/system/store";
 
 export default function Billing() {
-  const { clients } = useCoachData();
+  const { clients, settings, saveSettings } = useCoachData();
+  const { billing, full } = useCoachLimits();
   const back = () =>
     router.canGoBack() ? router.back() : router.replace("/coach/menu");
   const used = clients.filter(
     (c) => c.id !== "me" && c.status !== "completed",
   ).length;
-  const limit = sampleCoach.clientLimit;
+  const limit = settings.clientLimit ?? sampleCoach.clientLimit;
   const share = Math.min(1, used / limit);
 
   return (
@@ -35,6 +38,21 @@ export default function Billing() {
             month before paid plans start, with the price.
           </Text>
         </View>
+
+        {billing !== "active" ? (
+          <View style={[styles.card, styles.warn]}>
+            <Text variant="title">
+              {billing === "grace"
+                ? "Your payment didn't go through"
+                : "Invites and plan edits are paused"}
+            </Text>
+            <Text tone="muted">
+              {billing === "grace"
+                ? "You have 7 days to pay before inviting and editing plans pause. Your clients aren't affected."
+                : "Pay to start again. Your clients keep their plans, chat and check-ins in the meantime."}
+            </Text>
+          </View>
+        ) : null}
 
         <Eyebrow>Client spots</Eyebrow>
         <View style={styles.card}>
@@ -82,6 +100,34 @@ export default function Billing() {
         <Text variant="caption" tone="muted" style={styles.center}>
           Payments switch on with billing (PLAN Phase 6).
         </Text>
+
+        {SAMPLE_TOOLS ? (
+          <>
+            <Eyebrow>Sample build: preview states</Eyebrow>
+            <Pills
+              value={billing}
+              onChange={(v) => saveSettings({ ...settings, billing: v })}
+              options={[
+                { value: "active", label: "Paid" },
+                { value: "grace", label: "Payment failed" },
+                { value: "lapsed", label: "Lapsed" },
+              ]}
+            />
+            <Pills
+              value={full ? "full" : "room"}
+              onChange={(v) =>
+                saveSettings({
+                  ...settings,
+                  clientLimit: v === "full" ? used : undefined,
+                })
+              }
+              options={[
+                { value: "room", label: `Limit ${sampleCoach.clientLimit}` },
+                { value: "full", label: "At the limit" },
+              ]}
+            />
+          </>
+        ) : null}
       </Page>
     </View>
   );
@@ -95,6 +141,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
+  warn: { borderWidth: 1, borderColor: colors.warning },
   card: {
     gap: space[2],
     padding: space[4],

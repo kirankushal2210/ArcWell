@@ -17,8 +17,9 @@ import {
   suggestTargets,
 } from "@/features/coach/plans";
 import { colors, radius, rhythm, space } from "@/theme";
+import { useBillingGate } from "@/features/coach/limits";
 
-export default function NutritionBuilder() {
+function NutritionBuilderEditor() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { client, saveNutrition, templates } = useCoachData();
   const c = client(id);
@@ -112,3 +113,9 @@ const styles = StyleSheet.create({
   },
   footer: { paddingHorizontal: rhythm.gutter, paddingTop: space[2] },
 });
+
+/** Locked while the coach's billing is lapsed (K-27). */
+export default function NutritionBuilder() {
+  const gate = useBillingGate();
+  return gate ?? <NutritionBuilderEditor />;
+}

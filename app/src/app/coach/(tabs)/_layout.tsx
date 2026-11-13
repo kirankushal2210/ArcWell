@@ -9,15 +9,17 @@ import {
 } from "lucide-react-native";
 
 import { useCoachData } from "@/features/coach/CoachData";
+import { LoadingScreen } from "@/features/system/SystemStates";
 import { CoachTabBar } from "@/features/coach/parts";
 import { colors } from "@/theme";
 
 export default function CoachTabs() {
-  const { clients } = useCoachData();
+  const { clients, hydrated } = useCoachData();
   const toReview = clients
     .flatMap((c) => c.checkIns)
     .filter((k) => !k.reviewed).length;
   const unread = clients.reduce((n, c) => n + c.unread, 0);
+  if (!hydrated) return <LoadingScreen />;
   return (
     <Tabs
       tabBar={(props) => <CoachTabBar {...props} />}

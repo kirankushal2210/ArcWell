@@ -44,7 +44,7 @@ const expectEq = (label, cssVal, tsVal) => {
 const colorsTs = read("colors.ts");
 const palette = tsEntries(colorsTs, "palette");
 for (const [name, value] of cssVars) {
-  if (!/^(charcoal|grey|blue|cyan|amber|violet|green|red)-\d+$/.test(name)) continue;
+  if (!/^(charcoal|grey|blue|cyan|amber|violet|green|red|ink|mist|honey|sage|slate|rose|coral)-\d+$/.test(name)) continue;
   expectEq(`--${name}`, value.toUpperCase(), palette.get(camel(name))?.replace(/"/g, "").toUpperCase());
 }
 for (const key of palette.keys()) {
@@ -57,12 +57,14 @@ const roles = tsEntries(colorsTs, "colors");
 for (const [name, value] of cssVars) {
   if (!name.startsWith("color-")) continue;
   const key = camel(name.slice("color-".length));
-  const ts = name === "color-scrim" ? colorsTs.match(/scrim:\s*"([^"]+)"/)?.[1] : roles.get(key);
-  if (name === "color-scrim") {
+  // Translucent roles (scrim, glass) are written as rgb()/rgba() strings: compare the numbers.
+  if (/^rgba?\(/.test(value)) {
+    const ts = colorsTs.match(new RegExp(`${key}:\\s*"([^"]+)"`))?.[1];
     const norm = (v) => (v ?? "").replace(/[^\d.]/g, " ").trim().split(/\s+/).join(",");
-    expectEq("--color-scrim", norm(value), norm(ts));
+    expectEq(`--${name}`, norm(value), norm(ts));
     continue;
   }
+  const ts = roles.get(key);
   const ref = value.match(/^var\(--([a-z0-9-]+)\)$/);
   expectEq(`--${name}`, ref ? `palette.${camel(ref[1])}` : value, ts);
 }
@@ -102,11 +104,12 @@ for (const [name, value] of cssVars) {
 for (const key of space.keys()) if (!cssVars.has(`space-${key}`)) fail(`parity: space[${key}] has no --space-${key}`);
 expectEq("--tap-min", rem(cssVars.get("tap-min")), parseFloat(spacingTs.match(/tapMin = (\d+)/)?.[1]));
 expectEq("--control-height", rem(cssVars.get("control-height")), parseFloat(spacingTs.match(/controlHeight = (\d+)/)?.[1]));
+expectEq("--control-height-sm", rem(cssVars.get("control-height-sm")), parseFloat(spacingTs.match(/controlHeightSm = (\d+)/)?.[1]));
 
 // Radius and borders
 const radiusTs = read("radius.ts");
 const radius = tsEntries(radiusTs, "radius");
-for (const r of ["sm", "md", "lg", "full"]) {
+for (const r of ["sm", "md", "lg", "xl", "full"]) {
   expectEq(`--radius-${r}`, rem(cssVars.get(`radius-${r}`)), radius.has(r) ? parseFloat(radius.get(r)) : undefined);
 }
 expectEq("--border-width", rem(cssVars.get("border-width")), parseFloat(radiusTs.match(/borderWidth = (\d+)/)?.[1]));

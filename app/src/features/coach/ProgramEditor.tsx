@@ -22,6 +22,8 @@ import {
   uid,
 } from "@/features/coach/plans";
 import { colors, fontFamilyFor, radius, space, textSizes } from "@/theme";
+import { restFor } from "@/features/science/rules";
+import { VolumePanel } from "@/features/science/VolumePanel";
 
 /** Every workout day has at least one exercise, and there is at least one day. */
 export const programReady = (p: TrainingProgram) =>
@@ -151,13 +153,16 @@ export function ProgramEditor({
                   name,
                   sets: 3,
                   reps: defaultTarget(name),
-                  restSec: typeOf(name) === "distance_duration" ? 0 : 90,
+                  restSec:
+                    typeOf(name) === "distance_duration" ? 0 : restFor(name),
                 })),
               ],
             }));
           setPicker(null);
         }}
       />
+      {/* Live evidence check (D69): junk volume, missing muscles, crowded sessions. */}
+      <VolumePanel days={p.days} />
     </>
   );
 }

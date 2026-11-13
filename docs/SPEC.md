@@ -26,10 +26,16 @@ Market: India first. Android only at launch. Compliance: India DPDP Act.
 
 **Athlete app** (decisions D1–D52 in [DECISIONS.md](DECISIONS.md)):
 
-- Bottom bar — free: Today · Training · Nutrition. AI-coached: Today · Training · Nutrition · Recovery · AI Coaching. Human-coached: Today · Training · Nutrition · Recovery · Progress, where Progress is the combined Check-ins · Progress · Chat area.
+- Bottom bar (D57, D68): one floating glass tab bar at the bottom left with the glass + button at the bottom right. Every athlete sees Today · Training · Nutrition · Recovery; on the free plan Recovery opens a locked Arcwell Plus page. Human-coached athletes also get Progress, the combined Check-ins · Progress · Chat area. There is no AI tab: self-guided Plus athletes reach the AI coach from Today and the + sheet, and coached athletes never see AI (D44).
 - Side menu (☰) for all athletes: Account · Notifications · Training (Exercises, Workouts, Programs, History, Muscle Analytics) · Gyms · Physique (Bodyweight, Measurements, Photos, Charts). Workouts are standalone sessions (free: templates only; Pro: create your own); Programs are multi-week plans (Pro); Muscle Analytics shows weekly sets per muscle group (Pro); Gyms is a read-only map / directory (free). No Set Videos (no video in v1).
 - Recovery: Sleep · Recovery · Strain (D60). Sleep performance against sleep needed, a 0–100 recovery score (from a connected device, else a morning check-in, else onboarding answers), strain 0–21 from training load, a stress level, a health monitor with a device, a sleep planner and suggested recovery protocols. Devices through Android Health Connect. Coaches can set a sleep target and a recovery note.
 - Coached athletes see their past check-ins and coach feedback in a Progress timeline.
+- Daily habits, cardio fitness and HYROX (D74–D80; plan in `huberman_hyrox_integration_plan.md`):
+  - **What Arcwell shows (D78):** everything beyond the main goal is an opt-in module; an off module leaves no trace.
+  - **Morning start on Today (D80):** daylight, water, movement and optional coffee or tea, with a small typical cortisol-rhythm curve.
+  - **Daily habits (D74, D77):** evidence-rated habits in Sleep and light, Movement, Calm, Nutrition and Focus; each shows only in its time window; five at most; no branding (D75).
+  - **Cardio fitness (D79):** a VO2 max estimate, interval sessions around lifting, and retests.
+  - **HYROX race track (D76):** race goal, Race section, simulator and hybrid-race plan, for those who choose it.
 
 - Training: Hevy-style workout logging; an exercise library of about 440 common exercises with primary muscle, equipment and exercise type (weight and reps, bodyweight, weighted or assisted bodyweight, duration, distance, carries), custom exercises, and the athlete's own routines beside their program (D58); demo media from a commercially licensed source.
 - Nutrition: IFCT 2017 + curated Indian dishes, Indian portions (katori, roti, piece); coach meal plans as fixed meals with exact foods and quantities.
@@ -48,7 +54,7 @@ Market: India first. Android only at launch. Compliance: India DPDP Act.
 
 **Notifications:** new message, check-in due, check-in submitted (coach), plan assigned, daily workout reminder, coach feedback.
 
-**Out of v1:** iOS, marketplace/discovery, certificate checks (certifications are optional and self-reported), equipment-photo workouts, research-backed AI chat, direct wearable APIs beyond Health Connect (D60), barcode scanning, phone OTP login, coaching teams, coach web dashboard, admin app, video of any kind (attachments or set videos), full offline mode, lb units. v1.1 candidates are listed in DECISIONS.md (D45).
+**Out of v1:** personal-growth, journalling and grief tools, supplement or nootropic suggestions, jet-lag travel mode (D74, D75), iOS, marketplace/discovery, certificate checks (certifications are optional and self-reported), equipment-photo workouts, research-backed AI chat, direct wearable APIs beyond Health Connect (D60), barcode scanning, phone OTP login, coaching teams, coach web dashboard, admin app, video of any kind (attachments or set videos), full offline mode, lb units. v1.1 candidates are listed in DECISIONS.md (D45).
 
 ## Key rules
 
@@ -64,7 +70,7 @@ Market: India first. Android only at launch. Compliance: India DPDP Act.
 
 - App: Expo SDK 58, React Native 0.88, TypeScript, Expo Router (`app/`).
 - Backend: Supabase — Postgres + row-level security, Auth (Google + email), Realtime (chat), Edge Functions (`supabase/`).
-- Files: Amazon S3 via short-lived signed URLs issued by Edge Functions; images compressed client-side.
+- Files: Supabase Storage (private buckets with row-level security) via short-lived signed URLs; images compressed client-side (D72).
 - AI: provider-neutral layer (`supabase/functions/_shared/ai/`), Groq free tier at launch, swappable to Claude/OpenAI by config.
 - Offline: in-progress workout cached on device, synced on reconnect.
 - Notifications: Expo Notifications. Builds: EAS.
@@ -77,4 +83,4 @@ Market: India first. Android only at launch. Compliance: India DPDP Act.
 
 ## Known risks
 
-Exercise media licensing; Groq free-tier vision support; free-model accuracy for structured plans; health data to AI providers under DPDP; Android-only excludes iPhone clients; S3 costs after free credits; Supabase free-plan limits; thin regional Indian food data; two-person scope; gym directory data source and accuracy; "Arcwell" trademark conflicts outside India (US software mark, US/Canada supplement mark) — IP India search required before branding spend.
+Exercise media licensing; Groq free-tier vision support; free-model accuracy for structured plans; health data to AI providers under DPDP; Android-only excludes iPhone clients; Supabase storage and free-plan limits; thin regional Indian food data; two-person scope; gym directory data source and accuracy; "Arcwell" trademark conflicts outside India (US software mark, US/Canada supplement mark) — IP India search required before branding spend. "HYROX" is a registered trademark: use the word only to describe training for the race, with no logo, styling or implied partnership (D76).

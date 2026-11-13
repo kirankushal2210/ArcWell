@@ -24,6 +24,7 @@ import { IconButton, PressableScale, Text } from "@/components/primitives";
 import {
   colors,
   type ColorRole,
+  controlHeight,
   focusRingWidth,
   radius,
   rhythm,
@@ -575,9 +576,10 @@ export function NextButton({
       accessibilityState={{ disabled }}
       accessibilityLabel={label}
       testID="onboarding-next"
+      hitSlop={{ top: (tapMin - controlHeight) / 2, bottom: (tapMin - controlHeight) / 2 }}
       style={[styles.next, disabled && styles.nextDisabled]}
     >
-      <Text weight="semibold" tone="onBrand">
+      <Text variant="label" weight="semibold" tone="onBrand">
         {label}
       </Text>
     </PressableScale>
@@ -690,7 +692,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: space[1],
-    height: 36,
+    minHeight: 36,
     paddingHorizontal: space[4],
     borderRadius: radius.full,
     backgroundColor: colors.surface,
@@ -726,7 +728,7 @@ const styles = StyleSheet.create({
   },
 
   next: {
-    minHeight: 52,
+    minHeight: controlHeight,
     borderRadius: radius.md,
     backgroundColor: colors.brand,
     alignItems: "center",

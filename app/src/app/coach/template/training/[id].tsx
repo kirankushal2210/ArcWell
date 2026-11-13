@@ -19,8 +19,9 @@ import { Page, PageHeader } from "@/features/coach/parts";
 import { emptyProgram, type TrainingProgram } from "@/features/coach/plans";
 import { ProgramEditor, programReady } from "@/features/coach/ProgramEditor";
 import { colors, rhythm, space } from "@/theme";
+import { useBillingGate } from "@/features/coach/limits";
 
-export default function TrainingTemplate() {
+function TrainingTemplateEditor() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { templates, saveTemplate, deleteTemplate, duplicateTemplate } =
     useCoachData();
@@ -141,3 +142,9 @@ const styles = StyleSheet.create({
     paddingTop: space[2],
   },
 });
+
+/** Locked while the coach's billing is lapsed (K-27). */
+export default function TrainingTemplate() {
+  const gate = useBillingGate();
+  return gate ?? <TrainingTemplateEditor />;
+}

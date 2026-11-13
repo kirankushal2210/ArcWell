@@ -7,12 +7,7 @@ import { ChevronLeft, ChevronRight, Plus, X } from "lucide-react-native";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
-import {
-  Button,
-  IconButton,
-  PressableScale,
-  Text,
-} from "@/components/primitives";
+import { IconButton, PressableScale, Text } from "@/components/primitives";
 import { SectionTabs } from "@/components/SectionTabs";
 import {
   kcalText,
@@ -31,11 +26,15 @@ import {
   slotLabel,
   sumMacros,
 } from "@/features/athlete/foods";
+import { athleteMenuAction } from "@/features/athlete/MenuParts";
 import { MealPlanBody } from "@/features/athlete/MealPlanBody";
-import { AthletePage, NotJoined } from "@/features/athlete/useMe";
+import { AthleteDock, AthletePage, NotJoined } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Bars, PageHeader, Pills } from "@/features/coach/parts";
 import { colors, radius, space } from "@/theme";
+import { WhyThis } from "@/features/science/WhyThis";
+import { WaterCard } from "@/features/athlete/Water";
+import { UndoDock } from "@/features/athlete/UndoDock";
 
 function Bar({ value, target }: { value: number; target: number }) {
   const pct = target > 0 ? Math.min(1, value / target) : 0;
@@ -79,7 +78,7 @@ function DayPage({
     : 0;
 
   return (
-    <AthletePage>
+    <AthletePage dock>
       <View style={styles.hero}>
         {target ? (
           <>
@@ -94,6 +93,25 @@ function DayPage({
               {Math.round(eaten.kcal).toLocaleString("en-IN")} eaten · target{" "}
               {target.toLocaleString("en-IN")}
             </Text>
+            <WhyThis
+              title="How your targets are set"
+              label="How targets are set"
+              points={[
+                "Calories start from your resting energy (the Mifflin–St Jeor equation) times your activity, then a small change for your goal.",
+                "Fat loss is kept to about 0.5–1% of your bodyweight a week. Slower loss kept more muscle in athletes.",
+                "Protein is about 1.8 g per kg a day, or 2.0 g while losing fat. Muscle gains level off around 1.6 g on average, and up to about 2.2 g may help those wanting the most.",
+                "With a higher body fat, Arcwell works protein out from a healthy reference weight so the target isn't inflated. That's our choice, not a research finding.",
+                "Aim for at least 25 g of fibre a day, and about 2 to 2.5 litres of water in total from drinks and food.",
+              ]}
+              sources={[
+                "mifflin1990",
+                "helms2014",
+                "morton2018",
+                "jager2017",
+                "efsa2010fibre",
+                "efsa2010water",
+              ]}
+            />
           </>
         ) : (
           <>
@@ -101,7 +119,9 @@ function DayPage({
               {Math.round(eaten.kcal).toLocaleString("en-IN")}
             </Text>
             <Text tone="muted">
-              kcal eaten · {n.coachName} is still setting your targets
+              {n.coached
+                ? `kcal eaten · ${n.coachName} is still setting your targets`
+                : "kcal eaten · no daily target set yet"}
             </Text>
           </>
         )}
@@ -128,6 +148,23 @@ function DayPage({
           ))}
         </View>
       ) : null}
+
+      {n.macros && plan && day.length ? (
+        <Text variant="caption" tone="muted">
+          {`Protein by meal: ${MEAL_SLOTS.filter((m) =>
+            day.some((l) => l.meal === m.value),
+          )
+            .map(
+              (m) =>
+                `${m.label} ${Math.round(sumMacros(day.filter((l) => l.meal === m.value).map((l) => l.macros)).p)} g`,
+            )
+            .join(
+              " · ",
+            )}. Aim for about ${Math.round(0.3 * (n.me?.weights.at(-1) ?? 70))}–${Math.round(0.4 * (n.me?.weights.at(-1) ?? 70))} g at each main meal.`}
+        </Text>
+      ) : null}
+
+      {date === today ? <WaterCard /> : null}
 
       {n.tier === "free" && !hideUpgrade ? (
         <View style={styles.upsell}>
@@ -182,11 +219,6 @@ function DayPage({
               ? "Start with what you just ate. Your recent foods are one tap away."
               : "Add what you remember. Something beats nothing."}
           </Text>
-          <Button
-            label={`Log ${slotLabel(date === today ? slotNow() : "lunch").toLowerCase()}`}
-            icon={Plus}
-            onPress={() => open(date === today ? slotNow() : "lunch")}
-          />
         </View>
       ) : null}
 
@@ -347,15 +379,18 @@ const TABS: { key: NutritionTab; label: string }[] = [
 /** Nutrition (D61): Day · Meal plan · Trends as section tabs, sharing one date. */
 export default function Nutrition() {
   const n = useNutrition();
+  const { removedFood } = useCoachData();
   const [today] = useState(todayKey);
   const [date, setDate] = useState(today);
   const [tab, setTab] = useState<NutritionTab>("day");
   if (!n.me) return <NotJoined />;
+  const slot = date === today ? slotNow() : "lunch";
   return (
     <View style={styles.root}>
       <PageHeader
         title="Nutrition"
         sub={n.coached && n.plan ? `Targets from ${n.coachName}` : undefined}
+        actions={[athleteMenuAction]}
       />
       <View style={styles.dates}>
         <IconButton
@@ -384,7 +419,7 @@ export default function Nutrition() {
             today={today}
             openPlan={() => setTab("plan")}
           />,
-          <AthletePage key="p">
+          <AthletePage key="p" dock>
             {n.macros ? (
               <MealPlanBody date={date} />
             ) : (
@@ -411,6 +446,21 @@ export default function Nutrition() {
           <TrendsPage key="t" date={date} />,
         ]}
       />
+      {removedFood?.clientId === n.me?.id ? (
+        <UndoDock />
+      ) : tab === "trends" ? null : (
+        <AthleteDock
+          label={`Log ${slotLabel(slot).toLowerCase()}`}
+          icon={Plus}
+          pillar="nutrition"
+          onPress={() =>
+            router.push({
+              pathname: "/athlete/food/add",
+              params: { meal: slot, date },
+            })
+          }
+        />
+      )}
     </View>
   );
 }
@@ -437,7 +487,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceRaised,
     overflow: "hidden",
   },
-  fill: { height: 8, borderRadius: radius.full, backgroundColor: colors.brand },
+  fill: {
+    height: 8,
+    borderRadius: radius.full,
+    backgroundColor: colors.nutrition,
+  },
   macros: { flexDirection: "row", gap: space[2] },
   macro: {
     flex: 1,

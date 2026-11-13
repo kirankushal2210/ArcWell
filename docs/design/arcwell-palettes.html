@@ -1,0 +1,181 @@
+<title>Arcwell Palette Options</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: five palette options, each a full-width band with its Today phone on one side and its swatches, tab worlds and mood on the other. Dark page by choice, like the app. */
+:root {
+  color-scheme: dark;
+  --page: #000; --card: #121214; --fg: #FFFFFF; --fg-2: #9A9AA3; --hair: #26262A;
+  --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--fg); font: 400 17px/1.47 var(--font); letter-spacing: -0.011em; -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 64px 120px; }
+h1, h2, h3, p { margin: 0; }
+h1 { font-size: clamp(2.4rem, 6.4vw, 4.4rem); line-height: 1.04; letter-spacing: -0.04em; font-weight: 800; text-align: center; text-wrap: balance; }
+.intro { display: grid; gap: 18px; justify-items: center; }
+.kicker { font-size: .95rem; font-weight: 600; color: var(--fg-2); }
+.lede { max-width: 46ch; text-align: center; font-size: clamp(1.1rem, 2vw, 1.3rem); line-height: 1.45; color: var(--fg-2); font-weight: 500; }
+.jump { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.jump a { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: 99px; background: var(--card); color: var(--fg); text-decoration: none; font: 600 .9rem/1 var(--font); }
+.jump a:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.jump i { display: flex; gap: 3px; }
+.jump i b { width: 10px; height: 10px; border-radius: 50%; display: block; }
+
+.opt { margin-top: 96px; display: grid; grid-template-columns: 320px 1fr; gap: 40px; align-items: center; }
+@media (max-width: 820px) { .opt { grid-template-columns: 1fr; justify-items: center; gap: 28px; } }
+.info { display: grid; gap: 20px; min-width: 0; width: 100%; }
+.info .tag { font: 700 .82rem/1 var(--font); color: var(--fg-2); }
+.info h2 { font-size: clamp(2rem, 4.2vw, 2.9rem); line-height: 1.05; letter-spacing: -0.035em; font-weight: 800; }
+.info .mood { color: var(--fg-2); font-size: 1.05rem; max-width: 56ch; }
+.info .mood b { color: var(--fg); font-weight: 600; }
+.sw { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+@media (max-width: 520px) { .sw { grid-template-columns: repeat(3, 1fr); } }
+.sw div { display: grid; gap: 6px; min-width: 0; }
+.sw i { display: block; height: 62px; border-radius: 16px; }
+.sw b { font-size: .82rem; }
+.sw span { font-size: .72rem; color: var(--fg-2); font-variant-numeric: tabular-nums; }
+.worlds { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+@media (max-width: 520px) { .worlds { grid-template-columns: repeat(2, 1fr); } }
+.world { border-radius: 18px; padding: 12px; min-height: 88px; display: grid; align-content: space-between; box-shadow: inset 0 0 0 .5px rgba(255,255,255,.08); }
+.world b { font-size: .78rem; }
+.world strong { font: 800 1.4rem/1 var(--font); letter-spacing: -0.035em; font-variant-numeric: tabular-nums; }
+.pros { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (max-width: 520px) { .pros { grid-template-columns: 1fr; } }
+.pros div { background: var(--card); border-radius: 18px; padding: 14px 16px; font-size: .9rem; color: var(--fg-2); }
+.pros div b { display: block; color: var(--fg); font-size: .82rem; margin-bottom: 4px; }
+
+/* Phone (same Today screen for every palette) */
+.phone { width: 300px; max-width: 100%; height: 640px; border-radius: 48px; position: relative; overflow: hidden; background: #000; color: #fff; box-shadow: 0 0 0 9px #111, 0 0 0 10px #333, 0 30px 70px rgba(0,0,0,.7); }
+.sb { position: absolute; inset: 0 0 auto; height: 46px; display: flex; justify-content: space-between; align-items: center; padding: 0 28px 0 34px; font: 600 .82rem/1 var(--font); z-index: 8; }
+.di { width: 92px; height: 27px; border-radius: 99px; background: #000; }
+.scroll { position: absolute; inset: 0; padding: 52px 14px 150px; display: flex; flex-direction: column; gap: 12px; }
+.row { display: flex; align-items: center; gap: 10px; }
+.sp { flex: 1; min-width: 0; }
+.date { font: 600 .74rem/1 var(--font); color: rgba(255,255,255,.62); text-transform: uppercase; letter-spacing: .03em; }
+.lt { font: 800 1.95rem/1.05 var(--font); letter-spacing: -0.035em; }
+.av { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font: 700 .64rem/1 var(--font); background: #2A2A2E; flex: none; }
+.glass { background: rgba(48,48,54,.46); backdrop-filter: blur(24px) saturate(190%); -webkit-backdrop-filter: blur(24px) saturate(190%); box-shadow: inset 0 0 0 .5px rgba(255,255,255,.2), inset 0 1px 0 rgba(255,255,255,.22), 0 10px 30px rgba(0,0,0,.45); }
+.gbtn { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none; }
+.hero { border-radius: 28px; padding: 16px; display: grid; gap: 6px; color: #000; }
+.hero .k { font: 700 .7rem/1 var(--font); letter-spacing: .06em; text-transform: uppercase; opacity: .72; }
+.hero .t { font: 800 1.55rem/1.05 var(--font); letter-spacing: -0.035em; }
+.hero .m { font: 600 .78rem/1.3 var(--font); opacity: .78; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.tile { border-radius: 22px; padding: 13px; display: grid; gap: 5px; background: rgba(255,255,255,.07); }
+.tile .k { font: 600 .7rem/1 var(--font); }
+.tile .v { font: 800 1.55rem/1 var(--font); letter-spacing: -0.035em; font-variant-numeric: tabular-nums; }
+.tile .v small { font-size: .7rem; letter-spacing: 0; color: rgba(255,255,255,.6); margin-left: 2px; }
+.tile .s { font-size: .68rem; color: rgba(255,255,255,.62); }
+.bar { height: 6px; border-radius: 99px; background: rgba(255,255,255,.12); overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: 99px; }
+.wk { display: flex; justify-content: space-between; padding: 10px 12px; border-radius: 20px; background: rgba(255,255,255,.06); }
+.wk div { display: grid; justify-items: center; gap: 5px; font: 600 .6rem/1 var(--font); color: rgba(255,255,255,.6); }
+.wk i { width: 24px; height: 24px; border-radius: 50%; display: block; background: rgba(255,255,255,.1); }
+.dock { position: absolute; left: 14px; right: 14px; bottom: 92px; height: 56px; border-radius: 99px; display: grid; place-items: center; color: #000; font: 800 1rem/1 var(--font); letter-spacing: -0.015em; z-index: 7; }
+.tabbar { position: absolute; left: 14px; right: 82px; bottom: 18px; height: 62px; border-radius: 99px; display: flex; align-items: center; justify-content: space-around; padding: 0 6px; z-index: 7; }
+.tab { display: grid; justify-items: center; gap: 3px; font: 600 .58rem/1 var(--font); padding: 7px 8px; border-radius: 99px; color: rgba(255,255,255,.62); }
+.tab svg { width: 22px; height: 22px; }
+.tab.on { color: #fff; background: rgba(255,255,255,.14); }
+.fab { position: absolute; right: 14px; bottom: 18px; width: 62px; height: 62px; border-radius: 50%; display: grid; place-items: center; z-index: 7; }
+.fab svg { width: 26px; height: 26px; }
+.badge { position: absolute; top: -2px; right: -2px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 99px; font: 800 .55rem/16px var(--font); color: #000; text-align: center; }
+
+.foot { margin-top: 110px; background: var(--card); border-radius: 28px; padding: 30px; display: grid; gap: 12px; }
+.foot h2 { font-size: clamp(1.8rem, 3.6vw, 2.4rem); letter-spacing: -0.03em; line-height: 1.08; font-weight: 800; }
+.foot p { color: var(--fg-2); max-width: 70ch; }
+.foot p b { color: var(--fg); }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-dumbbell" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" d="M6.5 6.5v11M17.5 6.5v11M3.5 9.5v5M20.5 9.5v5M6.5 12h11"/></symbol>
+    <symbol id="i-fork" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M7 3v8M4.5 3v5a2.5 2.5 0 0 0 5 0V3M7 11v10M17.5 3c-2.2 2.2-2.2 6.5 0 8.5V21"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M3.5 10.5 12 3.5l8.5 7V20a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" d="M12 5v14M5 12h14"/></symbol>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <header class="intro">
+    <p class="kicker">Arcwell · Liquid Glass · palette options</p>
+    <h1>Five palettes. Same screen.</h1>
+    <p class="lede">Everything else stays the same: true black, glass controls, the action dock, the tab bar and the + in the same places. Only the colours change. Each option passes contrast on black.</p>
+    <nav class="jump" id="jump" aria-label="Jump to a palette"></nav>
+  </header>
+
+  <div id="opts"></div>
+
+  <section class="foot" aria-label="My pick">
+    <h2>My pick: Jewel, or Volt if you want it bolder.</h2>
+    <p><b>Jewel</b> looks the most premium and the most Apple: four distinct gem colours that read clearly on black and stay pleasant to look at for months. <b>Volt</b> is the boldest and most memorable, a single signature colour like the big sports brands use, but the three pillars are told apart by icon and label rather than colour.</p>
+  </section>
+</div>
+
+<script>
+(function () {
+  var P = [
+    { id: "apple", name: "Apple Fitness", tag: "Option 1",
+      mood: "<b>Familiar and premium.</b> Apple's own dark system colours, the ones Fitness and Health use. Instantly feels native to anyone who has used an iPhone.",
+      c: { train: ["Orange", "#FF9230"], fuel: ["Green", "#30D158"], rest: ["Indigo", "#6D7CFF"], act: ["Blue", "#0091FF"], alert: ["Red", "#FF4245"] },
+      pro: "Safe, polished, zero risk of looking cheap.", con: "Looks like Apple, not like Arcwell. Little brand of its own." },
+    { id: "jewel", name: "Jewel", tag: "Option 2",
+      mood: "<b>Rich and luxurious.</b> Gemstone tones: ruby, emerald and sapphire for the pillars, white glass for actions, and amber for anything new. Deep, saturated and calm at the same time. Feels like a paid, high-end product.",
+      c: { train: ["Ruby", "#FF4D6A"], fuel: ["Emerald", "#2EE59D"], rest: ["Sapphire", "#7B8CFF"], act: ["White", "#FFFFFF"], alert: ["Amber", "#FFB020"] },
+      pro: "Distinctive, premium, easy on the eyes over long use.", con: "Less loud than Neon or Volt for a gym crowd." },
+    { id: "neon", name: "Neon Night", tag: "Option 3",
+      mood: "<b>Electric and energetic.</b> Magenta, acid lime and cyan, like a city at night. The loudest, most social-media palette; it looks like nothing else in fitness.",
+      c: { train: ["Magenta", "#FF2D87"], fuel: ["Acid lime", "#C6F432"], rest: ["Cyan", "#22D3EE"], act: ["Violet", "#A06BFF"], alert: ["Flame", "#FF5A36"] },
+      pro: "Maximum pop, very shareable screenshots.", con: "Can feel young or tiring; harder to look serious for coaches." },
+    { id: "arctic", name: "Arctic", tag: "Option 4",
+      mood: "<b>Cool and clean.</b> Ice blue, mint and lavender, with white glass actions and one hot pink for anything new. Fresh and calm, closest to Apple's Weather and Sleep screens.",
+      c: { train: ["Ice blue", "#5AC8FA"], fuel: ["Mint", "#63E6BE"], rest: ["Lavender", "#A78BFA"], act: ["White", "#FFFFFF"], alert: ["Hot pink", "#FF375F"] },
+      pro: "Very calm and modern; new things stand out instantly in pink.", con: "Training feels cool rather than intense." },
+    { id: "volt", name: "Volt", tag: "Option 5",
+      mood: "<b>One signature colour.</b> Everything is black, white and glass, plus a single electric volt for whatever you should do next. Pillars are told apart by icon and label. The boldest brand.",
+      c: { train: ["Volt", "#D7FF3A"], fuel: ["Volt", "#D7FF3A"], rest: ["Volt", "#D7FF3A"], act: ["White", "#FFFFFF"], alert: ["Red", "#FF453A"] },
+      pro: "Unmistakable brand; extremely clear what to tap.", con: "Loses colour coding between Training, Nutrition and Recovery." }
+  ];
+  function L(h){ var c=[1,3,5].map(function(i){ var x=parseInt(h.substr(i,2),16)/255; return x<=0.04045?x/12.92:Math.pow((x+0.055)/1.055,2.4)}); return 0.2126*c[0]+0.7152*c[1]+0.0722*c[2]; }
+  function cr(a,b){ var x=L(a),y=L(b); return ((Math.max(x,y)+0.05)/(Math.min(x,y)+0.05)).toFixed(1); }
+  function field(h, pct){ var n=[1,3,5].map(function(i){ return Math.round(parseInt(h.substr(i,2),16)*pct); }); return "#"+n.map(function(v){ return ("0"+v.toString(16)).slice(-2); }).join(""); }
+  function phone(p){
+    var t=p.c.train[1], f=p.c.fuel[1], r=p.c.rest[1], a=p.c.alert[1];
+    return '<div class="phone" role="img" aria-label="Today screen in the '+p.name+' palette">'+
+      '<div class="sb"><span>9:41</span><span class="di"></span><span>●●●</span></div>'+
+      '<div class="scroll">'+
+        '<div class="row"><div class="sp"><div class="date">Friday, 13 November</div><div class="lt">Morning, Priya</div></div>'+
+        '<div class="gbtn glass" style="position:relative"><div class="av" style="box-shadow:0 0 0 2px #000,0 0 0 4px '+a+'">AK</div><span class="badge" style="background:'+a+'">1</span></div></div>'+
+        '<div class="hero" style="background:'+t+'"><div class="k">Up next · Week 3 of 8</div><div class="t">Lower body B</div><div class="m">5 exercises · 16 sets · 45 min</div></div>'+
+        '<div class="two">'+
+          '<div class="tile"><div class="k" style="color:'+f+'">Nutrition</div><div class="v">1,294<small>kcal</small></div><div class="bar"><i style="width:52%;background:'+f+'"></i></div></div>'+
+          '<div class="tile"><div class="k" style="color:'+r+'">Recovery</div><div class="v">82<small>%</small></div><div class="s">Ready to train</div></div>'+
+        '</div>'+
+        '<div class="wk" aria-hidden="true">'+
+          ['M','T','W','T','F','S','S'].map(function(d,i){ var s = [0,1,3].indexOf(i)>=0 ? 'background:'+t : (i===2||i===6) ? 'background:transparent;box-shadow:inset 0 0 0 2px '+r : i===4 ? 'box-shadow:0 0 0 2px #fff' : ''; return '<div><i style="'+s+'"></i>'+d+'</div>'; }).join('')+
+        '</div>'+
+        '<div class="tile"><div class="row"><div class="av">AK</div><div class="sp" style="font-size:.78rem">Keep it light on your back: goblet squats, 3 × 12.</div></div></div>'+
+      '</div>'+
+      '<div class="dock" style="background:'+t+'">Start workout</div>'+
+      '<div class="tabbar glass"><div class="tab on"><svg><use href="#i-home"/></svg>Today</div><div class="tab"><svg><use href="#i-dumbbell"/></svg>Train</div><div class="tab"><svg><use href="#i-fork"/></svg>Fuel</div><div class="tab"><svg><use href="#i-moon"/></svg>Rest</div></div>'+
+      '<div class="fab glass"><svg><use href="#i-plus"/></svg></div>'+
+    '</div>';
+  }
+  var roles=[["train","Training"],["fuel","Nutrition"],["rest","Recovery"],["act","Actions"],["alert","New and alerts"]];
+  var out="", jump="";
+  P.forEach(function(p){
+    jump += '<a href="#'+p.id+'"><i>'+[p.c.train[1],p.c.fuel[1],p.c.rest[1],p.c.act[1]].map(function(h){return '<b style="background:'+h+'"></b>';}).join('')+'</i>'+p.name+'</a>';
+    out += '<section class="opt" id="'+p.id+'" aria-label="'+p.name+'">'+ phone(p) +
+      '<div class="info"><span class="tag">'+p.tag+'</span><h2>'+p.name+'</h2><p class="mood">'+p.mood+'</p>'+
+      '<div class="sw">'+roles.map(function(r){ var c=p.c[r[0]]; return '<div><i style="background:'+c[1]+'"></i><b>'+r[1]+'</b><span>'+c[0]+' · '+c[1]+' · '+cr(c[1],"#000000")+':1</span></div>'; }).join('')+'</div>'+
+      '<div class="worlds">'+[["train","Training","3 of 4"],["fuel","Nutrition","1,294"],["rest","Recovery","82%"],["act","Coach","4"]].map(function(w){ var h=p.c[w[0]][1]; return '<div class="world" style="background:'+field(h,0.11)+'"><b style="color:'+h+'">'+w[1]+'</b><strong>'+w[2]+'</strong></div>'; }).join('')+'</div>'+
+      '<div class="pros"><div><b>Strength</b>'+p.pro+'</div><div><b>Watch out</b>'+p.con+'</div></div>'+
+      '</div></section>';
+  });
+  document.getElementById('jump').innerHTML = jump;
+  document.getElementById('opts').innerHTML = out;
+})();
+</script>

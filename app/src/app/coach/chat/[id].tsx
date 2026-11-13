@@ -57,7 +57,7 @@ export default function Chat() {
           "Nice work today!",
           "Let's talk on a call this week.",
         ]}
-        onSend={(text, image) => send(c.id, text, image)}
+        onSend={(text, image, file) => send(c.id, text, image, file)}
       />
     </KeyboardAvoidingView>
   );

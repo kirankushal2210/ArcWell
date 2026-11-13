@@ -52,7 +52,12 @@ import {
   Tokens,
   Wheel,
 } from "./parts";
-import { athleteFlow, type Field, type Flow } from "./questions";
+import {
+  athleteFlow,
+  type Field,
+  type Flow,
+  questionShown,
+} from "./questions";
 
 export type QuestionScreenProps = {
   flow?: Flow;
@@ -62,8 +67,13 @@ export type QuestionScreenProps = {
 };
 
 /** Fill of each section's progress segment while on question `index`. */
-function progress({ sections, questions }: Flow, index: number) {
-  const q = questions[index];
+function progress(
+  { sections, questions: all }: Flow,
+  index: number,
+  answers: Record<string, unknown>,
+) {
+  const q = all[index];
+  const questions = all.filter((x) => questionShown(x, answers));
   const current = sections.findIndex((s) => s.id === q.section);
   return sections.map((s, k) => {
     if (k < current) return 1;
@@ -84,7 +94,9 @@ export function QuestionScreen({
   const insets = useSafeAreaInsets();
   const { answers, setAnswer } = useOnboarding();
   const section = sections.find((s) => s.id === q.section);
-  const inSection = questions.filter((x) => x.section === q.section);
+  const inSection = questions.filter(
+    (x) => x.section === q.section && questionShown(x, answers),
+  );
   const eyebrow = section
     ? `${section.name} · ${inSection.indexOf(q) + 1} of ${inSection.length}`
     : undefined;
@@ -149,7 +161,7 @@ export function QuestionScreen({
     >
       <View style={styles.top}>
         <ProgressBar
-          segments={q.hideProgress ? [] : progress(flow, index)}
+          segments={q.hideProgress ? [] : progress(flow, index, answers)}
           onBack={onBack}
           onSkip={q.skippable ? onNext : undefined}
         />
