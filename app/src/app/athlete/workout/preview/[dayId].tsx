@@ -115,8 +115,10 @@ export default function Preview() {
           </View>
         ) : null}
         <Text tone="muted" numeric>
-          About {estimateMinutes(day)} min · {day.exercises.length} exercises ·{" "}
-          {sets} sets
+          About {estimateMinutes(day)} min
+          {day.exercises.length > 1
+            ? ` · ${day.exercises.length} exercises · ${sets} sets`
+            : ""}
           {routine ? " · your template" : coached ? ` · from ${coachName}` : ""}
         </Text>
         {/* Only notes a person wrote: the coach's, or the athlete's own on a routine (D88). */}
@@ -146,7 +148,7 @@ export default function Preview() {
                 <View style={styles.flex}>
                   <Text weight="semibold">{e.name}</Text>
                   <Text variant="label" weight="regular" tone="muted" numeric>
-                    {e.sets} × {e.reps}
+                    {e.sets > 1 ? `${e.sets} × ${e.reps}` : e.reps}
                     {e.restSec ? ` · rest ${clockTime(e.restSec * 1000)}` : ""}
                     {last.length ? ` · last ${setLabel(last[0], e.name)}` : ""}
                   </Text>

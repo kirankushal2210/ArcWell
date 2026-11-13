@@ -18,13 +18,8 @@ import { athleteMenuAction } from "@/features/athlete/MenuParts";
 import { useTodayWorkout } from "@/features/athlete/QuickLog";
 import { todayDate } from "@/features/athlete/recovery";
 import { Ring, useRecovery } from "@/features/athlete/RecoveryParts";
-import { FoodScanButton } from "@/features/athlete/FoodScanButton";
-import {
-  AthleteDock,
-  AthletePage,
-  NotJoined,
-  useMe,
-} from "@/features/athlete/useMe";
+import { FoodScanButton, RoundAction } from "@/features/athlete/FoodScanButton";
+import { AthletePage, NotJoined, useMe } from "@/features/athlete/useMe";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { dueText, sentThisWeek } from "@/features/coach/checkins";
 import { useCoachData } from "@/features/coach/CoachData";
@@ -348,8 +343,10 @@ export default function Today() {
                 ) : null}
               </View>
               <Text tone="muted" numeric>
-                {today.exercises.length} exercises ·{" "}
-                {today.exercises.reduce((s, e) => s + e.sets, 0)} sets
+                {/* A run (one exercise) shows what to do; lifting days show the counts. */}
+                {today.exercises.length === 1
+                  ? today.exercises[0].reps
+                  : `${today.exercises.length} exercises · ${today.exercises.reduce((s, e) => s + e.sets, 0)} sets`}
               </Text>
             </>
           ) : // A rest day says just that (D93); the card shows a line only while the plan is coming.
@@ -496,13 +493,13 @@ export default function Today() {
           />
         ) : null}
       </AthletePage>
+      {/* D100: Start workout is a small round button like the food scan, not a full-width bar;
+          on workout days the scan sits just above it. */}
       {today && !doneToday ? (
-        <AthleteDock
-          label="Start workout"
-          icon={Play}
-          pillar="training"
-          onPress={openToday}
-        />
+        <>
+          <RoundAction icon={Play} label="Start workout" onPress={openToday} />
+          <FoodScanButton meal={slotNow()} level={1} />
+        </>
       ) : (
         <FoodScanButton meal={slotNow()} />
       )}
