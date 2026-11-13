@@ -24,6 +24,24 @@ export type Segment =
 
 export const SEASON = "25/26";
 
+/** What a HYROX athlete's exercise library leads with (D83): running, the eight stations, and the
+ * strength lifts the race plan uses. */
+export const HYROX_EXERCISES = [
+  "Running",
+  "Ski erg",
+  "Sled push",
+  "Sled pull",
+  "Burpee broad jumps",
+  "Rowing machine",
+  "Farmers walk",
+  "Sandbag walking lunge",
+  "Wall ball",
+  "Squat (barbell)",
+  "Romanian deadlift (barbell)",
+  "Walking lunge (dumbbell)",
+  "Pull up",
+];
+
 export const STATIONS: {
   key: StationKey;
   label: string;

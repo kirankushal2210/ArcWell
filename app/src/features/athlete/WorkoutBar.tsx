@@ -54,7 +54,7 @@ export function WorkoutBar() {
               : "Tap to keep logging"}
           </Text>
         </View>
-        <ChevronUp size={20} color={colors.onPillar} />
+        <ChevronUp size={20} color={colors.onBrand} />
       </PressableScale>
     </View>
   );
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     height: WORKOUT_BAR,
     paddingHorizontal: space[4],
     borderRadius: radius.md,
-    backgroundColor: colors.training,
+    backgroundColor: colors.brand,
   },
   flex: { flex: 1 },
   sub: { opacity: 0.75 },

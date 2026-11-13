@@ -211,7 +211,7 @@ export function QuickLog() {
                   size={22}
                   color={onFill ? colors.onPillar : colors.text}
                 />
-                <Text weight="semibold" tone={onFill ? "onBrand" : "default"}>
+                <Text weight="semibold" tone={onFill ? "onPillar" : "default"}>
                   {t.label}
                 </Text>
               </PressableScale>

@@ -24,6 +24,8 @@ export function useVisibility() {
   const s = me ? settingsOf(me.id) : undefined;
   const modules = modulesOf(s, me?.goal);
   const race = raceActive(s);
+  // HYROX athletes (goal or active race) see HYROX training only (D83).
+  const hyrox = race || goalKeyOf(me?.goal) === "hyrox";
   const has = (m: ModuleKey) =>
     modules.includes(m) ||
     // A race needs running and cardio whatever the switches say.
@@ -38,6 +40,7 @@ export function useVisibility() {
     modules,
     has,
     race,
+    hyrox,
     setModules,
     toggle: (m: ModuleKey, on: boolean) =>
       setModules(

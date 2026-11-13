@@ -50,7 +50,7 @@ export function MyRoutines({ me }: { me: Client }) {
                 onPress={() => setMenu(r)}
               />
             </View>
-            <Text tone="muted" numberOfLines={2}>
+            <Text tone="muted" numberOfLines={1}>
               {r.exercises.map((e) => e.name).join(", ")}
             </Text>
             <Button
@@ -68,8 +68,7 @@ export function MyRoutines({ me }: { me: Client }) {
       ) : (
         <View style={styles.empty}>
           <Text tone="muted" style={styles.center}>
-            Save a workout you repeat, like an extra arm day or a hotel-gym
-            circuit, and start it in one tap.
+            No routines yet.
           </Text>
           <Button
             label="New routine"

@@ -92,8 +92,10 @@ export function Button({
 }: ButtonProps) {
   const inactive = disabled || loading;
   const v = look[variant];
-  const fill = pillar && variant === "primary" ? pillarFill[pillar] : v.bg;
-  const fg = pillar && variant === "primary" ? colors.onPillar : v.fg;
+  // Training actions use the red primary with white text (D83); other pillars carry dark text.
+  const tinted = pillar && pillar !== "training" && variant === "primary";
+  const fill = tinted ? pillarFill[pillar] : v.bg;
+  const fg = tinted ? colors.onPillar : v.fg;
   const tone: TextTone = inactive ? "disabled" : v.tone;
   const height = size === "sm" ? controlHeightSm : controlHeight;
   const slop = Math.max(0, (tapMin - height) / 2);

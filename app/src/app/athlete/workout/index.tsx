@@ -41,6 +41,7 @@ import { Sheet, SheetRow } from "@/features/athlete/Sheet";
 import {
   type ActiveWorkout,
   clockTime,
+  countsVolume,
   defaultTarget,
   exerciseFrom,
   exType,
@@ -68,6 +69,11 @@ import {
   textSizes,
 } from "@/theme";
 import { OfflineBanner } from "@/features/system/SystemStates";
+import {
+  isCompound,
+  RPE_OPTIONS,
+  rpeTargetFor,
+} from "@/features/science/rules";
 
 const REST_STEPS = [0, 30, 60, 90, 120, 180];
 
@@ -123,6 +129,10 @@ export default function Workout() {
   const [finishing, setFinishing] = useState(false);
   const [noting, setNoting] = useState<string | null>(null);
   const [pad, setPad] = useState<KeypadTarget | null>(null);
+  /** The set whose RPE is being picked. */
+  const [rpeFor, setRpeFor] = useState<{ exId: string; setId: string } | null>(
+    null,
+  );
 
   // One clock for the elapsed time, the rest countdown and timed sets.
   useEffect(() => {
@@ -388,7 +398,12 @@ export default function Workout() {
 
         {active.exercises.map((e) => {
           const prev = previousSets(history, e.name);
-          const hint = suggestion(history, e);
+          const rpeT = rpeTargetFor(
+            me?.profile?.experience ?? "some",
+            isCompound(e.name),
+          );
+          const rated = countsVolume(exType(e));
+          const hint = suggestion(history, e, rated ? rpeT : undefined);
           if (e.skipped)
             return (
               <View key={e.id} style={[styles.card, styles.dim]}>
@@ -426,7 +441,8 @@ export default function Workout() {
                   <Text variant="heading">{e.name}</Text>
                   <Text variant="label" weight="regular" tone="muted">
                     {e.swappedFrom ? `Swapped for ${e.swappedFrom} · ` : ""}
-                    {e.group} · target {e.target} · rest{" "}
+                    {e.group} · target {e.target}
+                    {rated ? ` · RPE ${rpeT[0]}–${rpeT[1]}` : ""} · rest{" "}
                     {e.restSec ? clockTime(e.restSec * 1000) : "none"}
                   </Text>
                 </PressableScale>
@@ -511,6 +527,11 @@ export default function Workout() {
                     {fieldHead(f, exType(e))}
                   </Text>
                 ))}
+                {rated ? (
+                  <Text variant="caption" tone="muted" style={styles.colRpe}>
+                    RPE
+                  </Text>
+                ) : null}
                 <View style={styles.colTick} />
               </View>
 
@@ -573,7 +594,9 @@ export default function Workout() {
                       style={styles.colPrev}
                       numberOfLines={1}
                     >
-                      {p ? setLabel(p, e.name) : "—"}
+                      {p
+                        ? `${setLabel(p, e.name)}${typeof p.rpe === "number" ? ` @${p.rpe}` : ""}`
+                        : "—"}
                     </Text>
                     {setFields(e).map((f) => {
                       const type = exType(e);
@@ -663,6 +686,28 @@ export default function Workout() {
                         single ? styles.colWide : styles.colIn,
                       );
                     })}
+                    {rated ? (
+                      s.warmup ? (
+                        <View style={styles.colRpe} />
+                      ) : (
+                        <PressableScale
+                          onPress={() => setRpeFor({ exId: e.id, setId: s.id })}
+                          accessibilityRole="button"
+                          accessibilityLabel={`${e.name} set ${workNo} RPE, ${typeof s.rpe === "number" ? s.rpe : "not set"}`}
+                          style={[styles.cell, styles.colRpe]}
+                        >
+                          <Text
+                            weight="semibold"
+                            tone={
+                              typeof s.rpe === "number" ? "default" : "muted"
+                            }
+                            numeric
+                          >
+                            {typeof s.rpe === "number" ? String(s.rpe) : "–"}
+                          </Text>
+                        </PressableScale>
+                      )
+                    ) : null}
                     <PressableScale
                       onPress={() => tick(e, s)}
                       accessibilityRole="checkbox"
@@ -850,6 +895,32 @@ export default function Workout() {
           </View>
         </View>
       ) : null}
+
+      {/* RPE for a set: how many more good reps were left (helms2016rir) */}
+      <Sheet
+        visible={!!rpeFor}
+        onClose={() => setRpeFor(null)}
+        title="How hard was that set?"
+        sub="RPE: 10 means no more reps; each step down is one more rep left."
+      >
+        {RPE_OPTIONS.map((o) => (
+          <SheetRow
+            key={o.value}
+            label={o.label}
+            onPress={() => {
+              if (rpeFor) editSet(rpeFor.exId, rpeFor.setId, { rpe: o.value });
+              setRpeFor(null);
+            }}
+          />
+        ))}
+        <SheetRow
+          label="Clear"
+          onPress={() => {
+            if (rpeFor) editSet(rpeFor.exId, rpeFor.setId, { rpe: null });
+            setRpeFor(null);
+          }}
+        />
+      </Sheet>
 
       {/* Exercise options (F4-06) */}
       <Sheet
@@ -1148,7 +1219,8 @@ const styles = StyleSheet.create({
   setDone: { backgroundColor: colors.bg },
   colSet: { width: 32, alignItems: "center" },
   colPrev: { flex: 1 },
-  colIn: { width: 64 },
+  colIn: { width: 58 },
+  colRpe: { width: 44, alignItems: "center", justifyContent: "center" },
   colWide: { width: 136 },
   colTick: { width: 44 },
   timedRow: { flexDirection: "row", alignItems: "center", gap: space[2] },

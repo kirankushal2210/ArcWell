@@ -22,6 +22,8 @@ export type LoggedSet = {
   seconds: number | null;
   /** Distance for runs, rides and carries. Missing on sets logged before distance existed. */
   km?: number | null;
+  /** Effort on the reps-in-reserve RPE scale (6–10), optional (helms2016rir). */
+  rpe?: number | null;
   done: boolean;
 };
 
@@ -70,6 +72,7 @@ export type Session = {
       reps: number | null;
       seconds: number | null;
       km?: number | null;
+      rpe?: number | null;
       warmup: boolean;
     }[];
     note?: string;
@@ -189,7 +192,7 @@ export const defaultTarget = (name: string) => {
 };
 
 /** Volume counts lifted weight: kg × reps, including the added weight on weighted bodyweight moves. */
-const countsVolume = (t: ExerciseType) =>
+export const countsVolume = (t: ExerciseType) =>
   t === "weight_reps" || t === "weighted_bodyweight";
 
 export function exerciseFrom(
@@ -351,6 +354,7 @@ export function toSession(
                 reps: s.reps,
                 seconds: s.seconds,
                 km: s.km ?? null,
+                rpe: s.rpe ?? null,
                 warmup: s.warmup,
               }))
           : [],
@@ -381,6 +385,8 @@ const step = (name: string) =>
 export function suggestion(
   sessions: Session[],
   e: LoggedExercise,
+  /** Target RPE range for this exercise; with it, last session's effort steers the advice. */
+  rpe?: [number, number],
 ): { text: string; kg: number | null } | null {
   if (!countsVolume(exType(e))) return null;
   const last = previousSets(sessions, e.name);
@@ -388,6 +394,13 @@ export function suggestion(
   if (!last.length || top === null) return null;
   const kg = Math.max(...last.map((s) => s.kg ?? 0));
   const allTop = last.every((s) => (s.reps ?? 0) >= top);
+  const rated = last
+    .map((s) => s.rpe)
+    .filter((v): v is number => typeof v === "number");
+  const avgRpe = rated.length
+    ? rated.reduce((a, b) => a + b, 0) / rated.length
+    : null;
+  const next = Math.round((kg + step(e.name)) * 4) / 4;
   if (!kg)
     return allTop
       ? {
@@ -395,15 +408,24 @@ export function suggestion(
           kg: null,
         }
       : null;
-  if (allTop) {
-    const next = Math.round((kg + step(e.name)) * 4) / 4;
+  if (allTop && avgRpe !== null && rpe && avgRpe >= 9.5)
     return {
-      text: `Hit ${top} reps on every set last time. Try ${next} kg.`,
+      text: `${top} reps every set last time, but close to failure (RPE ${avgRpe.toFixed(1)}). Stay at ${kg} kg and aim for RPE ${rpe[1]}.`,
+      kg,
+    };
+  if (allTop)
+    return {
+      text: `Hit ${top} reps on every set last time${avgRpe !== null ? ` at RPE ${avgRpe.toFixed(1)}` : ""}. Try ${next} kg.`,
       kg: next,
     };
-  }
+  // Easy: a full rep or more below the bottom of the range, so 4+ reps left on compounds.
+  if (avgRpe !== null && rpe && avgRpe <= rpe[0] - 1)
+    return {
+      text: `Last time felt easy (RPE ${avgRpe.toFixed(1)}). Try ${next} kg.`,
+      kg: next,
+    };
   return {
-    text: `Stay at ${kg} kg and aim for one more rep than last time.`,
+    text: `Stay at ${kg} kg and aim for one more rep than last time${rpe ? `, around RPE ${rpe[0]}–${rpe[1]}` : ""}.`,
     kg,
   };
 }

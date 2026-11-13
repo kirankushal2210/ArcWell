@@ -15,12 +15,14 @@ import {
 import { PRESETS } from "@/features/athlete/programs";
 import { NotJoined, useMe } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
+import { useVisibility } from "@/features/athlete/visibility";
 import { Eyebrow, Group } from "@/features/coach/parts";
 import { colors, space } from "@/theme";
 
 export default function Programs() {
   const me = useMe();
   const { meTier, coachName } = useCoachData();
+  const { hyrox } = useVisibility();
   if (!me) return <NotJoined />;
   const back = backTo("/athlete/menu");
 
@@ -58,13 +60,11 @@ export default function Programs() {
             Programs are part of Arcwell Plus
           </Text>
           <Text tone="muted" style={styles.center}>
-            Multi-week programs for building muscle, strength or losing fat,
-            fitted to your equipment and built on the research. Your current
-            plan stays free.
+            Your current plan stays free.
           </Text>
         </View>
         <Group>
-          {PRESETS.map((p, i) => (
+          {(hyrox ? [HYROX_ROW] : PRESETS).map((p, i) => (
             <NavRow
               key={p.key}
               first={i === 0}
@@ -85,40 +85,46 @@ export default function Programs() {
           {`${me.program.name} · ${7 - (me.protocol?.restDays.length ?? 7 - me.program.days.length)} days a week · ${me.program.weeks} weeks`}
         </InfoCard>
       ) : null}
-      <Eyebrow>Arcwell programs</Eyebrow>
-      <Group>
-        {PRESETS.map((p, i) => (
-          <NavRow
-            key={p.key}
-            first={i === 0}
-            label={p.name}
-            sub={p.who}
-            onPress={() =>
-              router.push({
-                pathname: "/athlete/programs/[key]",
-                params: { key: p.key },
-              })
-            }
-          />
-        ))}
-      </Group>
-      <Text variant="caption" tone="muted">
-        Every program is built to the same rules as your plan: 10 to 20 hard
-        sets a week for each main muscle, sets ending 0 to 3 reps short of
-        failure, and progression you can see.
-      </Text>
-      <Eyebrow>Race prep</Eyebrow>
+      {hyrox ? null : (
+        <>
+          <Eyebrow>Arcwell programs</Eyebrow>
+          <Group>
+            {PRESETS.map((p, i) => (
+              <NavRow
+                key={p.key}
+                first={i === 0}
+                label={p.name}
+                sub={p.who}
+                onPress={() =>
+                  router.push({
+                    pathname: "/athlete/programs/[key]",
+                    params: { key: p.key },
+                  })
+                }
+              />
+            ))}
+          </Group>
+        </>
+      )}
+      <Eyebrow>HYROX</Eyebrow>
       <Group>
         <NavRow
           first
-          label="Train for a HYROX race"
-          sub="Running, strength and stations, planned back from race day"
+          label={HYROX_ROW.name}
+          sub={HYROX_ROW.who}
           onPress={() => router.push("/athlete/race/setup")}
         />
       </Group>
     </MenuPage>
   );
 }
+
+/** The one program a HYROX athlete sees (D83). */
+const HYROX_ROW = {
+  key: "hyrox",
+  name: "HYROX race plan",
+  who: "Running, stations and strength, planned back from race day",
+};
 
 const styles = StyleSheet.create({
   center: { textAlign: "center" },

@@ -191,6 +191,32 @@ const setsWord = (n: number) => `${fmt(n)} set${n === 1 ? "" : "s"}`;
  * going all the way gives at most a trivial extra benefit. So: 0–3 reps in reserve. Beginners learn
  * the lifts at 2–3 in reserve. RIR scale: helms2016rir.
  */
+/**
+ * RPE on the reps-in-reserve scale (helms2016rir): RPE 10 = no more reps possible, 9 = one left,
+ * 8 = two left, and so on. Targets mirror rirFor: RPE = 10 − reps in reserve.
+ */
+export const RPE_OPTIONS: { value: number; label: string }[] = [
+  { value: 10, label: "10 · couldn't do another rep" },
+  { value: 9.5, label: "9.5 · maybe one more" },
+  { value: 9, label: "9 · one more rep left" },
+  { value: 8.5, label: "8.5 · one, maybe two left" },
+  { value: 8, label: "8 · two reps left" },
+  { value: 7.5, label: "7.5 · two or three left" },
+  { value: 7, label: "7 · three reps left" },
+  { value: 6, label: "6 · four or more left" },
+];
+
+/** Target RPE range for an exercise, from the reps-in-reserve rule. */
+export function rpeTargetFor(
+  experience: string,
+  compound: boolean,
+): [number, number] {
+  if (experience === "new") return [7, 8];
+  return compound ? [7, 9] : [8, 10];
+}
+
+export const isCompound = (name: string) => COMPOUND.test(name);
+
 export function rirFor(experience: string, compound: boolean) {
   if (experience === "new") return "2–3";
   return compound ? "1–3" : "0–2";

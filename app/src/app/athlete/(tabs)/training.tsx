@@ -36,14 +36,12 @@ import {
 } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
 import { CardioCard } from "@/features/cardio/CardioCard";
+import { HYROX_EXERCISES } from "@/features/race/data";
 import { RacePage } from "@/features/race/RacePage";
 import { useVisibility } from "@/features/athlete/visibility";
 import { Eyebrow, Group, GroupRow, PageHeader } from "@/features/coach/parts";
 import { todayIndex, WEEKDAYS, weekSchedule } from "@/features/coach/plans";
 import { colors, radius, space } from "@/theme";
-import { timesPerWeek } from "@/features/science/rules";
-import { VolumePanel } from "@/features/science/VolumePanel";
-import { Tip } from "@/features/athlete/Tip";
 
 function PlanPage() {
   const me = useMe();
@@ -57,11 +55,7 @@ function PlanPage() {
         {/* W-02: joined through the coach's general link; the coach hasn't assigned a plan yet. */}
         <View style={styles.card}>
           <Text variant="title">{coachName} is building your plan</Text>
-          <Text tone="muted">
-            You&apos;ll get a notification when it&apos;s ready. Until then, log
-            any workout you do and
-            {` ${coachName}`} sees it.
-          </Text>
+          <Text tone="muted">Log any workout until it&apos;s ready.</Text>
         </View>
         <MyRoutines me={me} />
       </AthletePage>
@@ -111,7 +105,7 @@ function PlanPage() {
           <Text weight="semibold" tone="onBrand">
             Resume
           </Text>
-          <ChevronRight size={20} color={colors.onPillar} />
+          <ChevronRight size={20} color={colors.onBrand} />
         </PressableScale>
       ) : null}
 
@@ -120,10 +114,8 @@ function PlanPage() {
           <Text variant="title">Program complete</Text>
           <Text tone="muted">
             {coached
-              ? `You finished all ${pw.weeks} weeks. ${coachName} sets your next program.`
-              : meTier === "pro"
-                ? `You finished all ${pw.weeks} weeks. Your AI coach builds the next block from your logs.`
-                : `You finished all ${pw.weeks} weeks. Run it again, or edit it to keep progressing.`}
+              ? `${coachName} sets your next program.`
+              : `All ${pw.weeks} weeks done.`}
           </Text>
           {coached ? null : (
             <Button
@@ -190,28 +182,18 @@ function PlanPage() {
               {today.exercises.length} exercises · about{" "}
               {estimateMinutes(today)} min
             </Text>
-            <Text
-              variant="label"
-              weight="regular"
-              tone="muted"
-              numberOfLines={2}
-            >
-              {today.exercises.map((e) => e.name).join(" · ")}
-            </Text>
           </>
         ) : (
           <>
             <Text variant="title">Rest day</Text>
-            <Text tone="muted">
-              {me.protocol?.note ||
-                "Recovery is part of the plan. Pick any workout below if you still want to train."}
-            </Text>
+            <Text tone="muted">Recover today.</Text>
           </>
         )}
       </View>
 
+      <CardioCard />
+
       <View style={styles.between}>
-        <CardioCard />
         <Eyebrow>{`Your program · ${program.days.length} workouts`}</Eyebrow>
         {coached || me.formerCoach || meTier !== "pro" ? null : (
           <PressableScale
@@ -232,7 +214,7 @@ function PlanPage() {
       </View>
       {me.formerCoach ? (
         <Text variant="caption" tone="muted">
-          {`From ${me.formerCoach.coachName}, read-only. Follow it as it is, or start your own routines below.`}
+          {`Read-only, from ${me.formerCoach.coachName}.`}
         </Text>
       ) : null}
       <Group>
@@ -267,24 +249,6 @@ function PlanPage() {
           );
         })}
       </Group>
-
-      <Tip
-        id="training-volume"
-
-        text="Your weekly sets per muscle are checked against the research. Tap Why this? to see how."
-      />
-
-      <VolumePanel
-        days={program.days}
-        timesPerWeek={timesPerWeek(
-          program.days.length,
-          me.protocol?.restDays ?? [],
-        )}
-
-        compact
-
-        title="Your weekly sets per muscle"
-      />
 
       <MyRoutines me={me} />
 
@@ -354,6 +318,11 @@ export default function Training() {
             </View>
             <ExerciseList
               recent={recentNames(sessions(me.id))}
+              suggested={
+                vis.hyrox
+                  ? { title: "HYROX", names: HYROX_EXERCISES }
+                  : undefined
+              }
               onPress={(e) =>
                 router.push({
                   pathname: "/athlete/exercises/[name]",
@@ -419,7 +388,7 @@ const styles = StyleSheet.create({
     gap: space[2],
     padding: space[4],
     borderRadius: radius.lg,
-    backgroundColor: colors.training,
+    backgroundColor: colors.brand,
   },
   card: {
     gap: space[2],
@@ -447,7 +416,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
   },
   dotToday: { borderWidth: 2, borderColor: colors.training },
-  dotDone: { backgroundColor: colors.training, borderColor: colors.training },
+  dotDone: { backgroundColor: colors.brand, borderColor: colors.brand },
   edit: {
     flexDirection: "row",
     alignItems: "center",

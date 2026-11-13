@@ -23,7 +23,7 @@ Mockups and wireframes live in `docs/design/`.
 | Who designs | Founder + Claude; design system built directly in code, rough layouts as mockups | No design budget yet |
 | Where designs live | Interactive HTML mockups in `docs/design/` (Figma later if a designer joins) | No tool to learn; shareable |
 | Reference apps | Hevy (workout logging), MyFitnessPal (food logging), Trainerize/TrueCoach (coach side) | Proven patterns for each job |
-| Theme | Dark only for now: Liquid Glass with the Stone palette (D67); light theme later | Gym use, low light, OLED Android phones |
+| Theme | Dark only for now: black and red (D83), Liquid Glass for controls; light theme later | Gym use, low light, OLED Android phones |
 | Language | English only at launch; layouts allow ~40% longer text for a later Hindi version | Avoid redesign when adding Hindi |
 | Ergonomics | One-handed use mid-workout | Logging happens between sets |
 
@@ -116,35 +116,35 @@ Draft, not approved or user-tested. Rendered at 3× from [onboarding-flow.html](
 
 ### Colour
 
-Liquid Glass with the soft Stone palette, Honey for Training (D67, replaces the black and white of D50; earlier palettes in DECISIONS.md D47, D49 and D50). Dark only for now.
+Black and red (D83, replaces D67's Stone palette; earlier palettes in DECISIONS.md D47–D50 and D67). Liquid Glass stays for the functional layer. Dark only for now.
 
 | Token | Value | Use |
 |---|---|---|
-| `bg` | `#141416` | App background (charcoal) |
-| `surface` | `#1D1E21` | Cards |
-| `surfaceRaised` | `#26272B` | Inputs, pressed states, secondary buttons |
-| `border` | `#303136` | Dividers only |
-| `borderStrong` | `#77787F` | Input and tick-box outlines (3:1+ on every surface) |
-| `text` | `#ECEDF0` | Primary text |
-| `textMuted` | `#9C9CA6` | Secondary text |
-| `textDisabled` | `#5E5F66` | Disabled controls only (WCAG-exempt) |
-| `brand` | `#E8EAEE` | Primary actions (soft-white buttons) |
-| `brandHover` | `#CFD2D8` | Pressed step |
-| `onBrand` | `#141416` | Text on primary buttons |
-| `accent` / `focus` | `#ECEDF0` | Selection, focus, active tab |
-| `training` | `#E8B65E` | Honey: Training fills, rings, numbers |
-| `nutrition` | `#A9C79E` | Sage: Nutrition |
-| `recovery` | `#9FB4DC` | Slate: Recovery |
-| `onPillar` | `#141416` | Text on any coloured fill |
-| `success` | `#A9C79E` | Completed, positive |
-| `warning` | `#E79AA8` | Rose: needs attention, new items |
-| `danger` | `#F2877F` | Errors and destructive actions only |
-| `glass` | `rgb(60 62 70 / 0.42)` | Glass controls (with blur) |
-| `glassEdge` | `rgb(255 255 255 / 0.16)` | Hairline edge on glass |
-| `glassSolid` | `#2A2B30` | Glass where blur is off |
-| `scrim` | `rgb(0 0 0 / 0.6)` | Dims the screen behind sheets and dialogs |
+| `bg` | `#0A0A0A` | App background (black) |
+| `surface` | `#151515` | Cards |
+| `surfaceRaised` | `#1F1F1F` | Inputs, pressed states, secondary buttons |
+| `border` | `#2B2B2B` | Dividers only |
+| `borderStrong` | `#767676` | Input and tick-box outlines (3:1+ on every surface) |
+| `text` | `#F2F2F2` | Primary text |
+| `textMuted` | `#A3A3A3` | Secondary text |
+| `textDisabled` | `#5C5C5C` | Disabled controls only (WCAG-exempt) |
+| `brand` | `#D32F2F` | Primary actions (red buttons) |
+| `brandHover` | `#B71C1C` | Pressed step |
+| `onBrand` | `#FFFFFF` | Text on primary buttons |
+| `accent` / `focus` | `#FF5A52` | Selection, focus, active tab |
+| `training` | `#FF5A52` | Red: Training fills, rings, numbers |
+| `nutrition` | `#7BD389` | Green: Nutrition |
+| `recovery` | `#8AB4F8` | Blue: Recovery |
+| `onPillar` | `#0A0A0A` | Text on any pillar or accent fill |
+| `success` | `#7BD389` | Completed, positive |
+| `warning` | `#F5B841` | Amber: needs attention, new items |
+| `danger` | `#FF5A52` | Errors and destructive actions only |
+| `glass` | `rgb(36 36 36 / 0.5)` | Glass controls (with blur) |
+| `glassEdge` | `rgb(255 255 255 / 0.14)` | Hairline edge on glass |
+| `glassSolid` | `#1A1A1A` | Glass where blur is off |
+| `scrim` | `rgb(0 0 0 / 0.7)` | Dims the screen behind sheets and dialogs |
 
-Colour on charcoal, dark text on colour: white text never sits on a pillar colour. One coloured action per screen, in the pillar's colour; everything else is glass, raised or plain. Glass is for the functional layer only (tab bar, +, toolbar buttons, sheets), never for content. No gradients or glows. Rose and coral are never used for eating over a target. Every text pair passes WCAG AA (checked 2026-11-13: text 15.7:1 on bg, muted 6.8:1, dark text on primary 15.3:1, on Honey 9.9:1).
+Red on black. Primary buttons are red with white text; every other coloured fill carries dark text. One coloured action per screen; everything else is glass, raised or plain. Glass is for the functional layer only, never for content. No gradients or glows. Amber and red are never used for eating over a target. Every text pair passes WCAG AA (checked 2026-11-14: text 17.7:1 on bg, muted 7.9:1, white on primary 5.0:1, dark text on bright red 6.5:1).
 
 ### Typography
 

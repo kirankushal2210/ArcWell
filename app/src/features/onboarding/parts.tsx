@@ -515,7 +515,7 @@ export function DayPicker({
             }
             style={[styles.day, on && styles.dayOn]}
           >
-            <Text variant="label" tone={on ? "onBrand" : "default"}>
+            <Text variant="label" tone={on ? "onPillar" : "default"}>
               {d}
             </Text>
           </PressableScale>
@@ -697,7 +697,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.full,
     backgroundColor: colors.surface,
   },
-  tokenOn: { backgroundColor: colors.accent },
+  tokenOn: { backgroundColor: colors.brand },
 
   days: { flexDirection: "row", justifyContent: "space-between" },
   day: {
