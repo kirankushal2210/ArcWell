@@ -69,8 +69,9 @@ The front end is finished on sample data before any backend wiring (Phases 1–8
   - Coached athletes: no AI; their coach sees a plain low-recovery flag on the client profile and decides.
 - [x] **FE-7 System states and full QA loop:** loading, error, offline, permission denied, force update, maintenance, notification pre-ask (S-01 to S-06, X-07, F4-09, F7-03), PDF attach and viewer UI (F7-02, X-06), then a full walk of every screen as free, Pro, coached and coach, fixing what's found, until nothing is left (Phase 14 of the frontend execution prompt)
 
-- [ ] **FE-8 Habits and cardio fitness (D74–D81):** smaller buttons (D81); module preferences and `useVisibility()` (D78); Morning start card with the cortisol-rhythm curve (D80); Daily habits with the Today selector, library, habit sheets and safety checks (D74, D77); Cardio fitness with estimates, tests, interval sessions and the live timer (D79); long-exhale breathing, focus block, walk after a meal, nutrition signals, if-then plans and the coach habits section.
-- [ ] **FE-9 HYROX race track (D76):** race data by season, race goal and onboarding branch, Race section, race simulator and results, hybrid-race plan rules, coach builder blocks and the client Race section.
+- [x] **FE-8 Habits and cardio fitness (D74–D81):** smaller buttons (D81); module preferences and `useVisibility()` (D78); Morning start card with the cortisol-rhythm curve (D80); Daily habits with the Today selector, library, habit sheets and safety checks (D74, D77); Cardio fitness with estimates, tests, interval sessions and the live timer (D79); long-exhale breathing, focus block, walk after a meal, nutrition signals, if-then plans and the coach habits section.
+- [x] **FE-9 HYROX race track (D76):** race data by season, race goal and onboarding branch, Race section, race simulator and results, hybrid-race plan rules, and the client race summary for coaches.
+  - Not built yet: dedicated endurance and station blocks in the coach plan builder (coaches can already add runs and stations as exercises with reps such as "5 × 1 km"); Health Connect for steps, heart rate and watch VO2 max (needs the development build); the jet-lag travel mode (v1.1); live heart rate in the interval timer.
 
 ## Backend build (D72, D73)
 
