@@ -1,6 +1,6 @@
 // Start a race sim (D76): half sim, full sim or a real race; division; optional Roxzone timing; and
 // swaps for missing kit, marked so they're never compared with real stations.
-import { Redirect, router } from "expo-router";
+import { Redirect, router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
@@ -35,7 +35,11 @@ const SWAP: Partial<Record<StationKey, { kit: string; swap: string }>> = {
 
 export default function NewSim() {
   const rc = useRace();
-  const [kind, setKind] = useState<SimKind>("half");
+  // The Race page's buttons open this with the sim already chosen.
+  const { kind: asked } = useLocalSearchParams<{ kind?: string }>();
+  const [kind, setKind] = useState<SimKind>(
+    asked === "full" || asked === "race" ? asked : "half",
+  );
   const [division, setDivision] = useState<DivisionKey>(
     rc.goal?.division ?? "open_women",
   );

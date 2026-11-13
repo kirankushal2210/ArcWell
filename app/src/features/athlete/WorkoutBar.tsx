@@ -6,26 +6,30 @@ import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useWorkoutSummary } from "@/features/athlete/ActiveWorkout";
 import { PressableScale, Text } from "@/components/primitives";
 import { colors, radius, rhythm, space } from "@/theme";
 
 import { clockTime, now } from "./training";
-import { useCoachData } from "@/features/coach/CoachData";
 import { tabBarTop } from "@/features/coach/parts";
 
 const WORKOUT_BAR = 52;
 
 export function WorkoutBar() {
-  const { active } = useCoachData();
+  const active = useWorkoutSummary();
   const insets = useSafeAreaInsets();
   const [clock, setClock] = useState(now);
+  const on = !!active;
   useEffect(() => {
+    if (!on) return;
     const t = setInterval(() => setClock(now()), 1000);
     return () => clearInterval(t);
-  }, []);
+  }, [on]);
   if (!active) return null;
   const resting =
-    active.rest && active.rest.endsAt > clock ? active.rest.endsAt - clock : 0;
+    active.restEndsAt && active.restEndsAt > clock
+      ? active.restEndsAt - clock
+      : 0;
 
   return (
     <View

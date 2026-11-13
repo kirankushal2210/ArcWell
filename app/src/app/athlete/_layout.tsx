@@ -9,6 +9,8 @@ export default function AthleteLayout() {
     <Stack
       screenOptions={{
         headerShown: false,
+        // Screens under the top one don't re-render until they're shown again.
+        freezeOnBlur: true,
         contentStyle: { backgroundColor: colors.bg },
       }}
     />

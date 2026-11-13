@@ -46,6 +46,8 @@ export default function AthleteTabs() {
         )}
         screenOptions={{
           headerShown: false,
+          // Hidden tabs don't re-render while another tab is in use.
+          freezeOnBlur: true,
           sceneStyle: { backgroundColor: colors.bg },
         }}
       >

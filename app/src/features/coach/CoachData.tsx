@@ -2,6 +2,9 @@
 // It sits at the root of the app, standing in for the server: what the coach plans here is what the
 // coached athlete sees after joining (D56), and what the athlete logs shows up on the coach's side.
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AppState } from "react-native";
+
+import { useSetActive } from "@/features/athlete/ActiveWorkout";
 
 import {
   type AthleteSettings,
@@ -32,7 +35,7 @@ import {
   migrateNames,
   registerCustomExercises,
 } from "@/features/athlete/library";
-import type { ActiveWorkout, Session } from "@/features/athlete/training";
+import type { Session } from "@/features/athlete/training";
 
 import { buildCheckIn, type CheckInForm, type PhotoPose } from "./checkins";
 import { withInstagram } from "./instagram";
@@ -155,14 +158,6 @@ type CoachData = {
   /** A self-guided athlete's own record, built from their onboarding answers. */
   self: Client | null;
   startSelf: (c: Client, tier: "pro" | "free") => void;
-  /** The workout in progress on this phone (F4-02); kept while moving between tabs (F4-09). */
-  active: ActiveWorkout | null;
-  setActive: (
-    next:
-      | ActiveWorkout
-      | null
-      | ((w: ActiveWorkout | null) => ActiveWorkout | null),
-  ) => void;
   /** Finished workouts per athlete, newest first (F4-13). */
   sessions: (clientId: string) => Session[];
   finishWorkout: (clientId: string, s: Session) => void;
@@ -310,7 +305,6 @@ type Saved = {
   meId: string | null;
   meTier: AthleteTier;
   self: Client | null;
-  active: ActiveWorkout | null;
   history: Record<string, Session[]>;
   custom?: Exercise[];
   foodLogs?: Record<string, FoodLog[]>;
@@ -388,7 +382,8 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
   const [meId, setMeId] = useState<string | null>(null);
   const [meTier, setMeTier] = useState<AthleteTier>("coached");
   const [self, setSelf] = useState<Client | null>(null);
-  const [active, setActive] = useState<ActiveWorkout | null>(null);
+  // The workout in progress lives in its own store (ActiveWorkout.tsx) so logging a set is cheap.
+  const setActive = useSetActive();
   const [history, setHistory] = useState<Record<string, Session[]>>({});
   const [joiningCoach, setJoiningCoach] = useState(false);
   const [hydrated, setHydrated] = useState(false);
@@ -419,7 +414,6 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
         if (s.meId !== undefined) setMeId(s.meId);
         if (s.meTier) setMeTier(s.meTier);
         if (s.self !== undefined) setSelf(upgradeSelfPlan(s.self));
-        if (s.active !== undefined) setActive(s.active);
         if (s.history) setHistory(s.history);
         if (s.custom) setCustom(s.custom);
         if (s.foodLogs) setFoodLogs(s.foodLogs);
@@ -441,7 +435,6 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       meId,
       meTier,
       self,
-      active,
       history,
       custom: customExercises,
       foodLogs,
@@ -454,14 +447,24 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       settings,
       stacks,
     };
-    AsyncStorage.setItem(STORE_KEY, JSON.stringify(saved)).catch(() => {});
+    // Serialising the whole store is slow, so save once changes settle, and at once when the app
+    // leaves the foreground, instead of on every tap.
+    const save = () =>
+      AsyncStorage.setItem(STORE_KEY, JSON.stringify(saved)).catch(() => {});
+    const t = setTimeout(save, 800);
+    const sub = AppState.addEventListener("change", (st) => {
+      if (st !== "active") save();
+    });
+    return () => {
+      clearTimeout(t);
+      sub.remove();
+    };
   }, [
     hydrated,
     clients,
     meId,
     meTier,
     self,
-    active,
     history,
     customExercises,
     foodLogs,
@@ -646,8 +649,6 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
     },
     client: (id) =>
       self && id === self.id ? self : clients.find((c) => c.id === id),
-    active,
-    setActive,
     sessions: (id) => history[id] ?? [],
     foodLogs: (id) => foodLogs[id] ?? [],
     addFoodLogs: (id, logs) =>

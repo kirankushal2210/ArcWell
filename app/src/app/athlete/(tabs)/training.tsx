@@ -14,6 +14,10 @@ import {
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
+import {
+  useSetActive,
+  useWorkoutSummary,
+} from "@/features/athlete/ActiveWorkout";
 import { Button, PressableScale, Text } from "@/components/primitives";
 import { SectionTabs } from "@/components/SectionTabs";
 import {
@@ -45,8 +49,9 @@ import { colors, radius, space } from "@/theme";
 
 function PlanPage() {
   const me = useMe();
-  const { coachName, meTier, active, setActive, sessions, restartProgram } =
-    useCoachData();
+  const { coachName, meTier, sessions, restartProgram } = useCoachData();
+  const active = useWorkoutSummary();
+  const setActive = useSetActive();
   if (!me) return <NotJoined />;
   const coached = meTier === "coached";
   if (!me.program)
@@ -279,7 +284,9 @@ const RACE_TAB = { key: "race" as const, label: "Race" };
 /** Training (D61): Plan · History · Exercises as section tabs under the title. */
 export default function Training() {
   const me = useMe();
-  const { coachName, meTier, sessions, active, setActive } = useCoachData();
+  const { coachName, meTier, sessions } = useCoachData();
+  const active = useWorkoutSummary();
+  const setActive = useSetActive();
   const [tab, setTab] = useState<TrainingTab>("plan");
   const tw = useTodayWorkout();
   const vis = useVisibility();

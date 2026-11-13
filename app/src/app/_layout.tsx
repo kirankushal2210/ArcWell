@@ -17,6 +17,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { AuthProvider } from "@/features/auth/AuthProvider";
+import { ActiveWorkoutProvider } from "@/features/athlete/ActiveWorkout";
 import { CoachDataProvider } from "@/features/coach/CoachData";
 import { ScreenError } from "@/features/system/SystemStates";
 import { colors } from "@/theme";
@@ -54,21 +55,26 @@ export default function RootLayout() {
         <NavigationBar style="dark" />
         {/* Sample data shared by the coach and athlete sides until the backend exists. */}
         <AuthProvider>
-          <CoachDataProvider>
-            <Stack
-              screenOptions={{
-                headerShown: false,
-                contentStyle: { backgroundColor: colors.bg },
-              }}
-            >
-              {/* Once in the coach app, a swipe back must not land in onboarding again. */}
-              <Stack.Screen name="coach" options={{ gestureEnabled: false }} />
-              <Stack.Screen
-                name="athlete"
-                options={{ gestureEnabled: false }}
-              />
-            </Stack>
-          </CoachDataProvider>
+          <ActiveWorkoutProvider>
+            <CoachDataProvider>
+              <Stack
+                screenOptions={{
+                  headerShown: false,
+                  contentStyle: { backgroundColor: colors.bg },
+                }}
+              >
+                {/* Once in the coach app, a swipe back must not land in onboarding again. */}
+                <Stack.Screen
+                  name="coach"
+                  options={{ gestureEnabled: false }}
+                />
+                <Stack.Screen
+                  name="athlete"
+                  options={{ gestureEnabled: false }}
+                />
+              </Stack>
+            </CoachDataProvider>
+          </ActiveWorkoutProvider>
         </AuthProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

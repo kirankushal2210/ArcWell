@@ -5,6 +5,7 @@ import { KeyRound } from "lucide-react-native";
 import type { ComponentProps, ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
 
+import { useWorkoutSummary } from "@/features/athlete/ActiveWorkout";
 import { Button, Text } from "@/components/primitives";
 import { useCoachData } from "@/features/coach/CoachData";
 import { ActionDock, Page } from "@/features/coach/parts";
@@ -32,7 +33,7 @@ export function AthletePage({
  * takes this spot, so the dock steps aside.
  */
 export function AthleteDock(props: ComponentProps<typeof ActionDock>) {
-  const { active } = useCoachData();
+  const active = useWorkoutSummary();
   if (active) return null;
   return <ActionDock {...props} />;
 }

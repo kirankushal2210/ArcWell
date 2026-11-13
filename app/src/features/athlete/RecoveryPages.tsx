@@ -13,12 +13,15 @@ import {
 import { StyleSheet, View } from "react-native";
 
 import {
+  useSetActive,
+  useWorkoutSummary,
+} from "@/features/athlete/ActiveWorkout";
+import {
   Button,
   IconButton,
   PressableScale,
   Text,
 } from "@/components/primitives";
-import { useCoachData } from "@/features/coach/CoachData";
 import { Bars, Eyebrow } from "@/features/coach/parts";
 import { colors, fontFamilyFor, radius, space, textSizes } from "@/theme";
 
@@ -140,7 +143,8 @@ export function Overview({
   isToday: boolean;
   open: (t: RecoveryTab) => void;
 }) {
-  const { active, setActive } = useCoachData();
+  const active = useWorkoutSummary();
+  const setActive = useSetActive();
   const health = healthMetrics(r.inputs, day.date);
   const inRange = health?.filter((m) => m.inRange).length ?? 0;
   const bedtime = plannerFor(day, r.baseline, "peak").bed;
@@ -661,7 +665,8 @@ export function StrainPage({
       : s.score > hi
         ? "Above today's target: go easy for the rest of the day"
         : "In today's target range";
-  const { active, setActive } = useCoachData();
+  const active = useWorkoutSummary();
+  const setActive = useSetActive();
 
   return (
     <AthletePage dock>

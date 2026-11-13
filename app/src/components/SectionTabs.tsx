@@ -1,7 +1,7 @@
 // Section tabs (D61): the second navigation level, under a main tab's title. At most four, swipeable
 // left and right, with an underline on the active one. One component for the whole app; anything
 // deeper opens a detail page with Back, never a third tab bar.
-import { type ReactNode, useEffect, useRef } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import {
   type NativeScrollEvent,
   type NativeSyntheticEvent,
@@ -38,10 +38,23 @@ export function SectionTabs<T extends string>({
     tabs.findIndex((t) => t.key === value),
   );
 
+  // Pages mount the first time they're shown (or swiped next to), then stay mounted, so opening a
+  // tab doesn't build every page at once.
+  const [seen, setSeen] = useState(() => new Set([index]));
+  if (!seen.has(index)) setSeen(new Set([...seen, index]));
+
   // Keep the pager on the selected tab when it changes from outside (a tapped ring, a tab).
   useEffect(() => {
     pager.current?.scrollTo({ x: index * width, animated: true });
   }, [index, width]);
+
+  // Build the neighbour as soon as a swipe starts, so it isn't blank mid-swipe.
+  const onDrag = () => {
+    const near = [index - 1, index + 1].filter(
+      (i) => i >= 0 && i < pages.length && !seen.has(i),
+    );
+    if (near.length) setSeen(new Set([...seen, ...near]));
+  };
 
   const settle = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const i = Math.round(e.nativeEvent.contentOffset.x / width);
@@ -81,12 +94,13 @@ export function SectionTabs<T extends string>({
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         onMomentumScrollEnd={settle}
+        onScrollBeginDrag={onDrag}
         contentOffset={{ x: index * width, y: 0 }}
         style={styles.flex}
       >
         {pages.map((p, i) => (
           <View key={tabs[i]?.key ?? i} style={{ width }}>
-            {p}
+            {seen.has(i) ? p : null}
           </View>
         ))}
       </ScrollView>

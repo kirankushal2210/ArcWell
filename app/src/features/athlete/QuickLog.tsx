@@ -21,6 +21,10 @@ import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import {
+  useSetActive,
+  useWorkoutSummary,
+} from "@/features/athlete/ActiveWorkout";
 import { GlassSurface } from "@/components/GlassSurface";
 import {
   Button,
@@ -46,7 +50,8 @@ export const PLUS_RESERVE = TAB_BAR_HEIGHT + space[2];
 /** Today's planned workout, whether a workout is already logged today, and whether one is running. */
 export function useTodayWorkout() {
   const me = useMe();
-  const { active, sessions } = useCoachData();
+  const { sessions } = useCoachData();
+  const active = useWorkoutSummary();
   const schedule = me?.program
     ? weekSchedule(me.program, me.protocol?.restDays ?? [])
     : [];
@@ -68,7 +73,9 @@ type Tile = {
 
 export function QuickLog() {
   const me = useMe();
-  const { meTier, active, setActive, logWeight, settingsOf } = useCoachData();
+  const { meTier, logWeight, settingsOf } = useCoachData();
+  const active = useWorkoutSummary();
+  const setActive = useSetActive();
   const insets = useSafeAreaInsets();
   const today = useTodayWorkout();
   const water = useWater();

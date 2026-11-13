@@ -6,6 +6,10 @@ import { ChevronRight, PencilLine, Play } from "lucide-react-native";
 import { Alert, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import {
+  useSetActive,
+  useWorkoutSummary,
+} from "@/features/athlete/ActiveWorkout";
 import { Button, Text } from "@/components/primitives";
 import {
   clockTime,
@@ -23,15 +27,10 @@ import { isoToday } from "@/features/athlete/athleteData";
 export default function Preview() {
   const { dayId } = useLocalSearchParams<{ dayId: string }>();
   const me = useMe();
-  const {
-    active,
-    setActive,
-    sessions,
-    meTier,
-    coachName,
-    settingsOf,
-    setAthleteSettings,
-  } = useCoachData();
+  const { sessions, meTier, coachName, settingsOf, setAthleteSettings } =
+    useCoachData();
+  const active = useWorkoutSummary();
+  const setActive = useSetActive();
   const insets = useSafeAreaInsets();
   const back = () =>
     router.canGoBack() ? router.back() : router.replace("/athlete/training");
