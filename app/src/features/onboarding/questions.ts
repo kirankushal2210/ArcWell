@@ -1,5 +1,6 @@
 // Athlete onboarding questions (SPEC.md, D52): one question per screen in five sections.
 // Screens follow the hi-fi mockups AO-01 to AO-17 (docs/design/hifi-mockups/onboarding-flow.html).
+import { HORMONAL_OPTIONS } from "@/features/science/womensHealth";
 import {
   Activity,
   Armchair,
@@ -162,20 +163,29 @@ export type Question = {
 };
 
 /** equals: the answer is this; in: one of these; not: anything but this (unanswered counts). */
-export type Cond = { key: string; equals?: string; in?: string[]; not?: string };
+export type Cond = {
+  key: string;
+  equals?: string;
+  in?: string[];
+  not?: string;
+};
 
 const holds = (c: Cond, answers: Record<string, unknown>) => {
   const v = answers[c.key];
   if (c.equals !== undefined) return v === c.equals;
   if (c.in) return typeof v === "string" && c.in.includes(v);
-  if (c.not !== undefined) return v !== c.not;
+  // For lists (chips), "not" means the list doesn't include it.
+  if (c.not !== undefined)
+    return Array.isArray(v) ? !v.includes(c.not) : v !== c.not;
   return true;
 };
 
 /** Whether a question applies, given the answers so far. */
 export const questionShown = (q: Question, answers: Record<string, unknown>) =>
   !q.showIf ||
-  (Array.isArray(q.showIf) ? q.showIf : [q.showIf]).every((c) => holds(c, answers));
+  (Array.isArray(q.showIf) ? q.showIf : [q.showIf]).every((c) =>
+    holds(c, answers),
+  );
 
 export type Section = { id: string; name: string; dot?: ColorRole };
 export type Flow = { sections: Section[]; questions: Question[] };
@@ -289,6 +299,51 @@ export const questions: Question[] = [
     sub: "Pick the closest look. It doesn't need to be exact.",
     skippable: true,
     fields: [{ kind: "bodyFat", key: "bodyFatPct", sexKey: "sex" }],
+  },
+  // Women's hormonal health (D87): only for women, both skippable.
+  {
+    id: "WH-01",
+    section: "you",
+    glyph: Flower2,
+    title: "Do any of these apply to you?",
+    sub: "They can change how you train and eat.",
+    skippable: true,
+    showIf: { key: "sex", equals: "female" },
+    fields: [
+      {
+        kind: "chips",
+        key: "hormonal",
+        options: [...HORMONAL_OPTIONS],
+        exclusive: "None",
+      },
+      {
+        kind: "note",
+        text: "Only you, and your coach if you have one, see this. Arcwell isn't a medical service; your doctor's advice comes first.",
+      },
+    ],
+  },
+  {
+    id: "WH-02",
+    section: "you",
+    glyph: Flower2,
+    title: "Are your periods usually regular?",
+    skippable: true,
+    showIf: [
+      { key: "sex", equals: "female" },
+      { key: "hormonal", not: "Pregnant" },
+    ],
+    fields: [
+      {
+        kind: "single",
+        key: "cycle",
+        options: [
+          { value: "regular", label: "Regular" },
+          { value: "irregular", label: "Irregular" },
+          { value: "none", label: "No periods right now" },
+          { value: "skip", label: "Prefer not to say" },
+        ],
+      },
+    ],
   },
   // ---------- Your goal ----------
   {
@@ -449,7 +504,10 @@ export const questions: Question[] = [
     title: "Your recent 5 km time",
     sub: "A rough guess is fine. It sets your running paces.",
     skippable: true,
-    showIf: [{ key: "goal", equals: "hyrox" }, { key: "weeklyKm", not: "0" }],
+    showIf: [
+      { key: "goal", equals: "hyrox" },
+      { key: "weeklyKm", not: "0" },
+    ],
     fields: [
       {
         kind: "wheel",
@@ -467,7 +525,10 @@ export const questions: Question[] = [
     glyph: Dumbbell,
     title: "Which stations have you tried?",
     sub: "We'll teach the new ones early, at light weights.",
-    showIf: [{ key: "goal", equals: "hyrox" }, { key: "raceLevel", equals: "first" }],
+    showIf: [
+      { key: "goal", equals: "hyrox" },
+      { key: "raceLevel", equals: "first" },
+    ],
     fields: [
       {
         kind: "chips",
@@ -492,7 +553,10 @@ export const questions: Question[] = [
     section: "goal",
     glyph: Flag,
     title: "What's your aim for this race?",
-    showIf: [{ key: "goal", equals: "hyrox" }, { key: "raceLevel", equals: "first" }],
+    showIf: [
+      { key: "goal", equals: "hyrox" },
+      { key: "raceLevel", equals: "first" },
+    ],
     fields: [
       {
         kind: "single",
@@ -513,14 +577,22 @@ export const questions: Question[] = [
     glyph: Timer,
     title: "Your best HYROX finish time",
     sub: "From your results page, roughly.",
-    showIf: [{ key: "goal", equals: "hyrox" }, { key: "raceLevel", in: ["returning", "advanced"] }],
+    showIf: [
+      { key: "goal", equals: "hyrox" },
+      { key: "raceLevel", in: ["returning", "advanced"] },
+    ],
     fields: [
       {
         kind: "wheel",
         key: "prevMin",
         initial: 95,
         unit: "h:mm",
-        values: range(50, 180, 1, (v) => `${Math.floor(v / 60)}:${String(v % 60).padStart(2, "0")}`),
+        values: range(
+          50,
+          180,
+          1,
+          (v) => `${Math.floor(v / 60)}:${String(v % 60).padStart(2, "0")}`,
+        ),
       },
     ],
   },
@@ -530,7 +602,10 @@ export const questions: Question[] = [
     glyph: Target,
     title: "Where did you lose the most time?",
     sub: "Pick up to three. Your plan works on these first.",
-    showIf: [{ key: "goal", equals: "hyrox" }, { key: "raceLevel", in: ["returning", "advanced"] }],
+    showIf: [
+      { key: "goal", equals: "hyrox" },
+      { key: "raceLevel", in: ["returning", "advanced"] },
+    ],
     fields: [
       {
         kind: "single",
@@ -569,14 +644,22 @@ export const questions: Question[] = [
     title: "Your average run pace in that race",
     sub: "Per kilometre, across all 8 runs. Your results page shows it.",
     skippable: true,
-    showIf: [{ key: "goal", equals: "hyrox" }, { key: "raceLevel", equals: "advanced" }],
+    showIf: [
+      { key: "goal", equals: "hyrox" },
+      { key: "raceLevel", equals: "advanced" },
+    ],
     fields: [
       {
         kind: "wheel",
         key: "racePaceSec",
         initial: 270,
         unit: "/km",
-        values: range(195, 480, 5, (v) => `${Math.floor(v / 60)}:${String(v % 60).padStart(2, "0")}`),
+        values: range(
+          195,
+          480,
+          5,
+          (v) => `${Math.floor(v / 60)}:${String(v % 60).padStart(2, "0")}`,
+        ),
       },
     ],
   },
@@ -585,7 +668,10 @@ export const questions: Question[] = [
     section: "goal",
     glyph: Trophy,
     title: "What are you racing for this season?",
-    showIf: [{ key: "goal", equals: "hyrox" }, { key: "raceLevel", equals: "advanced" }],
+    showIf: [
+      { key: "goal", equals: "hyrox" },
+      { key: "raceLevel", equals: "advanced" },
+    ],
     fields: [
       {
         kind: "single",
@@ -616,7 +702,12 @@ export const questions: Question[] = [
         key: "targetMin",
         initial: 90,
         unit: "h:mm",
-        values: range(50, 180, 1, (v) => `${Math.floor(v / 60)}:${String(v % 60).padStart(2, "0")}`),
+        values: range(
+          50,
+          180,
+          1,
+          (v) => `${Math.floor(v / 60)}:${String(v % 60).padStart(2, "0")}`,
+        ),
       },
     ],
   },

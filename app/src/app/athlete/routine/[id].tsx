@@ -21,7 +21,7 @@ import { defaultTarget } from "@/features/athlete/training";
 import { NotJoined, useMe } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
 import { ExerciseRows } from "@/features/coach/ExerciseRows";
-import { Page, PageHeader } from "@/features/coach/parts";
+import { Page } from "@/features/coach/parts";
 import { type TrainingDay, uid } from "@/features/coach/plans";
 import {
   colors,
@@ -54,100 +54,102 @@ export default function RoutineEditor() {
     back();
   };
 
+  const ready = !!r.name.trim() && r.exercises.length > 0;
+  const remove = () =>
+    saved &&
+    Alert.alert(
+      `Delete ${saved.name}?`,
+      "Workouts you logged from it stay in your history.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => {
+            deleteRoutine(me.id, saved.id);
+            back();
+          },
+        },
+      ],
+    );
+
   return (
     <KeyboardAvoidingView
       style={styles.root}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <PageHeader
-        title={saved ? "Edit routine" : "New routine"}
-        onBack={back}
-        actions={
-          saved
-            ? [
-                {
-                  icon: Trash2,
-                  label: "Delete routine",
-                  onPress: () =>
-                    Alert.alert(
-                      `Delete ${saved.name}?`,
-                      "Workouts you logged from it stay in your history.",
-                      [
-                        { text: "Cancel", style: "cancel" },
-                        {
-                          text: "Delete",
-                          style: "destructive",
-                          onPress: () => {
-                            deleteRoutine(me.id, saved.id);
-                            back();
-                          },
-                        },
-                      ],
-                    ),
-                },
-              ]
-            : []
-        }
-      />
+      {/* Cancel · title · Save, so saving is always one tap away. */}
+      <View style={[styles.bar, { paddingTop: insets.top + space[2] }]}>
+        <Button label="Cancel" variant="ghost" size="sm" onPress={back} />
+        <Text weight="semibold" style={styles.barTitle}>
+          {saved ? "Edit routine" : "Create routine"}
+        </Text>
+        <Button
+          label="Save"
+          size="sm"
+          variant={ready ? "primary" : "secondary"}
+          onPress={save}
+        />
+      </View>
       <Page>
         <View style={styles.gap}>
           <TextInput
             value={r.name}
             onChangeText={(v) => setR((x) => ({ ...x, name: v }))}
-            placeholder="Routine name, e.g. Arms and abs"
+            placeholder="Routine title"
             placeholderTextColor={colors.textMuted}
             style={[styles.name, tried && !r.name.trim() && styles.nameError]}
             autoFocus={!saved}
-            accessibilityLabel="Routine name"
+            accessibilityLabel="Routine title"
           />
           {tried && !r.name.trim() ? (
             <Text variant="label" weight="regular" tone="danger">
-              Give your routine a name.
+              Give your routine a title.
             </Text>
           ) : null}
         </View>
-        <TextInput
-          value={r.note ?? ""}
-          onChangeText={(v) => setR((x) => ({ ...x, note: v }))}
-          placeholder="Note to self (optional)"
-          placeholderTextColor={colors.textMuted}
-          multiline
-          style={styles.note}
-          accessibilityLabel="Routine note"
-        />
 
         {r.exercises.length ? (
-          <View style={styles.card}>
-            <ExerciseRows
-              exercises={r.exercises}
-              onChange={(list) => setR((x) => ({ ...x, exercises: list }))}
+          <>
+            <View style={styles.card}>
+              <ExerciseRows
+                exercises={r.exercises}
+                onChange={(list) => setR((x) => ({ ...x, exercises: list }))}
+              />
+            </View>
+            <Button
+              label="Add exercise"
+              icon={Plus}
+              variant="secondary"
+              fullWidth
+              onPress={() => setPicking(true)}
+            />
+          </>
+        ) : (
+          <View style={styles.empty}>
+            <Dumbbell size={32} color={colors.textMuted} />
+            <Text tone={tried ? "danger" : "muted"} style={styles.center}>
+              Add an exercise to get started.
+            </Text>
+            <Button
+              label="Add exercise"
+              icon={Plus}
+              fullWidth
+              onPress={() => setPicking(true)}
             />
           </View>
-        ) : (
-          <View style={[styles.empty, tried && styles.emptyError]}>
-            <Dumbbell size={28} color={colors.textMuted} />
-            <Text tone="muted" style={styles.center}>
-              Add the exercises you want in this routine. You can change sets,
-              reps and rest after.
-            </Text>
-          </View>
         )}
-        <Button
-          label="Add exercises"
-          icon={Plus}
-          variant="secondary"
-          fullWidth
-          onPress={() => setPicking(true)}
-        />
+
+        {saved ? (
+          <Button
+            label="Delete routine"
+            icon={Trash2}
+            variant="destructive"
+            fullWidth
+            onPress={remove}
+          />
+        ) : null}
       </Page>
-      <View
-        style={[
-          styles.footer,
-          { paddingBottom: Math.max(insets.bottom, space[4]) },
-        ]}
-      >
-        <Button label="Save routine" fullWidth onPress={save} />
-      </View>
 
       <ExercisePicker
         visible={picking}
@@ -179,30 +181,28 @@ export default function RoutineEditor() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
+  bar: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space[2],
+    paddingHorizontal: rhythm.gutter,
+    paddingBottom: space[2],
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
+  },
+  barTitle: { flex: 1, textAlign: "center" },
   gap: { gap: space[1] },
   center: { textAlign: "center" },
   name: {
-    minHeight: 52,
-    paddingHorizontal: space[4],
-    borderRadius: radius.md,
-    backgroundColor: colors.surface,
+    minHeight: space[12],
+    paddingVertical: space[2],
     fontFamily: fontFamilyFor("semibold"),
-    fontSize: textSizes.lg,
+    fontSize: textSizes.xl,
     color: colors.text,
-    borderWidth: 1,
-    borderColor: colors.border,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
   },
-  nameError: { borderColor: colors.danger },
-  note: {
-    minHeight: 48,
-    paddingHorizontal: space[4],
-    paddingVertical: space[3],
-    borderRadius: radius.md,
-    backgroundColor: colors.surface,
-    fontFamily: fontFamilyFor("regular"),
-    fontSize: textSizes.base,
-    color: colors.text,
-  },
+  nameError: { borderBottomColor: colors.danger },
   card: {
     paddingHorizontal: space[4],
     paddingVertical: space[1],
@@ -212,12 +212,6 @@ const styles = StyleSheet.create({
   empty: {
     alignItems: "center",
     gap: space[3],
-    padding: space[6],
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderStyle: "dashed",
-    borderColor: colors.borderStrong,
+    paddingVertical: space[12],
   },
-  emptyError: { borderColor: colors.danger },
-  footer: { paddingHorizontal: rhythm.gutter, paddingTop: space[2] },
 });

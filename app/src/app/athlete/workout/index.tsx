@@ -82,11 +82,8 @@ import {
   textSizes,
 } from "@/theme";
 import { OfflineBanner } from "@/features/system/SystemStates";
-import {
-  isCompound,
-  RPE_OPTIONS,
-  rpeTargetFor,
-} from "@/features/science/rules";
+import { RpeScale } from "@/features/athlete/RpeScale";
+import { isCompound, rpeTargetFor } from "@/features/science/rules";
 
 const REST_STEPS = [0, 30, 60, 90, 120, 180];
 
@@ -359,6 +356,10 @@ function Logger({
     : [];
   const rest = active.rest;
 
+  const rpeEx = rpeFor
+    ? active.exercises.find((e) => e.id === rpeFor.exId)
+    : undefined;
+  const rpeSet = rpeEx?.sets.find((x) => x.id === rpeFor?.setId);
   const padEx = pad
     ? active.exercises.find((e) => e.id === pad.exId)
     : undefined;
@@ -620,25 +621,20 @@ function Logger({
         visible={!!rpeFor}
         onClose={() => setRpeFor(null)}
         title="How hard was that set?"
-        sub="RPE: 10 means no more reps; each step down is one more rep left."
       >
-        {RPE_OPTIONS.map((o) => (
-          <SheetRow
-            key={o.value}
-            label={o.label}
-            onPress={() => {
-              if (rpeFor) editSet(rpeFor.exId, rpeFor.setId, { rpe: o.value });
+        {rpeEx && rpeSet ? (
+          <RpeScale
+            value={rpeSet.rpe}
+            target={rpeTargetFor(
+              me.profile?.experience ?? "some",
+              isCompound(rpeEx.name),
+            )}
+            onPick={(v) => {
+              editSet(rpeEx.id, rpeSet.id, { rpe: v });
               setRpeFor(null);
             }}
           />
-        ))}
-        <SheetRow
-          label="Clear"
-          onPress={() => {
-            if (rpeFor) editSet(rpeFor.exId, rpeFor.setId, { rpe: null });
-            setRpeFor(null);
-          }}
-        />
+        ) : null}
       </Sheet>
 
       {/* Exercise options (F4-06) */}

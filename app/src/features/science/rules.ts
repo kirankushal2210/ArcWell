@@ -196,14 +196,16 @@ const setsWord = (n: number) => `${fmt(n)} set${n === 1 ? "" : "s"}`;
  * 8 = two left, and so on. Targets mirror rirFor: RPE = 10 − reps in reserve.
  */
 export const RPE_OPTIONS: { value: number; label: string }[] = [
-  { value: 10, label: "10 · couldn't do another rep" },
-  { value: 9.5, label: "9.5 · maybe one more" },
-  { value: 9, label: "9 · one more rep left" },
-  { value: 8.5, label: "8.5 · one, maybe two left" },
-  { value: 8, label: "8 · two reps left" },
-  { value: 7.5, label: "7.5 · two or three left" },
-  { value: 7, label: "7 · three reps left" },
-  { value: 6, label: "6 · four or more left" },
+  { value: 10, label: "Failure: no more reps" },
+  { value: 9, label: "1 rep left" },
+  { value: 8, label: "2 reps left" },
+  { value: 7, label: "3 reps left" },
+  { value: 6, label: "4 reps left" },
+  { value: 5, label: "5 or 6 reps left" },
+  { value: 4, label: "Easy, many reps left" },
+  { value: 3, label: "Light" },
+  { value: 2, label: "Very light" },
+  { value: 1, label: "Barely any effort" },
 ];
 
 /** Target RPE range for an exercise, from the reps-in-reserve rule. */

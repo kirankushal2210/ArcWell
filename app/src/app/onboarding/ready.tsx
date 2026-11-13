@@ -22,6 +22,7 @@ import { NextButton } from "@/features/onboarding/parts";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { colors, radius, rhythm, space } from "@/theme";
 import { WhyThis } from "@/features/science/WhyThis";
+import { womensNotes, WOMENS_SOURCES } from "@/features/science/womensHealth";
 
 export default function Ready() {
   const { answers } = useOnboarding();
@@ -42,6 +43,7 @@ export default function Ready() {
   }, [scale]);
 
   const n = plan.nutrition;
+  const notes = womensNotes(answers);
   const r = plan.protocol;
 
   return (
@@ -133,6 +135,31 @@ export default function Ready() {
             {plan.summary.diet} · {n.meals.length} meals a day
           </Text>
         </View>
+
+        {notes.length ? (
+          <View style={styles.card}>
+            <View style={styles.head}>
+              <Text variant="eyebrow" tone="muted" style={styles.grow}>
+                For you
+              </Text>
+              <WhyThis
+                label="Why?"
+                title="Hormonal health and your plan"
+                points={[
+                  "PCOS: healthy eating and activity help everyone with PCOS, with no single diet preferred, even without weight loss.",
+                  "Pregnancy: without medical reasons not to, about 150 minutes of moderate activity a week is advised. No calorie deficit.",
+                  "Your cycle changed performance only slightly on average, so training isn't scheduled around it.",
+                ]}
+                sources={WOMENS_SOURCES}
+              />
+            </View>
+            {notes.map((t) => (
+              <Text key={t} variant="label" weight="regular">
+                {t}
+              </Text>
+            ))}
+          </View>
+        ) : null}
 
         <View style={styles.card}>
           <View style={styles.head}>

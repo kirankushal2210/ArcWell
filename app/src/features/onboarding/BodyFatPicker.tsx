@@ -1,97 +1,215 @@
-// Body fat level (onboarding, D84): nine drawn torsos from lean to high, with ranges for men and for
-// women. A visual estimate, so the answer is the middle of the picked range. Drawn here as simple
-// outlines (no photos or third-party art): the waist widens and ab lines fade as the level rises.
+// Body fat level (onboarding, D84, D87): eight illustrated figures per sex, from lean to high,
+// following the usual visual reference levels (men 8–40%, women 12–45%). Drawn here as original
+// illustrations, not photos: shoulders, arms, waist and belly change with the level, muscle lines
+// fade, and the belly and love handles grow. Tiles fade in one after another; the picked one pops.
 import { Check } from "lucide-react-native";
+import { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
-import Svg, { Path } from "react-native-svg";
+import Animated, {
+  FadeInDown,
+  ReduceMotion,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
+import Svg, { Ellipse, G, Path } from "react-native-svg";
 
 import { PressableScale, Text } from "@/components/primitives";
-import {
-  BODY_FAT_BANDS,
-  bandLabel,
-  bandValue,
-} from "@/features/science/bodyFat";
+import { BODY_FAT_LEVELS, levelLabel } from "@/features/science/bodyFat";
 import { colors, radius, space } from "@/theme";
+import { figureColors as fc } from "@/theme/figures";
 
-/** One torso; `t` runs from 0 (leanest) to 1 (highest). */
-function Torso({ t, female }: { t: number; female: boolean }) {
-  const sh = female ? 36 : 42; // shoulder half-width
-  const lat = sh - 7 + t * 4; // under the arms
-  const waist = (female ? 19 : 22) + t * 19;
-  const hip = (female ? 30 : 25) + t * 15;
-  const belly = t * t * 14;
-  const R = (dx: number) => 50 + dx;
-  const L = (dx: number) => 50 - dx;
-  // Neck, trapezius, round shoulder, lat, waist, hips; right side down, left side back up.
-  const d = [
-    `M${R(8)},4 L${R(9)},12`,
-    `Q${R(20)},14 ${R(sh - 6)},19`,
-    `Q${R(sh + 1)},22 ${R(sh)},32`,
-    `Q${R(sh - 1)},36 ${R(lat)},40`,
-    `Q${R(waist + belly)},${60 + t * 4} ${R(waist)},76`,
-    `Q${R(hip + belly / 2)},86 ${R(hip)},100`,
-    `L${L(hip)},100`,
-    `Q${L(hip + belly / 2)},86 ${L(waist)},76`,
-    `Q${L(waist + belly)},${60 + t * 4} ${L(lat)},40`,
-    `Q${L(sh - 1)},36 ${L(sh)},32`,
-    `Q${L(sh + 1)},22 ${L(sh - 6)},19`,
-    `Q${L(20)},14 ${L(9)},12`,
-    `L${L(8)},4 Z`,
+const clamp = (v: number) => Math.max(0, Math.min(1, v));
+
+/** One figure, chin to mid-thigh; `t` runs from 0 (leanest) to 1 (highest). */
+export function Figure({ t, female }: { t: number; female: boolean }) {
+  const C = 50;
+  const sh = (female ? 27 : 33) + t * 3; // shoulder half-width
+  const neck = (female ? 5 : 6.5) + t * 2;
+  const pit = sh - (female ? 7 : 8); // torso half-width under the arms
+  const waist = (female ? 13 : 19) + t * (female ? 16 : 17);
+  const hip = (female ? 25 : 21) + t * (female ? 13 : 14);
+  const belly = 16 * t * t; // sideways spill at the waist
+  const drop = 6 * t; // chest and belly sit lower
+  const armW = (female ? 7 : 9) + t * 5;
+  const R = (dx: number) => C + dx;
+  const L = (dx: number) => C - dx;
+  const top = 84; // shorts line
+
+  const torso = [
+    `M${L(neck)},0 L${R(neck)},0`,
+    `L${R(neck)},7 Q${R(sh - 8)},9 ${R(sh - 2)},16`,
+    `L${R(pit)},30`,
+    `Q${R(waist + belly)},${56 + drop} ${R(waist)},${70 + drop / 2}`,
+    `Q${R(hip + belly / 3)},${78 + drop / 2} ${R(hip)},${top + 2}`,
+    `L${L(hip)},${top + 2}`,
+    `Q${L(hip + belly / 3)},${78 + drop / 2} ${L(waist)},${70 + drop / 2}`,
+    `Q${L(waist + belly)},${56 + drop} ${L(pit)},30`,
+    `L${L(sh - 2)},16 Q${L(sh - 8)},9 ${L(neck)},7 Z`,
   ].join(" ");
-  const ink = colors.surface;
-  const abs = Math.max(0, 1 - t * 2); // six-pack fades out by the middle levels
-  const sag = t * 6;
+
+  // Arms hang at the sides; they thicken with the level.
+  const arm = (s: 1 | -1) => {
+    const x = (dx: number) => C + s * dx;
+    // Outside of the arm: pushed out as the waist widens, so the arms stay clear of the body.
+    const o = Math.max(sh + 3, waist + belly * 0.7 + armW - 3);
+    return [
+      `M${x(sh - 6)},14`,
+      `Q${x(o + 1)},14 ${x(o)},28`,
+      `Q${x(o + 1)},48 ${x(o - 1)},58`,
+      `L${x(o - 2)},82`,
+      `Q${x(o - armW / 2)},90 ${x(o - armW + 1)},82`,
+      `L${x(o - armW)},58`,
+      `Q${x(o - armW - 1)},40 ${x(pit + 1)},30 Z`,
+    ].join(" ");
+  };
+
+  const shorts = [
+    `M${L(hip + 1)},${top} L${R(hip + 1)},${top}`,
+    `L${R(hip + 3)},116 L${R(2)},116 L${C},104 L${L(2)},116 L${L(hip + 3)},116 Z`,
+  ].join(" ");
+  const side = (s: 1 | -1) => {
+    const x = (dx: number) => C + s * dx;
+    return `M${x(pit)},30 Q${x(waist + belly)},${56 + drop} ${x(waist)},${70 + drop / 2} L${x(waist - 4)},${70 + drop / 2} Q${x(waist + belly - 5)},${56 + drop} ${x(pit - 4)},32 Z`;
+  };
+
+  const abs = clamp(1 - t * (female ? 3 : 2.6));
+  const obliques = clamp(1 - t * 1.8);
+  const chestLine = clamp(1 - t * 0.5);
+
   return (
-    <Svg viewBox="0 0 100 100" width="100%" height="100%">
-      <Path d={d} fill={colors.textMuted} />
-      {/* Chest: two arcs from the breastbone, lower and softer as fat rises. */}
-      <Path
-        d={`M50,28 Q${L(sh - 14)},${30 + sag} ${L(sh - 9)},${40 + sag} M50,28 Q${R(sh - 14)},${30 + sag} ${R(sh - 9)},${40 + sag}`}
-        stroke={ink}
-        strokeWidth={1.8}
-        fill="none"
-        strokeLinecap="round"
-        opacity={0.35 + 0.65 * (1 - t * 0.6)}
-      />
-      {abs > 0 ? (
-        <Path
-          d={[
-            "M50,46 L50,86",
-            ...[52, 61, 70].map(
-              (y) =>
-                `M${L(9)},${y} Q${L(4)},${y + 1.5} 50,${y} Q${R(4)},${y + 1.5} ${R(9)},${y}`,
-            ),
-            `M${L(10)},46 Q${L(12)},64 ${L(8)},84`,
-            `M${R(10)},46 Q${R(12)},64 ${R(8)},84`,
-          ].join(" ")}
-          stroke={ink}
-          strokeWidth={1.6}
-          fill="none"
-          strokeLinecap="round"
-          opacity={abs}
-        />
-      ) : null}
-      {t >= 0.5 ? (
-        <>
-          {/* Navel and the fold under the belly. */}
+    <Svg viewBox="-12 0 124 120" width="100%" height="100%">
+      <Path d={torso} fill={fc.skin} />
+      {/* Sides in shade give the torso some depth. */}
+      <Path d={side(1)} fill={fc.skinShade} opacity={0.55} />
+      <Path d={side(-1)} fill={fc.skinShade} opacity={0.55} />
+      {female ? (
+        // Sports top: straps and a shaped band with a dip in the middle.
+        <G>
           <Path
-            d={`M49,${70 + t * 4} Q50,${72 + t * 4} 51,${70 + t * 4}`}
-            stroke={ink}
-            strokeWidth={1.8}
-            fill="none"
+            d={`M${L(neck + 2)},6 L${L(pit - 5)},26 M${R(neck + 2)},6 L${R(pit - 5)},26`}
+            stroke={fc.top}
+            strokeWidth={2.4}
             strokeLinecap="round"
           />
           <Path
-            d={`M${L(waist - 2)},${84 + t * 2} Q50,${92 + t * 4} ${R(waist - 2)},${84 + t * 2}`}
-            stroke={ink}
+            d={`M${L(pit - 1)},26 Q${L(pit * 0.5)},${21 + drop / 2} ${C},${27 + drop / 2} Q${R(pit * 0.5)},${21 + drop / 2} ${R(pit - 1)},26 L${R(pit - 2)},${38 + drop} Q${C},${40 + drop} ${L(pit - 2)},${38 + drop} Z`}
+            fill={fc.top}
+          />
+        </G>
+      ) : null}
+      <G stroke={fc.line} strokeLinecap="round" fill="none" strokeWidth={1.3}>
+        {female ? null : (
+          <>
+            {/* Chest: firm and square when lean, lower and rounder as fat rises. */}
+            <Path
+              d={`M${C},22 Q${L(sh - 14)},${34 + drop} ${L(pit - 1)},${36 + drop}`}
+              opacity={chestLine}
+            />
+            <Path
+              d={`M${C},22 Q${R(sh - 14)},${34 + drop} ${R(pit - 1)},${36 + drop}`}
+              opacity={chestLine}
+            />
+          </>
+        )}
+        {abs > 0 ? (
+          <G opacity={abs}>
+            <Path d={`M${C},${female ? 46 : 40} L${C},74`} />
+            {[48, 56, 64].map((y) => (
+              <Path key={y} d={`M${L(8)},${y} Q${C},${y + 2} ${R(8)},${y}`} />
+            ))}
+          </G>
+        ) : null}
+        {obliques > 0 ? (
+          <G opacity={obliques * 0.8}>
+            <Path d={`M${L(11)},42 Q${L(13)},60 ${L(9)},78`} />
+            <Path d={`M${R(11)},42 Q${R(13)},60 ${R(9)},78`} />
+          </G>
+        ) : null}
+        {t > 0.45 ? (
+          // Belly fold over the waistband.
+          <Path
+            d={`M${L(waist - 3)},${78 + drop / 2} Q${C},${84 + drop} ${R(waist - 3)},${78 + drop / 2}`}
+            opacity={clamp((t - 0.45) * 2.5)}
             strokeWidth={1.6}
-            fill="none"
-            strokeLinecap="round"
-            opacity={t}
           />
-        </>
-      ) : null}
+        ) : null}
+      </G>
+      <Ellipse
+        cx={C}
+        cy={70 + drop}
+        rx={1.2}
+        ry={t > 0.5 ? 1.8 : 1.2}
+        fill={fc.line}
+      />
+      <Path d={shorts} fill={fc.shorts} />
+      <Path d={arm(-1)} fill={fc.skinShade} />
+      <Path d={arm(1)} fill={fc.skinShade} />
+      <Path
+        d={`M${L(hip + 1)},${top} L${R(hip + 1)},${top} L${R(hip + 1)},${top + 4} L${L(hip + 1)},${top + 4} Z`}
+        fill={fc.shortsShade}
+      />
     </Svg>
+  );
+}
+
+function Tile({
+  index,
+  label,
+  on,
+  t,
+  female,
+  onPress,
+}: {
+  index: number;
+  label: string;
+  on: boolean;
+  t: number;
+  female: boolean;
+  onPress: () => void;
+}) {
+  const pop = useSharedValue(1);
+  useEffect(() => {
+    if (on) {
+      pop.set(1.06);
+      pop.set(withSpring(1, { dampingRatio: 0.55, duration: 380 }));
+    }
+  }, [on, pop]);
+  const style = useAnimatedStyle(() => ({
+    transform: [{ scale: pop.get() }],
+  }));
+  return (
+    <Animated.View
+      entering={FadeInDown.delay(index * 45)
+        .duration(260)
+        .reduceMotion(ReduceMotion.System)}
+      style={[styles.slot, style]}
+    >
+      <PressableScale
+        onPress={onPress}
+        accessibilityRole="radio"
+        accessibilityState={{ selected: on }}
+        accessibilityLabel={`Body fat ${label}`}
+        style={[styles.tile, on && styles.tileOn]}
+      >
+        <View style={styles.art}>
+          <Figure t={t} female={female} />
+        </View>
+        <View style={[styles.chip, on && styles.chipOn]}>
+          {on ? (
+            <Check size={11} strokeWidth={3} color={colors.onBrand} />
+          ) : null}
+          <Text
+            variant="caption"
+            weight="semibold"
+            tone={on ? "onBrand" : "default"}
+            numeric
+          >
+            {label}
+          </Text>
+        </View>
+      </PressableScale>
+    </Animated.View>
   );
 }
 
@@ -105,41 +223,20 @@ export function BodyFatPicker({
   onChange: (v: number) => void;
 }) {
   const female = sex === "female";
-  const bands = BODY_FAT_BANDS[female ? "female" : "male"];
+  const levels = BODY_FAT_LEVELS[female ? "female" : "male"];
   return (
     <View style={styles.grid} accessibilityRole="radiogroup">
-      {bands.map((r, i) => {
-        const v = bandValue(r);
-        const on = value === v;
-        const label = bandLabel(r, i === bands.length - 1);
-        return (
-          <PressableScale
-            key={label}
-            onPress={() => onChange(v)}
-            accessibilityRole="radio"
-            accessibilityState={{ selected: on }}
-            accessibilityLabel={`Body fat ${label}`}
-            style={[styles.tile, on && styles.tileOn]}
-          >
-            <View style={styles.art}>
-              <Torso t={i / (bands.length - 1)} female={female} />
-            </View>
-            <View style={[styles.chip, on && styles.chipOn]}>
-              {on ? (
-                <Check size={12} strokeWidth={3} color={colors.onBrand} />
-              ) : null}
-              <Text
-                variant="label"
-                weight="semibold"
-                tone={on ? "onBrand" : "default"}
-                numeric
-              >
-                {label}
-              </Text>
-            </View>
-          </PressableScale>
-        );
-      })}
+      {levels.map((v, i) => (
+        <Tile
+          key={`${female}-${v}`}
+          index={i}
+          label={levelLabel(v, i === levels.length - 1)}
+          on={value === v}
+          t={i / (levels.length - 1)}
+          female={female}
+          onPress={() => onChange(v)}
+        />
+      ))}
     </View>
   );
 }
@@ -149,34 +246,34 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    rowGap: space[3],
+    rowGap: space[2],
   },
+  slot: { width: "23.5%" },
   tile: {
-    width: "31.5%",
-    aspectRatio: 0.82,
+    aspectRatio: 0.62,
     borderRadius: radius.md,
     borderWidth: 1.5,
     borderColor: colors.border,
     backgroundColor: colors.surface,
     alignItems: "center",
     justifyContent: "flex-end",
-    paddingBottom: space[2],
+    paddingBottom: space[1] + space[1] / 2,
     overflow: "hidden",
   },
   tileOn: { borderColor: colors.accent },
   art: {
     position: "absolute",
     top: space[1],
-    left: space[1],
-    right: space[1],
-    bottom: space[8] + space[1],
+    left: 0,
+    right: 0,
+    bottom: space[6] + space[1],
   },
   chip: {
     flexDirection: "row",
     alignItems: "center",
-    gap: space[1],
+    gap: space[1] / 2,
     paddingHorizontal: space[2],
-    paddingVertical: space[1],
+    paddingVertical: space[1] / 2,
     borderRadius: radius.sm,
     backgroundColor: colors.surfaceRaised,
   },

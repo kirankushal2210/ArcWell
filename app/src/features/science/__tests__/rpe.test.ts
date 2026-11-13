@@ -60,9 +60,9 @@ describe("RPE targets", () => {
     expect(isCompound("Bench press (barbell)")).toBe(true);
     expect(isCompound("Bicep curl (dumbbell)")).toBe(false);
   });
-  it("offers 6 to 10", () => {
+  it("offers 1 to 10", () => {
     expect(RPE_OPTIONS.map((o) => o.value)).toContain(10);
-    expect(Math.min(...RPE_OPTIONS.map((o) => o.value))).toBe(6);
+    expect(Math.min(...RPE_OPTIONS.map((o) => o.value))).toBe(1);
   });
 });
 

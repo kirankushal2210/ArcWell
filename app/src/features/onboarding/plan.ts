@@ -1,6 +1,7 @@
 // Builds the starter plan shown at the end of onboarding (AO-18 to AO-21) from the answers.
 // Free accounts get calories only (D5): no protein, carb or fat targets here.
 // This runs on the device for now; when sign-up exists the server computes and stores the plan.
+import { noDeficit } from "@/features/science/womensHealth";
 import type { Answers } from "./OnboardingContext";
 import { buildWorkouts, type Workout } from "./workouts";
 
@@ -74,8 +75,10 @@ export function buildPlan(a: Answers): Plan {
           : goal === "recomposition"
             ? -200
             : 0;
+  // Pregnant or within a year of giving birth: no deficit (D87, mottola2018).
+  const goalChange = noDeficit(a) ? Math.max(0, adjustment) : adjustment;
   const floor = sex === "male" ? 1500 : sex === "female" ? 1200 : 1350;
-  const kcal = Math.max(floor, Math.round((tdee + adjustment) / 10) * 10);
+  const kcal = Math.max(floor, Math.round((tdee + goalChange) / 10) * 10);
   const weeklyKg = ((kcal - tdee) * 7) / KCAL_PER_KG;
 
   const daysPerWeek = Number(a.daysPerWeek ?? 4);

@@ -124,6 +124,47 @@ export const SOURCES: Record<string, Source> = {
       "One trial in trained men found 3-minute rests gave more strength and thigh growth than 1-minute rests.",
     note: "A single small trial.",
   },
+  teede2023: {
+    id: "teede2023",
+    topic: "nutrition",
+    authors: "Teede HJ, et al.",
+    year: 2023,
+    title:
+      "Recommendations from the 2023 International Evidence-based Guideline for the Assessment and Management of Polycystic Ovary Syndrome",
+    journal: "Hum Reprod",
+    ref: "38(9):1655–1679",
+    pmid: "37580037",
+    doi: "10.1093/humrep/dead156",
+    finding:
+      "Healthy eating and physical activity for everyone with PCOS, with no single diet preferred and benefits even without weight loss.",
+  },
+  mottola2018: {
+    id: "mottola2018",
+    topic: "training",
+    authors: "Mottola MF, et al.",
+    year: 2018,
+    title: "2019 Canadian guideline for physical activity throughout pregnancy",
+    journal: "Br J Sports Med",
+    ref: "52(21):1339–1346",
+    pmid: "30337460",
+    doi: "10.1136/bjsports-2018-100056",
+    finding:
+      "Without medical reasons not to, pregnant women should get at least 150 minutes of moderate activity a week, over at least 3 days.",
+  },
+  mcnulty2020: {
+    id: "mcnulty2020",
+    topic: "training",
+    authors: "McNulty KL, et al.",
+    year: 2020,
+    title:
+      "The Effects of Menstrual Cycle Phase on Exercise Performance in Eumenorrheic Women: A Systematic Review and Meta-Analysis",
+    journal: "Sports Med",
+    ref: "50(10):1813–1827",
+    pmid: "32661839",
+    doi: "10.1007/s40279-020-01319-3",
+    finding:
+      "Performance may dip by a trivial amount early in the cycle; effects vary between women, so an individual approach is advised.",
+  },
   plotkin2022: {
     id: "plotkin2022",
     topic: "training",
