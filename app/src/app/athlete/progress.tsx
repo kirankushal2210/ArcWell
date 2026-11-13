@@ -227,6 +227,9 @@ export default function Progress() {
       <PageHeader
         title="Progress"
         sub={coached ? `With ${coachName}` : undefined}
+        onBack={() =>
+          router.canGoBack() ? router.back() : router.replace("/athlete")
+        }
         actions={[athleteMenuAction]}
       />
       {coached ? (

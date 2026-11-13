@@ -12,7 +12,10 @@ import {
   useSetActive,
   useWorkoutSummary,
 } from "@/features/athlete/ActiveWorkout";
-import { athleteMenuAction } from "@/features/athlete/MenuParts";
+import {
+  athleteMenuAction,
+  progressAction,
+} from "@/features/athlete/MenuParts";
 import { MyRoutines } from "@/features/athlete/MyRoutines";
 import { emptyWorkout, programWeek } from "@/features/athlete/training";
 import { AthletePage, NotJoined, useMe } from "@/features/athlete/useMe";
@@ -93,7 +96,10 @@ export default function Training() {
   if (!me) return <NotJoined />;
   return (
     <View style={styles.root}>
-      <PageHeader title="Training" actions={[athleteMenuAction]} />
+      <PageHeader
+        title="Training"
+        actions={[progressAction, athleteMenuAction]}
+      />
       <SectionTabs
         tabs={
           vis.race

@@ -32,7 +32,10 @@ import {
   shiftDate,
   sumMacros,
 } from "@/features/athlete/foods";
-import { athleteMenuAction } from "@/features/athlete/MenuParts";
+import {
+  athleteMenuAction,
+  progressAction,
+} from "@/features/athlete/MenuParts";
 import { MealPlanBody } from "@/features/athlete/MealPlanBody";
 import { AthletePage, NotJoined } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
@@ -411,7 +414,7 @@ export default function Nutrition() {
             )}
           />
         }
-        actions={[athleteMenuAction]}
+        actions={[progressAction, athleteMenuAction]}
       />
       <DateStrip
         date={date}

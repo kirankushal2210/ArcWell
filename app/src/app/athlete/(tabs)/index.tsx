@@ -8,13 +8,15 @@ import {
   Check,
   MessageCircle,
   Play,
-  Sparkles,
 } from "lucide-react-native";
 import { Alert, StyleSheet, View } from "react-native";
 
 import { Avatar, Button, PressableScale, Text } from "@/components/primitives";
 import { slotNow, todayKey, useNutrition } from "@/features/athlete/FoodParts";
-import { athleteMenuAction } from "@/features/athlete/MenuParts";
+import {
+  athleteMenuAction,
+  progressAction,
+} from "@/features/athlete/MenuParts";
 import { useTodayWorkout } from "@/features/athlete/QuickLog";
 import { todayDate } from "@/features/athlete/recovery";
 import { Ring, useRecovery } from "@/features/athlete/RecoveryParts";
@@ -140,21 +142,7 @@ export default function Today() {
       <PageHeader
         title={meTier === "coached" ? `Hi ${first}` : "Today"}
         sub={dateLabel()}
-        actions={[
-          ...(meTier === "coached" || !settingsOf(me.id).ai
-            ? []
-            : [
-                {
-                  icon: Sparkles,
-                  label:
-                    meTier === "free"
-                      ? "AI coach, start free trial"
-                      : "AI coach",
-                  onPress: () => router.push("/athlete/ai"),
-                },
-              ]),
-          athleteMenuAction,
-        ]}
+        actions={[progressAction, athleteMenuAction]}
       />
       <AthletePage dock>
         {meTier === "coached" ? (

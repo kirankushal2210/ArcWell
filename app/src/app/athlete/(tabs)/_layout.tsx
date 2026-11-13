@@ -8,7 +8,6 @@ import {
   Dumbbell,
   House,
   Moon,
-  TrendingUp,
   Utensils,
 } from "lucide-react-native";
 
@@ -77,13 +76,6 @@ export default function AthleteTabs() {
           options={{
             title: "Recovery",
             tabBarIcon: ({ color }) => <Moon size={24} color={color} />,
-          }}
-        />
-        <Tabs.Screen
-          name="progress"
-          options={{
-            title: "Progress",
-            tabBarIcon: ({ color }) => <TrendingUp size={24} color={color} />,
           }}
         />
       </Tabs>

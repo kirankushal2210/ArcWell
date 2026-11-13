@@ -29,7 +29,10 @@ import {
   SleepPage,
   StrainPage,
 } from "@/features/athlete/RecoveryPages";
-import { athleteMenuAction } from "@/features/athlete/MenuParts";
+import {
+  athleteMenuAction,
+  progressAction,
+} from "@/features/athlete/MenuParts";
 import { useRecovery } from "@/features/athlete/RecoveryParts";
 import { AthleteDock, AthletePage, NotJoined } from "@/features/athlete/useMe";
 import { PageHeader } from "@/features/coach/parts";
@@ -60,7 +63,10 @@ export default function Recovery() {
   if (r.tier === "free")
     return (
       <View style={styles.root}>
-        <PageHeader title="Recovery" actions={[athleteMenuAction]} />
+        <PageHeader
+          title="Recovery"
+          actions={[progressAction, athleteMenuAction]}
+        />
         <AthletePage>
           <View style={styles.locked}>
             <Lock size={32} strokeWidth={1.6} color={colors.text} />
@@ -93,7 +99,10 @@ export default function Recovery() {
 
   return (
     <View style={styles.root}>
-      <PageHeader title="Recovery" actions={[athleteMenuAction]} />
+      <PageHeader
+        title="Recovery"
+        actions={[progressAction, athleteMenuAction]}
+      />
       <View style={styles.dates}>
         <IconButton
           icon={ChevronLeft}
