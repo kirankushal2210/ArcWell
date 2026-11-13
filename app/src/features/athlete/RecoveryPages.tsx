@@ -157,20 +157,14 @@ export function Overview({
         <LinkRow
           icon={Watch}
           title={`Finish connecting your ${DEVICE_LABEL[r.pendingDevice]}`}
-          sub="Sleep stages, heart rate and HRV fill in on their own"
           onPress={() => go("/athlete/recovery/connect")}
         />
       ) : null}
       {isToday && !day.log ? (
         <View style={styles.checkIn}>
-          <View style={styles.flex}>
-            <Text weight="semibold">How did you wake up?</Text>
-            <Text variant="label" weight="regular" tone="muted">
-              {day.source === "device"
-                ? "Add how you feel to your device's numbers. 20 seconds."
-                : "Sleep, soreness, energy, stress and mood. 20 seconds."}
-            </Text>
-          </View>
+          <Text weight="semibold" style={styles.flex}>
+            How did you wake up?
+          </Text>
           <Button
             label="Check in"
             size="sm"
@@ -237,9 +231,9 @@ export function Overview({
             </>
           ) : (
             <>
-              <Text weight="semibold">Connect a device</Text>
+              <Text weight="semibold">Connected device</Text>
               <Text variant="label" weight="regular" tone="muted">
-                Heart rate, HRV, oxygen
+                {brand ? DEVICE_LABEL[brand] : "None yet"}
               </Text>
             </>
           )}

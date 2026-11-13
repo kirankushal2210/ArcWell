@@ -82,11 +82,11 @@
   /* Pillars: fills, rings, numbers and markers. Text on a pillar fill is on-pillar.
      training  on bg / surface / raised: 6.45 / 5.94 / 5.37  AA ✓
      nutrition on bg / surface / raised: 10.86 / 10.02 / 9.04  AA ✓
-     recovery  on bg / surface / raised: 9.39 / 8.67 / 7.82  AA ✓
+     recovery  on bg / surface / raised: 6.45 / 5.94 / 5.37  AA ✓ (red, D93)
      on-pillar #0A0A0A on training 6.45 · nutrition 10.86 · recovery 9.39  AA ✓  */
   --color-training:        var(--red-400);
   --color-nutrition:       var(--green-400);
-  --color-recovery:        var(--blue-400);
+  --color-recovery:        var(--red-400);   /* D93: red, no blue-purple anywhere */
   --color-on-pillar:       var(--ink-900);
 
   /* Status

@@ -52,7 +52,7 @@ export const colors = {
   /** Pillars: fills, rings, numbers and markers. Text on a pillar fill uses `onPillar`. */
   training: palette.red400,
   nutrition: palette.green400,
-  recovery: palette.blue400,
+  recovery: palette.red400,
   onPillar: palette.ink900,
 
   success: palette.green400,

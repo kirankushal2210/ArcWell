@@ -19,7 +19,6 @@ import { useTodayWorkout } from "@/features/athlete/QuickLog";
 import { todayDate } from "@/features/athlete/recovery";
 import { Ring, useRecovery } from "@/features/athlete/RecoveryParts";
 import { FoodScanButton } from "@/features/athlete/FoodScanButton";
-import { programWeek } from "@/features/athlete/training";
 import {
   AthleteDock,
   AthletePage,
@@ -333,12 +332,6 @@ export default function Today() {
                   ? "Rest day"
                   : "Training"}
             </Text>
-            {me.program ? (
-              <Text variant="label" weight="regular" tone="muted" numeric>
-                Week {programWeek(me.program.weeks, me.programStart).week} of{" "}
-                {me.program.weeks}
-              </Text>
-            ) : null}
           </View>
           {today ? (
             <>
@@ -357,13 +350,9 @@ export default function Today() {
                 {today.exercises.reduce((s, e) => s + e.sets, 0)} sets
               </Text>
             </>
-          ) : (
-            <Text tone="muted">
-              {me.program
-                ? me.protocol?.note ||
-                  "Recover today. Your next workout is in Training."
-                : `${coachName} is building your plan. It shows here as soon as it's ready.`}
-            </Text>
+          ) : // A rest day says just that (D93); the card shows a line only while the plan is coming.
+          me.program ? null : (
+            <Text tone="muted">{`${coachName} is building your plan.`}</Text>
           )}
         </PressableScale>
 

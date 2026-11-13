@@ -134,7 +134,7 @@ Black and red (D83, replaces D67's Stone palette; earlier palettes in DECISIONS.
 | `accent` / `focus` | `#FF5A52` | Selection, focus, active tab |
 | `training` | `#FF5A52` | Red: Training fills, rings, numbers |
 | `nutrition` | `#7BD389` | Green: Nutrition |
-| `recovery` | `#8AB4F8` | Blue: Recovery |
+| `recovery` | `#FF5A52` | Red: Recovery (D93; was blue) |
 | `onPillar` | `#0A0A0A` | Text on any pillar or accent fill |
 | `success` | `#7BD389` | Completed, positive |
 | `warning` | `#F5B841` | Amber: needs attention, new items |
