@@ -1,7 +1,13 @@
 import { createGroqProvider } from "./groq.ts";
 import type { AiProvider } from "./types.ts";
 
-export type { AiMessage, AiProvider, AiRequest, AiResponse } from "./types.ts";
+export type {
+  AiMessage,
+  AiPart,
+  AiProvider,
+  AiRequest,
+  AiResponse,
+} from "./types.ts";
 
 // Single switch point for the AI provider. Changing AI_PROVIDER (plus that
 // provider's key/model secrets) moves every AI feature to a new provider
@@ -16,7 +22,9 @@ export function getAiProvider(): AiProvider {
     case "groq": {
       const apiKey = requireEnv("GROQ_API_KEY");
       const model = requireEnv("GROQ_MODEL");
-      return createGroqProvider(apiKey, model);
+      // A vision-capable model for photo features (meal scan); optional until those are used.
+      const vision = Deno.env.get("GROQ_VISION_MODEL") ?? undefined;
+      return createGroqProvider(apiKey, model, vision);
     }
     default:
       throw new Error(`AI provider "${provider}" is not implemented yet`);

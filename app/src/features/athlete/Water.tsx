@@ -47,7 +47,7 @@ export function WaterCard() {
             Water · {ml(w.today)}
           </Text>
           <Text variant="label" weight="regular" tone="muted" numeric>
-            Goal about {ml(w.goalMl)} a day, counting food
+            Goal {ml(w.goalMl)}
           </Text>
         </View>
         <IconButton

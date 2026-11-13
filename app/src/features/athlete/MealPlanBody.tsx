@@ -33,6 +33,25 @@ export function MealPlanBody({ date }: { date: string }) {
       </Text>
     );
   const day = n.logs.filter((l) => l.date === date);
+  if (!plan.meals.length)
+    return (
+      <View style={styles.card}>
+        <Text weight="semibold">No meals planned yet</Text>
+        {n.tier === "pro" ? (
+          <Button
+            label="Plan my day with AI"
+            size="sm"
+            onPress={() => router.push("/athlete/assistant/nutrition")}
+          />
+        ) : (
+          <Text variant="label" tone="muted">
+            {n.coached
+              ? `${n.coachName} adds your meals here.`
+              : "Log from search for now."}
+          </Text>
+        )}
+      </View>
+    );
 
   return (
     <>

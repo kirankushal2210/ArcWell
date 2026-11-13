@@ -4,7 +4,13 @@
 // athletes see macros and their meal plan. Swipe between days with the arrows.
 import { router } from "expo-router";
 import { Image } from "expo-image";
-import { ChevronRight, Plus, Utensils, X } from "lucide-react-native";
+import {
+  ChevronRight,
+  Plus,
+  RotateCcw,
+  Utensils,
+  X,
+} from "lucide-react-native";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
@@ -12,6 +18,7 @@ import { IconButton, PressableScale, Text } from "@/components/primitives";
 import { SectionTabs } from "@/components/SectionTabs";
 import {
   kcalText,
+  newLogId,
   slotNow,
   todayKey,
   useNutrition,
@@ -42,6 +49,8 @@ import {
   StreakPill,
 } from "@/features/athlete/NutritionParts";
 import { logStreak } from "@/features/athlete/streak";
+import { foodQuality } from "@/features/athlete/foodQuality";
+import { FoodQualityCard } from "@/features/athlete/FoodQualityCard";
 
 function DayPage({
   date,
@@ -89,6 +98,16 @@ function DayPage({
         <MacroCards
           eaten={{ protein: eaten.p, carbs: eaten.c, fat: eaten.f }}
           target={{ protein: plan.protein, carbs: plan.carbs, fat: plan.fat }}
+        />
+      ) : null}
+
+      {n.macros && day.length ? (
+        <FoodQualityCard
+          q={foodQuality(day, {
+            weightKg: n.me.weights.at(-1) ?? 70,
+            bedMinute: n.me.protocol?.bed ?? 22 * 60 + 30,
+            mine: n.myFoods,
+          })}
         />
       ) : null}
 
@@ -159,6 +178,12 @@ function DayPage({
       {MEAL_SLOTS.map((m) => {
         const items = day.filter((l) => l.meal === m.value);
         const total = sumMacros(items.map((l) => l.macros));
+        // One tap to repeat yesterday's meal into an empty slot (D96): urban routines repeat.
+        const yesterday = items.length
+          ? []
+          : n.logs.filter(
+              (l) => l.date === shiftDate(date, -1) && l.meal === m.value,
+            );
         return (
           <View key={m.value} style={styles.meal}>
             <View style={styles.mealHead}>
@@ -228,6 +253,33 @@ function DayPage({
                 </Text>
               </PressableScale>
             ))}
+            {yesterday.length ? (
+              <PressableScale
+                onPress={() =>
+                  n.add(
+                    yesterday.map((l) => ({
+                      ...l,
+                      id: newLogId(),
+                      date,
+                      at: undefined,
+                      fromPlan: undefined,
+                      swappedFor: undefined,
+                    })),
+                  )
+                }
+                accessibilityRole="button"
+                accessibilityLabel={`Log the same ${m.label.toLowerCase()} as yesterday`}
+                style={styles.addRow}
+              >
+                <RotateCcw size={18} color={colors.accent} />
+                <Text weight="medium" style={styles.flex}>
+                  Same as yesterday
+                </Text>
+                <Text variant="label" tone="muted" numeric>
+                  {kcalText(sumMacros(yesterday.map((l) => l.macros)).kcal)}
+                </Text>
+              </PressableScale>
+            ) : null}
             <PressableScale
               onPress={() => open(m.value)}
               accessibilityRole="button"
@@ -327,10 +379,6 @@ function TrendsPage({ date }: { date: string }) {
           />
         </View>
       ) : null}
-      <Text variant="caption" tone="muted">
-        The line is your target. On target means within 10% of your calories.
-        Days with nothing logged are left out of the averages.
-      </Text>
     </AthletePage>
   );
 }

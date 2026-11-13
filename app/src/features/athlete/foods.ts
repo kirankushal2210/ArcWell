@@ -63,6 +63,8 @@ export type FoodLog = {
   cooked?: "home" | "restaurant";
   source: FoodSource | "quick";
   macros: Macros;
+  /** Clock minute it was logged at, for the caffeine cut-off (D96); older logs don't have it. */
+  at?: number;
   /** The plate photo, when logged with a scan (D94). */
   photoUri?: string;
   /** Logged from the meal plan with "Ate this" (F5-12). */

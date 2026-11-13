@@ -1,7 +1,8 @@
 // Scan a meal (F5-09 to F5-11; D70, D94): a full-screen camera with a shutter and the gallery, then
 // "Analysing…" over the photo, then the result: the plate's calories and macros and each food found,
 // which the athlete ticks and adjusts. Nothing is logged until they tap Log. Plus only; coached
-// athletes never see AI (D44). Sample build: no AI yet, so every photo finds the same sample thali.
+// athletes never see AI (D44). With accounts on, the photo goes to the scan-meal edge function (D96);
+// sample builds show the sample plate, labelled as such.
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
@@ -31,13 +32,12 @@ import {
   PressableScale,
   Text,
 } from "@/components/primitives";
-import { PHOTO_SAMPLE } from "@/features/ai/nutritionAssist";
+import { type ScanItem, scanMeal } from "@/features/ai/scanMeal";
 import { todayKey, useNutrition } from "@/features/athlete/FoodParts";
 import {
   findFood,
-  logFromItem,
+  type FoodLog,
   type MealSlot,
-  searchFoods,
   slotLabel,
   sumMacros,
 } from "@/features/athlete/foods";
@@ -49,6 +49,13 @@ import { colors, radius, rhythm, space } from "@/theme";
 
 type Step = "camera" | "analysing" | "result";
 
+const FAILURE: Record<string, string> = {
+  not_food: "That doesn't look like food. Try again with the plate in frame.",
+  daily_limit: "You've used today's scans. Search or quick add instead.",
+  not_entitled: "Meal scans come with Arcwell Plus.",
+  error: "Couldn't read that one. Try again in good light.",
+};
+
 export default function ScanMeal() {
   const p = useLocalSearchParams<{ meal?: MealSlot; date?: string }>();
   const n = useNutrition();
@@ -57,24 +64,40 @@ export default function ScanMeal() {
   const [permission, requestPermission] = useCameraPermissions();
   const camera = useRef<CameraView>(null);
   const [step, setStep] = useState<Step>("camera");
-  const [shot, setShot] = useState<string | null>(null);
-  const fresh = () =>
-    PHOTO_SAMPLE.map((x) => ({
-      ...x,
-      food: searchFoods(x.name, [])[0],
-      keep: true,
-    })).filter((x) => !!x.food);
-  const [items, setItems] = useState(fresh);
+  const [shot, setShot] = useState<{
+    uri: string;
+    base64?: string;
+    mime?: string;
+  } | null>(null);
+  const [items, setItems] = useState<
+    (ScanItem & { keep: boolean; qty: number })[]
+  >([]);
+  const [sample, setSample] = useState(true);
+  const [failure, setFailure] = useState<string | null>(null);
   const meal: MealSlot = p.meal ?? "lunch";
   const date = p.date || todayKey();
   const close = () =>
     router.canGoBack() ? router.back() : router.replace("/athlete/nutrition");
 
+  // Analyse: the server scans the photo (or the sample plate in sample builds).
   useEffect(() => {
     if (step !== "analysing") return;
-    const t = setTimeout(() => setStep("result"), 1600);
-    return () => clearTimeout(t);
-  }, [step]);
+    let live = true;
+    scanMeal(shot, p.meal ?? "lunch").then((out) => {
+      if (!live) return;
+      if (out.status === "ok") {
+        setItems(out.items.map((x) => ({ ...x, keep: true, qty: 1 })));
+        setSample(out.sample);
+        setStep("result");
+      } else {
+        setFailure(FAILURE[out.status]);
+        setStep("camera");
+      }
+    });
+    return () => {
+      live = false;
+    };
+  }, [step, shot, p.meal]);
 
   if (!n.me) return <NotJoined />;
   // Photo logging is AI: Plus only; coached athletes never see it, even from a link (D44).
@@ -83,21 +106,29 @@ export default function ScanMeal() {
 
   const capture = async () => {
     const pic = await camera.current
-      ?.takePictureAsync({ quality: 0.5 })
+      ?.takePictureAsync({ quality: 0.5, base64: true })
       .catch(() => undefined);
-    if (pic?.uri) setShot(pic.uri);
+    if (pic?.uri)
+      setShot({ uri: pic.uri, base64: pic.base64, mime: "image/jpeg" });
   };
   const pick = async () => {
     const r = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
       quality: 0.5,
+      base64: true,
     });
-    const uri = r.assets?.[0]?.uri;
-    if (uri) setShot(uri);
+    const a = r.assets?.[0];
+    if (a?.uri)
+      setShot({
+        uri: a.uri,
+        base64: a.base64 ?? undefined,
+        mime: a.mimeType ?? "image/jpeg",
+      });
   };
   const again = () => {
     setShot(null);
-    setItems(fresh());
+    setItems([]);
+    setFailure(null);
     setStep("camera");
   };
 
@@ -120,7 +151,7 @@ export default function ScanMeal() {
         <View style={styles.flex1}>
           {shot ? (
             <Image
-              source={{ uri: shot }}
+              source={{ uri: shot.uri }}
               style={styles.flex1}
               contentFit="cover"
             />
@@ -165,6 +196,11 @@ export default function ScanMeal() {
         </View>
         <View style={[styles.topBar, top]}>{closeButton}</View>
         <View style={[styles.controls, bottom]}>
+          {failure ? (
+            <Text tone="warning" style={styles.center}>
+              {failure}
+            </Text>
+          ) : null}
           {shot ? (
             <View style={styles.row}>
               <IconButton
@@ -220,7 +256,7 @@ export default function ScanMeal() {
         <View style={styles.topBarStatic}>{closeButton}</View>
         {shot ? (
           <Image
-            source={{ uri: shot }}
+            source={{ uri: shot.uri }}
             style={styles.photo}
             contentFit="cover"
           />
@@ -235,18 +271,31 @@ export default function ScanMeal() {
 
   // ---------- Result ----------
   const kept = items.filter((x) => x.keep);
-  const logs = kept
-    .map((x) =>
-      logFromItem(
-        { foodId: x.food.id, qty: x.qty, unit: x.food.units[0]?.key ?? "g" },
-        date,
-        meal,
-        uid("f"),
-        myFoods,
-      ),
-    )
-    .filter((l): l is NonNullable<typeof l> => !!l)
-    .map((l) => (shot ? { ...l, photoUri: shot } : l));
+  // Each kept food becomes a log at the scanned portion times the stepper (D96).
+  const logs: FoodLog[] = kept.map((x) => {
+    const k = x.qty;
+    const r = (v: number) => Math.round(v * 10) / 10;
+    return {
+      id: uid("f"),
+      date,
+      meal,
+      ...(x.foodId ? { foodId: x.foodId } : {}),
+      name: x.name,
+      qty: x.unit === "g" ? Math.round(x.grams * k) : k,
+      unit: x.unit,
+      grams: Math.round(x.grams * k),
+      source: x.foodId
+        ? (findFood(x.foodId, myFoods)?.source ?? "quick")
+        : "quick",
+      macros: {
+        kcal: Math.round(x.macros.kcal * k),
+        p: r(x.macros.p * k),
+        c: r(x.macros.c * k),
+        f: r(x.macros.f * k),
+      },
+      ...(shot ? { photoUri: shot.uri } : {}),
+    };
+  });
   const total = sumMacros(logs.map((l) => l.macros));
   const macroTiles: [MacroKey, string, number][] = [
     ["protein", "Protein", total.p],
@@ -259,13 +308,13 @@ export default function ScanMeal() {
       <View style={styles.topBarStatic}>
         {closeButton}
         <Text variant="label" tone="muted" style={styles.flex1}>
-          {`${slotLabel(meal)} · sample result`}
+          {sample ? `${slotLabel(meal)} · sample result` : slotLabel(meal)}
         </Text>
       </View>
       <ScrollView contentContainerStyle={styles.body}>
         {shot ? (
           <Image
-            source={{ uri: shot }}
+            source={{ uri: shot.uri }}
             style={styles.photo}
             contentFit="cover"
           />
@@ -299,9 +348,8 @@ export default function ScanMeal() {
 
         <View style={styles.list}>
           {items.map((x, i) => {
-            const f = findFood(x.food.id) ?? x.food;
             return (
-              <View key={x.name} style={[styles.food, i > 0 && styles.line]}>
+              <View key={x.key} style={[styles.food, i > 0 && styles.line]}>
                 <PressableScale
                   onPress={() =>
                     setItems((xs) =>
@@ -310,7 +358,7 @@ export default function ScanMeal() {
                   }
                   accessibilityRole="checkbox"
                   accessibilityState={{ checked: x.keep }}
-                  accessibilityLabel={f.name}
+                  accessibilityLabel={x.name}
                   style={[styles.box, x.keep && styles.boxOn]}
                 >
                   {x.keep ? (
@@ -319,13 +367,13 @@ export default function ScanMeal() {
                 </PressableScale>
                 <View style={styles.flex1}>
                   <Text weight="medium" tone={x.keep ? "default" : "muted"}>
-                    {f.name}
+                    {x.name}
                   </Text>
                   <Text
                     variant="caption"
                     tone={x.confidence === "check" ? "warning" : "muted"}
                   >
-                    {`${x.confidence === "check" ? "Check this one" : "Looks right"} · ${f.units[0]?.label ?? "g"}`}
+                    {`${x.confidence === "check" ? "Check this one" : "Looks right"} · ${Math.round(x.grams * x.qty)} g · ${Math.round(x.macros.kcal * x.qty)} kcal`}
                   </Text>
                 </View>
                 <NumberStepper
@@ -339,7 +387,7 @@ export default function ScanMeal() {
                   decimals={1}
                   min={0.5}
                   max={6}
-                  accessibilityLabel={`${f.name} portions`}
+                  accessibilityLabel={`${x.name} portions`}
                 />
               </View>
             );

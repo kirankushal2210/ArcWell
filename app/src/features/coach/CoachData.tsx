@@ -37,6 +37,8 @@ import {
 } from "@/features/athlete/library";
 import type { Session } from "@/features/athlete/training";
 
+import { selfPlan } from "@/features/athlete/selfPlan";
+
 import { buildCheckIn, type CheckInForm, type PhotoPose } from "./checkins";
 import { withInstagram } from "./instagram";
 import { type Enhanced, emptyEnhanced, sampleEnhanced } from "./enhanced";
@@ -651,8 +653,19 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       self && id === self.id ? self : clients.find((c) => c.id === id),
     sessions: (id) => history[id] ?? [],
     foodLogs: (id) => foodLogs[id] ?? [],
-    addFoodLogs: (id, logs) =>
-      setFoodLogs((all) => ({ ...all, [id]: [...(all[id] ?? []), ...logs] })),
+    addFoodLogs: (id, logs) => {
+      // Stamp the clock time on today's new logs, for the caffeine cut-off (D96).
+      const now = new Date();
+      const today = isoToday();
+      const minute = now.getHours() * 60 + now.getMinutes();
+      const stamped = logs.map((l) =>
+        l.at === undefined && l.date === today ? { ...l, at: minute } : l,
+      );
+      setFoodLogs((all) => ({
+        ...all,
+        [id]: [...(all[id] ?? []), ...stamped],
+      }));
+    },
     updateFoodLog: (id, log) =>
       setFoodLogs((all) => ({
         ...all,
@@ -1105,6 +1118,28 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       })),
     logWeight: (id, kg) =>
       update(id, (c) => ({
+        // Self-guided: calorie and macro targets follow the new weight (D96). Coached athletes'
+        // targets stay with their coach.
+        ...(meTier !== "coached" && c.selfAnswers && c.nutritionPlan
+          ? (() => {
+              const t = selfPlan({ ...c.selfAnswers, weightKg: kg }).nutrition;
+              const n = c.nutritionPlan;
+              return {
+                nutritionPlan: {
+                  ...n,
+                  kcal: t.kcal,
+                  protein: t.protein,
+                  carbs: t.carbs,
+                  fat: t.fat,
+                },
+                nutrition: {
+                  ...c.nutrition,
+                  targetKcal: t.kcal,
+                  proteinG: t.protein,
+                },
+              };
+            })()
+          : {}),
         weights: [...c.weights, kg],
         weighIns: [
           ...(c.weighIns ?? []).filter((w) => w.date !== isoToday()),

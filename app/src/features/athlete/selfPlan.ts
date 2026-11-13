@@ -167,6 +167,7 @@ export function selfClient(a: Answers, plan: SelfPlan): Client {
   return {
     id: "me",
     name: "You",
+    selfAnswers: a,
     status: "active",
     joined: "today",
     weeksWithYou: 0,
