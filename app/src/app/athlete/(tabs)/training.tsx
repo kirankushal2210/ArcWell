@@ -14,12 +14,12 @@ import {
 } from "@/features/athlete/ActiveWorkout";
 import { athleteMenuAction } from "@/features/athlete/MenuParts";
 import { MyRoutines } from "@/features/athlete/MyRoutines";
-import { OverloadPage } from "@/features/athlete/OverloadPage";
 import { emptyWorkout, programWeek } from "@/features/athlete/training";
 import { AthletePage, NotJoined, useMe } from "@/features/athlete/useMe";
 import { useVisibility } from "@/features/athlete/visibility";
 import { useCoachData } from "@/features/coach/CoachData";
 import { PageHeader } from "@/features/coach/parts";
+import { EndurancePage } from "@/features/cardio/EndurancePage";
 import { RacePage } from "@/features/race/RacePage";
 import { colors, radius, space } from "@/theme";
 
@@ -76,14 +76,15 @@ function PlanPage() {
   );
 }
 
-type TrainingTab = "plan" | "race" | "overload";
-const PLAN_TAB = { key: "plan" as const, label: "Plan" };
+type TrainingTab = "plan" | "race" | "endurance";
+/** D99: the plan tab is Hypertrophy (lifting), beside Endurance (cardio). */
+const PLAN_TAB = { key: "plan" as const, label: "Hypertrophy" };
 /** The Race section exists only while a race goal is active (D76). */
 const RACE_TAB = { key: "race" as const, label: "Race" };
-/** Progressive overload, with the workout history under it, sits last (D85). */
-const OVERLOAD_TAB = { key: "overload" as const, label: "Overload" };
+/** Endurance (D99): cardio fitness and this week's cardio sessions. Overload stays in the menu. */
+const ENDURANCE_TAB = { key: "endurance" as const, label: "Endurance" };
 
-/** Training (D61, D85): Plan · Race (while racing) · Overload as section tabs under the title. The
+/** Training (D61, D85, D99): Hypertrophy · Race (while racing) · Endurance as section tabs. The
  * exercise library opens only when building a routine or adding to a workout. */
 export default function Training() {
   const me = useMe();
@@ -96,8 +97,8 @@ export default function Training() {
       <SectionTabs
         tabs={
           vis.race
-            ? [PLAN_TAB, RACE_TAB, OVERLOAD_TAB]
-            : [PLAN_TAB, OVERLOAD_TAB]
+            ? [PLAN_TAB, RACE_TAB, ENDURANCE_TAB]
+            : [PLAN_TAB, ENDURANCE_TAB]
         }
         value={!vis.race && tab === "race" ? "plan" : tab}
         onChange={setTab}
@@ -110,8 +111,8 @@ export default function Training() {
                 </AthletePage>,
               ]
             : []),
-          <AthletePage key="o">
-            <OverloadPage me={me} />
+          <AthletePage key="e">
+            <EndurancePage />
           </AthletePage>,
         ]}
       />
