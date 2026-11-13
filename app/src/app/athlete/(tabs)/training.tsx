@@ -2,11 +2,11 @@
 // athlete's own), history and the exercise library. The plan comes from the coach (coached) or from
 // the athlete's answers (self-guided, D57).
 import { router } from "expo-router";
-import { Play, Plus } from "lucide-react-native";
+import { ChevronRight, Play, Plus } from "lucide-react-native";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
-import { Button, Text } from "@/components/primitives";
+import { Button, PressableScale, Text } from "@/components/primitives";
 import { SectionTabs } from "@/components/SectionTabs";
 import {
   useSetActive,
@@ -43,12 +43,26 @@ function PlanPage() {
 
   return (
     <AthletePage>
-      <Button
-        label={active ? `Resume ${active.name}` : "Start an empty workout"}
-        icon={active ? Play : Plus}
-        fullWidth
+      <PressableScale
         onPress={startEmpty}
-      />
+        accessibilityRole="button"
+        accessibilityLabel={
+          active ? `Resume ${active.name}` : "Start an empty workout"
+        }
+        style={styles.quick}
+      >
+        <View style={styles.quickIcon}>
+          {active ? (
+            <Play size={20} color={colors.onBrand} fill={colors.onBrand} />
+          ) : (
+            <Plus size={22} strokeWidth={2.4} color={colors.onBrand} />
+          )}
+        </View>
+        <Text variant="heading" style={styles.flex}>
+          {active ? `Resume ${active.name}` : "Empty workout"}
+        </Text>
+        <ChevronRight size={20} color={colors.textMuted} />
+      </PressableScale>
 
       {!program && coached ? (
         <Text variant="label" tone="muted">
@@ -91,7 +105,7 @@ const RACE_TAB = { key: "race" as const, label: "Race" };
 /** Training (D61): Plan · History · Exercises as section tabs under the title. */
 export default function Training() {
   const me = useMe();
-  const { coachName, meTier, sessions } = useCoachData();
+  const { sessions } = useCoachData();
   const [tab, setTab] = useState<TrainingTab>("plan");
   const vis = useVisibility();
   if (!me) return <NotJoined />;
@@ -103,7 +117,9 @@ export default function Training() {
         title="Training"
         sub={
           program && pw
-            ? `${program.name} · ${pw.done ? "complete" : `week ${pw.week} of ${pw.weeks}`} · ${meTier === "coached" ? `by ${coachName}` : me.formerCoach ? `from ${me.formerCoach.coachName}, read-only` : "from your answers"}`
+            ? pw.done
+              ? "Program complete"
+              : `Week ${pw.week} of ${pw.weeks}`
             : undefined
         }
         actions={[athleteMenuAction]}
@@ -156,6 +172,25 @@ export default function Training() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
+  flex: { flex: 1 },
+  quick: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space[3],
+    padding: space[3],
+    borderRadius: radius.lg,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.brand,
+  },
+  quickIcon: {
+    width: space[12],
+    height: space[12],
+    borderRadius: radius.md,
+    backgroundColor: colors.brand,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   newRow: { alignItems: "flex-end", paddingHorizontal: space[2] },
   card: {
     gap: space[2],

@@ -185,14 +185,6 @@ export function MorningStart() {
       : m.phase === "morning"
         ? `Morning cortisol: ${meterLabel(m.value)}`
         : "Your cortisol curve";
-  const note =
-    m.phase === "morning"
-      ? count === 4
-        ? "All four non-negotiables done: high now, low tonight."
-        : "Tick all four for a high morning and a low night."
-      : count === 4
-        ? "All four done this morning: coming down to low at night."
-        : `${count} of 4 done this morning, so today's curve is flatter. Dashed: the all-four day.`;
 
   return (
     <View
@@ -212,9 +204,6 @@ export function MorningStart() {
       {width > 0 ? (
         <CortisolGraph rhythm={rhythm} now={now} done={count} width={width} />
       ) : null}
-      <Text variant="caption" tone="muted">
-        {`${note} Illustration, not measured.`}
-      </Text>
       <View style={styles.todo}>
         <View style={styles.todoHead}>
           <Text variant="caption" weight="semibold" style={styles.flex}>
@@ -240,18 +229,13 @@ export function MorningStart() {
                 ) : null}
               </View>
               <Icon size={15} color={on ? colors.text : colors.textMuted} />
-              <View style={styles.flex}>
-                <Text
-                  variant="label"
-                  weight="semibold"
-                  style={on ? styles.doneText : undefined}
-                >
-                  {i.label}
-                </Text>
-                <Text variant="caption" tone="muted">
-                  {i.hint}
-                </Text>
-              </View>
+              <Text
+                variant="label"
+                weight="semibold"
+                style={[styles.flex, on && styles.doneText]}
+              >
+                {i.label}
+              </Text>
             </PressableScale>
           );
         })}
