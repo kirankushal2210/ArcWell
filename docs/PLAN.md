@@ -7,7 +7,7 @@ Rough estimates assume two builders using AI tools heavily. Total ≈ 18–24 we
 - [ ] Exercise demo media: confirm commercial licence (fallback: openly licensed stills)
 - [ ] IFCT 2017: confirm usage rights; get it into machine-readable form
 - [ ] Groq: current free models, rate limits, data retention, vision support
-- [ ] Accounts: Google Play Console, Supabase (staging), AWS (S3), Expo, Razorpay (business KYC)
+- [ ] Accounts: Google Play Console, Supabase (hosted, Mumbai; founder creates it, D72), Expo, Razorpay (business KYC)
 - [ ] Privacy policy + DPDP consent text (health data, AI, photos, coach access)
 - [ ] IP India trademark search for "Arcwell" (software and fitness classes)
 - [ ] Confirm Android package name before first Play upload (currently `com.arcwell.app`; permanent once published)
@@ -69,9 +69,22 @@ The front end is finished on sample data before any backend wiring (Phases 1–8
   - Coached athletes: no AI; their coach sees a plain low-recovery flag on the client profile and decides.
 - [x] **FE-7 System states and full QA loop:** loading, error, offline, permission denied, force update, maintenance, notification pre-ask (S-01 to S-06, X-07, F4-09, F7-03), PDF attach and viewer UI (F7-02, X-06), then a full walk of every screen as free, Pro, coached and coach, fixing what's found, until nothing is left (Phase 14 of the frontend execution prompt)
 
+## Backend build (D72, D73)
+
+The front end is complete (FE-1 to FE-7). The backend wires those screens to Supabase one slice at a time, coach loop first. Each slice: migrations with RLS and pgTAP tests (coach isolation, join-date visibility, access ending on leave), a repository that replaces the sample store for that area so screens don't change, then a check on web and a phone. Built against the local stack first; the hosted Mumbai project follows once the founder creates it.
+
+- [ ] **B1 Accounts, roles and coach links:** email-code sign-in (D62), profiles and consents, coach and athlete roles, invites (general and personal, single-use), coach_clients with status, history access and ending coaching; split the sample store (`CoachData.tsx`) into per-area repositories.
+- [ ] **B2 Plans and templates:** training programs, meal plans, recovery protocols, supplements, templates and assigning; coach-only writes, client reads.
+- [ ] **B3 Workout logging:** sessions and sets with the in-progress workout cached on the phone and synced on reconnect; routines and custom exercises.
+- [ ] **B4 Food logging:** food logs, my foods and meal-plan logging on the current sample food data until the IFCT rights and reviewed Indian data arrive.
+- [ ] **B5 Check-ins, chat, files and notifications:** weekly check-ins with photos in Supabase Storage, realtime chat with photos and PDFs, the six notifications with Expo Notifications.
+- [ ] **B6 Progress, recovery and consent:** weigh-ins, measurements, progress photos, recovery logs, transformation photo approvals and withdrawal, export and delete.
+- [ ] **B7 Billing and entitlements:** RevenueCat with Google Play for Arcwell Plus, Razorpay links for coaches, server-side tier checks (coached athletes never get AI). Waits on Play Console, RevenueCat and Razorpay KYC.
+- [ ] **B8 AI:** the AI layer in `supabase/functions/_shared/ai/` behind the FE-6 screens, with entitlement and daily-cap checks and output validated against the D69 rules.
+
 ## Phase 1 — Foundations (2–3 weeks)
 
-Auth (Google + email), role choice, onboarding; core tables with RLS on every table plus pgTAP tests for coach isolation, join-date visibility and revocation on leave; S3 signed-URL upload function with client-side compression; role-based app shell.
+Auth (Google + email), role choice, onboarding; core tables with RLS on every table plus pgTAP tests for coach isolation, join-date visibility and revocation on leave; Supabase Storage signed-URL uploads with client-side compression (D72); role-based app shell.
 
 ## Phase 2 — Coach ↔ client core (3 weeks)
 

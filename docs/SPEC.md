@@ -64,7 +64,7 @@ Market: India first. Android only at launch. Compliance: India DPDP Act.
 
 - App: Expo SDK 58, React Native 0.88, TypeScript, Expo Router (`app/`).
 - Backend: Supabase — Postgres + row-level security, Auth (Google + email), Realtime (chat), Edge Functions (`supabase/`).
-- Files: Amazon S3 via short-lived signed URLs issued by Edge Functions; images compressed client-side.
+- Files: Supabase Storage (private buckets with row-level security) via short-lived signed URLs; images compressed client-side (D72).
 - AI: provider-neutral layer (`supabase/functions/_shared/ai/`), Groq free tier at launch, swappable to Claude/OpenAI by config.
 - Offline: in-progress workout cached on device, synced on reconnect.
 - Notifications: Expo Notifications. Builds: EAS.
@@ -77,4 +77,4 @@ Market: India first. Android only at launch. Compliance: India DPDP Act.
 
 ## Known risks
 
-Exercise media licensing; Groq free-tier vision support; free-model accuracy for structured plans; health data to AI providers under DPDP; Android-only excludes iPhone clients; S3 costs after free credits; Supabase free-plan limits; thin regional Indian food data; two-person scope; gym directory data source and accuracy; "Arcwell" trademark conflicts outside India (US software mark, US/Canada supplement mark) — IP India search required before branding spend.
+Exercise media licensing; Groq free-tier vision support; free-model accuracy for structured plans; health data to AI providers under DPDP; Android-only excludes iPhone clients; Supabase storage and free-plan limits; thin regional Indian food data; two-person scope; gym directory data source and accuracy; "Arcwell" trademark conflicts outside India (US software mark, US/Canada supplement mark) — IP India search required before branding spend.
