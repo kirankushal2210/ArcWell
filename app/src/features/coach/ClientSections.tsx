@@ -23,6 +23,7 @@ import {
   shiftDate,
   slotLabel,
 } from "@/features/athlete/foods";
+import { ClientHabits } from "@/features/coach/ClientHabits";
 import { useCoachData } from "@/features/coach/CoachData";
 import { accountOf, dayInline, inr, renewsOn } from "@/features/coach/crm";
 import { PaidTag } from "@/features/coach/CrmParts";
@@ -701,6 +702,7 @@ export function Recovery({ c }: { c: Client }) {
               .join(", ")
           : `${first} hasn't marked any recovery protocols done this week.`}
       </Text>
+      <ClientHabits c={c} />
     </>
   );
 }

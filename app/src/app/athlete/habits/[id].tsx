@@ -124,6 +124,17 @@ export default function HabitPage() {
                 onPress={() => setLeft(null)}
               />
             </View>
+          ) : h.id === "long-exhale" ? (
+            <Button
+              label="Start guided breathing"
+              size="sm"
+              onPress={() =>
+                router.push({
+                  pathname: "/athlete/recovery/breathe",
+                  params: { pattern: "sigh" },
+                })
+              }
+            />
           ) : h.tracker === "timer" || h.id === "morning-daylight" ? (
             <View style={styles.row}>
               {(h.id === "focus-block" ? [25, 45, 60, 90] : [target ?? 5]).map(

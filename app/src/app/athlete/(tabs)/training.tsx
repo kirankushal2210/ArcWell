@@ -6,6 +6,7 @@ import {
   Check,
   ChevronRight,
   Dumbbell,
+  Flag,
   PencilLine,
   Play,
   Plus,
@@ -35,6 +36,8 @@ import {
 } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
 import { CardioCard } from "@/features/cardio/CardioCard";
+import { RacePage } from "@/features/race/RacePage";
+import { useVisibility } from "@/features/athlete/visibility";
 import { Eyebrow, Group, GroupRow, PageHeader } from "@/features/coach/parts";
 import { todayIndex, WEEKDAYS, weekSchedule } from "@/features/coach/plans";
 import { colors, radius, space } from "@/theme";
@@ -300,12 +303,14 @@ function PlanPage() {
   );
 }
 
-type TrainingTab = "plan" | "history" | "exercises";
+type TrainingTab = "plan" | "history" | "exercises" | "race";
 const TABS: { key: TrainingTab; label: string }[] = [
   { key: "plan", label: "Plan" },
   { key: "history", label: "History" },
   { key: "exercises", label: "Exercises" },
 ];
+/** The Race section exists only while a race goal is active (D76). */
+const RACE_TAB = { key: "race" as const, label: "Race" };
 
 /** Training (D61): Plan · History · Exercises as section tabs under the title. */
 export default function Training() {
@@ -313,6 +318,7 @@ export default function Training() {
   const { coachName, meTier, sessions, active, setActive } = useCoachData();
   const [tab, setTab] = useState<TrainingTab>("plan");
   const tw = useTodayWorkout();
+  const vis = useVisibility();
   if (!me) return <NotJoined />;
   const startToday = !!tw.day && !tw.done;
   const program = me.program;
@@ -329,8 +335,8 @@ export default function Training() {
         actions={[athleteMenuAction]}
       />
       <SectionTabs
-        tabs={TABS}
-        value={tab}
+        tabs={vis.race ? [...TABS, RACE_TAB] : TABS}
+        value={!vis.race && tab === "race" ? "plan" : tab}
         onChange={setTab}
         pages={[
           <PlanPage key="p" />,
@@ -356,9 +362,23 @@ export default function Training() {
               }
             />
           </View>,
+          ...(vis.race
+            ? [
+                <AthletePage key="r">
+                  <RacePage />
+                </AthletePage>,
+              ]
+            : []),
         ]}
       />
-      {tab !== "plan" ? null : startToday && tw.day ? (
+      {tab === "race" && vis.race ? (
+        <AthleteDock
+          label="Start race sim"
+          icon={Flag}
+          pillar="training"
+          onPress={() => router.push("/athlete/race/sim/new")}
+        />
+      ) : tab !== "plan" ? null : startToday && tw.day ? (
         <AthleteDock
           label="Start workout"
           icon={Play}

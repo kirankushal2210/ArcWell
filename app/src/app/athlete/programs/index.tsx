@@ -107,6 +107,15 @@ export default function Programs() {
         sets a week for each main muscle, sets ending 0 to 3 reps short of
         failure, and progression you can see.
       </Text>
+      <Eyebrow>Race prep</Eyebrow>
+      <Group>
+        <NavRow
+          first
+          label="Train for a HYROX race"
+          sub="Running, strength and stations, planned back from race day"
+          onPress={() => router.push("/athlete/race/setup")}
+        />
+      </Group>
     </MenuPage>
   );
 }

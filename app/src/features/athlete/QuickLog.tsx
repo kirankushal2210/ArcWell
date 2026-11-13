@@ -8,11 +8,14 @@ import { router } from "expo-router";
 import {
   Camera,
   Dumbbell,
+  Flag,
+  type LucideIcon,
   Moon,
   Plus,
   Sparkles,
+  Target,
   Utensils,
-  type LucideIcon,
+  Wind,
 } from "lucide-react-native";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
@@ -34,6 +37,7 @@ import { slotNow } from "./FoodParts";
 import { Sheet, SheetRow } from "./Sheet";
 import { emptyWorkout } from "./training";
 import { useMe } from "./useMe";
+import { useVisibility } from "./visibility";
 import { GLASS_ML, ml, useWater } from "./Water";
 
 /** Width the tab bar leaves free for the + button: the button plus the gap before it. */
@@ -68,6 +72,7 @@ export function QuickLog() {
   const insets = useSafeAreaInsets();
   const today = useTodayWorkout();
   const water = useWater();
+  const vis = useVisibility();
   const [open, setOpen] = useState(false);
   const last = me?.weights[me.weights.length - 1] ?? 70;
   const [kg, setKg] = useState(last);
@@ -136,6 +141,34 @@ export function QuickLog() {
             onPress: () => go("/athlete/ai"),
           },
     );
+
+  // Opt-in modules (D78): only what the athlete turned on appears here.
+  if (vis.has("calm"))
+    tiles.push({
+      label: "Breathe",
+      icon: Wind,
+      fill: colors.surfaceRaised,
+      onPress: () =>
+        go({
+          pathname: "/athlete/recovery/breathe",
+          params: { pattern: "sigh" },
+        }),
+    });
+  if (vis.has("focus"))
+    tiles.push({
+      label: "Focus block",
+      icon: Target,
+      fill: colors.surfaceRaised,
+      onPress: () =>
+        go({ pathname: "/athlete/habits/[id]", params: { id: "focus-block" } }),
+    });
+  if (vis.race)
+    tiles.push({
+      label: "Race sim",
+      icon: Flag,
+      fill: colors.surfaceRaised,
+      onPress: () => go("/athlete/race/sim/new"),
+    });
 
   return (
     <>

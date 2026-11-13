@@ -141,7 +141,7 @@ export type SimSplit = {
 export type RaceSim = {
   id: string;
   date: string;
-  kind: "full" | "half" | "race" | "custom";
+  kind: "full" | "half" | "race";
   division: DivisionKey;
   totalSec: number;
   splits: SimSplit[];
@@ -158,6 +158,16 @@ export type RaceState = {
   };
   status?: "active" | "done" | "cancelled";
   sims: RaceSim[];
+  /** A sim in progress: timestamps so a locked phone or a killed app loses nothing. */
+  live?: {
+    id: string;
+    kind: "full" | "half" | "race";
+    roxzone: boolean;
+    division: string;
+    startedAt: number;
+    marks: number[];
+    substitutes: Partial<Record<StationKey, string>>;
+  };
 };
 
 export type IfThen = { id: string; goal: string; obstacle: string; plan: string };

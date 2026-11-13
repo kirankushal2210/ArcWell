@@ -166,6 +166,15 @@ export default function HabitsLibrary() {
         </Text>
       ) : null}
 
+      {hb.v.has("focus") ? (
+        <Button
+          label="If-then plans"
+          variant="secondary"
+          size="sm"
+          onPress={() => router.push("/athlete/habits/plans")}
+        />
+      ) : null}
+
       <Sheet
         visible={safety}
         onClose={() => setSafety(false)}
