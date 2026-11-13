@@ -55,6 +55,8 @@ export type FoodLog = {
   cooked?: "home" | "restaurant";
   source: FoodSource | "quick";
   macros: Macros;
+  /** The plate photo, when logged with a scan (D94). */
+  photoUri?: string;
   /** Logged from the meal plan with "Ate this" (F5-12). */
   fromPlan?: string;
   /** Logged with "Ate something else" instead of this plan meal: the coach sees the swap. */
