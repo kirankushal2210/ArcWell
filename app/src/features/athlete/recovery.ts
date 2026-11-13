@@ -745,7 +745,17 @@ export function outlookFor(
   day: Day,
   planned: string | null,
   bedtime: number,
+  /** Rest mode on (D98): rest is the plan, no strain target. */
+  rest = false,
 ): { title: string; lines: string[] } {
+  if (rest)
+    return {
+      title: "Rest mode",
+      lines: [
+        "Rest is the plan today: no strain target, easy movement only if you feel like it.",
+        `In bed by ${clockOf(bedtime)} tonight. Sleep is the best help to get back.`,
+      ],
+    };
   const r = day.recovery;
   const [lo, hi] = day.strain.target;
   const lines = [

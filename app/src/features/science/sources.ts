@@ -151,6 +151,47 @@ export const SOURCES: Record<string, Source> = {
     finding:
       "Without medical reasons not to, pregnant women should get at least 150 minutes of moderate activity a week, over at least 3 days.",
   },
+  plews2013: {
+    id: "plews2013",
+    topic: "recovery",
+    authors: "Plews DJ, Laursen PB, Stanley J, Kilding AE, Buchheit M",
+    year: 2013,
+    title:
+      "Training adaptation and heart rate variability in elite endurance athletes: opening the door to effective monitoring",
+    journal: "Sports Med",
+    ref: "43(9):773–781",
+    pmid: "23852425",
+    doi: "10.1007/s40279-013-0071-8",
+    finding:
+      "Rolling 7-day HRV averages tracked training adaptation and fatigue better than single-day values.",
+  },
+  mishra2020: {
+    id: "mishra2020",
+    topic: "recovery",
+    authors: "Mishra T, et al.",
+    year: 2020,
+    title: "Pre-symptomatic detection of COVID-19 from smartwatch data",
+    journal: "Nat Biomed Eng",
+    ref: "4(12):1208–1220",
+    pmid: "33208926",
+    doi: "10.1038/s41551-020-00640-6",
+    finding:
+      "Raised resting heart rate and other changes in smartwatch data appeared days before symptoms of infection in most cases.",
+  },
+  nes2014: {
+    id: "nes2014",
+    topic: "training",
+    authors: "Nes BM, Vatten LJ, Nauman J, Janszky I, Wisløff U",
+    year: 2014,
+    title:
+      "A simple nonexercise model of cardiorespiratory fitness predicts long-term mortality",
+    journal: "Med Sci Sports Exerc",
+    ref: "46(6):1159–1165",
+    pmid: "24576863",
+    doi: "10.1249/MSS.0000000000000219",
+    finding:
+      "Fitness age, the age at which an average person has your fitness, predicted long-term mortality better than age alone.",
+  },
   mcnulty2020: {
     id: "mcnulty2020",
     topic: "training",

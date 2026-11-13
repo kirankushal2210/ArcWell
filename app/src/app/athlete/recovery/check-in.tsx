@@ -11,7 +11,10 @@ import { simulatedDay, todayDate } from "@/features/athlete/recovery";
 import { Scale, TimeStepper } from "@/features/athlete/RecoveryForm";
 import { useRecovery } from "@/features/athlete/RecoveryParts";
 import { NotJoined } from "@/features/athlete/useMe";
+import { useCoachData } from "@/features/coach/CoachData";
 import { Page, PageHeader } from "@/features/coach/parts";
+import { findFood, shiftDate } from "@/features/athlete/foods";
+import { journalFromFood } from "@/features/athlete/recoveryInsights";
 import { colors, radius, rhythm, space } from "@/theme";
 
 const HABITS = [
@@ -40,7 +43,26 @@ export default function CheckIn() {
   const [energy, setEnergy] = useState(saved?.energy ?? 3);
   const [stress, setStress] = useState(saved?.stress ?? 2);
   const [mood, setMood] = useState(saved?.mood ?? 3);
-  const [habits, setHabits] = useState<string[]>(saved?.habits ?? []);
+  // Last night's habits start from what was logged yesterday (D98); the athlete can change them.
+  const { foodLogs, myFoods } = useCoachData();
+  const [habits, setHabits] = useState<string[]>(() => {
+    if (saved?.habits) return saved.habits;
+    const yesterday = shiftDate(date, -1);
+    return journalFromFood(
+      foodLogs(r.id)
+        .filter((l) => l.date === yesterday)
+        .map((l) => {
+          const f = findFood(l.foodId, myFoods);
+          return {
+            at: l.at,
+            meal: l.meal,
+            caffeineMg: f?.caffeine ? (f.caffeine * l.grams) / 100 : 0,
+            alcohol: f?.id === "beer" || f?.id === "wine",
+          };
+        }),
+      r.baseline.bed,
+    );
+  });
   const back = () =>
     router.canGoBack() ? router.back() : router.replace("/athlete/recovery");
   if (!r.me) return <NotJoined />;

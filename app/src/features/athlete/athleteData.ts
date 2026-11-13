@@ -103,6 +103,10 @@ export type AthleteSettings = {
   morning?: Record<string, Partial<Record<MorningItem, number>>>;
   /** Cardio fitness (D79). */
   cardio?: CardioState;
+  /** Rest mode (D98): on while sick, injured or run down; strain targets pause. */
+  restMode?: { since: string; reason: "sick" | "injured" | "run_down" | "other" };
+  /** Period start dates for cycle tracking (D98), women only, optional. */
+  periods?: string[];
   /** HYROX race track (D76). */
   race?: RaceState;
   /** If-then plans (implementation intentions) for goals and habits. */
