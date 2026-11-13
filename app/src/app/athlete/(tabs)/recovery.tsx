@@ -21,7 +21,8 @@ import {
 } from "@/components/primitives";
 import { SectionTabs } from "@/components/SectionTabs";
 import { dateLabel, shiftDate } from "@/features/athlete/foods";
-import { DEVICE_LABEL, todayDate } from "@/features/athlete/recovery";
+import { DEVICE_LABEL } from "@/features/athlete/recovery";
+import { useDayPicker } from "@/features/athlete/useToday";
 import {
   Overview,
   RecoveryPage,
@@ -49,8 +50,7 @@ const TABS: { key: RecoveryTab; label: string }[] = [
 export default function Recovery() {
   const r = useRecovery();
   const p = useLocalSearchParams<{ tab?: RecoveryTab }>();
-  const [today] = useState(todayDate);
-  const [date, setDate] = useState(today);
+  const { today, date, setDate } = useDayPicker();
   const [tab, setTab] = useState<RecoveryTab>(p.tab ?? "overview");
   // Opened from Today's rings with a section in mind: switch to it.
   const [asked, setAsked] = useState(p.tab);

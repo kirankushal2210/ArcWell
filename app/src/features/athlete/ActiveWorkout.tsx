@@ -12,6 +12,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { AppState } from "react-native";
@@ -34,6 +35,7 @@ const ACTIVE_KEY = "arcwell.active.v1";
 /** Older builds kept the workout inside the sample store; read it once if the new key is empty. */
 const LEGACY_KEY = "arcwell.sample.v1";
 const SAVE_DELAY_MS = 400;
+const BACKUP_KEY = "arcwell.active.backup";
 
 const FullCtx = createContext<ActiveWorkout | null>(null);
 const SummaryCtx = createContext<WorkoutSummary | null>(null);
@@ -42,10 +44,16 @@ const SetCtx = createContext<SetActive>(() => {});
 export function ActiveWorkoutProvider({ children }: { children: ReactNode }) {
   const [active, setActive] = useState<ActiveWorkout | null>(null);
   const [hydrated, setHydrated] = useState(false);
+  // Same safety rules as the sample store: an unreadable saved workout is backed up and never
+  // overwritten, and a change still waiting for its save is written if the provider goes away.
+  const saveBlocked = useRef(false);
+  const pendingSave = useRef<(() => void) | null>(null);
 
   useEffect(() => {
+    let stored: string | null = null;
     (async () => {
       const raw = await AsyncStorage.getItem(ACTIVE_KEY);
+      stored = raw;
       if (raw) return JSON.parse(raw) as ActiveWorkout | null;
       const legacy = await AsyncStorage.getItem(LEGACY_KEY);
       return legacy
@@ -57,15 +65,23 @@ export function ActiveWorkoutProvider({ children }: { children: ReactNode }) {
         // A workout started before hydration finished wins over the saved one.
         if (w) setActive((cur) => cur ?? w);
       })
-      .catch(() => {})
+      .catch(() => {
+        saveBlocked.current = true;
+        if (stored) AsyncStorage.setItem(BACKUP_KEY, stored).catch(() => {});
+      })
       .finally(() => setHydrated(true));
   }, []);
+  useEffect(() => () => pendingSave.current?.(), []);
 
   // Debounced save, flushed when the app leaves the foreground.
   useEffect(() => {
     if (!hydrated) return;
-    const save = () =>
+    const save = () => {
+      pendingSave.current = null;
+      if (saveBlocked.current) return;
       AsyncStorage.setItem(ACTIVE_KEY, JSON.stringify(active)).catch(() => {});
+    };
+    pendingSave.current = save;
     const t = setTimeout(save, SAVE_DELAY_MS);
     const sub = AppState.addEventListener("change", (s) => {
       if (s !== "active") save();

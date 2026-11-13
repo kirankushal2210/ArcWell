@@ -18,6 +18,7 @@ import {
   type ReactNode,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from "react";
 
@@ -302,6 +303,9 @@ type CoachData = {
 const Ctx = createContext<CoachData | null>(null);
 
 const STORE_KEY = "arcwell.sample.v1";
+/** Where an unreadable saved copy is kept, so a failed load never loses it (see the load effect). */
+const BACKUP_KEY = "arcwell.sample.backup";
+const SAVE_DELAY_MS = 800;
 type Saved = {
   clients: Client[];
   meId: string | null;
@@ -406,9 +410,21 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
   // F4-09: the workout in progress, history and the athlete's plan are saved on the phone after every
   // change, so closing the app mid-workout loses nothing. Sample build: plain AsyncStorage; the real
   // build syncs to Supabase and keeps the offline copy in encrypted storage.
+  //
+  // Safety rules:
+  // - If the saved copy can't be read, it is backed up and saving stops for this run, so sample
+  //   data never replaces what's stored.
+  // - A finished workout saves at once (urgent), before the cleared workout in progress does, so
+  //   closing the app straight after Finish can't lose it.
+  // - A change still waiting for its save is written if the provider goes away.
+  const saveBlocked = useRef(false);
+  const saveUrgent = useRef(false);
+  const pendingSave = useRef<(() => void) | null>(null);
   useEffect(() => {
+    let stored: string | null = null;
     AsyncStorage.getItem(STORE_KEY)
       .then((raw) => {
+        stored = raw;
         if (!raw) return;
         const s = JSON.parse(migrateNames(raw)) as Partial<Saved>;
         if (s.clients) setClients(s.clients.map(withExtras));
@@ -427,9 +443,13 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
         if (s.coach) setCoach(s.coach);
         if (s.settings) setSettings(s.settings);
       })
-      .catch(() => {})
+      .catch(() => {
+        saveBlocked.current = true;
+        if (stored) AsyncStorage.setItem(BACKUP_KEY, stored).catch(() => {});
+      })
       .finally(() => setHydrated(true));
   }, []);
+  useEffect(() => () => pendingSave.current?.(), []);
   useEffect(() => {
     if (!hydrated) return;
     const saved: Saved = {
@@ -451,9 +471,14 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
     };
     // Serialising the whole store is slow, so save once changes settle, and at once when the app
     // leaves the foreground, instead of on every tap.
-    const save = () =>
+    const save = () => {
+      pendingSave.current = null;
+      saveUrgent.current = false;
+      if (saveBlocked.current) return;
       AsyncStorage.setItem(STORE_KEY, JSON.stringify(saved)).catch(() => {});
-    const t = setTimeout(save, 800);
+    };
+    pendingSave.current = save;
+    const t = setTimeout(save, saveUrgent.current ? 0 : SAVE_DELAY_MS);
     const sub = AppState.addEventListener("change", (st) => {
       if (st !== "active") save();
     });
@@ -760,6 +785,7 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
         routines: (c.routines ?? []).filter((x) => x.id !== routineId),
       })),
     finishWorkout: (id, s) => {
+      saveUrgent.current = true;
       setHistory((h) => ({ ...h, [id]: [s, ...(h[id] ?? [])] }));
       const top =
         s.bests[0]?.text ??
