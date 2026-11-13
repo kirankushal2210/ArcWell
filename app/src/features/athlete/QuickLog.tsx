@@ -132,6 +132,7 @@ export function QuickLog() {
       onPress: () => go("/athlete/recovery/check-in"),
     });
   const aiOff = !coached && !settingsOf(me.id).ai;
+  const showAi = !coached && !aiOff;
   if (!aiOff)
     tiles.push(
       coached
@@ -183,22 +184,38 @@ export function QuickLog() {
         pointerEvents="box-none"
         style={[styles.wrap, { bottom: tabBarBottom(insets.bottom) }]}
       >
-        <PressableScale
-          onPress={() => {
-            setKg(last);
-            setSaved(false);
-            setOpen(true);
-          }}
-          accessibilityRole="button"
-          accessibilityLabel="Log something"
-        >
-          <GlassSurface style={styles.plus}>
-            {/* A View so the icon paints above the blur layers on web. */}
-            <View>
-              <Plus size={26} strokeWidth={2.2} color={colors.text} />
-            </View>
-          </GlassSurface>
-        </PressableScale>
+        {/* D97: self-guided athletes get the AI coach here; coached athletes (never AI, D44) and
+            anyone who turned AI off keep the + log menu. */}
+        {showAi ? (
+          <PressableScale
+            onPress={() => router.push("/athlete/ai")}
+            accessibilityRole="button"
+            accessibilityLabel="AI coach"
+          >
+            <GlassSurface style={styles.plus}>
+              <View>
+                <Sparkles size={26} strokeWidth={2.2} color={colors.accent} />
+              </View>
+            </GlassSurface>
+          </PressableScale>
+        ) : (
+          <PressableScale
+            onPress={() => {
+              setKg(last);
+              setSaved(false);
+              setOpen(true);
+            }}
+            accessibilityRole="button"
+            accessibilityLabel="Log something"
+          >
+            <GlassSurface style={styles.plus}>
+              {/* A View so the icon paints above the blur layers on web. */}
+              <View>
+                <Plus size={26} strokeWidth={2.2} color={colors.text} />
+              </View>
+            </GlassSurface>
+          </PressableScale>
+        )}
       </View>
 
       <Sheet visible={open} onClose={() => setOpen(false)} title="Log">

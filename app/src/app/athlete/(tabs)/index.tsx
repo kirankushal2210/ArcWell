@@ -162,10 +162,12 @@ export default function Today() {
         ]}
       />
       <AthletePage dock>
-        <Tip
-          id="today-plus"
-          text="Tap + at the bottom right to log food, water, weight or a check-in from anywhere."
-        />
+        {meTier === "coached" ? (
+          <Tip
+            id="today-plus"
+            text="Tap + at the bottom right to log food, water, weight or a check-in from anywhere."
+          />
+        ) : null}
         {meTier === "pro" &&
         sub &&
         (sub.status === "grace" ||
