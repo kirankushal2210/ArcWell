@@ -147,7 +147,8 @@ max_catalogs = 2
 
 # Store vector embeddings in S3 for large and durable datasets
 [storage.vector]
-enabled = true
+# Off: not used, and the local storage service crash-loops with it on (storage-api v1.90).
+enabled = false
 max_buckets = 10
 max_indexes = 5
 
