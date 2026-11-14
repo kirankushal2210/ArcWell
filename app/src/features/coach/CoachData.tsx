@@ -327,10 +327,37 @@ type Saved = {
 /** Sample extras added after the first release of the sample data (D64). */
 function withExtras(c: Client): Client {
   if (c.id === "karan" && c.competitive === undefined)
-    return { ...c, competitive: true, enhanced: sampleEnhanced() };
+    return withProgram({
+      ...c,
+      competitive: true,
+      enhanced: sampleEnhanced(),
+    });
   if (c.id === "priya" && c.supplements === undefined)
-    return { ...c, supplements: cloneItems(sampleStacks()[1].items) };
-  return c;
+    return withProgram({
+      ...c,
+      supplements: cloneItems(sampleStacks()[1].items),
+    });
+  return withProgram(c);
+}
+
+/**
+ * Sample clients arrive with their coach's plan as a name only ("Fat loss · 4 days"). Give each
+ * the program behind that name, as the coach's builder already shows it, so the athlete's Coach
+ * plan and every screen that reads the program see what the coach assigned (D105). The start date
+ * puts them partway through, in line with how long they've been with the coach.
+ */
+function withProgram(c: Client): Client {
+  const name = c.plan?.training;
+  if (c.program || c.pending || !name) return c;
+  const program = { ...programFromTemplate(name), name };
+  const weeksIn = Math.max(0, (c.weeksWithYou - 1) % program.weeks);
+  return {
+    ...c,
+    program,
+    programStart:
+      c.programStart ??
+      new Date(Date.now() - weeksIn * 7 * 86400000).toISOString(),
+  };
 }
 
 /** Saved self plans from before exact foods: rebuild the example day with foods (sample data only). */
