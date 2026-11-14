@@ -45,8 +45,9 @@ jobs:
       - uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
+      # The repo root has a package.json, so tell Deno to fetch the functions' npm packages itself.
       - run: >-
-          deno check
+          deno check --node-modules-dir=auto
           supabase/functions/_shared/ai/index.ts
           supabase/functions/scan-meal/index.ts
           supabase/functions/revenuecat-webhook/index.ts
