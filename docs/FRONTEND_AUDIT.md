@@ -265,3 +265,60 @@ These can't be finished in Expo Go:
 - Health Connect (steps, heart rate, sleep, watch VO2 max).
 - Live heart rate in the interval timer.
 - Exercise demo media, which also needs licensing.
+
+## 8. Third pass (2026-11-14, after D104 and D105)
+
+Every route, `router.push` target and stub was checked again. There are no stub screens, TODOs or "coming soon" pages. Every link goes to a real route; only `/dev/gallery` and `/dev/tokens` are unlinked. No raw colours were found outside `theme/`.
+
+**Coach plan (D105), done.**
+- Athletes who joined through a coach see a **Coach plan** tile in Hypertrophy, in place of Arcwell plan.
+- It opens the program the coach assigned, with the program's name, "from" the coach, and the week.
+- A new assignment shows up at once.
+- Before this, sample clients came with only the plan's name, so athletes saw "building your plan" and no tile.
+
+### E. Bugs
+
+- [ ] **Confirm dialogs do nothing on web.** About 25 `Alert.alert` calls have no web fallback. Fix it with one shared `confirm()` helper like `confirmDiscard`. Size M.
+  - **Blocking:**
+    - `PhotoSlot.tsx:44` `choosePhoto`. Every "add a photo" path is dead on web: profiles, check-in and physique photos, chat images, onboarding.
+    - Closing the race sim (`race/sim/live.tsx:61`).
+    - Starting a workout while another runs (`workout/preview/[dayId].tsx:56`).
+  - **Confirms that never fire:**
+    - Sign out (coach menu, athlete Today, `menu/account.tsx`).
+    - Sample reset.
+    - Complete or remove a client (`client/status/[id].tsx:61,94`).
+    - Disconnect a device (`recovery/connect.tsx:136`).
+    - Delete a template (`MyRoutines.tsx:226`).
+  - **Only the message is lost:** template and stack assign, recovery planner, create exercise, photo permission.
+- [ ] **A new program keeps the old start date.** When the coach picks a different template in the plan builder and saves, `saveProgram` keeps `programStart`. A new 4-week program can then open as "complete". Size S.
+- [ ] **"Plan assigned · starts Monday"** (`CoachData.tsx`, assignPlan) disagrees with the data: the program starts now. Size S.
+- [ ] **No "plan updated" notice for the athlete.** The plan item in `notifications.ts:63` is never new and ignores edits, though Settings has a toggle for it. Size S.
+- [ ] **UTC date slicing still left:** `coach/enhanced/[id].tsx:70,106` and `notifications.ts:68`. Size S.
+- [ ] **"1 exercises · N min"** on template cards for single-run days (`MyRoutines.tsx:48`). This breaks D100. Size S.
+- [ ] Dead export `SEASON` (`features/race/data.ts:25`). Size S.
+
+### F. Partly built (known D104 limits)
+
+- [ ] The athlete routine editor has no effort (RPE) or block fields. Size M.
+- Still as designed:
+  - .xls import (use .xlsx or .csv).
+  - PDFs open outside the app.
+  - A drawn Gyms map.
+
+### C and D, rechecked
+
+- **C (tests):** check-in due dates are now covered. Still untested:
+  - `recovery.ts` (`dayFor`, `plannerFor`, `suggestFor`, `outlookFor`).
+  - `selfPlan()`.
+  - `toSession` and `programWeek`.
+  - `visibility.ts` (`modulesOf`, `raceActive`).
+- **D (docs)**, still open, and now also:
+  - **SPEC.md** is behind on D97, D98, D101 and D105:
+    - Coached athletes' bar and Progress.
+    - Side menu.
+    - Recovery.
+    - Hypertrophy, Race and Endurance.
+    - Templates.
+    - RPE per set.
+    - Nutrition rebuild.
+  - **DESIGN.md §6** component table still says "not built" for parts now built: tab bar, set row, rest timer, macro bars, food row and portion picker, chat bubble, paywall card.
