@@ -53,3 +53,4 @@ jobs:
           supabase/functions/razorpay-webhook/index.ts
           supabase/functions/delete-account/index.ts
           supabase/functions/notify/index.ts
+          supabase/functions/demo-billing/index.ts

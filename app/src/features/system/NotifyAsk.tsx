@@ -1,12 +1,15 @@
 // Notifications permission (X-07, X-08; N-06): explain first, then ask Android. If it was turned off,
 // say so and offer phone settings. Never asked out of the blue.
+import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
 import { BellRing } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { Linking, Platform, StyleSheet, View } from "react-native";
 
 import { Button, Text } from "@/components/primitives";
+import { registerPushToken } from "@/features/accounts/repo";
 import { Sheet } from "@/features/athlete/Sheet";
+import { accountsEnabled } from "@/lib/supabase";
 import { colors, radius, space } from "@/theme";
 
 type Status = "granted" | "denied" | "undetermined";
@@ -16,11 +19,12 @@ export function useNotifyPermission() {
   useEffect(() => {
     if (Platform.OS === "web") return;
     Notifications.getPermissionsAsync()
-      .then((p) =>
+      .then((p) => {
         setStatus(
           p.granted ? "granted" : p.canAskAgain ? "undetermined" : "denied",
-        ),
-      )
+        );
+        if (p.granted) void savePushToken();
+      })
       .catch(() => {});
   }, []);
   const request = async () => {
@@ -28,8 +32,25 @@ export function useNotifyPermission() {
     if (Platform.OS === "web") return setStatus("granted");
     const p = await Notifications.requestPermissionsAsync().catch(() => null);
     setStatus(p?.granted ? "granted" : "denied");
+    if (p?.granted) void savePushToken();
   };
   return { status, request };
+}
+
+/**
+ * With accounts, tell the server where to send this device's notifications (B5). Needs a
+ * development build with an EAS project id; Expo Go and the web simply skip it.
+ */
+async function savePushToken() {
+  if (Platform.OS === "web" || !accountsEnabled) return;
+  const projectId = Constants.expoConfig?.extra?.eas?.projectId as
+    string | undefined;
+  if (!projectId) return;
+  const t = await Notifications.getExpoPushTokenAsync({ projectId }).catch(
+    () => null,
+  );
+  if (t?.data)
+    await registerPushToken(t.data, Platform.OS === "ios" ? "ios" : "android");
 }
 
 const COPY = {

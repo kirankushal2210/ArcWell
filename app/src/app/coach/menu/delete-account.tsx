@@ -15,9 +15,11 @@ import {
 } from "@/features/athlete/MenuParts";
 import { useCoachData } from "@/features/coach/CoachData";
 import { colors } from "@/theme";
+import { useAccountActions } from "@/features/accounts/useAccountActions";
 
 export default function DeleteCoachAccount() {
   const { clients, closeCoachAccount } = useCoachData();
+  const account = useAccountActions();
   const [typed, setTyped] = useState("");
   const back = backTo("/coach/menu/settings");
   const joined = clients.filter(
@@ -38,8 +40,11 @@ export default function DeleteCoachAccount() {
             label="Delete my coach account"
             destructive
             disabled={!ok}
-            onConfirm={() => {
-              closeCoachAccount();
+            onConfirm={async () => {
+              // With accounts, the server deletes the account; clients keep their own data (D42).
+              if (account.live) {
+                if (!(await account.deleteNow())) return;
+              } else closeCoachAccount();
               if (router.canDismiss()) router.dismissAll();
               router.replace("/");
             }}

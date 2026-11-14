@@ -257,6 +257,25 @@ export async function notify(e: NotifyEvent) {
 /** Whether the signed-in athlete has anything stored yet (a returning athlete on a new phone). */
 export async function hasAthleteProfile(): Promise<boolean> {
   if (!accountsEnabled || !supabase) return false;
-  const { data } = await supabase.from("athlete_profiles").select("athlete_id").maybeSingle();
+  const { data } = await supabase
+    .from("athlete_profiles")
+    .select("athlete_id")
+    .maybeSingle();
   return !!data;
+}
+
+// ---------- Billing (B7) ----------
+
+/** Investor demo builds: the paywall's trial goes through the demo-billing function (no Play yet). */
+export const demoBilling = process.env.EXPO_PUBLIC_DEMO_BILLING === "1";
+
+/** Start (or cancel) the demo Plus trial. Real builds buy through Google Play and RevenueCat. */
+export async function demoPlus(action: "trial" | "cancel"): Promise<Res<true>> {
+  if (!accountsEnabled || !supabase) return off();
+  const { error } = await supabase.functions.invoke("demo-billing", {
+    body: { action },
+  });
+  return error
+    ? fail("Couldn't start the trial. Try again.")
+    : { data: true, error: null };
 }
