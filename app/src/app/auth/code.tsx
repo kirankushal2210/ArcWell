@@ -8,6 +8,7 @@ import { KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Button, Text, TextField } from "@/components/primitives";
+import { hasAthleteProfile } from "@/features/accounts/repo";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { useCoachData } from "@/features/coach/CoachData";
 import { ProgressBar, QuestionHeader } from "@/features/onboarding/parts";
@@ -52,14 +53,15 @@ export default function CodeStep() {
     }
     if (router.canDismiss()) router.dismissAll();
     if (r.profile?.role === "coach") router.replace("/coach");
-    else if (r.profile?.role === "athlete")
-      // Plans live on the phone until sync arrives; on a new phone, build one again.
+    else if (r.profile?.role === "athlete") {
+      // With accounts the plan lives on the server (D107): a returning athlete goes straight in.
+      const returning = auth.enabled ? await hasAthleteProfile() : !!meId;
       router.replace(
-        meId
+        returning
           ? "/athlete"
           : { pathname: "/onboarding/[step]", params: { step: "0" } },
       );
-    else router.replace("/role");
+    } else router.replace("/role");
   };
 
   const resend = async () => {

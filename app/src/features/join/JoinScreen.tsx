@@ -36,6 +36,8 @@ import {
 } from "@/theme";
 import { PolicyLinks } from "@/features/legal/LegalLinks";
 
+import { CloudJoin } from "./CloudJoin";
+
 function JoinForm({ code: initial }: { code?: string }) {
   const { findInvite, claimInvite, coachName } = useCoachData();
   const auth = useAuth();
@@ -264,7 +266,11 @@ const styles = StyleSheet.create({
 
 /** A coached athlete opening an invite sees how switching coach works first (F3-03). */
 export function JoinScreen({ code }: { code?: string }) {
-  const { meTier } = useCoachData();
+  const { meTier, sync } = useCoachData();
+  const auth = useAuth();
+  // Real accounts check the code on the server; signed out, the store is still the sample.
+  if (auth.enabled && (sync === "off" || meTier !== "coached"))
+    return <CloudJoin code={code} />;
   if (meTier === "coached")
     return (
       <Redirect

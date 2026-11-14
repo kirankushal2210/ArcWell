@@ -234,8 +234,16 @@ select
 -- Chat ---------------------------------------------------------------------------------------------
 select
   lives_ok (
-    $$ insert into public.messages (coach_id, athlete_id, body) values ('00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-0000000000a1', 'Hi coach') $$,
-    'athlete 1 messages their coach'
+    $$ insert into public.messages (id, coach_id, athlete_id, body) values ('20000000-0000-4000-8000-000000000001', '00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-0000000000a1', 'Hi coach') $$,
+    'athlete 1 messages their coach, with an id the app chose'
+  );
+
+select
+  throws_ok (
+    $$ insert into public.messages (id, coach_id, athlete_id, body) values ('20000000-0000-4000-8000-000000000001', '00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-0000000000a1', 'Hi coach') $$,
+    '23505',
+    null,
+    'the same message is never stored twice'
   );
 
 select

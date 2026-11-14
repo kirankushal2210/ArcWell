@@ -10,13 +10,17 @@ import { AppState } from "react-native";
 const url = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const key = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
+// The web build also renders on the server (output "server"), where there is no localStorage:
+// there the client keeps no session, and the browser takes over once the page loads.
+const storage = typeof localStorage === "undefined" ? undefined : localStorage;
+
 export const supabase: SupabaseClient | null =
   url && key
     ? createClient(url, key, {
         auth: {
-          storage: localStorage,
-          autoRefreshToken: true,
-          persistSession: true,
+          storage,
+          autoRefreshToken: !!storage,
+          persistSession: !!storage,
           detectSessionInUrl: false,
         },
       })
