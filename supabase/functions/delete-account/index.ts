@@ -3,7 +3,11 @@
 // from it. A coach's clients keep their own data and plans (D42); coaching links end with them.
 //
 // Only ever acts on the caller's own id, taken from their verified session, never from the body.
+import { removeUserFiles } from "../_shared/files.ts";
 import { asCaller, asService, cors, reply } from "../_shared/http.ts";
+
+/** A few tries a day is plenty; more is a script (S-01). */
+const DAILY_CAP = 5;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
@@ -11,19 +15,16 @@ Deno.serve(async (req) => {
   const auth = req.headers.get("Authorization");
   if (!auth) return reply(401, { error: "signed_out" });
 
-  const { data } = await asCaller(auth).auth.getUser();
+  const me = asCaller(auth);
+  const { data } = await me.auth.getUser();
   const id = data?.user?.id;
   if (!id) return reply(401, { error: "signed_out" });
+  const { data: allowed } = await me.rpc("call_try_use", { p_fn: "delete_account", p_cap: DAILY_CAP });
+  if (!allowed) return reply(429, { error: "rate_limited" });
 
   const db = asService();
   // Files: athlete-files/<id>/<area>/<file>.
-  const bucket = db.storage.from("athlete-files");
-  const { data: areas } = await bucket.list(id, { limit: 100 });
-  for (const area of areas ?? []) {
-    const { data: files } = await bucket.list(`${id}/${area.name}`, { limit: 1000 });
-    const paths = (files ?? []).map((f) => `${id}/${area.name}/${f.name}`);
-    if (paths.length) await bucket.remove(paths);
-  }
+  await removeUserFiles(db, id);
 
   const { error } = await db.auth.admin.deleteUser(id);
   if (error) {

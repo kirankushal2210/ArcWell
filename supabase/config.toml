@@ -446,3 +446,7 @@ verify_jwt = false
 
 [functions.razorpay-webhook]
 verify_jwt = false
+
+# Called by pg_cron through pg_net, not by users: checks the shared CRON_SECRET instead of a JWT.
+[functions.cron]
+verify_jwt = false

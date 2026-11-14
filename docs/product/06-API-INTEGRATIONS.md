@@ -1,6 +1,6 @@
 # 06 · API Integrations and Specifications
 
-**Updated:** 14 November 2026 (to D108). Every outside service Arcwell talks to, how it's called, what's sent and what comes back. **Rule:** the app talks only to Supabase. Every other service is called by an Edge Function or calls us through a webhook. No third-party key ever ships in the app.
+**Updated:** 14 November 2026 (to D111). Every outside service Arcwell talks to, how it's called, what's sent and what comes back. **Rule:** the app talks only to Supabase. Every other service is called by an Edge Function or calls us through a webhook. No third-party key ever ships in the app.
 
 ## 1. Integration map
 
@@ -14,7 +14,8 @@
 | **Groq** | AI model for the AI coach and meal scan | `_shared/ai/groq.ts` | `GROQ_API_KEY` (function secret) | Free tier | Wired; switched on by key (rules engine without) |
 | **RevenueCat + Google Play Billing** | Arcwell Plus subscriptions | App SDK (to add) → RevenueCat → `revenuecat-webhook` | Webhook shared secret | Free to $2.5k MTR | Webhook done and tested; SDK after Play Console |
 | **Razorpay** | Coach subscriptions (links, outside the app) | Razorpay → `razorpay-webhook` | HMAC-SHA256 signature | Per transaction | Webhook done and tested; live after KYC |
-| **Expo Push (FCM)** | Push notifications | `notify` function → `exp.host` | Expo access token (optional) | Free | Function done; needs a development build |
+| **Expo Push (FCM)** | Push notifications (events and scheduled reminders) | `notify` and `cron` functions → `exp.host` (`_shared/push.ts`) | Expo access token (optional) | Free | Functions done; delivery needs a development build |
+| **pg_cron + pg_net** (inside Supabase) | Scheduled reminders and the retention purge (D111) | Postgres → `cron` function | `CRON_SECRET` (function secret, also in Vault) | Free | Done; turned on per project by two Vault secrets (doc 10) |
 | **Android Health Connect** | Sleep, HRV, steps from devices | App, on device only | Android permission prompt | Free | Screen in place; module needs a development build |
 | **Google Sign-In** | One-tap sign-in | Supabase Auth provider | OAuth client (Google Cloud) | Free | Planned (v1 launch) |
 | **Resend** | Real sign-in emails (SMTP for Auth) | Supabase Auth | SMTP key (dashboard) | Free to 3k a month | Planned (local uses Mailpit) |
@@ -50,6 +51,7 @@ All functions are `POST` with a JSON body and JSON replies. CORS is allowed for 
 | `not_entitled` | 403 | Not Plus, no AI consent, or coached (D44) |
 | `not_allowed` | 403 | Caller can't act on that row |
 | `daily_limit` | 429 | Daily AI cap reached |
+| `rate_limited` | 429 | Daily call cap reached for a non-AI function (S-01) |
 | `method` | 405 | Not POST |
 | `server` | 500 | Database error (logged as a code only) |
 
@@ -95,14 +97,18 @@ If the model errors or its answer fails validation, the rules engine answers ins
   - `{ kind: "check_in", id }`;
   - `{ kind: "check_in_reply", athleteId, id }`;
   - `{ kind: "plan", athleteId }`.
+- **Limit:** 300 calls per person per UTC day (`call_try_use`), then 429 `rate_limited`.
+- **Settings:** if the recipient is an athlete who turned that type off (Menu → Notifications: `messages`, `checkIns`, `plan`), nothing is sent and the reply is `{ ok: true, sent: 0 }`.
 - **Response:** `{ ok: true, sent: <device count> }`.
 - **Push content:** title and "From <name>" only, never message text or health data. `data.route` opens the right screen.
+- **Dead tokens:** tokens Expo reports as `DeviceNotRegistered` are deleted.
 
 ### 3.4 `delete-account` (Google Play rule)
 
 - **Auth:** user JWT. Acts only on the caller's id from the verified session.
 - **Request:** empty. **Response:** `{ ok: true }`.
-- **Effect:** removes `athlete-files/<id>/**`, then deletes the auth user. Every table cascades; coaching links end.
+- **Limit:** 5 calls per person per UTC day, then 429 `rate_limited`. The counter is keyed to the auth user, so someone who never finished onboarding can still delete their account.
+- **Effect:** removes `athlete-files/<id>/**` (paged, through the Storage API), then deletes the auth user. Every table cascades; coaching links end.
 
 ### 3.5 `revenuecat-webhook` (B7)
 
@@ -125,12 +131,20 @@ If the model errors or its answer fails validation, the rules engine answers ins
 - **Effect:** writes the same `subscriptions` row the RevenueCat webhook would (7-day trial).
 - **Response:** `{ ok: true, tier }`. **Never enabled in production.**
 
+### 3.8 `cron` (D111, pg_cron only)
+
+- **Auth:** `x-cron-secret: <CRON_SECRET>` (constant-time compare), checked before the body is read. `verify_jwt = false`. Called only by `run_cron_call()` from pg_cron; never by the app.
+- **Request:** `{ job: "reminders" }` (every 15 minutes) or `{ job: "purge" }` (daily, after `purge_expired()`).
+- **reminders:** `claim_reminders()` returns the workout and check-in reminders due now and records them, so a rerun sends nothing twice. Pushes: "Training time" (→ `/athlete/training`) and "Check-in due today" (→ `/athlete/weekly-check-in`). No health data.
+- **purge:** removes every file in `athlete-files` whose top folder is an account that no longer exists.
+- **Response:** `{ ok: true, due, sent }` or `{ ok: true, orphans, removed }`. Errors: 401 `not_allowed`, 400 `bad_request`, 405 `method`, 500 `server`.
+
 ## 4. Outbound calls (from functions)
 
 | To | From | Sent | Never sent |
 |---|---|---|---|
 | Groq `POST /openai/v1/chat/completions` | `_shared/ai/groq.ts` | System prompt, the question, week-level numbers, or the meal photo | Name, email, coach, notes, messages, ids |
-| Expo `POST https://exp.host/--/api/v2/push/send` | `notify` | Device token, title, "From <name>", route | Message text, health data |
+| Expo `POST https://exp.host/--/api/v2/push/send` (batches of 100) | `notify`, `cron` | Device token, title, "From <name>" or a fixed reminder line, route | Message text, health data |
 
 **Timeouts and failure:**
 - Groq: failure → rules engine.
@@ -147,11 +161,13 @@ If the model errors or its answer fails validation, the rules engine answers ins
 | `REVENUECAT_WEBHOOK_AUTH` | Function secret + RevenueCat dashboard | Webhook |
 | `RAZORPAY_WEBHOOK_SECRET` | Function secret + Razorpay dashboard | Webhook |
 | `DEMO_BILLING` | Function secret (demo only) | demo-billing |
+| `CRON_SECRET` | Function secret, and the same value in Vault as `cron_secret` | cron |
+| Vault `project_url` | Vault (the project's `https://<ref>.supabase.co`) | `run_cron_call()` |
 | `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` | Injected by Supabase | Functions |
 
 - **Local:** `supabase/functions/.env` (git-ignored; template in `.env.example`).
 - **Hosted:** `npx supabase secrets set NAME=value`.
-- **The service-role key** exists only inside functions (`asService()`), used for webhooks, deletion and push-token lookup. It is never in the app.
+- **The service-role key** exists only inside functions (`asService()`), used for webhooks, deletion, push-token lookup and the scheduled jobs. It is never in the app.
 
 ## 6. Versioning and change rules
 

@@ -4,6 +4,7 @@
 // devices. Notifications never carry health data or message text: only who and what kind
 // ("New message from Coach Anjali").
 import { asCaller, asService, cors, reply } from "../_shared/http.ts";
+import { sendPush } from "../_shared/push.ts";
 
 type Event =
   | { kind: "message"; id: string }
@@ -11,15 +12,16 @@ type Event =
   | { kind: "check_in_reply"; athleteId: string; id: string }
   | { kind: "plan"; athleteId: string };
 
-async function sendPush(tokens: string[], title: string, body: string, data: Record<string, string>) {
-  if (!tokens.length) return 0;
-  const res = await fetch("https://exp.host/--/api/v2/push/send", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Accept: "application/json" },
-    body: JSON.stringify(tokens.map((to) => ({ to, title, body, data, sound: "default" }))),
-  }).catch(() => null);
-  return res?.ok ? tokens.length : 0;
-}
+/** Calls a person can make in a UTC day (S-01): far above real use, low enough to stop a runaway loop. */
+const DAILY_CAP = 300;
+
+/** The athlete's notification switch for each event (Menu → Notifications). */
+const SWITCH: Record<Event["kind"], string> = {
+  message: "messages",
+  check_in: "checkIns",
+  check_in_reply: "checkIns",
+  plan: "plan",
+};
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
@@ -37,6 +39,8 @@ Deno.serve(async (req) => {
   const { data: u } = await me.auth.getUser();
   const caller = u?.user?.id;
   if (!caller) return reply(401, { error: "signed_out" });
+  const { data: allowed } = await me.rpc("call_try_use", { p_fn: "notify", p_cap: DAILY_CAP });
+  if (!allowed) return reply(429, { error: "rate_limited" });
 
   // Every lookup runs as the caller first, so RLS proves they can see what they're notifying about.
   let to = "";
@@ -72,13 +76,19 @@ Deno.serve(async (req) => {
   }
 
   const db = asService();
+  // Respect the recipient's own switches. Coaches have none; a missing switch means on.
+  const { data: prof } = await db.from("athlete_profiles").select("payload").eq("athlete_id", to).maybeSingle();
+  const notify = (prof?.payload as { athleteSettings?: { notify?: Record<string, unknown> } } | null)
+    ?.athleteSettings?.notify;
+  if (notify?.[SWITCH[ev.kind]] === false) return reply(200, { ok: true, sent: 0 });
+
   const { data: who } = await db.from("profiles").select("display_name").eq("id", caller).maybeSingle();
   const { data: rows } = await db.from("push_tokens").select("token").eq("user_id", to);
-  const sent = await sendPush(
-    (rows ?? []).map((r) => r.token as string),
+  const { sent, dead } = await sendPush((rows ?? []).map((r) => r.token as string), {
     title,
-    who?.display_name ? `From ${who.display_name}` : "Open Arcwell to see it",
-    { route },
-  );
+    body: who?.display_name ? `From ${who.display_name}` : "Open Arcwell to see it",
+    data: { route },
+  });
+  if (dead.length) await db.from("push_tokens").delete().in("token", dead);
   return reply(200, { ok: true, sent });
 });

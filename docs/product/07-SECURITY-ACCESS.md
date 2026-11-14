@@ -1,6 +1,6 @@
 # 07 · Security and Access Document
 
-**Updated:** 14 November 2026 (to D108). Who can see and do what, how that's enforced, what happens when things fail, and what we do when something goes wrong. **Rule:** access is enforced in the database (row-level security) and on the server, never only by hiding things in the app.
+**Updated:** 14 November 2026 (to D111). Who can see and do what, how that's enforced, what happens when things fail, and what we do when something goes wrong. **Rule:** access is enforced in the database (row-level security) and on the server, never only by hiding things in the app.
 
 ## 1. Roles
 
@@ -40,7 +40,7 @@ A user's role can't be changed by the user (`check_role` trigger). One account i
 
 ## 3. How it's enforced
 
-1. **RLS on every table** (27 tables, 182 pgTAP tests in `supabase/tests/`; `008_schema_hygiene` fails if any table lacks RLS or a policy). Policies use the helper functions in doc 05 §5. Every new table must ship with tests proving the three rules in AGENTS.md.
+1. **RLS on every table** (29 tables, 201 pgTAP tests in `supabase/tests/`; `008_schema_hygiene` fails if any table lacks RLS or a policy). Policies use the helper functions in doc 05 §5. Every new table must ship with tests proving the three rules in AGENTS.md.
 2. **Least-privilege grants:**
    - `anon` gets nothing except the invite-preview functions;
    - `authenticated` gets column-level insert and update only where the app writes;
@@ -48,7 +48,8 @@ A user's role can't be changed by the user (`check_role` trigger). One account i
 3. **Guards inside rows:** triggers stop a coach from editing an athlete's check-in answers (reply only), a recipient from editing a message (only `read_at`), and anyone from approving a transformation except the athlete.
 4. **Security-definer functions** run with `search_path = ''`, schema-qualified names, explicit caller checks, and `execute` revoked from `public` and `anon` unless meant for them.
 5. **Edge Functions** read the caller from the verified JWT, never from the body; run lookups as the caller first (so RLS applies); use the service role only after.
-6. **Webhooks** check a shared secret (RevenueCat) or HMAC signature (Razorpay) with a constant-time compare, before parsing anything.
+6. **Webhooks and the scheduled job** check a shared secret (RevenueCat, `cron`) or HMAC signature (Razorpay) with a constant-time compare, before parsing anything. The job functions (`claim_reminders`, `purge_expired`, `run_cron_call`) can't be called by signed-in users (pgTAP).
+9. **Rate limits:** AI features have daily caps (`ai_try_use`); `notify` (300 a day) and `delete-account` (5 a day) have per-user caps (`call_try_use`, S-01); Auth limits sign-in codes per IP.
 7. **Storage:** one private bucket. The path's first folder is the owner (`storage_owner()`). Files are shown only through signed URLs that expire in 1 hour; payloads store paths, never URLs.
 8. **Sessions:** 1-hour access tokens with rotating refresh tokens. Sign-in codes are 6 digits, expire in 1 hour and are rate-limited per IP (30 tries per 5 minutes).
 
@@ -79,10 +80,10 @@ A user's role can't be changed by the user (`check_role` trigger). One account i
 | At rest | Supabase encryption at rest (disk and backups). The on-phone cache is AsyncStorage (not encrypted yet: ticket SEC-05) |
 | To AI | Only week-level numbers and the user's question; never names, email, notes, messages, ids or earlier chat (`cleanContext`) |
 | AI chat | Kept on the phone only, for the day; never stored on the server; wiped on Clear chat, sign-out, account deletion and AI off (D109) |
-| In push | "New message, from <name>": never message text or health data |
+| In push | "New message, from <name>", or a fixed reminder line ("Training time", "Check-in due today"): never message text or health data. Each athlete's notification switches are honoured on the server |
 | In logs | **No health data or personal data in logs or error messages**: functions log an error *name* or *code* only. App errors shown to users are plain sentences |
 | Secrets | Never in the app or git. Public app config only (`EXPO_PUBLIC_*`). Function secrets via `supabase secrets set`. The service-role key lives only inside functions |
-| Retention | Deleted accounts are cleared from live systems within 30 days and from backups within 90 days (Privacy Policy). Ended coaching keeps the athlete's data with the athlete |
+| Retention | Deleted accounts are cleared from live systems at once (`delete-account`) and from backups within 90 days (Supabase backups last 7 to 28 days). A daily purge job removes counters, logs and unused invites after 30 days, and stray files of deleted accounts (D111, doc 05 §6). Ended coaching keeps the athlete's data with the athlete |
 
 ## 6. Error boundaries and screen states
 
@@ -139,9 +140,9 @@ Every screen handles all five states, using the shared components:
 
 | Ticket | Gap | When |
 |---|---|---|
-| SEC-01 | No rate limit on non-AI functions (`notify`, `delete-account`) beyond Auth's IP limits | Before beta |
+| ~~SEC-01~~ | ~~No rate limit on non-AI functions~~: done (D111, `call_try_use`) | ✅ |
 | SEC-02 | Sentry with PII scrubbing not wired | Before beta |
-| SEC-03 | Retention purge job (30/90 days) not built for the hosted project | Before launch |
+| ~~SEC-03~~ | ~~Retention purge job~~: done (D111, `purge_expired` and the `cron` storage sweep); turns on per project with the Vault secrets | ✅ |
 | SEC-04 | CAPTCHA on sign-up (Supabase Auth supports hCaptcha / Turnstile) | If abuse appears |
 | SEC-05 | On-phone cache not encrypted | v1.1 |
 | SEC-06 | External security review / pen test | After funding, before public launch |

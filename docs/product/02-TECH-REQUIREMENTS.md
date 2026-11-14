@@ -16,6 +16,7 @@
 | Backend | **Supabase**: Postgres 17 with row-level security, Auth, Storage, Realtime, Edge Functions (Deno 2) | Region **Mumbai (ap-south-1)** for production (D72) |
 | Data access | `@supabase/supabase-js ^2.119` only; sync layer in `app/src/features/sync/` | No other ORM, GraphQL or REST client |
 | Server logic | SQL functions (security definer, `search_path = ''`) and Edge Functions in `supabase/functions/` | No separate Node or Express server |
+| Scheduled jobs | **pg_cron** calls the `cron` Edge Function through **pg_net** (D111) | Reminders every 15 minutes, retention purge daily; secrets in Vault |
 | AI | Provider-neutral layer `supabase/functions/_shared/ai/`: Groq first, Claude or OpenAI later by config; rules-engine fallback (D108) | Never called from the app |
 | Billing | RevenueCat with Google Play Billing (athletes); Razorpay subscription links (coaches), both by webhook | See doc 06 |
 | Push | Expo Notifications (FCM underneath) through the `notify` Edge Function | Needs a development build |
@@ -56,7 +57,7 @@ docs/                   product docs (docs/product/), decisions, design, roadmap
    - the app pulls again every 20 s, when it comes back to the foreground, and live on new messages (Realtime);
    - offline changes are kept until they're saved.
 3. **Files:** uploaded to the private `athlete-files` bucket as `<athlete id>/<area>/<file>`; shown through 1-hour signed URLs.
-4. **Server-only actions:** SQL functions (redeem invite, end link, share history, tier, AI entitlement and caps) and Edge Functions (AI coach, meal scan, webhooks, deletion, push).
+4. **Server-only actions:** SQL functions (redeem invite, end link, share history, tier, AI entitlement and caps) and Edge Functions (AI coach, meal scan, webhooks, deletion, push, scheduled jobs).
 
 ## 4. Environments
 

@@ -80,7 +80,7 @@ To show two phones, use two browser windows. One opens http://localhost:8081 and
 | Real now | Stand-in until funding (LAUNCH_ROADMAP §7) |
 |---|---|
 | Accounts, emailed sign-in codes, roles | Codes go to the local inbox, not real email (Resend later) |
-| Every table behind row-level security (182 database tests) | Runs on this laptop, not a hosted server (Supabase Pro later) |
+| Every table behind row-level security (201 database tests) | Runs on this laptop, not a hosted server (Supabase Pro later) |
 | Coach ⇄ athlete sync: plans, workouts, food, check-ins, chat, photos, export, delete | Push notifications need a development build (EAS, free tier) |
 | Billing logic, RevenueCat and Razorpay webhooks (tested with signed test events) | Plus is granted by `demo-billing`, not a Google Play purchase |
 | AI coach on the server: chat, tailor today and the weekly review, behind entitlement, daily caps and checks (D108) | Without a Groq key the rules engine answers. A free key (console.groq.com, `GROQ_API_KEY` and `GROQ_MODEL` in `supabase/functions/.env`) switches on the model |

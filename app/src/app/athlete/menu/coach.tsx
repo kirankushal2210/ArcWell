@@ -1,7 +1,7 @@
 // My coach (L-01): who coaches you and since when, their profile (D43), earlier-history access
-// (AC-10), and leaving.
+// (AC-10), reporting the profile (D-05), and leaving.
 import { router } from "expo-router";
-import { MessageCircle } from "lucide-react-native";
+import { Flag, MessageCircle } from "lucide-react-native";
 import { StyleSheet, View } from "react-native";
 
 import { Button, StatusChip, Text } from "@/components/primitives";
@@ -10,6 +10,7 @@ import { NotJoined, useMe } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
 import { CoachPhoto, FoldedBio } from "@/features/coach/CoachProfileView";
 import { Group } from "@/features/coach/parts";
+import { reportCoach } from "@/features/legal/ReportCoach";
 import { TransformationsStrip } from "@/features/coach/TransformationsStrip";
 import { colors, radius, space } from "@/theme";
 
@@ -54,6 +55,11 @@ export default function MyCoach() {
           label="Access to my earlier history"
           value={me.historyFrom ? "On" : "Off"}
           onPress={() => router.push("/athlete/menu/history-access")}
+        />
+        <NavRow
+          icon={Flag}
+          label="Report this profile"
+          onPress={() => reportCoach(coach.name)}
         />
       </Group>
       <TransformationsStrip />

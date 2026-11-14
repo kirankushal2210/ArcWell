@@ -58,3 +58,4 @@ jobs:
           supabase/functions/notify/index.ts
           supabase/functions/demo-billing/index.ts
           supabase/functions/ai-coach/index.ts
+          supabase/functions/cron/index.ts

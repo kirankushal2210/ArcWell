@@ -1,6 +1,6 @@
 # 09 · Feature Ticket List
 
-**Updated:** 14 November 2026 (to D108). The PRD (doc 01) broken into tickets. Agents and contributors pick **one open ticket at a time**, meet its acceptance criteria, and pass the checks in AGENTS.md §6. When it's done, flip the status here in the same change.
+**Updated:** 14 November 2026 (to D111). The PRD (doc 01) broken into tickets. Agents and contributors pick **one open ticket at a time**, meet its acceptance criteria, and pass the checks in AGENTS.md §6. When it's done, flip the status here in the same change.
 
 **Status key:**
 - ✅ done (built and tested on the local stack);
@@ -56,8 +56,8 @@
 | D-01 | Weekly check-ins with photos | Coach replies only (guard); photos in private storage | M | ✅ |
 | D-02 | Live chat with photos and PDFs | Realtime; read receipts; no duplicate on retry | M | ✅ |
 | D-03 | Push on message, check-in, reply, plan change | `notify` checks the caller; no health data in the push | M | 🟡 server done; delivery needs a development build |
-| D-04 | Scheduled pushes: check-in due, daily workout | `pg_cron` job calls a function; respects notification settings | M | ⬜ |
-| D-05 | Report a coach profile | Button on the coach profile; goes to a support inbox | S | ⬜ (copyright notices by email until then) |
+| D-04 | Scheduled pushes: check-in due, daily workout | `pg_cron` job calls a function; respects notification settings | M | 🟡 server done (D111: `claim_reminders`, `cron` function, pgTAP); delivery needs a development build; on per project via Vault secrets |
+| D-05 | Report a coach profile | Button on the coach profile; goes to a support inbox | S | ✅ My coach and the invite page; mail to support (D111) |
 
 ## Epic E · Progress and recovery (B6)
 
@@ -115,9 +115,9 @@
 
 | ID | Ticket | Acceptance criteria | Size | Status |
 |---|---|---|---|---|
-| S-01 (SEC-01) | Rate limits on non-AI functions | Per-user limit on `notify` and `delete-account` | S | ⬜ |
+| S-01 (SEC-01) | Rate limits on non-AI functions | Per-user limit on `notify` and `delete-account` | S | ✅ `call_try_use` (300 and 5 a day), pgTAP and curl |
 | S-02 (SEC-02) | Sentry with PII scrubbing | App and functions; no health data in events | S | ⬜ free tier |
-| S-03 (SEC-03) | Retention purge job | 30 days live, 90 days backups, as the Privacy Policy says | S | ⬜ |
+| S-03 (SEC-03) | Retention purge job | 30 days live, 90 days backups, as the Privacy Policy says | S | ✅ `purge_expired` + `cron` storage sweep, daily (D111) |
 | S-04 (SEC-04) | CAPTCHA on sign-up | hCaptcha or Turnstile in Supabase Auth | S | ⬜ if abuse appears |
 | S-05 (SEC-05) | Encrypt the on-phone cache | Encrypted storage for synced data | M | ⬜ v1.1 |
 | S-06 (SEC-06) | External security review | Pen test before public launch | M | 💰 |

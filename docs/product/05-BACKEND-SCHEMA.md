@@ -1,6 +1,6 @@
 # 05 · Backend Schema Document
 
-**Updated:** 14 November 2026 (to D108). The database is **Supabase Postgres 17**, defined only by migrations in `supabase/migrations/` and proven by pgTAP tests in `supabase/tests/` (182 tests, including schema hygiene checks in `008_schema_hygiene`). The column tables in section 7 are generated from the live local database. Regenerate them after any migration.
+**Updated:** 14 November 2026 (to D111). The database is **Supabase Postgres 17**, defined only by migrations in `supabase/migrations/` and proven by pgTAP tests in `supabase/tests/` (201 tests, including schema hygiene checks in `008_schema_hygiene`). The column tables in section 7 are generated from the live local database. Regenerate them after any migration.
 
 ## 1. Rules for every table (no exceptions)
 
@@ -54,6 +54,8 @@ erDiagram
   profiles ||--o| coach_billing : coach
   profiles ||--o{ ai_usage : athlete
   profiles ||--o{ push_tokens : device
+  profiles ||--o{ reminder_sends : athlete
+  auth_users ||--o{ call_usage : "any account"
 ```
 
 ## 3. Tables by area: who reads, who writes
@@ -87,6 +89,8 @@ erDiagram
 | Billing and AI | `subscriptions` | athlete | revenuecat-webhook or demo-billing (service role) | ai_entitlement_usage + b7 |
 | | `coach_billing` | coach | razorpay-webhook (service role) | b7_billing |
 | | `ai_usage` | athlete | `ai_try_use()` only | ai_entitlement_usage |
+| Jobs and limits | `call_usage` (per user, function, UTC day; keyed to the auth user so an unfinished sign-up can still delete itself) | self | `call_try_use()` only | scheduled_jobs |
+| | `reminder_sends` (per user, kind, India-time day) | self | `claim_reminders()` only (service role) | scheduled_jobs |
 | Storage | bucket `athlete-files` (`<athlete>/<area>/<file>`) | athlete; current coach | athlete; coach adds only into `chat/` | b5 |
 
 ## 4. Payload shapes (app TypeScript types)
@@ -127,6 +131,10 @@ The mapping between the store and rows is `app/src/features/sync/map.ts` (unit-t
 | `end_link(other, reason)` / `end_coaching(link, reason)` | Leave, complete or remove |
 | `share_history(bool)` / `set_history_access(link, from)` | Athlete's history switch |
 | `export_my_data()` | Everything about the caller (invoker rights, so RLS applies) |
+| `call_try_use(fn, cap)` | Daily cap for non-AI functions (`notify` 300, `delete-account` 5) |
+| `claim_reminders(now)` (service role only) | The workout and check-in reminders due in this 15-minute slot, honouring the athlete's switches, reminder time and paused status; records each so a rerun never sends twice |
+| `purge_expired(now)` (service role only) | The retention job (section 6) |
+| `run_cron_call(job)` (pg_cron only) | Calls the `cron` Edge Function with the URL and secret from Vault; does nothing if either is missing |
 | `storage_owner(name)` | Folder owner for storage policies |
 | Guards: `check_ins_guard`, `messages_guard`, `enhanced_guard`, `transformations_guard`, `plans_stamp`, `*_check`, `touch_updated_at` | Who may change what, inside a row |
 
@@ -134,7 +142,11 @@ The mapping between the store and rows is `app/src/features/sync/map.ts` (unit-t
 
 - **Deleting an account:** the `delete-account` function removes the person's files, then their auth user. Every table cascades from it.
 - **Coach deletes their account:** `coach_clients` rows cascade, so the links end. Clients keep their own rows.
-- **Retention promised in the Privacy Policy:** 30 days to clear live systems, 90 days to clear backups. A scheduled purge job is still to be built for the hosted project (ticket in doc 09).
+- **Retention promised in the Privacy Policy:** 30 days to clear live systems, 90 days to clear backups (D111):
+  - account deletion is immediate (above), so live data is gone the same day;
+  - **daily purge job** (`arcwell-purge`, pg_cron, 03:00 India time): `purge_expired()` deletes AI and call counters and reminder logs older than 30 days, unused invites 30 days after they expired or were withdrawn, and the copied client details on used invites after 30 days; then the `cron` function removes any files in storage whose account no longer exists;
+  - **backups** are Supabase's own: none on the free plan, 7 days of daily backups on Pro (up to 28 days with point-in-time recovery), all well inside 90 days.
+- **Scheduled jobs (pg_cron):** `arcwell-reminders` every 15 minutes and `arcwell-purge` daily. Both call the `cron` Edge Function through `run_cron_call()`, which needs the Vault secrets `project_url` and `cron_secret` (doc 10).
 
 ## 7. Columns (generated)
 
@@ -178,6 +190,15 @@ The mapping between the store and rows is `app/src/features/sync/map.ts` (unit-t
 | day | date | no |  |
 | payload | jsonb | no |  |
 | updated_at | timestamptz | no | `now()` |
+
+#### `call_usage`
+
+| Column | Type | Null | Default |
+|---|---|---|---|
+| user_id | uuid | no |  |
+| day | date | no | `((now() AT TIME ZONE 'utc'::text))::date` |
+| fn | text | no |  |
+| count | integer | no | `0` |
 
 #### `check_ins`
 
@@ -368,6 +389,15 @@ The mapping between the store and rows is `app/src/features/sync/map.ts` (unit-t
 | user_id | uuid | no | `auth.uid()` |
 | platform | text | no | `'android'::text` |
 | updated_at | timestamptz | no | `now()` |
+
+#### `reminder_sends`
+
+| Column | Type | Null | Default |
+|---|---|---|---|
+| user_id | uuid | no |  |
+| kind | text | no |  |
+| day | date | no |  |
+| sent_at | timestamptz | no | `now()` |
 
 #### `routines`
 

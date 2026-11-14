@@ -1,6 +1,6 @@
 # 03 · App Flow Document
 
-**Updated:** 14 November 2026 (to D108). Describes every route, how people move between them, and exactly what happens on each important tap or submit: on the phone (store) and on the server (Supabase). Route files live in `app/src/app/`.
+**Updated:** 14 November 2026 (to D111). Describes every route, how people move between them, and exactly what happens on each important tap or submit: on the phone (store) and on the server (Supabase). Route files live in `app/src/app/`.
 
 The store: `CoachDataProvider`. Sync: `features/sync`, D107.
 
@@ -143,6 +143,7 @@ flowchart LR
 
 - **Personal invite:** copies the plans and notes, sets the invited name, starts the profile with the coach's details, and is used up.
 - **General invite:** links the athlete; the coach then builds their plans.
+- **Report this profile** (on the invite page's coach profile): opens the person's mail app addressed to support, with the coach named (D-05).
 - **Errors:**
   - already coached: "Leave them first";
   - invite used or expired: "Ask for a new one";
@@ -224,11 +225,13 @@ Three steps: Measurements → About you / the week → Review → **Send**.
 | Item | Result |
 |---|---|
 | Profile | Edits the athlete profile (`athlete_profiles`) and display name |
+| My coach → **Report this profile** | Opens the mail app to support with the coach named; if no mail app opens, shows the address (D-05) |
 | My coach → **Leave** | `end_link(coach, 'left')`; becomes a free athlete with their history and the coach's plan, read-only; optionally withdraws approved photos |
 | Privacy and permissions | AI on or off (`consents` ai), photos on or off, history sharing (`share_history`), policy links |
 | Export my data | `export_my_data()` → JSON download (web) or share sheet (phone) |
 | Delete account | Type DELETE → `delete-account` function (files removed, account deleted, everything cascades) → signed out to Welcome |
-| Notifications | Switches per type; a push token is registered after permission (development build) |
+| Notifications | Switches per type, honoured on the server for every push; a push token is registered after permission (development build) |
+| Reminders | Workout time (default 18:00, on) drives the daily workout push; the check-in push goes at 09:00 on the coach's check-in day, unless already checked in or paused (D111) |
 | Help, legal | `/legal/<doc>` (works offline and before sign-up) |
 | Sign out | `auth.signOut` → store returns to the sample → Welcome |
 

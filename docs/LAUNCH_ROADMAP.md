@@ -340,7 +340,7 @@ These limits are fine for development and investor demos, but not for real users
 
 ### Status (14 November 2026)
 
-Part A is built: B1 to B7 run on the local stack with 182 database tests, and the app syncs signed-in accounts (D107). The investor demo runs end to end; see [DEMO.md](DEMO.md). B8 is built too: the AI coach runs on the server with guardrails and a rules fallback (D108). Still free and to do:
+Part A is built: B1 to B7 run on the local stack with 201 database tests, and the app syncs signed-in accounts (D107). The investor demo runs end to end; see [DEMO.md](DEMO.md). B8 is built too: the AI coach runs on the server with guardrails and a rules fallback (D108). Still free and to do:
 - push delivery, which needs a development build;
 - a free Groq key to switch on the model.
 

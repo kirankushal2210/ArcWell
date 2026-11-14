@@ -1,6 +1,6 @@
 # 10 · Deployment and Testing Runbook
 
-**Updated:** 14 November 2026 (to D110). How to test Arcwell on a laptop, how to run staging, how a change reaches production, and the checklist that must be fully ticked before launch. Follow the steps in order; don't skip a gate because "it worked locally".
+**Updated:** 14 November 2026 (to D111). How to test Arcwell on a laptop, how to run staging, how a change reaches production, and the checklist that must be fully ticked before launch. Follow the steps in order; don't skip a gate because "it worked locally".
 
 | Environment | Backend | App build | Who uses it | Cost | Status |
 |---|---|---|---|---|---|
@@ -44,7 +44,7 @@ Build profiles are in [`app/eas.json`](../../app/eas.json): `development` (devel
 ```bash
 npm run lint        # ESLint + design tokens + static legal pages
 npm run typecheck   # TypeScript, strict
-npm run test        # Jest: logic, sync mapping, AI guardrails, billing mapping, chat memory
+npm run test        # Jest: logic, sync mapping, AI guardrails, billing mapping, push tickets, chat memory
 npm run db:test     # pgTAP: every table's access rules
 npm run db:lint     # schema lint
 deno check --node-modules-dir=auto supabase/functions/*/index.ts
@@ -78,8 +78,9 @@ Run against `http://127.0.0.1:54321/functions/v1/<name>`. Record the results in 
 |---|---|
 | `ai-coach` | No token → 401 · coached athlete → 403 · Plus chat → 200 with sources · out-of-scope → 200 `out_of_scope` · 41st chat of the day → 429 |
 | `scan-meal` | No token → 401 · bad body → 400 · image over 4 MB → 413 · not Plus → 403 |
-| `notify` | Message the caller didn't send → 403 · own message → 200 `sent` |
-| `delete-account` | No token → 401 · own account → 200, then the user and files are gone |
+| `notify` | Message the caller didn't send → 403 · own message → 200 `sent` · recipient turned Messages off → 200 `sent: 0` · past 300 calls today → 429 `rate_limited` |
+| `delete-account` | No token → 401 · own account → 200, then the user and files are gone · signed up but never onboarded → 200 · past 5 calls today → 429 |
+| `cron` | No or wrong `x-cron-secret` → 401 · GET → 405 · unknown job → 400 · `reminders` → 200 `due`, `sent` · `purge` → 200; files under a folder with no account are removed, a live account's files stay |
 | `revenuecat-webhook` | Wrong `Authorization` → 401 · `TEST` → 200 · purchase → `subscriptions` row is Plus · an older event → ignored |
 | `razorpay-webhook` | Bad signature → 401 · `subscription.charged` with `notes.coach_id` → `coach_billing` active |
 | `demo-billing` | With `DEMO_BILLING` unset → 404 |
@@ -118,16 +119,28 @@ Staging is a hosted copy with **fake data only**. It's where a change is proven 
    ```
 
    Set `DEMO_BILLING=on` only if staging is used for demos.
-4. **Auth settings** (dashboard):
+4. **Turn on the scheduled jobs** (reminders every 15 minutes, purge daily; D111). Make one long random secret, then set it in both places, from the SQL editor for Vault:
+
+   ```bash
+   npx supabase secrets set CRON_SECRET=<long random string>
+   ```
+
+   ```sql
+   select vault.create_secret('https://<staging-ref>.supabase.co', 'project_url');
+   select vault.create_secret('<the same long random string>', 'cron_secret');
+   ```
+
+   Check it: `select public.run_cron_call('purge');` returns a request id, and `select * from net._http_response order by id desc limit 1;` shows status 200. Without both Vault secrets the jobs run but call nothing.
+5. **Auth settings** (dashboard):
    - email OTP on, length 6;
    - site URL and redirect URLs set to the app scheme `arcwell://`;
    - custom SMTP when the domain exists (until then, staging's built-in mail has a low hourly limit).
-5. Turn on 2FA for every dashboard account. Don't give staging access to anyone who doesn't need it.
-6. **EAS** (free plan):
+6. Turn on 2FA for every dashboard account. Don't give staging access to anyone who doesn't need it.
+7. **EAS** (free plan):
    - `npx eas-cli@latest login`, then `npx eas-cli@latest init` (links the project);
    - `npx eas-cli@latest env:create` for the `preview` environment with the staging URL and publishable key;
    - `npx eas-cli@latest update:configure` to set up channels.
-7. **Webhooks in test mode:** point the RevenueCat sandbox and the Razorpay test-mode webhooks at the staging functions.
+8. **Webhooks in test mode:** point the RevenueCat sandbox and the Razorpay test-mode webhooks at the staging functions.
 
 ### B2. Every change
 
@@ -181,7 +194,7 @@ Every box must be ticked, with the name of the person who checked it, before the
 - [ ] Domain live: invite pages, the hosted legal pages, `/.well-known/assetlinks.json` with the release key's SHA-256, `support@` and `privacy@` mailboxes
 - [ ] Dashboard: 2FA for all members; access limited to the founders
 - [ ] Sentry on in the app and functions with PII scrubbing; one test error seen (S-02)
-- [ ] Retention purge job scheduled (S-03); rate limits on non-AI functions (S-01)
+- [ ] `CRON_SECRET` and the Vault secrets `project_url` and `cron_secret` set (B1 step 4), so the reminders and the retention purge run (S-03, D-04); one purge run checked in `net._http_response`
 - [ ] A restore from backup tested once on a scratch project
 
 ### C3. App build
