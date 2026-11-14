@@ -4,7 +4,12 @@ import { Redirect, router } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
-import { Button, Chip, Text } from "@/components/primitives";
+import { Button, Chip, Text, TextField } from "@/components/primitives";
+import {
+  tailorFromText,
+  useCoachContext,
+  useServerCoach,
+} from "@/features/ai/coachClient";
 import { TAILOR_OPTIONS, tailor, type TailorKind } from "@/features/ai/tailor";
 import { isoToday } from "@/features/athlete/athleteData";
 import { useTodayWorkout } from "@/features/athlete/QuickLog";
@@ -25,6 +30,14 @@ export default function TailorToday() {
   const { meTier, setAthleteSettings } = useCoachData();
   const today = useTodayWorkout();
   const [kind, setKind] = useState<TailorKind | null>(null);
+  // With accounts, the athlete can say it in their own words; the coach picks from the same fixed
+  // options (B8) and the rules below make the change.
+  const server = useServerCoach();
+  const [now] = useState(() => Date.now());
+  const context = useCoachContext(now);
+  const [words, setWords] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState<string | null>(null);
   if (!me) return <NotJoined />;
   // AI is Plus-only and coached athletes never see it (D44): a direct link goes back to Today.
   if (meTier !== "pro") return <Redirect href="/athlete" />;
@@ -47,7 +60,7 @@ export default function TailorToday() {
   return (
     <MenuPage
       title="Tailor today"
-      sub={`${day.name} · sample`}
+      sub={server ? day.name : `${day.name} · sample`}
       back={back}
       footer={
         t ? (
@@ -74,6 +87,45 @@ export default function TailorToday() {
       }
     >
       <Text tone="muted">What&apos;s different today?</Text>
+      {server ? (
+        <View style={styles.ask}>
+          <TextField
+            label="Tell your AI coach"
+            value={words}
+            onChangeText={setWords}
+            placeholder="e.g. knee feels sore and I have 30 minutes"
+          />
+          <Button
+            label={busy ? "Thinking…" : "Suggest a change"}
+            size="sm"
+            variant="secondary"
+            disabled={busy || words.trim().length < 3}
+            onPress={() => {
+              setBusy(true);
+              setNote(null);
+              void tailorFromText(words, context).then(({ data, error }) => {
+                setBusy(false);
+                const first = data?.kinds.find((k) =>
+                  TAILOR_OPTIONS.some((o) => o.kind === k),
+                ) as TailorKind | undefined;
+                if (first) setKind(first);
+                setNote(
+                  first
+                    ? null
+                    : error
+                      ? "Can't reach the coach right now. Pick an option below."
+                      : "Nothing to change for that. Pick an option below if one fits.",
+                );
+              });
+            }}
+          />
+          {note ? (
+            <Text variant="label" weight="regular" tone="muted">
+              {note}
+            </Text>
+          ) : null}
+        </View>
+      ) : null}
       <View style={styles.chips}>
         {TAILOR_OPTIONS.map((o) => (
           <Chip
@@ -116,6 +168,7 @@ export default function TailorToday() {
 }
 
 const styles = StyleSheet.create({
+  ask: { gap: space[2] },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: space[2] },
   why: { flexDirection: "row", gap: space[2], alignItems: "flex-start" },
   flex: { flex: 1 },

@@ -36,3 +36,10 @@ function requireEnv(name: string): string {
   if (!value) throw new Error(`Missing required secret: ${name}`);
   return value;
 }
+
+/** Whether a model is configured. Without one, features that have a rules engine use it (B8). */
+export function aiConfigured(): boolean {
+  const provider = Deno.env.get("AI_PROVIDER") ?? "groq";
+  if (provider === "groq") return !!Deno.env.get("GROQ_API_KEY") && !!Deno.env.get("GROQ_MODEL");
+  return false;
+}

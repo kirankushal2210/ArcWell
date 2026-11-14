@@ -26,6 +26,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Button, Chip, IconButton, Text } from "@/components/primitives";
 import { type Answer, answer, PROMPTS } from "@/features/ai/answers";
+import {
+  askCoach,
+  useCoachContext,
+  useServerCoach,
+} from "@/features/ai/coachClient";
 import { TodaySuggestion } from "@/features/ai/TodaySuggestion";
 import { AI_DAILY_LIMIT, isoToday } from "@/features/athlete/athleteData";
 import { NavRow } from "@/features/athlete/MenuParts";
@@ -152,8 +157,10 @@ export default function AICoach() {
 type Msg = {
   from: "me" | "ai";
   text: string;
-  kind?: Answer["kind"];
+  kind?: Answer["kind"] | "unknown";
   sources?: string[];
+  /** Waiting for the server's answer. */
+  pending?: boolean;
 };
 
 /** The AI coach for Plus members (D70): today's suggestion, tools, and a chat. Sample answers only. */
@@ -163,6 +170,10 @@ function AIHub() {
   const insets = useSafeAreaInsets();
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [text, setText] = useState("");
+  // With accounts, questions go to the ai-coach function (B8); the sample build answers locally.
+  const server = useServerCoach();
+  const [now] = useState(() => Date.now());
+  const context = useCoachContext(now);
   const back = () =>
     router.canGoBack() ? router.back() : router.replace("/athlete");
   if (!me) return <NotJoined />;
@@ -203,6 +214,36 @@ function AIHub() {
   const ask = (q: string) => {
     const question = q.trim();
     if (!question || limited) return;
+    if (server) {
+      setText("");
+      setMsgs((m) => [
+        ...m,
+        { from: "me", text: question },
+        { from: "ai", text: "Thinking…", pending: true },
+      ]);
+      void askCoach(question, context).then(({ data, error }) => {
+        const reply: Msg = data
+          ? {
+              from: "ai",
+              text: data.text,
+              kind: data.kind,
+              sources: data.sources,
+            }
+          : {
+              from: "ai",
+              text:
+                error === "daily_limit"
+                  ? `That's today's questions used. They reset tomorrow.`
+                  : error === "not_entitled"
+                    ? "The AI coach is part of Arcwell Plus, with AI turned on in Privacy."
+                    : "Can't reach the coach right now. Check your connection and try again.",
+            };
+        setMsgs((m) => [...m.slice(0, -1), reply]);
+        if (data)
+          setAthleteSettings(me.id, { aiUsage: { date: today, n: used + 1 } });
+      });
+      return;
+    }
     const a = answer(question, {
       protein: me.nutritionPlan?.protein,
       kcal: me.nutritionPlan?.kcal,
@@ -252,7 +293,13 @@ function AIHub() {
       style={styles.root}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <PageHeader title="AI coach" sub="Sample answers for now" onBack={back} />
+      <PageHeader
+        title="AI coach"
+        sub={
+          server ? "From your week and the evidence" : "Sample answers for now"
+        }
+        onBack={back}
+      />
       <Page>
         <TodaySuggestion />
         <Group>
@@ -277,7 +324,11 @@ function AIHub() {
                 m.from === "me" ? styles.mine : styles.theirs,
               ]}
             >
-              <Text tone={m.from === "me" ? "onBrand" : "default"}>
+              <Text
+                tone={
+                  m.from === "me" ? "onBrand" : m.pending ? "muted" : "default"
+                }
+              >
                 {m.text}
               </Text>
               {m.sources?.length ? (

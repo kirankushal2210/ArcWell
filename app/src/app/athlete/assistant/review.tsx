@@ -2,10 +2,15 @@
 // suggestions, each with its reason and sources. Suggestions open the tool to act on them; nothing
 // changes by itself. Sample build: worked out by the evidence rules, not a model.
 import { Redirect, router, type Href } from "expo-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { Button, Text } from "@/components/primitives";
+import {
+  useCoachContext,
+  useServerCoach,
+  weeklyReview,
+} from "@/features/ai/coachClient";
 import { todayKey, useNutrition } from "@/features/athlete/FoodParts";
 import { shiftDate, sumMacros } from "@/features/athlete/foods";
 import { backTo, InfoCard, MenuPage } from "@/features/athlete/MenuParts";
@@ -26,12 +31,39 @@ type Suggestion = {
   href: Href;
 };
 
+/** Where each of the coach's actions leads; "keep going" needs no button. */
+const ACTION: Record<string, { action: string; href: Href } | undefined> = {
+  nutrition: { action: "Protein ideas", href: "/athlete/assistant/nutrition" },
+  recovery: { action: "Open Recovery", href: "/athlete/recovery" },
+  tailor: { action: "Tailor today", href: "/athlete/assistant/tailor" },
+  plan: { action: "Build a new plan", href: "/athlete/assistant/plan" },
+  keep_going: { action: "See your plan", href: "/athlete/plan" },
+};
+
 export default function WeeklyReview() {
   const me = useMe();
   const n = useNutrition();
   const r = useRecovery();
   const { meTier, sessions } = useCoachData();
   const [now] = useState(() => Date.now());
+  // With accounts the review comes from the ai-coach function (B8): checked suggestions only.
+  const server = useServerCoach();
+  const context = useCoachContext(now);
+  const [fromServer, setFromServer] = useState<Suggestion[] | null>(null);
+  const asked = useRef(false);
+  useEffect(() => {
+    if (!server || asked.current || meTier !== "pro") return;
+    asked.current = true;
+    void weeklyReview(context).then(({ data }) => {
+      if (!data) return;
+      const out: Suggestion[] = [];
+      for (const t of data.tips) {
+        const a = ACTION[t.action];
+        if (a) out.push({ ...t, action: a.action, href: a.href });
+      }
+      setFromServer(out);
+    });
+  }, [server, context, meTier]);
   if (!me || !n.me) return <NotJoined />;
   // AI is Plus-only and coached athletes never see it (D44): a direct link goes back to Today.
   if (meTier !== "pro") return <Redirect href="/athlete" />;
@@ -106,8 +138,13 @@ export default function WeeklyReview() {
       href: "/athlete/analytics",
     });
 
+  const shown = fromServer ?? tips;
   return (
-    <MenuPage title="Weekly review" sub="Last 7 days · sample" back={back}>
+    <MenuPage
+      title="Weekly review"
+      sub={server ? "Last 7 days" : "Last 7 days · sample"}
+      back={back}
+    >
       <Eyebrow>Training</Eyebrow>
       <KeyValues
         rows={[
@@ -141,8 +178,8 @@ export default function WeeklyReview() {
       <KeyValues rows={[["Average sleep", `${avgSleepH.toFixed(1)} h`]]} />
 
       <Eyebrow>Suggestions</Eyebrow>
-      {tips.length ? (
-        tips.map((t) => (
+      {shown.length ? (
+        shown.map((t) => (
           <View key={t.title} style={styles.card}>
             <View style={styles.head}>
               <Text weight="semibold" style={styles.flex}>

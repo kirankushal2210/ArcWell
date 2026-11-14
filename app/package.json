@@ -81,6 +81,10 @@
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/src/$1",
       "^lucide-react-native$": "<rootDir>/jest/lucide-stub.js"
-    }
+    },
+    "moduleDirectories": [
+      "node_modules",
+      "<rootDir>/node_modules"
+    ]
   }
 }

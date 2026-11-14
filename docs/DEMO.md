@@ -73,6 +73,7 @@ To show two phones, use two browser windows. One opens http://localhost:8081 and
 5. **Check-in loop.** The client sends a check-in; it appears in the coach's Check-ins. The coach replies, and the client sees "Coach replied to your check-in".
 6. **Privacy rules.** The coach only ever sees their own clients, and only from the day each one joined. The athlete can share earlier history in Privacy.
 7. **Arcwell Plus.** A new self-guided athlete finishes onboarding, signs up and starts the 7-day trial. The server makes them Plus, and AI features appear.
+8. **AI coach.** As Meera, open the AI coach and ask about protein: the answer uses her real week and cites its sources. Weekly review gives suggestions from her logs. Ask about creatine or an injury: it declines. Coached athletes like Ravi never get AI, and the server refuses them even by direct call.
 
 ## What's real and what's stand-in
 
@@ -82,4 +83,4 @@ To show two phones, use two browser windows. One opens http://localhost:8081 and
 | Every table behind row-level security (177 database tests) | Runs on this laptop, not a hosted server (Supabase Pro later) |
 | Coach ⇄ athlete sync: plans, workouts, food, check-ins, chat, photos, export, delete | Push notifications need a development build (EAS, free tier) |
 | Billing logic, RevenueCat and Razorpay webhooks (tested with signed test events) | Plus is granted by `demo-billing`, not a Google Play purchase |
-| AI meal scan through the server (Groq free tier) | Other AI features are screens only (D70) |
+| AI coach on the server: chat, tailor today and the weekly review, behind entitlement, daily caps and checks (D108) | Without a Groq key the rules engine answers. A free key (console.groq.com, `GROQ_API_KEY` and `GROQ_MODEL` in `supabase/functions/.env`) switches on the model |
