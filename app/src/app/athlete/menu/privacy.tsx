@@ -18,6 +18,7 @@ import { recordConsent } from "@/features/auth/consent";
 import { NotJoined, useMe } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Eyebrow, Group } from "@/features/coach/parts";
+import { LegalRows } from "@/features/legal/LegalLinks";
 import { space } from "@/theme";
 import { openPlaySubscriptions } from "@/features/system/store";
 
@@ -123,6 +124,8 @@ export default function Privacy() {
           />
         </View>
       </Sheet>
+      <Eyebrow>Policies</Eyebrow>
+      <LegalRows />
     </MenuPage>
   );
 }

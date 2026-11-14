@@ -34,6 +34,7 @@ import {
   space,
   textSizes,
 } from "@/theme";
+import { PolicyLinks } from "@/features/legal/LegalLinks";
 
 function JoinForm({ code: initial }: { code?: string }) {
   const { findInvite, claimInvite, coachName } = useCoachData();
@@ -167,8 +168,9 @@ function JoinForm({ code: initial }: { code?: string }) {
           style={styles.agree}
         >
           <Text weight="medium" style={styles.flex}>
-            I agree to the Terms and Privacy Policy, and let {coachName} see my
-            training, food, sleep and progress while they coach me.
+            I agree to the Terms of Use and Privacy Policy, and let {coachName}
+            see my training, food, sleep and progress while they coach me.
+            I&apos;m 18 or older.
           </Text>
           <View style={[styles.tick, agree && styles.tickOn]}>
             {agree ? (
@@ -176,6 +178,7 @@ function JoinForm({ code: initial }: { code?: string }) {
             ) : null}
           </View>
         </PressableScale>
+        <PolicyLinks />
       </Page>
       <View
         style={[

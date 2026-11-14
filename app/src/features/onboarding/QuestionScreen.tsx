@@ -43,6 +43,7 @@ import {
   space,
   textSizes,
 } from "@/theme";
+import { PolicyLinks } from "@/features/legal/LegalLinks";
 
 import { BodyFatPicker } from "./BodyFatPicker";
 import { useOnboarding } from "./OnboardingContext";
@@ -347,7 +348,7 @@ function FieldView({ field: f }: { field: Field }) {
 
     case "agree": {
       const on = answers[f.key] === true;
-      return (
+      const box = (
         <PressableScale
           onPress={() => setAnswer(f.key, !on)}
           accessibilityRole="checkbox"
@@ -363,6 +364,14 @@ function FieldView({ field: f }: { field: Field }) {
             ) : null}
           </View>
         </PressableScale>
+      );
+      return f.links ? (
+        <View style={styles.agreeWrap}>
+          {box}
+          <PolicyLinks />
+        </View>
+      ) : (
+        box
       );
     }
 
@@ -946,6 +955,7 @@ const styles = StyleSheet.create({
   features: { gap: space[4], paddingTop: space[1] },
   feature: { flexDirection: "row", alignItems: "flex-start", gap: space[4] },
   featureText: { flex: 1, gap: space[1] / 2 },
+  agreeWrap: { gap: space[2] },
   agree: {
     flexDirection: "row",
     alignItems: "center",

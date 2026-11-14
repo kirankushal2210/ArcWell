@@ -65,10 +65,12 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint && npm run tokens:check",
+    "lint": "expo lint && npm run tokens:check && npm run legal:check",
     "typecheck": "tsc --noEmit",
     "tokens:check": "node scripts/check-tokens.mjs",
-    "test": "jest"
+    "test": "jest",
+    "legal:build": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-legal.mjs",
+    "legal:check": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-legal.mjs --check"
   },
   "private": true,
   "jest": {

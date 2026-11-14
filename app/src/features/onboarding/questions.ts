@@ -133,7 +133,13 @@ export type Field =
       kind: "features";
       items: { icon: LucideIcon; title: string; sub: string }[];
     }
-  | { kind: "agree"; key: string; label: string }
+  | {
+      kind: "agree";
+      key: string;
+      label: string;
+      /** Show links to the Terms of Use and Privacy Policy under it (D106). */
+      links?: boolean;
+    }
   | { kind: "photo"; key: string }
   | { kind: "services"; key: string }
   /** Coach's existing Excel, Google Sheets or CSV workout file (D55). */
@@ -253,7 +259,7 @@ export const questions: Question[] = [
         key: "age",
         initial: 27,
         unit: "years",
-        values: range(13, 80, 1, (v) => String(v)),
+        values: range(18, 80, 1, (v) => String(v)),
       },
     ],
   },

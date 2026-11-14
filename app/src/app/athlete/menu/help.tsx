@@ -5,7 +5,8 @@ import { Linking } from "react-native";
 
 import { Button, Text, TextField } from "@/components/primitives";
 import { backTo, InfoCard, MenuPage } from "@/features/athlete/MenuParts";
-import { Group, GroupRow } from "@/features/coach/parts";
+import { Eyebrow, Group, GroupRow } from "@/features/coach/parts";
+import { LegalRows } from "@/features/legal/LegalLinks";
 
 const TOPICS: [string, string][] = [
   [
@@ -80,6 +81,8 @@ export default function Help() {
           Nothing matches. Contact support and we&apos;ll answer directly.
         </InfoCard>
       )}
+      <Eyebrow>Policies</Eyebrow>
+      <LegalRows />
     </MenuPage>
   );
 }

@@ -18,6 +18,7 @@ import { useCoachData } from "@/features/coach/CoachData";
 import { useOnboarding } from "@/features/onboarding/OnboardingContext";
 import { ProgressBar, QuestionHeader } from "@/features/onboarding/parts";
 import { colors, radius, rhythm, space } from "@/theme";
+import { PolicyLinks } from "@/features/legal/LegalLinks";
 
 export default function SavePlan() {
   const insets = useSafeAreaInsets();
@@ -80,8 +81,9 @@ export default function SavePlan() {
             style={styles.agree}
           >
             <Text weight="medium" style={styles.flex}>
-              I agree to the Terms and Privacy Policy, and to Arcwell storing my
-              health data (answers, workouts, food and sleep) to run my plan.
+              I agree to the Terms of Use and Privacy Policy, and to Arcwell
+              storing my health data (answers, workouts, food and sleep) to run
+              my plan. I&apos;m 18 or older.
             </Text>
             <View style={[styles.tick, agree && styles.tickOn]}>
               {agree ? (
@@ -89,6 +91,7 @@ export default function SavePlan() {
               ) : null}
             </View>
           </PressableScale>
+          <PolicyLinks />
           <PressableScale
             onPress={() => setAnswer("photoConsent", !photos)}
             accessibilityRole="checkbox"
