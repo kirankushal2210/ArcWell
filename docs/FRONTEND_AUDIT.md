@@ -324,3 +324,58 @@ Every route, `router.push` target and stub was checked again. There are no stub 
     - RPE per set.
     - Nutrition rebuild.
   - **DESIGN.md §6** component table still says "not built" for parts now built: tab bar, set row, rest timer, macro bars, food row and portion picker, chat bubble, paywall card.
+
+## 9. Full audit (2026-11-14, after D106)
+
+A full pass over every route, link, alert, date, gate and recent decision.
+- **Routes:** every route is reachable (only `/dev/*` is unlinked) and every link target exists.
+- **Clean:** no direct `Alert.alert` is left, and no UTC date slicing in app code.
+- **AI gating:** AI is hidden from coached athletes on every route and card.
+- **Recent decisions:** D97 to D106 all show as decided.
+- **Typecheck:** it had broken on the new legal test, which was missing its `@jest/globals` import. Fixed in the same commit as this section.
+
+**Verdict:** on sample data the front end is feature-complete for v1, apart from effort and block fields in the athlete's template editor. What's left is small fixes, tests and docs.
+
+### G. Bugs (all small)
+
+- [ ] **"1 exercises" on single-run days (D100)** in the workout notice (`notifications.ts:83`) and the logger header, "x of 1 exercises" (`workout/index.tsx:432`).
+- [ ] **Nested button in food rows.** The add button sits inside the row's button (`FoodParts.tsx:91/109`, used in `food/add.tsx`). This is the same fix as `ExerciseList`.
+- [ ] **Wrong or blank screen for an unknown id:**
+  - `habits/[id]` and `race/sim/[id]` say "Join your coach first".
+  - `history/[id]`, `recovery/protocol/[id]` and coach `chat/[id]` show an empty page.
+- [ ] **The coach invite page uses sample values** (`BusinessPages.tsx:384`):
+  - The link is always `arcwell.app/c/anjali-kapoor`, while onboarding builds it from the coach's name.
+  - "Client spots" ignores `settings.clientLimit`.
+- [ ] **The coach consent box has no "I'm 18 or older"** (`coachQuestions.ts:111`), unlike the athlete and invite consent boxes and the Terms.
+- [ ] **Small tap targets:**
+  - The food tick box on the meal-scan result is 24 dp (`food/photo.tsx:385`).
+  - The remove buttons in coach onboarding are about 34 dp (`QuestionScreen.tsx:592,696`).
+- [ ] **UTC slice in sample Instagram leads** (`instagram.ts:134,152`). It's correct in India, so low priority.
+- [ ] **Stale comments:**
+  - `athlete/_layout.tsx:1` (Progress tab).
+  - `food/add.tsx:4` (photo logging "coming").
+  - A repeated comment in `assistant/nutrition.tsx:40`.
+- **To decide:**
+  - The AI chat forgets its messages when you leave the page.
+  - The logger's progression hint uses the sparkle (AI) icon for coached athletes too, though it's rules-based and not AI.
+
+### Still open from earlier
+
+- [ ] **F.** The athlete template editor has no effort (RPE) or block fields. Size M.
+- [ ] **C. Tests** are missing for:
+  - `recovery.ts`, `selfPlan()`, `toSession`, `programWeek`, `visibility.ts`;
+  - `ai/tailor.ts`, `ai/answers.ts`, `science/strength.ts`;
+  - `coach/crm.ts`, `enhanced.ts`, `supplements.ts`, `readSheet.ts`;
+  - `notifications.ts`, `lib/alert.ts`.
+- [ ] **D. Docs:**
+  - `SPEC.md` is behind on D53 to D106.
+  - `DESIGN.md` §3, §6 and §7 are out of date.
+  - `sitemap.md` still has the Progress tab and the old menu.
+  - `PLAN.md` still says the blocks are not built and FE-6 has "no APIs".
+  - `DECISIONS.md` has two contradictions: D45's effort per workout, and copy-from-yesterday listed as v1.1.
+- **By design, or waiting on the backend or a dev build:**
+  - Supabase data and sign-in.
+  - Play billing and Razorpay; the Razorpay button stays disabled.
+  - Push delivery, Health Connect, live heart rate, exercise media.
+  - Real invite tokens and the domain.
+  - .xls import, the in-app PDF viewer, map tiles.
