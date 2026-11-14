@@ -14,7 +14,6 @@ import {
 } from "lucide-react-native";
 import { useState } from "react";
 import {
-  Alert,
   KeyboardAvoidingView,
   Linking,
   Platform,
@@ -53,6 +52,7 @@ import {
   TOUCHES,
 } from "@/features/coach/instagram";
 import { Eyebrow, Page, PageHeader, Pills } from "@/features/coach/parts";
+import { alert } from "@/lib/alert";
 import {
   colors,
   fontFamilyFor,
@@ -225,7 +225,7 @@ export default function LeadDetail() {
     setEntry("");
   };
   const remove = () =>
-    Alert.alert(`Delete ${l.name}?`, "Their timeline goes too.", [
+    alert(`Delete ${l.name}?`, "Their timeline goes too.", [
       { text: "Cancel", style: "cancel" },
       {
         text: "Delete",

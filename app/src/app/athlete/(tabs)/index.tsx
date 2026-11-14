@@ -3,13 +3,8 @@
 // Recovery, Strain and Stress rings (paid and coached; D60). The dock starts today's workout in
 // Honey, or logs food once training is done (D67).
 import { router } from "expo-router";
-import {
-  Camera,
-  Check,
-  MessageCircle,
-  Play,
-} from "lucide-react-native";
-import { Alert, StyleSheet, View } from "react-native";
+import { Camera, Check, MessageCircle, Play } from "lucide-react-native";
+import { StyleSheet, View } from "react-native";
 
 import { Avatar, Button, PressableScale, Text } from "@/components/primitives";
 import { slotNow, todayKey, useNutrition } from "@/features/athlete/FoodParts";
@@ -23,14 +18,11 @@ import { Ring, useRecovery } from "@/features/athlete/RecoveryParts";
 import { FoodScanButton, RoundAction } from "@/features/athlete/FoodScanButton";
 import { AthletePage, NotJoined, useMe } from "@/features/athlete/useMe";
 import { useAuth } from "@/features/auth/AuthProvider";
-import {
-  checkInStatus,
-  dueText,
-  missedDay,
-} from "@/features/coach/checkins";
+import { checkInStatus, dueText, missedDay } from "@/features/coach/checkins";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Group, GroupRow, PageHeader, PillarDot } from "@/features/coach/parts";
 import { clock } from "@/features/coach/plans";
+import { alert } from "@/lib/alert";
 import { colors, radius, space } from "@/theme";
 import {
   REMIND_DAY,
@@ -444,22 +436,18 @@ export default function Today() {
             variant="ghost"
             fullWidth
             onPress={() =>
-              Alert.alert(
-                "Sign out?",
-                "Your plan and history stay on this phone.",
-                [
-                  { text: "Cancel", style: "cancel" },
-                  {
-                    text: "Sign out",
-                    onPress: () => {
-                      auth.signOut().finally(() => {
-                        if (router.canDismiss()) router.dismissAll();
-                        router.replace("/");
-                      });
-                    },
+              alert("Sign out?", "Your plan and history stay on this phone.", [
+                { text: "Cancel", style: "cancel" },
+                {
+                  text: "Sign out",
+                  onPress: () => {
+                    auth.signOut().finally(() => {
+                      if (router.canDismiss()) router.dismissAll();
+                      router.replace("/");
+                    });
                   },
-                ],
-              )
+                },
+              ])
             }
           />
         ) : null}
@@ -469,7 +457,7 @@ export default function Today() {
             variant="ghost"
             fullWidth
             onPress={() =>
-              Alert.alert(
+              alert(
                 "Reset this phone?",
                 "Clears your plan, workouts and history from this sample build.",
                 [

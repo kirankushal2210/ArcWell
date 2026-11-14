@@ -6,7 +6,7 @@ import { useKeepAwake } from "expo-keep-awake";
 import { router } from "expo-router";
 import { Undo2, X } from "lucide-react-native";
 import { useEffect, useState } from "react";
-import { Alert, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { IconButton, PressableScale, Text } from "@/components/primitives";
@@ -18,6 +18,7 @@ import {
   stepTimes,
 } from "@/features/race/sim";
 import { useRace } from "@/features/race/useRace";
+import { alert } from "@/lib/alert";
 import { colors, radius, rhythm, space } from "@/theme";
 
 const nowMs = () => Date.now();
@@ -58,7 +59,7 @@ export default function RaceMode() {
     rc.split();
   };
   const close = () =>
-    Alert.alert(
+    alert(
       "Leave the sim?",
       "It keeps running in the background until you finish or discard it.",
       [

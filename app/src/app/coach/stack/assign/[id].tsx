@@ -1,13 +1,14 @@
 // Give a supplement stack to clients (D64): each gets their own copy, replacing their list.
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { Alert, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Button, Text } from "@/components/primitives";
 import { ClientPicker } from "@/features/coach/ClientPicker";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Page, PageHeader } from "@/features/coach/parts";
+import { alert } from "@/lib/alert";
 import { colors, rhythm, space } from "@/theme";
 
 export default function AssignStack() {
@@ -58,7 +59,7 @@ export default function AssignStack() {
             assignStack(s.id, picked);
             const n = picked.length;
             back();
-            Alert.alert(
+            alert(
               "Stack given",
               `${n} ${n === 1 ? "client has" : "clients have"} their own copy of ${s.name}.`,
             );

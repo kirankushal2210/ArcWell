@@ -141,7 +141,12 @@ type CoachData = {
   duplicateTemplate: (id: string) => string;
   /** Gives each client their own copy of the template, replacing their current program or meal plan. */
   assignTemplate: (id: string, clientIds: string[]) => void;
-  saveProgram: (id: string, p: TrainingProgram) => void;
+  /** Save a client's program. `restart` starts it again from week 1 (a different program). */
+  saveProgram: (
+    id: string,
+    p: TrainingProgram,
+    opts?: { restart?: boolean },
+  ) => void;
   /** Switch to a new program from today (TR-04): week 1 starts now and rest days follow it. */
   startProgram: (id: string, p: TrainingProgram, restDays: number[]) => void;
   saveNutrition: (id: string, n: NutritionPlan) => void;
@@ -969,6 +974,7 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
     },
 
     assignPlan: (id, training, meals) => {
+      const now = new Date().toISOString();
       const t = templates.find(
         (x) => x.kind === "training" && x.name === training,
       );
@@ -979,11 +985,12 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
         program: t?.program
           ? { ...cloneProgram(t.program), name: t.name }
           : programFromTemplate(training),
-        programStart: new Date().toISOString(),
+        programStart: now,
+        programUpdatedAt: now,
         nutritionPlan: m?.nutrition
           ? cloneNutrition(m.nutrition)
           : c.nutritionPlan,
-        line: "Plan assigned · starts Monday",
+        line: "Plan assigned · starts today",
         attention: undefined,
       }));
       bumpTemplates([t?.id, m?.id], 1);
@@ -1030,13 +1037,15 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
     assignTemplate: (id, clientIds) => {
       const t = templates.find((x) => x.id === id);
       if (!t || !clientIds.length) return;
+      const now = new Date().toISOString();
       for (const cid of clientIds) {
         if (t.kind === "training" && t.program) {
           const program = { ...cloneProgram(t.program), name: t.name };
           update(cid, (c) => ({
             isNew: false,
             program,
-            programStart: new Date().toISOString(),
+            programStart: now,
+            programUpdatedAt: now,
             plan: { training: t.name, meals: c.plan?.meals ?? "" },
             training: {
               ...c.training,
@@ -1080,18 +1089,22 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
             },
         training: { ...c.training, weekPlanned: 7 - restDays.length },
       })),
-    saveProgram: (id, p) =>
-      update(id, (c) => ({
-        program: p,
-        programStart: c.programStart ?? new Date().toISOString(),
-        plan: { training: p.name, meals: c.plan?.meals ?? "" },
-        training: {
-          ...c.training,
-          weekPlanned: c.protocol
-            ? 7 - c.protocol.restDays.length
-            : p.days.length,
-        },
-      })),
+    saveProgram: (id, p, opts) =>
+      update(id, (c) => {
+        const now = new Date().toISOString();
+        return {
+          program: p,
+          programStart: opts?.restart || !c.programStart ? now : c.programStart,
+          programUpdatedAt: now,
+          plan: { training: p.name, meals: c.plan?.meals ?? "" },
+          training: {
+            ...c.training,
+            weekPlanned: c.protocol
+              ? 7 - c.protocol.restDays.length
+              : p.days.length,
+          },
+        };
+      }),
     saveNutrition: (id, n) =>
       update(id, (c) => ({
         nutritionPlan: n,

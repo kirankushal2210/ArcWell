@@ -6,7 +6,7 @@
 import { router } from "expo-router";
 import { Check, ShieldCheck, Watch } from "lucide-react-native";
 import { useState } from "react";
-import { Alert, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { plusOnly } from "@/features/athlete/PlusOnly";
@@ -15,6 +15,7 @@ import { DEVICE_LABEL, type DeviceBrand } from "@/features/athlete/recovery";
 import { useRecovery } from "@/features/athlete/RecoveryParts";
 import { NotJoined } from "@/features/athlete/useMe";
 import { Eyebrow, Page, PageHeader } from "@/features/coach/parts";
+import { alert } from "@/lib/alert";
 import { colors, radius, rhythm, space } from "@/theme";
 
 const BRANDS = Object.keys(DEVICE_LABEL) as DeviceBrand[];
@@ -133,7 +134,7 @@ function Connect() {
             variant="secondary"
             fullWidth
             onPress={() =>
-              Alert.alert(
+              alert(
                 `Disconnect ${DEVICE_LABEL[device.brand]}?`,
                 "Your scores go back to the morning check-in. Past days keep their numbers.",
                 [

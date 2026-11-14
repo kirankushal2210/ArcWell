@@ -4,13 +4,7 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { Copy, Trash2, UserPlus } from "lucide-react-native";
 import { useState } from "react";
-import {
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  View,
-} from "react-native";
+import { KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Button, Text } from "@/components/primitives";
@@ -18,6 +12,7 @@ import { useCoachData } from "@/features/coach/CoachData";
 import { Page, PageHeader } from "@/features/coach/parts";
 import { emptyProgram, type TrainingProgram } from "@/features/coach/plans";
 import { ProgramEditor, programReady } from "@/features/coach/ProgramEditor";
+import { alert } from "@/lib/alert";
 import { colors, rhythm, space } from "@/theme";
 import { useBillingGate } from "@/features/coach/limits";
 
@@ -44,21 +39,17 @@ function TrainingTemplateEditor() {
       program: { ...p, name },
     });
   const remove = () =>
-    Alert.alert(
-      `Delete ${t?.name}?`,
-      "Clients already on it keep their own copy.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: () => {
-            if (t) deleteTemplate(t.id);
-            back();
-          },
+    alert(`Delete ${t?.name}?`, "Clients already on it keep their own copy.", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: () => {
+          if (t) deleteTemplate(t.id);
+          back();
         },
-      ],
-    );
+      },
+    ]);
 
   return (
     <KeyboardAvoidingView

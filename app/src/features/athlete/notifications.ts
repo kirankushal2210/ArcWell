@@ -6,7 +6,7 @@ import type { Href } from "expo-router";
 import { dueText, sentThisWeek } from "@/features/coach/checkins";
 import { useCoachData } from "@/features/coach/CoachData";
 
-import { dayText } from "./athleteData";
+import { dayText, isoDate } from "./athleteData";
 import { useTodayWorkout } from "./QuickLog";
 import { useMe } from "./useMe";
 
@@ -60,15 +60,22 @@ export function useNotifications(): { items: Note[]; unread: number } {
         href: { pathname: "/athlete/photos/review/[id]", params: { id: t.id } },
         isNew: true,
       });
-  if (coached && on.plan && me.program)
+  // A new id each time the coach assigns or changes the program, so it counts as new again.
+  if (coached && on.plan && me.program) {
+    const at = me.programUpdatedAt ?? me.programStart;
+    const changed =
+      !!me.programUpdatedAt &&
+      !!me.programStart &&
+      me.programUpdatedAt !== me.programStart;
     items.push({
-      id: "plan",
-      title: "Your plan is ready",
+      id: `plan-${at ?? ""}`,
+      title: changed ? `${coachName} updated your plan` : "Your plan is ready",
       sub: `${me.program.name} · from ${coachName}`,
-      when: me.programStart ? dayText(me.programStart.slice(0, 10)) : "",
-      href: "/athlete/training",
-      isNew: false,
+      when: at ? dayText(isoDate(new Date(at))) : "",
+      href: "/athlete/plan",
+      isNew: !!me.programUpdatedAt,
     });
+  }
   if (on.workout && today.day && !today.done)
     items.push({
       id: "workout",

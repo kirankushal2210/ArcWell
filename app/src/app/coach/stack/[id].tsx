@@ -4,7 +4,6 @@ import { router, useLocalSearchParams } from "expo-router";
 import { Trash2, UserPlus } from "lucide-react-native";
 import { useState } from "react";
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -21,6 +20,7 @@ import {
   supplementsReady,
 } from "@/features/coach/SupplementEditor";
 import type { Supplement } from "@/features/coach/supplements";
+import { alert } from "@/lib/alert";
 import {
   colors,
   fontFamilyFor,
@@ -65,21 +65,17 @@ function StackScreenEditor() {
                   icon: Trash2,
                   label: "Delete stack",
                   onPress: () =>
-                    Alert.alert(
-                      `Delete ${s.name}?`,
-                      "Clients keep their own copy.",
-                      [
-                        { text: "Cancel", style: "cancel" },
-                        {
-                          text: "Delete",
-                          style: "destructive",
-                          onPress: () => {
-                            deleteStack(s.id);
-                            back();
-                          },
+                    alert(`Delete ${s.name}?`, "Clients keep their own copy.", [
+                      { text: "Cancel", style: "cancel" },
+                      {
+                        text: "Delete",
+                        style: "destructive",
+                        onPress: () => {
+                          deleteStack(s.id);
+                          back();
                         },
-                      ],
-                    ),
+                      },
+                    ]),
                 },
               ]
             : []

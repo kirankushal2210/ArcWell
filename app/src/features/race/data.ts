@@ -22,8 +22,6 @@ export type Segment =
       reps?: number;
     };
 
-export const SEASON = "25/26";
-
 /** What a HYROX athlete's exercise library leads with (D83): running, the eight stations, and the
  * strength lifts the race plan uses. */
 export const HYROX_EXERCISES = [

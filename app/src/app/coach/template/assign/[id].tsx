@@ -5,12 +5,13 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { Check } from "lucide-react-native";
 import { useState } from "react";
-import { Alert, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Avatar, Button, Text } from "@/components/primitives";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Group, GroupRow, Page, PageHeader } from "@/features/coach/parts";
+import { alert } from "@/lib/alert";
 import { colors, radius, rhythm, space } from "@/theme";
 import { useBillingGate } from "@/features/coach/limits";
 
@@ -117,7 +118,7 @@ function AssignTemplateEditor() {
             assignTemplate(t.id, picked);
             const n = picked.length;
             back();
-            Alert.alert(
+            alert(
               "Template assigned",
               `${n} ${n === 1 ? "client has" : "clients have"} their own copy of ${t.name}. Open a client to adjust theirs.`,
             );

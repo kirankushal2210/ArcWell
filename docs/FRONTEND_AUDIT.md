@@ -278,7 +278,9 @@ Every route, `router.push` target and stub was checked again. There are no stub 
 
 ### E. Bugs
 
-- [ ] **Confirm dialogs do nothing on web.** About 25 `Alert.alert` calls have no web fallback. Fix it with one shared `confirm()` helper like `confirmDiscard`. Size M.
+**All fixed 2026-11-14.** `lib/alert.ts` is one alert for phone and web, used everywhere. On web, Add a photo goes straight to the file picker. A coach who picks a different template or Blank in the builder restarts the program from week 1. Every assignment or change records `programUpdatedAt`, which raises a new "Your plan is ready" or "Coach updated your plan" notice.
+
+- [x] **Confirm dialogs do nothing on web.** About 25 `Alert.alert` calls have no web fallback. Fix it with one shared `confirm()` helper like `confirmDiscard`. Size M.
   - **Blocking:**
     - `PhotoSlot.tsx:44` `choosePhoto`. Every "add a photo" path is dead on web: profiles, check-in and physique photos, chat images, onboarding.
     - Closing the race sim (`race/sim/live.tsx:61`).
@@ -290,12 +292,12 @@ Every route, `router.push` target and stub was checked again. There are no stub 
     - Disconnect a device (`recovery/connect.tsx:136`).
     - Delete a template (`MyRoutines.tsx:226`).
   - **Only the message is lost:** template and stack assign, recovery planner, create exercise, photo permission.
-- [ ] **A new program keeps the old start date.** When the coach picks a different template in the plan builder and saves, `saveProgram` keeps `programStart`. A new 4-week program can then open as "complete". Size S.
-- [ ] **"Plan assigned · starts Monday"** (`CoachData.tsx`, assignPlan) disagrees with the data: the program starts now. Size S.
-- [ ] **No "plan updated" notice for the athlete.** The plan item in `notifications.ts:63` is never new and ignores edits, though Settings has a toggle for it. Size S.
-- [ ] **UTC date slicing still left:** `coach/enhanced/[id].tsx:70,106` and `notifications.ts:68`. Size S.
-- [ ] **"1 exercises · N min"** on template cards for single-run days (`MyRoutines.tsx:48`). This breaks D100. Size S.
-- [ ] Dead export `SEASON` (`features/race/data.ts:25`). Size S.
+- [x] **A new program keeps the old start date.** When the coach picks a different template in the plan builder and saves, `saveProgram` keeps `programStart`. A new 4-week program can then open as "complete". Size S.
+- [x] **"Plan assigned · starts Monday"** (`CoachData.tsx`, assignPlan) disagrees with the data: the program starts now. Size S.
+- [x] **No "plan updated" notice for the athlete.** The plan item in `notifications.ts:63` is never new and ignores edits, though Settings has a toggle for it. Size S.
+- [x] **UTC date slicing still left:** `coach/enhanced/[id].tsx:70,106` and `notifications.ts:68`. Size S.
+- [x] **"1 exercises · N min"** on template cards for single-run days (`MyRoutines.tsx:48`). This breaks D100. Size S.
+- [x] Dead export `SEASON` (`features/race/data.ts:25`). Size S.
 
 ### F. Partly built (known D104 limits)
 

@@ -3,7 +3,7 @@
 // during the workout (D45).
 import { router, useLocalSearchParams } from "expo-router";
 import { ChevronRight, PencilLine, Play } from "lucide-react-native";
-import { Alert, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import {
@@ -22,6 +22,7 @@ import { NotJoined, useMe } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Group, GroupRow, Page, PageHeader } from "@/features/coach/parts";
 import { planLine } from "@/features/coach/plans";
+import { alert } from "@/lib/alert";
 import { colors, radius, rhythm, space } from "@/theme";
 import { isoToday } from "@/features/athlete/athleteData";
 
@@ -53,7 +54,7 @@ export default function Preview() {
 
   const start = () => {
     if (active && active.dayId !== day.id) {
-      Alert.alert(
+      alert(
         "A workout is already running",
         `Finish or discard ${active.name} first.`,
         [

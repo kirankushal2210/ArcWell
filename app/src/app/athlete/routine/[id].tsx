@@ -5,7 +5,6 @@ import { router, useLocalSearchParams } from "expo-router";
 import { Dumbbell, Plus, Trash2 } from "lucide-react-native";
 import { useState } from "react";
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -23,6 +22,7 @@ import { useCoachData } from "@/features/coach/CoachData";
 import { ExerciseRows } from "@/features/coach/ExerciseRows";
 import { Page } from "@/features/coach/parts";
 import { type TrainingDay, uid } from "@/features/coach/plans";
+import { alert } from "@/lib/alert";
 import {
   colors,
   fontFamilyFor,
@@ -57,7 +57,7 @@ export default function RoutineEditor() {
   const ready = !!r.name.trim() && r.exercises.length > 0;
   const remove = () =>
     saved &&
-    Alert.alert(
+    alert(
       `Delete ${saved.name}?`,
       "Workouts you logged from it stay in your history.",
       [

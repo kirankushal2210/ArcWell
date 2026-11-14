@@ -13,12 +13,13 @@ import {
   Settings,
   UserRound,
 } from "lucide-react-native";
-import { Alert, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { Avatar, Button, Text } from "@/components/primitives";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Group, GroupRow, Page, PageHeader } from "@/features/coach/parts";
+import { alert } from "@/lib/alert";
 import { colors, radius, space } from "@/theme";
 
 type Href =
@@ -121,22 +122,18 @@ export default function CoachMenu() {
             variant="ghost"
             fullWidth
             onPress={() =>
-              Alert.alert(
-                "Sign out?",
-                "Your clients and plans stay on this phone.",
-                [
-                  { text: "Cancel", style: "cancel" },
-                  {
-                    text: "Sign out",
-                    onPress: () => {
-                      auth.signOut().finally(() => {
-                        if (router.canDismiss()) router.dismissAll();
-                        router.replace("/");
-                      });
-                    },
+              alert("Sign out?", "Your clients and plans stay on this phone.", [
+                { text: "Cancel", style: "cancel" },
+                {
+                  text: "Sign out",
+                  onPress: () => {
+                    auth.signOut().finally(() => {
+                      if (router.canDismiss()) router.dismissAll();
+                      router.replace("/");
+                    });
                   },
-                ],
-              )
+                },
+              ])
             }
           />
         ) : (

@@ -12,12 +12,13 @@ import {
   Plus,
 } from "lucide-react-native";
 import { useState } from "react";
-import { Alert, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { IconButton, PressableScale, Text } from "@/components/primitives";
 import { useCoachData } from "@/features/coach/CoachData";
 import { type TrainingDay, uid } from "@/features/coach/plans";
 import type { Client } from "@/features/coach/sampleData";
+import { alert } from "@/lib/alert";
 import { colors, radius, space } from "@/theme";
 
 import { Sheet, SheetRow } from "./Sheet";
@@ -45,7 +46,12 @@ export function RoutineCard({
         <View style={styles.flex}>
           <Text weight="semibold">{day.name}</Text>
           <Text variant="caption" tone="muted" numeric>
-            {`${day.exercises.length} exercises · ${estimateMinutes(day)} min`}
+            {/* D100: a single-exercise session (a run) shows what to do, as on Today. */}
+            {`${
+              day.exercises.length === 1
+                ? day.exercises[0].reps
+                : `${day.exercises.length} exercises`
+            } · ${estimateMinutes(day)} min`}
           </Text>
         </View>
         {onMenu ? (
@@ -223,7 +229,7 @@ export function MyRoutines({
               onPress={() => {
                 const r = menu;
                 setMenu(null);
-                Alert.alert(
+                alert(
                   `Delete ${r.name}?`,
                   "Workouts you logged from it stay in your history.",
                   [

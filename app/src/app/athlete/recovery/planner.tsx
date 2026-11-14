@@ -4,7 +4,7 @@ import * as Notifications from "expo-notifications";
 import { router, useLocalSearchParams } from "expo-router";
 import { BellRing } from "lucide-react-native";
 import { useState } from "react";
-import { Alert, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { plusOnly } from "@/features/athlete/PlusOnly";
 import { Button, Text } from "@/components/primitives";
@@ -19,6 +19,7 @@ import {
 import { StatRow, useRecovery } from "@/features/athlete/RecoveryParts";
 import { NotJoined } from "@/features/athlete/useMe";
 import { Page, PageHeader, Pills } from "@/features/coach/parts";
+import { alert } from "@/lib/alert";
 import { colors, radius, space } from "@/theme";
 
 /** Schedule tonight's wind-down reminder 30 minutes before bed (local notification). */
@@ -114,7 +115,7 @@ function Planner() {
           onPress={() =>
             remind(plan.bed)
               .then((ok) =>
-                Alert.alert(
+                alert(
                   ok ? "Reminder set" : "Couldn't set a reminder",
                   ok
                     ? `We'll remind you at ${clockOf(plan.bed - 30)}.`

@@ -5,11 +5,12 @@ import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { Camera, User } from "lucide-react-native";
 import { useState } from "react";
-import { Alert, Linking, StyleSheet, View } from "react-native";
+import { Linking, Platform, StyleSheet, View } from "react-native";
 
 import { ImageViewer } from "@/components/ImageViewer";
 
 import { PressableScale, Text } from "@/components/primitives";
+import { alert } from "@/lib/alert";
 import { colors, radius, space } from "@/theme";
 
 async function pick(camera: boolean): Promise<string | null> {
@@ -17,7 +18,7 @@ async function pick(camera: boolean): Promise<string | null> {
     ? await ImagePicker.requestCameraPermissionsAsync()
     : await ImagePicker.requestMediaLibraryPermissionsAsync();
   if (!perm.granted) {
-    Alert.alert(
+    alert(
       camera ? "Camera is off for Arcwell" : "Photos are off for Arcwell",
       "Photos are optional and everything else keeps working. To add one, turn access on in your phone's settings.",
       [
@@ -39,9 +40,13 @@ async function pick(camera: boolean): Promise<string | null> {
   return !res.canceled && res.assets[0] ? res.assets[0].uri : null;
 }
 
-/** Ask camera or library, then hand back the photo URI. */
+/** Ask camera or library, then hand back the photo URI. The web has one file picker for both. */
 export function choosePhoto(onPicked: (uri: string) => void) {
-  Alert.alert("Add a photo", undefined, [
+  if (Platform.OS === "web") {
+    void pick(false).then((u) => u && onPicked(u));
+    return;
+  }
+  alert("Add a photo", undefined, [
     {
       text: "Take photo",
       onPress: () => pick(true).then((u) => u && onPicked(u)),

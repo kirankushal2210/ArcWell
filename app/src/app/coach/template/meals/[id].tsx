@@ -5,7 +5,6 @@ import { router, useLocalSearchParams } from "expo-router";
 import { Copy, Trash2, UserPlus } from "lucide-react-native";
 import { useState } from "react";
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -23,6 +22,7 @@ import {
   type NutritionPlan,
   targetsFor,
 } from "@/features/coach/plans";
+import { alert } from "@/lib/alert";
 import {
   colors,
   fontFamilyFor,
@@ -66,21 +66,17 @@ function MealTemplateEditor() {
       nutrition: n,
     });
   const remove = () =>
-    Alert.alert(
-      `Delete ${t?.name}?`,
-      "Clients already on it keep their own copy.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: () => {
-            if (t) deleteTemplate(t.id);
-            back();
-          },
+    alert(`Delete ${t?.name}?`, "Clients already on it keep their own copy.", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: () => {
+          if (t) deleteTemplate(t.id);
+          back();
         },
-      ],
-    );
+      },
+    ]);
 
   return (
     <KeyboardAvoidingView
