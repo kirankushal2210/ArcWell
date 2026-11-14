@@ -635,8 +635,8 @@ function athleteRows(
   coachId: string | null,
 ) {
   const localId = me.id;
-  // Only a real name: an empty one must never overwrite the name an invite handed over.
-  if (me.name.trim())
+  // Only a real name: an empty one, or onboarding's placeholder "You", must never overwrite a name.
+  if (me.name.trim() && me.name.trim() !== "You")
     put(out, {
       table: "profiles",
       key: `profiles:${uid}`,
