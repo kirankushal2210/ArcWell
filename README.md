@@ -2,7 +2,7 @@
 
 Training, nutrition and recovery in one Android app — a client-management platform for coaches, with an optional AI coach for athletes.
 
-**Start with the product documents in [docs/product/](docs/product/README.md):** PRD, technical requirements, app flow, design brief, backend schema, API integrations, security and access, the AI guardrails ([AGENTS.md](AGENTS.md)) and the feature tickets. They're the source of truth; the older docs below are detail and history.
+**Start with the product documents in [docs/product/](docs/product/README.md):** PRD, technical requirements, app flow, design brief, backend schema, API integrations, security and access, the AI guardrails ([AGENTS.md](AGENTS.md)), the feature tickets and the deployment and testing runbook. They're the source of truth; the older docs below are detail and history.
 
 - Decisions: [docs/DECISIONS.md](docs/DECISIONS.md)
 - Investor demo: [docs/DEMO.md](docs/DEMO.md)

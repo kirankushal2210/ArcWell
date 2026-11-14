@@ -1,6 +1,6 @@
 # 05 · Backend Schema Document
 
-**Updated:** 14 November 2026 (to D108). The database is **Supabase Postgres 17**, defined only by migrations in `supabase/migrations/` and proven by pgTAP tests in `supabase/tests/` (177 tests). The column tables in section 7 are generated from the live local database. Regenerate them after any migration.
+**Updated:** 14 November 2026 (to D108). The database is **Supabase Postgres 17**, defined only by migrations in `supabase/migrations/` and proven by pgTAP tests in `supabase/tests/` (182 tests, including schema hygiene checks in `008_schema_hygiene`). The column tables in section 7 are generated from the live local database. Regenerate them after any migration.
 
 ## 1. Rules for every table (no exceptions)
 
@@ -21,6 +21,7 @@
 8. **Functions:** `security definer` only when needed, always `set search_path = ''` with schema-qualified names, and execute revoked from `public, anon` unless meant for them.
 9. **Every table has `updated_at`** (or is append-only), set by a trigger.
 10. **No health data in logs, errors or function output beyond what the caller may read.**
+11. **Every foreign key has an index** (account deletion cascades through them, and lookups use them). Enforced by `supabase/tests/008_schema_hygiene.test.sql`, which also fails if a table lacks RLS or a policy, if signed-out users get any table privilege, or if a security-definer function doesn't pin an empty `search_path`.
 
 ## 2. Entity overview
 

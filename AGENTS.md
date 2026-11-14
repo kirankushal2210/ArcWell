@@ -12,6 +12,7 @@ Every AI coding agent (and every person) working in this repo follows this file.
 | Tables, policies, SQL functions | [05-BACKEND-SCHEMA.md](docs/product/05-BACKEND-SCHEMA.md) and [07-SECURITY-ACCESS.md](docs/product/07-SECURITY-ACCESS.md) |
 | Edge Functions or outside services | [06-API-INTEGRATIONS.md](docs/product/06-API-INTEGRATIONS.md) |
 | Picking up work | [09-FEATURE-TICKETS.md](docs/product/09-FEATURE-TICKETS.md): work on one ticket at a time and meet its acceptance criteria |
+| Testing, deploying, releasing | [10-DEPLOYMENT-RUNBOOK.md](docs/product/10-DEPLOYMENT-RUNBOOK.md): local checks, staging order, launch checklist, rollback |
 | Anything under `app/` | [app/AGENTS.md](app/AGENTS.md): Expo changes every SDK; check the versioned docs and use `npx expo install` |
 
 `docs/SPEC.md`, `PLAN.md` and `DESIGN.md` are history and detail; where they differ from `docs/product/`, the product docs win.
@@ -22,6 +23,7 @@ Every AI coding agent (and every person) working in this repo follows this file.
   - RLS enabled;
   - policies;
   - least-privilege grants;
+  - an index on every foreign key;
   - pgTAP tests in `supabase/tests/` proving that a coach can't see another coach's clients, that a coach sees client data only from the join date unless history access is granted, and that access ends when the link ends.
 - **Coached athletes never see AI.** Entitlements are enforced on the server (`ai_entitled()`), not just hidden in the UI.
 - **AI only on the server**, through `supabase/functions/_shared/ai/`:

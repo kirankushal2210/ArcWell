@@ -190,3 +190,4 @@ The steps and costs are in [LAUNCH_ROADMAP.md](../LAUNCH_ROADMAP.md).
 | 07 | [Security and access](07-SECURITY-ACCESS.md) |
 | 08 | [AI guardrails and rules](../../AGENTS.md) (the rule file every agent reads) |
 | 09 | [Feature tickets](09-FEATURE-TICKETS.md) |
+| 10 | [Deployment and testing runbook](10-DEPLOYMENT-RUNBOOK.md) |

@@ -96,9 +96,12 @@
 
 | ID | Ticket | Acceptance criteria | Size | Status |
 |---|---|---|---|---|
-| H-01 | The 9 product documents | `docs/product/01`–`09` and AGENTS.md, linked from the README | M | ✅ |
+| H-01 | The 10 product documents | `docs/product/01`–`10` and AGENTS.md, linked from the README | M | ✅ |
 | H-02 | CI runs every required check | lint (ESLint, tokens, legal), typecheck, Jest, pgTAP, db lint, deno check | S | ✅ |
 | H-03 | Tests for untested logic | `recovery.ts`, `selfPlan()`, `programWeek`, `visibility.ts`, `tailor.ts`, `crm.ts`, `readSheet.ts`, `lib/alert.ts` | M | ⬜ |
+| H-12 | EAS build profiles | `app/eas.json`: development, preview (APK), production (app bundle) with channels | S | ✅ (linking to an Expo account is part of H-06) |
+| H-13 | Billing mapping unit tests | RevenueCat and Razorpay event mapping covered by Jest | S | ✅ |
+| H-14 | Foreign-key indexes | Every foreign key indexed (migration `fk_indexes`) | S | ✅ |
 | H-04 | Investor demo | Seed script, guide, screenshots (DEMO.md) | M | ✅ |
 | H-05 | Staging project | Supabase free project in Mumbai; migrations pushed; functions deployed | S | ⬜ free |
 | H-06 | Installable test app | EAS internal distribution APK | S | ⬜ free tier |

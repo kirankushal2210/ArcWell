@@ -40,7 +40,7 @@ A user's role can't be changed by the user (`check_role` trigger). One account i
 
 ## 3. How it's enforced
 
-1. **RLS on every table** (27 tables, 177 pgTAP tests in `supabase/tests/`). Policies use the helper functions in doc 05 §5. Every new table must ship with tests proving the three rules in AGENTS.md.
+1. **RLS on every table** (27 tables, 182 pgTAP tests in `supabase/tests/`; `008_schema_hygiene` fails if any table lacks RLS or a policy). Policies use the helper functions in doc 05 §5. Every new table must ship with tests proving the three rules in AGENTS.md.
 2. **Least-privilege grants:**
    - `anon` gets nothing except the invite-preview functions;
    - `authenticated` gets column-level insert and update only where the app writes;
