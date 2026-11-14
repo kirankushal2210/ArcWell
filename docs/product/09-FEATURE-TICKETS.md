@@ -22,7 +22,7 @@
 | A-06 | General invite link | Walk-ins join the coach; respects `coach_has_room` and standing | S | ✅ |
 | A-07 | Leave, complete or remove a link | Access ends at once (pgTAP); athlete keeps data, becomes free | S | ✅ |
 | A-08 | History sharing | Off by default; on lets the coach see earlier logs (pgTAP) | S | ✅ |
-| A-09 | Google sign-in (D62) | One tap on Android; links to the same account by email | M | ⬜ needs a development build and a Google OAuth client |
+| A-09 | Google sign-in (D62, D112) | One tap on Android; links to the same account by email; the button appears only once it works | M | ⬜ needs a development build and a Google OAuth client |
 | A-10 | Production sign-in email | Codes sent from the Arcwell domain through Resend | S | 💰 domain |
 | A-11 | Invite links open the app | Domain + `assetlinks.json` + preview page; Play Install Referrer, with the typed code as fallback | M | 💰 domain |
 
@@ -102,6 +102,7 @@
 | H-12 | EAS build profiles | `app/eas.json`: development, preview (APK), production (app bundle) with channels | S | ✅ (linking to an Expo account is part of H-06) |
 | H-13 | Billing mapping unit tests | RevenueCat and Razorpay event mapping covered by Jest | S | ✅ |
 | H-14 | Foreign-key indexes | Every foreign key indexed (migration `fk_indexes`) | S | ✅ |
+| H-15 | Demo readiness pass | Every coach and athlete screen opened as the demo accounts; the DEMO.md story checked | M | ✅ 116 screens crawled; fixed: Business tab crash (seeded lead), lead not found, negative stress and low recovery for clients without check-ins, 12 screens with no not-found state, injury questions not declined, two "+" buttons on Today, a leftover Sign out on Today, "Pro" label, switched-off Google button (D112) |
 | H-04 | Investor demo | Seed script, guide, screenshots (DEMO.md) | M | ✅ |
 | H-05 | Staging project | Supabase free project in Mumbai; migrations pushed; functions deployed | S | ⬜ free |
 | H-06 | Installable test app | EAS internal distribution APK | S | ⬜ free tier |

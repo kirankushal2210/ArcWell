@@ -17,7 +17,6 @@ import { todayDate } from "@/features/athlete/recovery";
 import { Ring, useRecovery } from "@/features/athlete/RecoveryParts";
 import { FoodScanButton, RoundAction } from "@/features/athlete/FoodScanButton";
 import { AthletePage, NotJoined, useMe } from "@/features/athlete/useMe";
-import { useAuth } from "@/features/auth/AuthProvider";
 import { checkInStatus, dueText, missedDay } from "@/features/coach/checkins";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Group, GroupRow, PageHeader, PillarDot } from "@/features/coach/parts";
@@ -46,7 +45,6 @@ export default function Today() {
   const me = useMe();
   const n = useNutrition();
   const { coachName, meTier, resetSample, settingsOf } = useCoachData();
-  const auth = useAuth();
   const r = useRecovery();
   const tw = useTodayWorkout();
   if (!me) return <NotJoined />;
@@ -430,27 +428,6 @@ export default function Today() {
           ) : null}
         </View>
 
-        {auth.session ? (
-          <Button
-            label="Sign out"
-            variant="ghost"
-            fullWidth
-            onPress={() =>
-              alert("Sign out?", "Your plan and history stay on this phone.", [
-                { text: "Cancel", style: "cancel" },
-                {
-                  text: "Sign out",
-                  onPress: () => {
-                    auth.signOut().finally(() => {
-                      if (router.canDismiss()) router.dismissAll();
-                      router.replace("/");
-                    });
-                  },
-                },
-              ])
-            }
-          />
-        ) : null}
         {SAMPLE_TOOLS ? (
           <Button
             label="Sample build: reset this phone"

@@ -168,13 +168,14 @@ export const emptyClient = (id: string, name: string): Client => ({
   targetKg: 0,
   training: { weekDone: 0, weekPlanned: 0, logs: [] },
   nutrition: { targetKcal: 0, proteinG: 0, days: [] },
+  // 1–5 scales: the neutral middle until the athlete's first morning check-in.
   recovery: {
     sleepTargetH: 8,
     nights: [],
-    quality: 0,
-    stress: 0,
-    energy: 0,
-    soreness: 0,
+    quality: 3,
+    stress: 3,
+    energy: 3,
+    soreness: 3,
   },
   measurements: [],
   photoWeeks: [],
@@ -303,10 +304,10 @@ function summarise(
       ...c.recovery,
       sleepTargetH: c.protocol?.sleepH ?? c.recovery.sleepTargetH,
       nights,
-      quality: last?.quality ?? 0,
-      stress: last?.stress ?? 0,
-      energy: last?.energy ?? 0,
-      soreness: last?.soreness ?? 0,
+      quality: last?.quality ?? 3,
+      stress: last?.stress ?? 3,
+      energy: last?.energy ?? 3,
+      soreness: last?.soreness ?? 3,
     },
     measurements,
   };
@@ -573,7 +574,11 @@ export function assemble(
     foodLogs,
     recovery,
     custom: custom.length || serverOnly ? custom : local.custom,
-    leads: p.leads.map((r) => r.payload as Lead),
+    // The row's id is the lead's id; a lead without a history gets an empty one.
+    leads: p.leads.map((r) => {
+      const l = r.payload as Lead;
+      return { ...l, id: r.id ?? l.id, events: l.events ?? [] };
+    }),
     // A new coach keeps the starter templates and stacks from onboarding; they are pushed.
     templates:
       tpl.length || serverOnly

@@ -11,6 +11,7 @@ import { useCoachData } from "@/features/coach/CoachData";
 import { Eyebrow, Page, PageHeader } from "@/features/coach/parts";
 import { PlanRows } from "@/features/coach/PlanRows";
 import { colors, radius, space } from "@/theme";
+import { NotFound } from "@/features/system/SystemStates";
 
 export default function Invite() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -25,7 +26,7 @@ export default function Invite() {
     if (c && !c.invite) createInvite(c.id);
   }, [c, createInvite]);
 
-  if (!c) return <PageHeader title="Invite" onBack={back} />;
+  if (!c) return <NotFound title="Invite" what="invite" onBack={back} />;
   const invite = c.invite;
   const first = c.name.split(" ")[0];
   // Placeholder domain until the invite-link domain is chosen (PLAN.md blockers).

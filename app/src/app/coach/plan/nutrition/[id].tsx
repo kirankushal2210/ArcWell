@@ -18,6 +18,7 @@ import {
 } from "@/features/coach/plans";
 import { colors, radius, rhythm, space } from "@/theme";
 import { useBillingGate } from "@/features/coach/limits";
+import { NotFound } from "@/features/system/SystemStates";
 
 function NutritionBuilderEditor() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -39,7 +40,7 @@ function NutritionBuilderEditor() {
   const meals = templates.filter((t) => t.kind === "meals" && t.nutrition);
   const back = () =>
     router.canGoBack() ? router.back() : router.replace("/coach");
-  if (!c) return <PageHeader title="Nutrition" onBack={back} />;
+  if (!c) return <NotFound title="Nutrition" what="client" onBack={back} />;
   const first = c.name.split(" ")[0];
 
   return (

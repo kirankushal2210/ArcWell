@@ -1,8 +1,8 @@
 // A small round button for logging food (D86), in place of the full-width "Log food" bar. Plus
 // members get the scan (photo logging); coached and free athletes, who don't get AI (D44), get a
-// "+" that opens food search.
+// food icon that opens food search (not a "+", which is the tab bar's "Log something").
 import { router } from "expo-router";
-import { type LucideIcon, Plus, ScanLine } from "lucide-react-native";
+import { type LucideIcon, ScanLine, Utensils } from "lucide-react-native";
 import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -66,7 +66,7 @@ export function FoodScanButton({
   const scan = meTier === "pro";
   return (
     <RoundAction
-      icon={scan ? ScanLine : Plus}
+      icon={scan ? ScanLine : Utensils}
       label={scan ? "Scan a meal" : "Log food"}
       level={level}
       onPress={() =>

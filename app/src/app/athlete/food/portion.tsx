@@ -31,6 +31,7 @@ import {
 } from "@/features/athlete/foods";
 import { Page, PageHeader, Pills } from "@/features/coach/parts";
 import { colors, rhythm, space } from "@/theme";
+import { NotFound } from "@/features/system/SystemStates";
 
 export default function Portion() {
   const p = useLocalSearchParams<{
@@ -63,7 +64,7 @@ export default function Portion() {
   const [mealSheet, setMealSheet] = useState(false);
   const back = () =>
     router.canGoBack() ? router.back() : router.replace("/athlete/nutrition");
-  if (!food) return <PageHeader title="Food" onBack={back} />;
+  if (!food) return <NotFound title="Food" what="food" onBack={back} />;
 
   const unit = units.find((u) => u.key === unitKey) ?? units[0];
   const grams = unit.key === "g" ? qty : unit.grams * qty;

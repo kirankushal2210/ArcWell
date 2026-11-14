@@ -30,6 +30,7 @@ import {
   textSizes,
 } from "@/theme";
 import { useBillingGate } from "@/features/coach/limits";
+import { NotFound } from "@/features/system/SystemStates";
 
 function StackScreenEditor() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -41,7 +42,7 @@ function StackScreenEditor() {
   const back = () =>
     router.canGoBack() ? router.back() : router.replace("/coach/plans");
   if (id !== "new" && !s)
-    return <PageHeader title="Stack not found" onBack={back} />;
+    return <NotFound title="Stack" what="stack" onBack={back} />;
   const ready = !!name.trim() && items.length > 0 && supplementsReady(items);
   const save = () =>
     saveStack({

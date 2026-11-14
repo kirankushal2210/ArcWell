@@ -1,4 +1,5 @@
 // The AI coach's guardrails (B8): what reaches the model, and what's accepted from it.
+import { OUT_OF_SCOPE as APP_OUT_OF_SCOPE } from "@/features/ai/answers";
 import { describe, expect, it } from "@jest/globals";
 
 import {
@@ -31,6 +32,35 @@ describe("AI coach guardrails", () => {
       expect(OUT_OF_SCOPE.test(q)).toBe(true);
     expect(rulesChat("Should I take creatine?", {}).kind).toBe("out_of_scope");
     expect(OUT_OF_SCOPE.test("How much protein do I need?")).toBe(false);
+  });
+
+  it("declines pain and medicine questions in everyday words", () => {
+    for (const q of [
+      "My knee hurts after squats, what should I take for it?",
+      "Sharp pain in my shoulder when I bench",
+      "I think I sprained my ankle",
+      "My elbow aches, can I still train?",
+      "Is ibuprofen ok before a workout?",
+      "I feel dizzy during cardio",
+      "My hand goes numb on the bike",
+    ])
+      expect(rulesChat(q, {}).kind).toBe("out_of_scope");
+  });
+
+  it("still answers ordinary training questions", () => {
+    for (const q of [
+      "Should I take a rest day after legs?",
+      "How sore should I be after a workout?",
+      "What's a good strain score for today?",
+      "How many sets per week for a beginner?",
+      "What number of reps builds muscle?",
+    ])
+      expect(OUT_OF_SCOPE.test(q)).toBe(false);
+  });
+
+  it("the phone and the server decline the same questions", () => {
+    expect(APP_OUT_OF_SCOPE.source).toBe(OUT_OF_SCOPE.source);
+    expect(APP_OUT_OF_SCOPE.flags).toBe(OUT_OF_SCOPE.flags);
   });
 
   it("sends only known numbers in sane ranges", () => {

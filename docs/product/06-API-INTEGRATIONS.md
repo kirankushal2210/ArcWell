@@ -57,7 +57,7 @@ All functions are `POST` with a JSON body and JSON replies. CORS is allowed for 
 
 ### 3.1 `ai-coach` (B8, D108)
 
-- **Auth:** user JWT. **Checks in order:** signed in → `ai_entitled()` → out-of-scope filter (chat only; answered at once and not counted) → `ai_try_use(feature, cap)` → model or rules → answer validated.
+- **Auth:** user JWT. **Checks in order:** signed in → `ai_entitled()` → out-of-scope filter (chat only; answered at once and not counted; covers injuries and pain in everyday words, medical conditions, medicines, drugs, supplements and contest prep, with the same pattern on the phone and the server, checked by a test) → `ai_try_use(feature, cap)` → model or rules → answer validated.
 - **Daily caps:** chat 40, tailor 15, review 6.
 
 **Request**

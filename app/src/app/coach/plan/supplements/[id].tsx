@@ -15,6 +15,7 @@ import {
 import { cloneItems, type Supplement } from "@/features/coach/supplements";
 import { colors, rhythm, space } from "@/theme";
 import { useBillingGate } from "@/features/coach/limits";
+import { NotFound } from "@/features/system/SystemStates";
 
 function ClientSupplementsEditor() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -24,7 +25,7 @@ function ClientSupplementsEditor() {
   const [items, setItems] = useState<Supplement[]>(() => c?.supplements ?? []);
   const back = () =>
     router.canGoBack() ? router.back() : router.replace("/coach");
-  if (!c) return <PageHeader title="Supplements" onBack={back} />;
+  if (!c) return <NotFound title="Supplements" what="client" onBack={back} />;
   const first = c.name.split(" ")[0];
 
   return (

@@ -17,6 +17,7 @@ import {
 import { ProgramEditor, programReady } from "@/features/coach/ProgramEditor";
 import { colors, rhythm, space } from "@/theme";
 import { useBillingGate } from "@/features/coach/limits";
+import { NotFound } from "@/features/system/SystemStates";
 
 function TrainingBuilderEditor() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -39,7 +40,7 @@ function TrainingBuilderEditor() {
   const [restart, setRestart] = useState(false);
   const back = () =>
     router.canGoBack() ? router.back() : router.replace("/coach");
-  if (!c) return <PageHeader title="Training" onBack={back} />;
+  if (!c) return <NotFound title="Training" what="client" onBack={back} />;
   const first = c.name.split(" ")[0];
 
   return (

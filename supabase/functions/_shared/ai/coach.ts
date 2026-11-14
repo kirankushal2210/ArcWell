@@ -87,9 +87,10 @@ const describe = (c: CoachContext) =>
 
 // ---------- Scope ----------
 
-/** Contest prep, injury rehab, medical questions and drugs aren't for an AI coach (D22). */
+/** Contest prep, injuries and pain, medical questions, medicines and drugs aren't for an AI coach (D22).
+ * Keep in step with app/src/features/ai/answers.ts (a test checks they match). */
 export const OUT_OF_SCOPE =
-  /contest|show prep|peak week|stage|rehab|physio|injur|torn|fracture|surgery|diabet|pregnan|medicat|blood pressure|thyroid|steroid|\bped\b|sarm|\btrt\b|testosterone|eating disorder|supplement|creatine|nootropic/i;
+  /contest|show prep|peak week|stage|rehab|physio|injur|torn|fracture|surgery|diabet|pregnan|medicat|blood pressure|thyroid|steroid|\bped\b|sarm|\btrt\b|testosterone|eating disorder|supplement|creatine|nootropic|\bhurts?\b|\bhurting\b|\bpain|\baches?\b|aching|sprain|tendon|tendin|swelling|swollen|\bnumb(?:ness)?\b|tingl|dizz|faint|painkill|ibuprofen|paracetamol|medicine|\bpills?\b|what (?:should|can) i take|\btake (?:for|something for)\b/i;
 
 export const OUT_OF_SCOPE_TEXT =
   "I can't help with that. For injuries, medical conditions, contest prep, supplements or performance drugs, please talk to a doctor, physiotherapist or qualified coach. I can still help with your everyday training, food and sleep.";

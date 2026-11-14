@@ -31,6 +31,7 @@ import {
   Pills,
 } from "@/features/coach/parts";
 import { PhotoSlot } from "@/features/coach/PhotoSlot";
+import { NotFound } from "@/features/system/SystemStates";
 import {
   colors,
   fontFamilyFor,
@@ -63,11 +64,7 @@ export default function CheckInReview() {
     router.canGoBack() ? router.back() : router.replace("/coach/check-ins");
 
   if (!found)
-    return (
-      <View style={styles.root}>
-        <PageHeader title="Check-in" onBack={back} />
-      </View>
-    );
+    return <NotFound title="Check-in" what="check-in" onBack={back} />;
   const { c, k, i } = found;
   const first = c.name.split(" ")[0];
   const prev = c.checkIns[i + 1];

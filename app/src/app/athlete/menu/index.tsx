@@ -34,11 +34,13 @@ export default function AthleteMenu() {
   const notes = useNotifications();
   if (!me) return <NotJoined />;
   const free = meTier === "free";
+  // What people see: "Arcwell Plus" for the paid tier, the coach's name when coached ("Pro" is
+  // only the internal name for the full tools, D10).
   const tier =
     meTier === "coached"
-      ? `Pro · ${coachName}`
+      ? `Coached by ${coachName.replace(/^Coach\s+/, "")}`
       : meTier === "pro"
-        ? "Pro · AI plan"
+        ? "Arcwell Plus"
         : "Free";
 
   return (

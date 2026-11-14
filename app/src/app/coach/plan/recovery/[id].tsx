@@ -36,6 +36,7 @@ import {
   textSizes,
 } from "@/theme";
 import { useBillingGate } from "@/features/coach/limits";
+import { NotFound } from "@/features/system/SystemStates";
 
 function TimeStepper({
   label,
@@ -88,7 +89,7 @@ function RecoveryBuilderEditor() {
   );
   const back = () =>
     router.canGoBack() ? router.back() : router.replace("/coach");
-  if (!c) return <PageHeader title="Recovery" onBack={back} />;
+  if (!c) return <NotFound title="Recovery" what="client" onBack={back} />;
 
   const span = (r.wake + 1440 - (r.bed % 1440)) % 1440;
   const trainingDays = 7 - r.restDays.length;

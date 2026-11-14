@@ -283,6 +283,31 @@ describe("cloud sync mapping (D107)", () => {
     expect(w.clients[0].weights).toEqual([61.2]);
     expect(w.clients[0].unread).toBe(1);
     expect(w.clients[0].messages[0].from).toBe("client");
+    // No morning check-ins yet: the 1–5 recovery answers sit at the neutral middle, never 0.
+    expect(w.clients[0].recovery).toMatchObject({
+      quality: 3,
+      stress: 3,
+      energy: 3,
+      soreness: 3,
+    });
+  });
+
+  it("a lead takes its row's id and always has a history list", () => {
+    const p = emptyPull();
+    p.leads.push({
+      coach_id: COACH,
+      id: "l-row",
+      payload: {
+        id: "l-other",
+        name: "Kabir",
+        source: "instagram",
+        stage: "new",
+        createdAt: "2026-11-10T10:00:00Z",
+      },
+    });
+    const w = assemble(p, { uid: COACH, role: "coach" }, blankWorld());
+    expect(w.leads[0].id).toBe("l-row");
+    expect(w.leads[0].events).toEqual([]);
   });
 
   it("only deletes rows the account owns", () => {

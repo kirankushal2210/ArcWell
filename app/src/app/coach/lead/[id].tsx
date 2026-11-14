@@ -61,6 +61,7 @@ import {
   space,
   textSizes,
 } from "@/theme";
+import { NotFound } from "@/features/system/SystemStates";
 
 const SOURCES = Object.keys(SOURCE_LABEL) as LeadSource[];
 const FOLLOW_UPS = [
@@ -217,7 +218,7 @@ export default function LeadDetail() {
     router.canGoBack() ? router.back() : router.replace("/coach/business");
   if (id === "new") return <NewLead preset={preset} />;
   const l = leads.find((x) => x.id === id);
-  if (!l) return <PageHeader title="Lead not found" onBack={back} />;
+  if (!l) return <NotFound title="Lead" what="lead" onBack={back} />;
   const open = isOpen(l.stage);
   const log = (kind: LeadEventKind) => {
     const fallback = kind === "call" ? "Call" : "Note";

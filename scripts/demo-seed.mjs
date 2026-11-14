@@ -140,8 +140,28 @@ async function seedCoach() {
     ],
     prefer: "resolution=ignore-duplicates,return=minimal",
   });
+  // The row id and the payload id must match (the app keys leads by it), and the history is `events`.
+  const lid = id("l");
+  const callAt = ago(-1, 11).toISOString();
   await insert(coach.token, "leads", [
-    { coach_id: coach.id, id: id("l"), payload: { id: id("l"), name: "Kabir Mehta", source: "instagram", stage: "call_booked", createdAt: ago(3).toISOString(), goal: "Lose fat", timeline: [] } },
+    {
+      coach_id: coach.id,
+      id: lid,
+      payload: {
+        id: lid,
+        name: "Kabir Mehta",
+        source: "instagram",
+        stage: "call_booked",
+        goal: "Lose fat",
+        createdAt: ago(3, 12).toISOString(),
+        callAt,
+        events: [
+          { id: id("v"), at: ago(3, 12).toISOString(), kind: "created", text: "Messaged on Instagram about fat loss" },
+          { id: id("v"), at: ago(2, 10).toISOString(), kind: "message", text: "Sent the coaching packages" },
+          { id: id("v"), at: ago(1, 19).toISOString(), kind: "stage", text: "Call booked" },
+        ],
+      },
+    },
   ]).catch(() => {});
   return coach;
 }
