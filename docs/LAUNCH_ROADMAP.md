@@ -9,6 +9,7 @@ Written 14 November 2026, after the full front-end audit (FRONTEND_AUDIT.md §9)
 - [4. Start to deployment, step by step](#4-start-to-deployment-step-by-step)
 - [5. What costs money](#5-what-costs-money)
 - [6. Decisions waiting on the founder](#6-decisions-waiting-on-the-founder)
+- [7. Build free now, pay after funding](#7-build-free-now-pay-after-funding)
 
 ## Where things stand
 
@@ -280,3 +281,80 @@ Sources for the prices:
 - [Razorpay pricing](https://razorpay.com/pricing) and [Razorpay SaaS pricing guide](https://razorpay.com/blog/best-payment-gateway-pricing-saas-india-tco-guide/)
 - [Groq pricing summary (morphllm)](https://www.morphllm.com/groq-pricing)
 - [Google Play service fees](https://support.google.com/googleplay/android-developer/answer/112622?hl=en)
+
+---
+
+## 7. Build free now, pay after funding
+
+Founder decision, 14 November 2026: build every backend part that costs nothing first, while raising money. Add the paid parts once investors are in.
+
+**Yes, this works.** Nearly all of the backend can be built and tested for ₹0:
+- The Supabase CLI runs the whole backend on this Mac in Docker, all free and already working: database, sign-in, file storage, realtime chat, Edge Functions and scheduled jobs.
+- AI, email, builds and payment test modes all have free tiers or sandboxes.
+- Spending is only needed to **go live**: production hosting, the Play Store, the company and legal work.
+
+### Part A: free, start now
+
+Built on the local stack and tested by CI, then shown on a free hosted Supabase project for demos.
+
+| Work | Why it's free |
+|---|---|
+| **B1** Sign-in (email code and Google), roles, onboarding saved, invites, joining and leaving a coach | Local Supabase Auth. The local stack catches emails in Mailpit, so no email service is needed yet. A Google OAuth client is free. |
+| **B2** Plans, templates, supplements and Enhanced, assigning | Local database |
+| **B3** Workout logging, routines, custom exercises, race sims and cardio, offline sync | Local database |
+| **B4** Food logging and my foods, on the current sample food data | Local database. Seeding IFCT waits on its usage rights, which are free to ask about. |
+| **B5** Check-ins with photos, realtime chat with images and PDFs, notifications | Local Storage and Realtime. Expo push and Firebase Cloud Messaging are free. |
+| **B6** Progress, recovery, habits, transformation approvals, export and delete | Local database and Storage |
+| **B8** AI: plans, meal plans, chat, meal scan | Groq free tier, with the daily caps already in place |
+| **B7, coach side:** Razorpay subscription links and webhook | Razorpay **test mode** works before KYC; no real money moves |
+| **B7, athlete side:** entitlement logic and the RevenueCat webhook handler | Built and tested against sample webhook payloads. The real Play purchase test waits for Part B. |
+| Coach CRM (leads, Instagram) | Local database |
+| Crash reporting | Sentry free plan |
+| Development build for phone-only features: Health Connect, live heart rate, push, Google sign-in | EAS free plan (15 Android builds a month), or local builds with Android Studio |
+| **Investor demo:** a hosted staging backend plus an installable test app | Supabase **free** hosted project in Mumbai. EAS internal distribution shares an APK by link, with no Play Store needed. |
+| Legal pages, invite web page, `assetlinks.json` | Free static hosting on a free subdomain until the real domain is bought |
+
+**Limits of the free setup:**
+- A free hosted Supabase project pauses after a week without use; it resumes from the dashboard.
+- Free projects have smaller limits (about 500 MB database and 1 GB files) and no daily backups.
+
+These limits are fine for development and investor demos, but not for real users' health data.
+
+### Part B: paid, after funding
+
+| Work or item | Cost | Why it can't be free |
+|---|---|---|
+| **Supabase Pro** for the production project | About $25/month | Real users need daily backups, no pausing and higher limits |
+| **Google Play developer account** | $25 once | Needed for the store, and to test real Play Billing purchases (B7 athlete side) |
+| **Real Play purchase testing and RevenueCat setup** | RevenueCat is free until $2,500 a month in revenue; Google takes 15% of sales | Needs the Play app above |
+| **Company registration and business bank account** | About ₹7,000 to ₹15,000 | Razorpay live KYC, an organisation Play account, and the legal pages all need a company |
+| **Razorpay live mode** | No fee until coaches pay; about 2% per payment | Needs company KYC |
+| **Domain and business email** | About ₹800 to ₹2,000 a year; email can be free on Zoho | Invite links, legal pages and support addresses at the real domain |
+| **Sign-in email in production** | Resend free tier (3,000 a month), then about $20/month | The local stack catches emails; production must actually send them |
+| **Lawyer review** of the Terms, Privacy Policy and coach terms | Quote needed | Required before real health data is collected |
+| **Trademark filing** | ₹4,500 per class | Protects the name before launch |
+| **Exercise demo media licence** | Quote needed (free stills as fallback) | Licensed content |
+| **Sports scientist and dietitian review** (D69) | Quote needed | Professional review of the evidence rules |
+| **EAS Starter** (optional) | $19/month | Faster builds once releases are frequent |
+| **Paid AI** beyond Groq's free tier | Pay per use | Only when real Plus users exceed free limits |
+
+### Order of work
+
+1. **Now, free:** B1 → B2 → B3 → B4 → B5 → B6 → B8 → the free parts of B7. Every slice ships the usual pieces: RLS, pgTAP tests, a repository replacing the sample store, and a check on web and a phone.
+2. **Before talking to investors, free:**
+   - Move the finished slices to a free hosted Supabase project.
+   - Build a test APK with EAS.
+   - Share it by link for demos.
+3. **After funding, paid:**
+   - register the company;
+   - Play Console and RevenueCat, then real purchase tests;
+   - Razorpay live mode;
+   - Supabase Pro production project;
+   - domain, email and production email sending;
+   - legal and content reviews;
+   - store listing, closed beta, then launch.
+
+Moving from free to paid needs **no code changes**, only configuration:
+- the same migrations run on the paid project;
+- the app gets the new project's URL and key through EAS secrets;
+- the RevenueCat and Razorpay webhooks get their live secrets.
