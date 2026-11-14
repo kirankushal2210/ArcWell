@@ -12,7 +12,7 @@ import {
   shareHistory,
 } from "@/features/accounts/repo";
 import { useAuth } from "@/features/auth/AuthProvider";
-import { inviteCodeFor, UUID } from "@/features/sync/ids";
+import { generalInviteCode, inviteCodeFor, UUID } from "@/features/sync/ids";
 import type { World } from "@/features/sync/map";
 import {
   cloudCacheKey,
@@ -143,6 +143,8 @@ type CoachData = {
   answerEnhanced: (clientId: string, yes: boolean) => void;
   editEnhanced: (clientId: string, fn: (e: Enhanced) => Enhanced) => void;
   coachName: string;
+  /** With accounts: the coach's general invite code, in their public link (D56, D107). */
+  inviteCode?: string;
   client: (id: string) => Client | undefined;
   /** Adds a client (D56); with `leadId`, the lead is marked joined and linked. */
   addClient: (c: NewClient, leadId?: string) => string;
@@ -795,6 +797,10 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
         enhanced: fn(c.enhanced ?? emptyEnhanced()),
       })),
     coachName,
+    inviteCode:
+      cloudUid && auth.profile?.role === "coach"
+        ? generalInviteCode(coachName, cloudUid)
+        : undefined,
     reminded,
     meId,
     hydrated,

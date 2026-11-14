@@ -377,13 +377,13 @@ export function ClientsPage() {
 // ---------- Invite ----------
 
 export function InvitePage() {
-  const { clients, coachName } = useCoachData();
+  const { clients, coachName, inviteCode } = useCoachData();
   const { limit: clientLimit } = useCoachLimits();
   const [copied, setCopied] = useState(false);
   const used = clients.filter(
     (c) => c.id !== "me" && c.status !== "completed",
   ).length;
-  const link = coachLink(coachName);
+  const link = coachLink(coachName, inviteCode);
   const url = `https://${link}`;
   const message = `Join my coaching on Arcwell: your plans, check-ins and chat in one app. ${url}`;
   return (
@@ -516,7 +516,7 @@ const styles = StyleSheet.create({
 // ---------- Instagram (D66) ----------
 
 export function InstagramPage() {
-  const { leads, coachName } = useCoachData();
+  const { leads, coachName, inviteCode } = useCoachData();
   const [period, setPeriod] = useState<Period>("30");
   const [copied, setCopied] = useState<string | null>(null);
   const s = igStats(leads, period);
@@ -527,7 +527,7 @@ export function InstagramPage() {
       const ob = isOpen(b.stage) ? 0 : 1;
       return oa - ob || b.createdAt.localeCompare(a.createdAt);
     });
-  const bio = `https://${coachLink(coachName)}?src=instagram`;
+  const bio = `https://${coachLink(coachName, inviteCode)}?src=instagram`;
   const copy = async (key: string, text: string) => {
     await Clipboard.setStringAsync(text);
     setCopied(key);

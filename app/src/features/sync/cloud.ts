@@ -172,7 +172,10 @@ export type PushResult = { ok: number; failed: PushRow[]; retry: PushRow[] };
 
 /** No code (network) or a connection or timeout error: worth trying again. */
 const passing = (e: { code?: string }) =>
-  !e.code || e.code.startsWith("08") || e.code === "57014" || e.code === "PGRST301";
+  !e.code ||
+  e.code.startsWith("08") ||
+  e.code === "57014" ||
+  e.code === "PGRST301";
 
 const without = (o: Record<string, unknown>) =>
   Object.fromEntries(Object.entries(o).filter(([, v]) => v !== undefined));

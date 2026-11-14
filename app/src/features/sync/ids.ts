@@ -40,3 +40,23 @@ export function inviteCodeFor(clientId: string) {
       alphabet[parseInt(hex.slice(i * 2, i * 2 + 2), 16) % alphabet.length];
   return out;
 }
+
+/**
+ * The coach's general invite code (their public link, D56): up to six letters of their name plus
+ * four characters from their account id, so it reads as theirs and never clashes with another coach.
+ */
+export function generalInviteCode(coachName: string, uid: string) {
+  const alphabet = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+  const letters = coachName
+    .replace(/^Coach\s+/i, "")
+    .replace(/[^A-Za-z]/g, "")
+    .toUpperCase()
+    .slice(0, 6)
+    .padEnd(2, "X");
+  const hex = hashUuid(`general|${uid}`).replace(/-/g, "");
+  let tail = "";
+  for (let i = 0; i < 4; i++)
+    tail +=
+      alphabet[parseInt(hex.slice(i * 2, i * 2 + 2), 16) % alphabet.length];
+  return `${letters}${tail}`;
+}

@@ -11,7 +11,8 @@
     "db:lint": "supabase db lint",
     "app:start": "npm --prefix app run start",
     "typecheck": "npm --prefix app run typecheck",
-    "lint": "npm --prefix app run lint"
+    "lint": "npm --prefix app run lint",
+    "demo:seed": "node scripts/demo-seed.mjs"
   },
   "devDependencies": {
     "supabase": "^3.1.0"

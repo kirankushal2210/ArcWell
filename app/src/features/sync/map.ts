@@ -24,7 +24,7 @@ import type {
 } from "@/features/coach/sampleData";
 import type { Stack } from "@/features/coach/supplements";
 
-import { hashUuid, inviteCodeFor, UUID } from "./ids";
+import { generalInviteCode, hashUuid, inviteCodeFor, UUID } from "./ids";
 
 export type Role = "athlete" | "coach";
 export type Tier = "coached" | "pro" | "free";
@@ -840,6 +840,16 @@ function coachRows(out: Map<string, PushRow>, w: World, uid: string) {
     insert: {},
     update: { display_name: (w.coach.name || "Coach").slice(0, 80) },
     mode: "update",
+  });
+  // The coach's general invite, behind their public link (D56): made once, never changed.
+  const general = generalInviteCode(w.coach.name || "Coach", uid);
+  put(out, {
+    table: "invites",
+    key: `invites:${general}`,
+    match: { code: general },
+    insert: { code: general, kind: "general" },
+    update: {},
+    mode: "insert",
   });
   const payload = { ...w.coach, settings };
   put(out, {

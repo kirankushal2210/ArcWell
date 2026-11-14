@@ -338,6 +338,12 @@ These limits are fine for development and investor demos, but not for real users
 | **EAS Starter** (optional) | $19/month | Faster builds once releases are frequent |
 | **Paid AI** beyond Groq's free tier | Pay per use | Only when real Plus users exceed free limits |
 
+### Status (14 November 2026)
+
+Part A is built: B1 to B7 run on the local stack with 177 database tests, and the app syncs signed-in accounts (D107). The investor demo runs end to end; see [DEMO.md](DEMO.md). Still free and to do:
+- push delivery, which needs a development build;
+- the remaining AI features (B8).
+
 ### Order of work
 
 1. **Now, free:** B1 → B2 → B3 → B4 → B5 → B6 → B8 → the free parts of B7. Every slice ships the usual pieces: RLS, pgTAP tests, a repository replacing the sample store, and a check on web and a phone.
