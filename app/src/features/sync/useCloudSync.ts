@@ -140,6 +140,13 @@ export function useCloudSync({
         base.delete(`athlete_profiles:${c.uid}`);
       if (!pulled.coach_profiles.some((r) => r.coach_id === c.uid))
         base.delete(`coach_profiles:${c.uid}`);
+      // Invites worked out on the phone (the coach's general one) count only once the server has them.
+      for (const [k, r] of base)
+        if (
+          r.table === "invites" &&
+          !pulled.invites.some((i) => i.code === r.match.code)
+        )
+          base.delete(k);
       unread.current = unreadFor(pulled, c);
       if (!first && version.current !== started) return; // the store moved while pulling; next round
       prev.current = base;
