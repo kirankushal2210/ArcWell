@@ -14,7 +14,6 @@ import {
 } from "lucide-react-native";
 import { useState } from "react";
 import {
-  Alert,
   KeyboardAvoidingView,
   Linking,
   Platform,
@@ -38,6 +37,7 @@ import {
   STAGE_LABEL,
   STAGES,
   timeText,
+  ymd,
 } from "@/features/coach/crm";
 import { StageTag } from "@/features/coach/CrmParts";
 import {
@@ -52,6 +52,7 @@ import {
   TOUCHES,
 } from "@/features/coach/instagram";
 import { Eyebrow, Page, PageHeader, Pills } from "@/features/coach/parts";
+import { alert } from "@/lib/alert";
 import {
   colors,
   fontFamilyFor,
@@ -224,7 +225,7 @@ export default function LeadDetail() {
     setEntry("");
   };
   const remove = () =>
-    Alert.alert(`Delete ${l.name}?`, "Their timeline goes too.", [
+    alert(`Delete ${l.name}?`, "Their timeline goes too.", [
       { text: "Cancel", style: "cancel" },
       {
         text: "Delete",
@@ -395,7 +396,7 @@ export default function LeadDetail() {
             />
             {l.stage === "call_booked" && l.callAt ? (
               <Text variant="label" weight="regular" tone="muted" numeric>
-                Call booked for {dayInline(l.callAt.slice(0, 10))},{" "}
+                Call booked for {dayInline(ymd(new Date(l.callAt)))},{" "}
                 {timeText(l.callAt)}
               </Text>
             ) : null}
@@ -441,7 +442,7 @@ export default function LeadDetail() {
                 <View style={styles.flex}>
                   <Text>{e.text}</Text>
                   <Text variant="caption" tone="muted" numeric>
-                    {dayText(e.at.slice(0, 10))}, {timeText(e.at)}
+                    {dayText(ymd(new Date(e.at)))}, {timeText(e.at)}
                   </Text>
                 </View>
               </View>

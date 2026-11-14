@@ -5,6 +5,7 @@ import { Wind } from "lucide-react-native";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
+import { plusOnly } from "@/features/athlete/PlusOnly";
 import { Button, Text } from "@/components/primitives";
 import { daysBack, PROTOCOLS, todayDate } from "@/features/athlete/recovery";
 import {
@@ -23,7 +24,9 @@ import {
 } from "@/features/coach/parts";
 import { colors, radius, space } from "@/theme";
 
-export default function Stress() {
+export default plusOnly(Stress);
+
+function Stress() {
   const p = useLocalSearchParams<{ date?: string }>();
   const r = useRecovery();
   const [today] = useState(todayDate);

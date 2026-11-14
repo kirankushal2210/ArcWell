@@ -3,34 +3,26 @@
 // Recovery, Strain and Stress rings (paid and coached; D60). The dock starts today's workout in
 // Honey, or logs food once training is done (D67).
 import { router } from "expo-router";
-import {
-  Camera,
-  Check,
-  MessageCircle,
-  Play,
-  Plus,
-  Sparkles,
-} from "lucide-react-native";
-import { Alert, StyleSheet, View } from "react-native";
+import { Camera, Check, MessageCircle, Play } from "lucide-react-native";
+import { StyleSheet, View } from "react-native";
 
 import { Avatar, Button, PressableScale, Text } from "@/components/primitives";
 import { slotNow, todayKey, useNutrition } from "@/features/athlete/FoodParts";
-import { athleteMenuAction } from "@/features/athlete/MenuParts";
+import {
+  athleteMenuAction,
+  progressAction,
+} from "@/features/athlete/MenuParts";
 import { useTodayWorkout } from "@/features/athlete/QuickLog";
 import { todayDate } from "@/features/athlete/recovery";
 import { Ring, useRecovery } from "@/features/athlete/RecoveryParts";
-import { programWeek } from "@/features/athlete/training";
-import {
-  AthleteDock,
-  AthletePage,
-  NotJoined,
-  useMe,
-} from "@/features/athlete/useMe";
+import { FoodScanButton, RoundAction } from "@/features/athlete/FoodScanButton";
+import { AthletePage, NotJoined, useMe } from "@/features/athlete/useMe";
 import { useAuth } from "@/features/auth/AuthProvider";
-import { dueText, sentThisWeek } from "@/features/coach/checkins";
+import { checkInStatus, dueText, missedDay } from "@/features/coach/checkins";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Group, GroupRow, PageHeader, PillarDot } from "@/features/coach/parts";
 import { clock } from "@/features/coach/plans";
+import { alert } from "@/lib/alert";
 import { colors, radius, space } from "@/theme";
 import {
   REMIND_DAY,
@@ -115,7 +107,8 @@ export default function Today() {
     .reduce((s, l) => s + l.macros.p, 0);
   const checkIn = (() => {
     const k = me.checkIns[0];
-    const sent = sentThisWeek(me);
+    const status = checkInStatus(me);
+    const sent = status.kind === "sent";
     return {
       sent,
       title: !me.checkIns.length
@@ -124,14 +117,16 @@ export default function Today() {
           ? k?.reviewed
             ? `${coachName} replied to your check-in`
             : "Check-in sent"
-          : "Weekly check-in",
+          : status.kind === "overdue"
+            ? "Check-in overdue"
+            : "Weekly check-in",
       sub: !me.checkIns.length
         ? "Photos and weight, so you can see how far you come"
         : sent
           ? k?.reviewed
             ? (k.reply ?? "")
             : `${coachName} will reply soon`
-          : `${dueText(me)} · photos, weight and 6 questions`,
+          : `${status.kind === "overdue" ? `Was due ${missedDay(me, status)}` : dueText(me)} · photos, weight and 6 questions`,
     };
   })();
   const openToday = () =>
@@ -146,27 +141,15 @@ export default function Today() {
       <PageHeader
         title={meTier === "coached" ? `Hi ${first}` : "Today"}
         sub={dateLabel()}
-        actions={[
-          ...(meTier === "coached" || !settingsOf(me.id).ai
-            ? []
-            : [
-                {
-                  icon: Sparkles,
-                  label:
-                    meTier === "free"
-                      ? "AI coach, start free trial"
-                      : "AI coach",
-                  onPress: () => router.push("/athlete/ai"),
-                },
-              ]),
-          athleteMenuAction,
-        ]}
+        actions={[progressAction, athleteMenuAction]}
       />
       <AthletePage dock>
-        <Tip
-          id="today-plus"
-          text="Tap + at the bottom right to log food, water, weight or a check-in from anywhere."
-        />
+        {meTier === "coached" ? (
+          <Tip
+            id="today-plus"
+            text="Tap + at the bottom right to log food, water, weight or a check-in from anywhere."
+          />
+        ) : null}
         {meTier === "pro" &&
         sub &&
         (sub.status === "grace" ||
@@ -333,12 +316,6 @@ export default function Today() {
                   ? "Rest day"
                   : "Training"}
             </Text>
-            {me.program ? (
-              <Text variant="label" weight="regular" tone="muted" numeric>
-                Week {programWeek(me.program.weeks, me.programStart).week} of{" "}
-                {me.program.weeks}
-              </Text>
-            ) : null}
           </View>
           {today ? (
             <>
@@ -353,17 +330,15 @@ export default function Today() {
                 ) : null}
               </View>
               <Text tone="muted" numeric>
-                {today.exercises.length} exercises ·{" "}
-                {today.exercises.reduce((s, e) => s + e.sets, 0)} sets
+                {/* A run (one exercise) shows what to do; lifting days show the counts. */}
+                {today.exercises.length === 1
+                  ? today.exercises[0].reps
+                  : `${today.exercises.length} exercises · ${today.exercises.reduce((s, e) => s + e.sets, 0)} sets`}
               </Text>
             </>
-          ) : (
-            <Text tone="muted">
-              {me.program
-                ? me.protocol?.note ||
-                  "Recover today. Your next workout is in Training."
-                : `${coachName} is building your plan. It shows here as soon as it's ready.`}
-            </Text>
+          ) : // A rest day says just that (D93); the card shows a line only while the plan is coming.
+          me.program ? null : (
+            <Text tone="muted">{`${coachName} is building your plan.`}</Text>
           )}
         </PressableScale>
 
@@ -461,22 +436,18 @@ export default function Today() {
             variant="ghost"
             fullWidth
             onPress={() =>
-              Alert.alert(
-                "Sign out?",
-                "Your plan and history stay on this phone.",
-                [
-                  { text: "Cancel", style: "cancel" },
-                  {
-                    text: "Sign out",
-                    onPress: () => {
-                      auth.signOut().finally(() => {
-                        if (router.canDismiss()) router.dismissAll();
-                        router.replace("/");
-                      });
-                    },
+              alert("Sign out?", "Your plan and history stay on this phone.", [
+                { text: "Cancel", style: "cancel" },
+                {
+                  text: "Sign out",
+                  onPress: () => {
+                    auth.signOut().finally(() => {
+                      if (router.canDismiss()) router.dismissAll();
+                      router.replace("/");
+                    });
                   },
-                ],
-              )
+                },
+              ])
             }
           />
         ) : null}
@@ -486,7 +457,7 @@ export default function Today() {
             variant="ghost"
             fullWidth
             onPress={() =>
-              Alert.alert(
+              alert(
                 "Reset this phone?",
                 "Clears your plan, workouts and history from this sample build.",
                 [
@@ -505,25 +476,15 @@ export default function Today() {
           />
         ) : null}
       </AthletePage>
+      {/* D100: Start workout is a small round button like the food scan, not a full-width bar;
+          on workout days the scan sits just above it. */}
       {today && !doneToday ? (
-        <AthleteDock
-          label="Start workout"
-          icon={Play}
-          pillar="training"
-          onPress={openToday}
-        />
+        <>
+          <RoundAction icon={Play} label="Start workout" onPress={openToday} />
+          <FoodScanButton meal={slotNow()} level={1} />
+        </>
       ) : (
-        <AthleteDock
-          label="Log food"
-          icon={Plus}
-          pillar="nutrition"
-          onPress={() =>
-            router.push({
-              pathname: "/athlete/food/add",
-              params: { meal: slotNow() },
-            })
-          }
-        />
+        <FoodScanButton meal={slotNow()} />
       )}
     </View>
   );

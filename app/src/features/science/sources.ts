@@ -124,6 +124,102 @@ export const SOURCES: Record<string, Source> = {
       "One trial in trained men found 3-minute rests gave more strength and thigh growth than 1-minute rests.",
     note: "A single small trial.",
   },
+  teede2023: {
+    id: "teede2023",
+    topic: "nutrition",
+    authors: "Teede HJ, et al.",
+    year: 2023,
+    title:
+      "Recommendations from the 2023 International Evidence-based Guideline for the Assessment and Management of Polycystic Ovary Syndrome",
+    journal: "Hum Reprod",
+    ref: "38(9):1655–1679",
+    pmid: "37580037",
+    doi: "10.1093/humrep/dead156",
+    finding:
+      "Healthy eating and physical activity for everyone with PCOS, with no single diet preferred and benefits even without weight loss.",
+  },
+  mottola2018: {
+    id: "mottola2018",
+    topic: "training",
+    authors: "Mottola MF, et al.",
+    year: 2018,
+    title: "2019 Canadian guideline for physical activity throughout pregnancy",
+    journal: "Br J Sports Med",
+    ref: "52(21):1339–1346",
+    pmid: "30337460",
+    doi: "10.1136/bjsports-2018-100056",
+    finding:
+      "Without medical reasons not to, pregnant women should get at least 150 minutes of moderate activity a week, over at least 3 days.",
+  },
+  plews2013: {
+    id: "plews2013",
+    topic: "recovery",
+    authors: "Plews DJ, Laursen PB, Stanley J, Kilding AE, Buchheit M",
+    year: 2013,
+    title:
+      "Training adaptation and heart rate variability in elite endurance athletes: opening the door to effective monitoring",
+    journal: "Sports Med",
+    ref: "43(9):773–781",
+    pmid: "23852425",
+    doi: "10.1007/s40279-013-0071-8",
+    finding:
+      "Rolling 7-day HRV averages tracked training adaptation and fatigue better than single-day values.",
+  },
+  mishra2020: {
+    id: "mishra2020",
+    topic: "recovery",
+    authors: "Mishra T, et al.",
+    year: 2020,
+    title: "Pre-symptomatic detection of COVID-19 from smartwatch data",
+    journal: "Nat Biomed Eng",
+    ref: "4(12):1208–1220",
+    pmid: "33208926",
+    doi: "10.1038/s41551-020-00640-6",
+    finding:
+      "Raised resting heart rate and other changes in smartwatch data appeared days before symptoms of infection in most cases.",
+  },
+  nes2014: {
+    id: "nes2014",
+    topic: "training",
+    authors: "Nes BM, Vatten LJ, Nauman J, Janszky I, Wisløff U",
+    year: 2014,
+    title:
+      "A simple nonexercise model of cardiorespiratory fitness predicts long-term mortality",
+    journal: "Med Sci Sports Exerc",
+    ref: "46(6):1159–1165",
+    pmid: "24576863",
+    doi: "10.1249/MSS.0000000000000219",
+    finding:
+      "Fitness age, the age at which an average person has your fitness, predicted long-term mortality better than age alone.",
+  },
+  mcnulty2020: {
+    id: "mcnulty2020",
+    topic: "training",
+    authors: "McNulty KL, et al.",
+    year: 2020,
+    title:
+      "The Effects of Menstrual Cycle Phase on Exercise Performance in Eumenorrheic Women: A Systematic Review and Meta-Analysis",
+    journal: "Sports Med",
+    ref: "50(10):1813–1827",
+    pmid: "32661839",
+    doi: "10.1007/s40279-020-01319-3",
+    finding:
+      "Performance may dip by a trivial amount early in the cycle; effects vary between women, so an individual approach is advised.",
+  },
+  plotkin2022: {
+    id: "plotkin2022",
+    topic: "training",
+    authors: "Plotkin D, et al.",
+    year: 2022,
+    title:
+      "Progressive overload without progressing load? The effects of load or repetition progression on muscular adaptations",
+    journal: "PeerJ",
+    ref: "10:e14142",
+    pmid: "36199287",
+    doi: "10.7717/peerj.14142",
+    finding:
+      "In 43 trained lifters over 8 weeks, adding reps and adding weight gave similar muscle and strength gains. Arcwell counts either as progress.",
+  },
   helms2016rir: {
     id: "helms2016rir",
     topic: "training",
@@ -256,6 +352,19 @@ export const SOURCES: Record<string, Source> = {
     doi: "10.1093/ajcn/51.2.241",
     finding:
       "The equation Arcwell uses to estimate the energy you burn at rest from weight, height, age and sex.",
+  },
+  cunningham1980: {
+    id: "cunningham1980",
+    topic: "nutrition",
+    authors: "Cunningham JJ",
+    year: 1980,
+    title:
+      "A reanalysis of the factors influencing basal metabolic rate in normal adults",
+    journal: "Am J Clin Nutr",
+    ref: "33(11):2372–2374",
+    pmid: "7435418",
+    finding:
+      "Lean body mass alone predicted resting energy use (500 + 22 × lean kg); sex and age added little. Arcwell uses it when you give your body fat level.",
   },
   efsa2010water: {
     id: "efsa2010water",

@@ -9,25 +9,31 @@
     "@supabase/supabase-js": "^2.119.0",
     "expo": "~58.0.23",
     "expo-blur": "~58.0.6",
+    "expo-camera": "~58.0.14",
     "expo-clipboard": "~58.0.4",
     "expo-constants": "~58.0.15",
     "expo-dev-client": "~58.0.19",
     "expo-device": "~58.0.5",
     "expo-document-picker": "~58.0.5",
+    "expo-file-system": "~58.0.13",
     "expo-font": "~58.0.11",
     "expo-haptics": "~58.0.8",
     "expo-image": "~58.0.18",
+    "expo-image-manipulator": "~58.0.16",
     "expo-image-picker": "~58.0.10",
     "expo-keep-awake": "~58.0.4",
     "expo-linking": "~58.0.16",
     "expo-navigation-bar": "~58.0.4",
+    "expo-network": "~58.0.5",
     "expo-notifications": "~58.1.9",
     "expo-router": "~58.0.30",
+    "expo-sharing": "~58.0.23",
     "expo-splash-screen": "~58.0.13",
     "expo-sqlite": "~58.0.16",
     "expo-status-bar": "~58.0.4",
     "expo-system-ui": "~58.0.7",
     "expo-web-browser": "~58.0.7",
+    "fflate": "^0.8.3",
     "lucide-react-native": "1.62.0",
     "nativewind": "4.2.7",
     "react": "19.3.0",
@@ -59,10 +65,12 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint && npm run tokens:check",
+    "lint": "expo lint && npm run tokens:check && npm run legal:check",
     "typecheck": "tsc --noEmit",
     "tokens:check": "node scripts/check-tokens.mjs",
-    "test": "jest"
+    "test": "jest",
+    "legal:build": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-legal.mjs",
+    "legal:check": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-legal.mjs --check"
   },
   "private": true,
   "jest": {
@@ -71,7 +79,8 @@
       "**/__tests__/**/*.test.ts?(x)"
     ],
     "moduleNameMapper": {
-      "^@/(.*)$": "<rootDir>/src/$1"
+      "^@/(.*)$": "<rootDir>/src/$1",
+      "^lucide-react-native$": "<rootDir>/jest/lucide-stub.js"
     }
   }
 }

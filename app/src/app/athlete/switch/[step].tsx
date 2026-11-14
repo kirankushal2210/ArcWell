@@ -8,8 +8,8 @@
 // - ended (F8-08, TL-02): Plus ended; free plan, history kept, AI plan read-only (D32, D33).
 // - already (F3-03): a coached athlete opened another invite; one coach at a time.
 // - left (L-03, and K-29 when the coach closed their account): what changed after coaching ends.
-// The bottom bar follows D57 and D68 (four tabs; AI from Today and the + menu), which postdate the
-// wireframes' bar wording.
+// The bottom bar follows D97 and D101 (four tabs; AI on the round button beside the bar; Progress at
+// the top right), which postdate the wireframes' bar wording.
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
@@ -83,7 +83,7 @@ export default function Switch() {
             items={[
               `${first}'s training, nutrition and recovery guidance replaces your ${meTier === "pro" ? "AI plan" : "plan"}`,
               ...(meTier === "pro"
-                ? ["The AI coach disappears from Today and the + menu"]
+                ? ["The AI button beside the tab bar becomes the + log menu"]
                 : []),
               "Your workouts, logs and history stay",
             ]}
@@ -113,7 +113,7 @@ export default function Switch() {
               "Recovery is unlocked: sleep, recovery and strain every morning",
               "Food shows full macros: protein, carbs and fat",
               "Programs and Muscle Analytics are in ☰ → Training",
-              "Your AI coach is on Today and in the + menu",
+              "Your AI coach is the round button at the bottom right",
             ]}
           />
         </InfoCard>
@@ -246,9 +246,9 @@ export default function Switch() {
         <InfoCard>
           <Bullets
             items={[
-              `A Progress tab joins your bar: check-ins and chat with ${first}`,
+              `Progress, at the top right, now has check-ins and chat with ${first}`,
               `Training, Nutrition and Recovery follow ${first}'s guidance once your plan is ready`,
-              "Your past workouts are in ☰ → Training → History",
+              "Your past workouts are in ☰ → Training → Progressive overload",
             ]}
           />
         </InfoCard>

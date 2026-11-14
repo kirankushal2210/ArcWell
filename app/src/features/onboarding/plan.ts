@@ -1,6 +1,7 @@
 // Builds the starter plan shown at the end of onboarding (AO-18 to AO-21) from the answers.
 // Free accounts get calories only (D5): no protein, carb or fat targets here.
 // This runs on the device for now; when sign-up exists the server computes and stores the plan.
+import { noDeficit } from "@/features/science/womensHealth";
 import type { Answers } from "./OnboardingContext";
 import { buildWorkouts, type Workout } from "./workouts";
 
@@ -51,9 +52,14 @@ export function buildPlan(a: Answers): Plan {
   const age = num(a.age, 27);
   const sex = (a.sex as string | undefined) ?? "unspecified";
 
-  // Mifflin–St Jeor; "Prefer not to say" uses the average of the two constants (D44).
+  // With a body fat level (D84), resting energy comes from lean mass (cunningham1980); otherwise
+  // Mifflin–St Jeor, where "Prefer not to say" uses the average of the two constants (D44).
   const sexConstant = sex === "male" ? 5 : sex === "female" ? -161 : -78;
-  const bmr = 10 * weight + 6.25 * height - 5 * age + sexConstant;
+  const bodyFat = typeof a.bodyFatPct === "number" ? a.bodyFatPct : null;
+  const bmr =
+    bodyFat !== null
+      ? 500 + 22 * weight * (1 - bodyFat / 100)
+      : 10 * weight + 6.25 * height - 5 * age + sexConstant;
   const tdee = bmr * (ACTIVITY[(a.activity as string) ?? "moderate"] ?? 1.55);
 
   // Fat loss is capped at about 0.5% of body weight a week; gains stay small.
@@ -69,8 +75,10 @@ export function buildPlan(a: Answers): Plan {
           : goal === "recomposition"
             ? -200
             : 0;
+  // Pregnant or within a year of giving birth: no deficit (D87, mottola2018).
+  const goalChange = noDeficit(a) ? Math.max(0, adjustment) : adjustment;
   const floor = sex === "male" ? 1500 : sex === "female" ? 1200 : 1350;
-  const kcal = Math.max(floor, Math.round((tdee + adjustment) / 10) * 10);
+  const kcal = Math.max(floor, Math.round((tdee + goalChange) / 10) * 10);
   const weeklyKg = ((kcal - tdee) * 7) / KCAL_PER_KG;
 
   const daysPerWeek = Number(a.daysPerWeek ?? 4);
@@ -124,9 +132,3 @@ export function buildPlan(a: Answers): Plan {
     },
   };
 }
-
-export const formatKcal = (kcal: number) => kcal.toLocaleString("en-IN");
-export const formatWeekly = (kg: number) =>
-  Math.abs(kg) < 0.05
-    ? "Steady"
-    : `${kg < 0 ? "−" : "+"}${Math.abs(kg).toFixed(1)} kg`;

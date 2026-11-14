@@ -1,8 +1,8 @@
-// The + button and quick log sheet (D67): a round glass button at the bottom right, next to the
-// tab bar, in the same place on every athlete tab. It opens a sheet of the things people log most:
-// colour tiles for workout, food and recovery (you pick by colour before you read), then weight in
-// one tap. The AI coach lives here and in Today's toolbar for self-guided athletes; coached athletes
-// get their weekly check-in instead and never see AI (D44).
+// The round glass button at the bottom right, next to the tab bar, on every athlete tab (D67, D97).
+// For self-guided athletes with AI on it opens the AI coach. For coached athletes (who never see AI,
+// D44) and anyone who turned AI off it is the + quick log sheet: colour tiles for workout, food and
+// recovery (you pick by colour before you read), the weekly check-in for coached athletes, then
+// weight in one tap.
 import type { Href } from "expo-router";
 import { router } from "expo-router";
 import {
@@ -21,6 +21,10 @@ import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import {
+  useSetActive,
+  useWorkoutSummary,
+} from "@/features/athlete/ActiveWorkout";
 import { GlassSurface } from "@/components/GlassSurface";
 import {
   Button,
@@ -46,7 +50,8 @@ export const PLUS_RESERVE = TAB_BAR_HEIGHT + space[2];
 /** Today's planned workout, whether a workout is already logged today, and whether one is running. */
 export function useTodayWorkout() {
   const me = useMe();
-  const { active, sessions } = useCoachData();
+  const { sessions } = useCoachData();
+  const active = useWorkoutSummary();
   const schedule = me?.program
     ? weekSchedule(me.program, me.protocol?.restDays ?? [])
     : [];
@@ -68,7 +73,9 @@ type Tile = {
 
 export function QuickLog() {
   const me = useMe();
-  const { meTier, active, setActive, logWeight, settingsOf } = useCoachData();
+  const { meTier, logWeight, settingsOf } = useCoachData();
+  const active = useWorkoutSummary();
+  const setActive = useSetActive();
   const insets = useSafeAreaInsets();
   const today = useTodayWorkout();
   const water = useWater();
@@ -125,6 +132,7 @@ export function QuickLog() {
       onPress: () => go("/athlete/recovery/check-in"),
     });
   const aiOff = !coached && !settingsOf(me.id).ai;
+  const showAi = !coached && !aiOff;
   if (!aiOff)
     tiles.push(
       coached
@@ -176,22 +184,38 @@ export function QuickLog() {
         pointerEvents="box-none"
         style={[styles.wrap, { bottom: tabBarBottom(insets.bottom) }]}
       >
-        <PressableScale
-          onPress={() => {
-            setKg(last);
-            setSaved(false);
-            setOpen(true);
-          }}
-          accessibilityRole="button"
-          accessibilityLabel="Log something"
-        >
-          <GlassSurface style={styles.plus}>
-            {/* A View so the icon paints above the blur layers on web. */}
-            <View>
-              <Plus size={26} strokeWidth={2.2} color={colors.text} />
-            </View>
-          </GlassSurface>
-        </PressableScale>
+        {/* D97: self-guided athletes get the AI coach here; coached athletes (never AI, D44) and
+            anyone who turned AI off keep the + log menu. */}
+        {showAi ? (
+          <PressableScale
+            onPress={() => router.push("/athlete/ai")}
+            accessibilityRole="button"
+            accessibilityLabel="AI coach"
+          >
+            <GlassSurface style={styles.plus}>
+              <View>
+                <Sparkles size={26} strokeWidth={2.2} color={colors.accent} />
+              </View>
+            </GlassSurface>
+          </PressableScale>
+        ) : (
+          <PressableScale
+            onPress={() => {
+              setKg(last);
+              setSaved(false);
+              setOpen(true);
+            }}
+            accessibilityRole="button"
+            accessibilityLabel="Log something"
+          >
+            <GlassSurface style={styles.plus}>
+              {/* A View so the icon paints above the blur layers on web. */}
+              <View>
+                <Plus size={26} strokeWidth={2.2} color={colors.text} />
+              </View>
+            </GlassSurface>
+          </PressableScale>
+        )}
       </View>
 
       <Sheet visible={open} onClose={() => setOpen(false)} title="Log">
@@ -211,7 +235,7 @@ export function QuickLog() {
                   size={22}
                   color={onFill ? colors.onPillar : colors.text}
                 />
-                <Text weight="semibold" tone={onFill ? "onBrand" : "default"}>
+                <Text weight="semibold" tone={onFill ? "onPillar" : "default"}>
                   {t.label}
                 </Text>
               </PressableScale>

@@ -1,11 +1,11 @@
-// Weekly check-in for coached athletes (F6, D12): front, side and back photos (optional, coach
-// only), weight and waist, six 1–5 scores for the week, and three short answers. The first one is
-// the starting point (week 0). After sending, this page shows the coach's reply and the history.
+// Weekly check-in for coached athletes (F6, D12), in steps (F6-02 to F6-05): measurements, photos
+// (optional, coach only, skipped when photo consent is off), the week (six 1–5 scores and three short
+// answers), then a review of every answer, each one editable, and Send. The first one is the
+// starting point (week 0). After sending, this page shows the coach's reply and the history.
 import { router } from "expo-router";
 import { Check, Lock } from "lucide-react-native";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -26,7 +26,13 @@ import {
   sentThisWeek,
 } from "@/features/coach/checkins";
 import { useCoachData } from "@/features/coach/CoachData";
-import { Eyebrow, Page, PageHeader } from "@/features/coach/parts";
+import {
+  Eyebrow,
+  Group,
+  GroupRow,
+  Page,
+  PageHeader,
+} from "@/features/coach/parts";
 import { choosePhoto, PhotoSlot } from "@/features/coach/PhotoSlot";
 import {
   colors,
@@ -37,11 +43,19 @@ import {
   textSizes,
 } from "@/theme";
 
+type Step = "body" | "photos" | "week" | "review";
+type Words = "wins" | "struggles" | "question";
+
+const one = (n: number) => n.toFixed(1);
+
 export default function WeeklyCheckIn() {
   const me = useMe();
-  const { meTier, coachName, submitCheckIn } = useCoachData();
+  const { meTier, coachName, submitCheckIn, settingsOf } = useCoachData();
   const insets = useSafeAreaInsets();
   const [again, setAgain] = useState(false);
+  const [step, setStep] = useState<Step>("body");
+  // Opened from the review: Next goes straight back to it.
+  const [editing, setEditing] = useState(false);
   const last = me?.checkIns[0];
   const [f, setF] = useState<CheckInForm>(() => ({
     photos: {},
@@ -71,6 +85,7 @@ export default function WeeklyCheckIn() {
   const first = coachName.replace(/^Coach\s+/, "");
   const start = !me.checkIns.length;
   const sent = sentThisWeek(me) && !again;
+  const photosOn = settingsOf(me.id).photos;
   const answered = SCORES.filter((s) => f.scores[s.key]).length;
   const setPhoto = (p: PhotoPose, uri: string) =>
     setF((x) => ({ ...x, photos: { ...x.photos, [p]: uri } }));
@@ -111,11 +126,44 @@ export default function WeeklyCheckIn() {
             label="Send another"
             variant="ghost"
             fullWidth
-            onPress={() => setAgain(true)}
+            onPress={() => {
+              setAgain(true);
+              setStep("body");
+              setEditing(false);
+            }}
           />
         </Page>
       </View>
     );
+
+  const steps: { key: Step; label: string }[] = [
+    { key: "body", label: "Measurements" },
+    ...(photosOn ? [{ key: "photos" as const, label: "Photos" }] : []),
+    { key: "week", label: start ? "About you" : "The week" },
+    { key: "review", label: "Review and send" },
+  ];
+  const at = Math.max(
+    0,
+    steps.findIndex((s) => s.key === step),
+  );
+  // The step on screen (a step that went away, like photos turned off, falls back to the first).
+  const shown = steps[at].key;
+  const next = () => {
+    if (editing) {
+      setEditing(false);
+      setStep("review");
+    } else setStep(steps[Math.min(at + 1, steps.length - 1)].key);
+  };
+  const edit = (to: Step) => {
+    setEditing(true);
+    setStep(to);
+  };
+  const words: [Words, string][] = [
+    ["wins", start ? "What do you want to change?" : "Wins this week"],
+    ["struggles", start ? "What's got in the way before?" : "What was hard"],
+    ["question", `A question for ${first} (optional)`],
+  ];
+  const photoCount = POSES.filter((p) => f.photos[p.key]).length;
 
   return (
     <KeyboardAvoidingView
@@ -124,96 +172,214 @@ export default function WeeklyCheckIn() {
     >
       <PageHeader
         title={start ? "Your starting point" : "Weekly check-in"}
-        sub={start ? "Week 0 · so you can see how far you come" : dueText(me)}
-        onBack={back}
+        sub={
+          start
+            ? "Week 0 · so you can see how far you come"
+            : sentThisWeek(me)
+              ? undefined
+              : dueText(me)
+        }
+        onBack={() => (at > 0 ? setStep(steps[at - 1].key) : back())}
       />
-      <Page>
-        <Eyebrow>Photos · optional</Eyebrow>
-        <View style={styles.photos}>
-          {POSES.map((p) => (
-            <PhotoSlot
-              key={p.key}
-              uri={f.photos[p.key]}
-              label={p.label}
-              onPress={() => choosePhoto((u) => setPhoto(p.key, u))}
-            />
-          ))}
-        </View>
-        <View style={styles.private}>
-          <Lock size={14} color={colors.textMuted} />
-          <Text variant="caption" tone="muted" style={styles.flex}>
-            Only {coachName} sees these. Same light, same spot, morning before
-            food makes weeks easy to compare.
+      {/* Keyed by step so each one opens at the top. */}
+      <Page key={shown}>
+        <View
+          style={styles.progress}
+          accessible
+          accessibilityRole="progressbar"
+          accessibilityLabel={`Step ${at + 1} of ${steps.length}, ${steps[at].label}`}
+          accessibilityValue={{ min: 1, max: steps.length, now: at + 1 }}
+        >
+          <View style={styles.track}>
+            {steps.map((s, i) => (
+              <View
+                key={s.key}
+                style={[styles.segment, i <= at && styles.segmentOn]}
+              />
+            ))}
+          </View>
+          <Text variant="label" weight="regular" tone="muted" numeric>
+            {`Step ${at + 1} of ${steps.length} · ${steps[at].label}`}
           </Text>
         </View>
 
-        <Eyebrow>Body</Eyebrow>
-        <View style={styles.row}>
-          <Text style={styles.flex}>Weight</Text>
-          <NumberStepper
-            value={f.weightKg}
-            onChange={(v) => setF((x) => ({ ...x, weightKg: v }))}
-            step={0.1}
-            decimals={1}
-            min={30}
-            max={250}
-            unit="kg"
-            accessibilityLabel="Weight"
-          />
-        </View>
-        <View style={styles.row}>
-          <Text style={styles.flex}>Waist (at the navel)</Text>
-          <NumberStepper
-            value={f.waistCm ?? 80}
-            onChange={(v) => setF((x) => ({ ...x, waistCm: v }))}
-            step={0.5}
-            decimals={1}
-            min={40}
-            max={200}
-            unit="cm"
-            accessibilityLabel="Waist"
-          />
-        </View>
-
-        {start ? null : (
+        {shown === "body" ? (
           <>
-            <Eyebrow>{`How was your week · ${answered} of ${SCORES.length}`}</Eyebrow>
-            {SCORES.map((s) => (
-              <Scale
-                key={s.key}
-                label={s.label}
-                value={f.scores[s.key] ?? 0}
-                onChange={(v) =>
-                  setF((x) => ({ ...x, scores: { ...x.scores, [s.key]: v } }))
-                }
-                ends={[s.low, s.high]}
+            <View style={styles.row}>
+              <Text style={styles.flex}>Weight</Text>
+              <NumberStepper
+                value={f.weightKg}
+                onChange={(v) => setF((x) => ({ ...x, weightKg: v }))}
+                step={0.1}
+                decimals={1}
+                min={30}
+                max={250}
+                unit="kg"
+                accessibilityLabel="Weight"
+              />
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.flex}>Waist (at the navel)</Text>
+              <NumberStepper
+                value={f.waistCm ?? 80}
+                onChange={(v) => setF((x) => ({ ...x, waistCm: v }))}
+                step={0.5}
+                decimals={1}
+                min={40}
+                max={200}
+                unit="cm"
+                accessibilityLabel="Waist"
+              />
+            </View>
+            <Text variant="caption" tone="muted">
+              Morning, after the toilet, before food.
+            </Text>
+          </>
+        ) : null}
+
+        {shown === "photos" ? (
+          <>
+            <View style={styles.photos}>
+              {POSES.map((p) => (
+                <PhotoSlot
+                  key={p.key}
+                  uri={f.photos[p.key]}
+                  label={p.label}
+                  onPress={() => choosePhoto((u) => setPhoto(p.key, u))}
+                />
+              ))}
+            </View>
+            <View style={styles.private}>
+              <Lock size={14} color={colors.textMuted} />
+              <Text variant="caption" tone="muted" style={styles.flex}>
+                Optional. Only {coachName} sees these. Same light, same spot,
+                morning before food makes weeks easy to compare.
+              </Text>
+            </View>
+          </>
+        ) : null}
+
+        {shown === "week" ? (
+          <>
+            {start ? null : (
+              <>
+                <Eyebrow>{`How was your week · ${answered} of ${SCORES.length}`}</Eyebrow>
+                {SCORES.map((s) => (
+                  <Scale
+                    key={s.key}
+                    label={s.label}
+                    value={f.scores[s.key] ?? 0}
+                    onChange={(v) =>
+                      setF((x) => ({
+                        ...x,
+                        scores: { ...x.scores, [s.key]: v },
+                      }))
+                    }
+                    ends={[s.low, s.high]}
+                  />
+                ))}
+              </>
+            )}
+            <Eyebrow>{start ? "Tell your coach" : "In your words"}</Eyebrow>
+            {words.map(([k, label]) => (
+              <TextInput
+                key={k}
+                value={f[k]}
+                onChangeText={(v) => setF((x) => ({ ...x, [k]: v }))}
+                placeholder={label}
+                placeholderTextColor={colors.textMuted}
+                multiline
+                style={styles.input}
+                accessibilityLabel={label}
               />
             ))}
           </>
-        )}
+        ) : null}
 
-        <Eyebrow>{start ? "Tell your coach" : "In your words"}</Eyebrow>
-        {(
-          [
-            ["wins", start ? "What do you want to change?" : "Wins this week"],
-            [
-              "struggles",
-              start ? "What's got in the way before?" : "What was hard",
-            ],
-            ["question", `A question for ${first} (optional)`],
-          ] as const
-        ).map(([k, label]) => (
-          <TextInput
-            key={k}
-            value={f[k]}
-            onChangeText={(v) => setF((x) => ({ ...x, [k]: v }))}
-            placeholder={label}
-            placeholderTextColor={colors.textMuted}
-            multiline
-            style={styles.input}
-            accessibilityLabel={label}
-          />
-        ))}
+        {shown === "review" ? (
+          <>
+            <Section title="Measurements" onEdit={() => edit("body")}>
+              <Group>
+                <GroupRow first>
+                  <Text tone="muted" style={styles.flex}>
+                    Weight
+                  </Text>
+                  <Text weight="medium" numeric>
+                    {one(f.weightKg)} kg
+                  </Text>
+                </GroupRow>
+                <GroupRow>
+                  <Text tone="muted" style={styles.flex}>
+                    Waist
+                  </Text>
+                  <Text weight="medium" numeric>
+                    {f.waistCm === undefined ? "—" : `${one(f.waistCm)} cm`}
+                  </Text>
+                </GroupRow>
+              </Group>
+            </Section>
+
+            {photosOn ? (
+              <Section title="Photos" onEdit={() => edit("photos")}>
+                {photoCount ? (
+                  <View style={styles.photos}>
+                    {POSES.filter((p) => f.photos[p.key]).map((p) => (
+                      <PhotoSlot
+                        key={p.key}
+                        uri={f.photos[p.key]}
+                        label={p.label}
+                        onPress={() => edit("photos")}
+                      />
+                    ))}
+                  </View>
+                ) : (
+                  <Text tone="muted">No photos this time.</Text>
+                )}
+              </Section>
+            ) : (
+              <Text variant="caption" tone="muted">
+                Photos are off, so this goes without them. Turn them on in
+                Privacy any time.
+              </Text>
+            )}
+
+            <Section
+              title={start ? "About you" : "The week"}
+              onEdit={() => edit("week")}
+            >
+              <Group>
+                {start ? null : (
+                  <GroupRow first>
+                    <View style={styles.flex}>
+                      <Text variant="label" weight="regular" tone="muted">
+                        {`Scores · ${answered} of ${SCORES.length}`}
+                      </Text>
+                      <Text numeric>
+                        {answered
+                          ? SCORES.filter((s) => f.scores[s.key])
+                              .map((s) => `${s.label} ${f.scores[s.key]}`)
+                              .join(" · ")
+                          : "None yet"}
+                      </Text>
+                    </View>
+                  </GroupRow>
+                )}
+                {words.map(([k, label], i) => (
+                  <GroupRow key={k} first={start && i === 0}>
+                    <View style={styles.flex}>
+                      <Text variant="label" weight="regular" tone="muted">
+                        {label}
+                      </Text>
+                      <Text tone={f[k].trim() ? "default" : "muted"}>
+                        {f[k].trim() || "—"}
+                      </Text>
+                    </View>
+                  </GroupRow>
+                ))}
+              </Group>
+            </Section>
+          </>
+        ) : null}
       </Page>
       <View
         style={[
@@ -221,28 +387,55 @@ export default function WeeklyCheckIn() {
           { paddingBottom: Math.max(insets.bottom, space[4]) },
         ]}
       >
-        <Button
-          label={start ? "Send my starting point" : "Send check-in"}
-          fullWidth
-          onPress={() => {
-            const go = () => {
+        {shown === "review" ? (
+          <Button
+            label={start ? "Send my starting point" : "Send check-in"}
+            fullWidth
+            onPress={() => {
               submitCheckIn(me.id, f);
               setAgain(false);
-            };
-            if (!start && answered < SCORES.length)
-              Alert.alert(
-                "Send without every score?",
-                `${SCORES.length - answered} left blank. ${first} reads them all.`,
-                [
-                  { text: "Keep going", style: "cancel" },
-                  { text: "Send", onPress: go },
-                ],
-              );
-            else go();
-          }}
-        />
+              setStep("body");
+              setEditing(false);
+            }}
+          />
+        ) : (
+          <Button
+            label={
+              editing
+                ? "Back to review"
+                : shown === "photos" && !photoCount
+                  ? "Skip photos"
+                  : "Next"
+            }
+            fullWidth
+            onPress={next}
+          />
+        )}
       </View>
     </KeyboardAvoidingView>
+  );
+}
+
+/** A review section: its title, an Edit button that opens that step, and the answers. */
+function Section({
+  title,
+  onEdit,
+  children,
+}: {
+  title: string;
+  onEdit: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <View style={styles.section}>
+      <View style={styles.sectionHead}>
+        <Text variant="eyebrow" tone="muted" style={styles.flex}>
+          {title}
+        </Text>
+        <Button label="Edit" variant="ghost" size="sm" onPress={onEdit} />
+      </View>
+      {children}
+    </View>
   );
 }
 
@@ -307,4 +500,15 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
   },
   footer: { paddingHorizontal: rhythm.gutter, paddingTop: space[2] },
+  progress: { gap: space[2] },
+  track: { flexDirection: "row", gap: space[1] },
+  segment: {
+    flex: 1,
+    height: space[1],
+    borderRadius: radius.full,
+    backgroundColor: colors.surfaceRaised,
+  },
+  segmentOn: { backgroundColor: colors.brand },
+  section: { gap: space[2] },
+  sectionHead: { flexDirection: "row", alignItems: "center", gap: space[2] },
 });

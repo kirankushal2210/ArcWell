@@ -1,6 +1,7 @@
 // Email step of sign-in and sign-up (PLAN Phase 1): one field, then a 6-digit code by email. No
 // password. Sign-up screens (save your plan, personal invite, coach setup) arrive here with a
-// pending role and consent; Sign In on the welcome screen arrives with none.
+// pending role and consent; Sign In on the welcome screen arrives with none. Every one of them shows
+// the turned-off Google button here (D62).
 import { router } from "expo-router";
 import { Mail } from "lucide-react-native";
 import { useState } from "react";
@@ -9,6 +10,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Button, Text, TextField } from "@/components/primitives";
 import { useAuth } from "@/features/auth/AuthProvider";
+import { GoogleButton } from "@/features/auth/GoogleButton";
 import { ProgressBar, QuestionHeader } from "@/features/onboarding/parts";
 import { colors, rhythm, space } from "@/theme";
 
@@ -89,6 +91,7 @@ export default function EmailStep() {
             loadingLabel="Sending code"
             onPress={send}
           />
+          <GoogleButton />
           {signUp ? null : (
             <Text variant="caption" tone="muted" style={styles.center}>
               New to Arcwell? Go back and tap Get Started.

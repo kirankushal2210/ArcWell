@@ -1,9 +1,9 @@
 // Gym detail (G-02): area, hours, day pass and equipment, with directions in the phone's maps app.
 import { useLocalSearchParams } from "expo-router";
-import { Linking, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { Button, Chip, Text } from "@/components/primitives";
-import { SAMPLE_GYMS } from "@/features/athlete/gyms";
+import { openInMaps, SAMPLE_GYMS } from "@/features/athlete/gyms";
 import { backTo, InfoCard, MenuPage } from "@/features/athlete/MenuParts";
 import { Eyebrow, KeyValues } from "@/features/coach/parts";
 import { space } from "@/theme";
@@ -28,11 +28,7 @@ export default function GymDetail() {
           label="Directions"
           variant="secondary"
           fullWidth
-          onPress={() =>
-            Linking.openURL(
-              `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${g.area}, ${g.city}`)}`,
-            )
-          }
+          onPress={() => openInMaps(g)}
         />
       }
     >

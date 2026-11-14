@@ -6,14 +6,18 @@ import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { plusOnly } from "@/features/athlete/PlusOnly";
 import { Button, Text } from "@/components/primitives";
 import { protocolById, todayDate } from "@/features/athlete/recovery";
 import { useRecovery } from "@/features/athlete/RecoveryParts";
 import { NotJoined } from "@/features/athlete/useMe";
 import { Eyebrow, Page, PageHeader } from "@/features/coach/parts";
 import { colors, radius, rhythm, space } from "@/theme";
+import { NotFound } from "@/features/system/SystemStates";
 
-export default function ProtocolDetail() {
+export default plusOnly(ProtocolDetail);
+
+function ProtocolDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const r = useRecovery();
   const insets = useSafeAreaInsets();
@@ -22,7 +26,7 @@ export default function ProtocolDetail() {
     router.canGoBack() ? router.back() : router.replace("/athlete/recovery");
   const p = protocolById(id);
   if (!r.me) return <NotJoined />;
-  if (!p) return <PageHeader title="Protocol" onBack={back} />;
+  if (!p) return <NotFound title="Protocol" what="protocol" onBack={back} />;
   const done = r.store.done.includes(`${today}:${p.id}`);
 
   return (

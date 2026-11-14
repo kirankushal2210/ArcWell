@@ -9,9 +9,14 @@
 
 export type AiRole = "system" | "user" | "assistant";
 
+/** A message part: text, or an image as a data URL (vision models only, D96). */
+export type AiPart =
+  | { type: "text"; text: string }
+  | { type: "image"; dataUrl: string };
+
 export interface AiMessage {
   role: AiRole;
-  content: string;
+  content: string | AiPart[];
 }
 
 export interface AiRequest {
@@ -19,6 +24,8 @@ export interface AiRequest {
   /** Ask the provider for a JSON object response when supported. */
   json?: boolean;
   maxOutputTokens?: number;
+  /** Use the provider's vision model (needed for image parts). */
+  vision?: boolean;
 }
 
 export interface AiUsage {

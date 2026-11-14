@@ -2,6 +2,9 @@
 // It sits at the root of the app, standing in for the server: what the coach plans here is what the
 // coached athlete sees after joining (D56), and what the athlete logs shows up on the coach's side.
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AppState } from "react-native";
+
+import { useSetActive } from "@/features/athlete/ActiveWorkout";
 
 import {
   type AthleteSettings,
@@ -15,6 +18,7 @@ import {
   type ReactNode,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from "react";
 
@@ -32,7 +36,9 @@ import {
   migrateNames,
   registerCustomExercises,
 } from "@/features/athlete/library";
-import type { ActiveWorkout, Session } from "@/features/athlete/training";
+import type { Session } from "@/features/athlete/training";
+
+import { selfPlan } from "@/features/athlete/selfPlan";
 
 import { buildCheckIn, type CheckInForm, type PhotoPose } from "./checkins";
 import { withInstagram } from "./instagram";
@@ -135,7 +141,12 @@ type CoachData = {
   duplicateTemplate: (id: string) => string;
   /** Gives each client their own copy of the template, replacing their current program or meal plan. */
   assignTemplate: (id: string, clientIds: string[]) => void;
-  saveProgram: (id: string, p: TrainingProgram) => void;
+  /** Save a client's program. `restart` starts it again from week 1 (a different program). */
+  saveProgram: (
+    id: string,
+    p: TrainingProgram,
+    opts?: { restart?: boolean },
+  ) => void;
   /** Switch to a new program from today (TR-04): week 1 starts now and rest days follow it. */
   startProgram: (id: string, p: TrainingProgram, restDays: number[]) => void;
   saveNutrition: (id: string, n: NutritionPlan) => void;
@@ -155,14 +166,6 @@ type CoachData = {
   /** A self-guided athlete's own record, built from their onboarding answers. */
   self: Client | null;
   startSelf: (c: Client, tier: "pro" | "free") => void;
-  /** The workout in progress on this phone (F4-02); kept while moving between tabs (F4-09). */
-  active: ActiveWorkout | null;
-  setActive: (
-    next:
-      | ActiveWorkout
-      | null
-      | ((w: ActiveWorkout | null) => ActiveWorkout | null),
-  ) => void;
   /** Finished workouts per athlete, newest first (F4-13). */
   sessions: (clientId: string) => Session[];
   finishWorkout: (clientId: string, s: Session) => void;
@@ -305,12 +308,14 @@ type CoachData = {
 const Ctx = createContext<CoachData | null>(null);
 
 const STORE_KEY = "arcwell.sample.v1";
+/** Where an unreadable saved copy is kept, so a failed load never loses it (see the load effect). */
+const BACKUP_KEY = "arcwell.sample.backup";
+const SAVE_DELAY_MS = 800;
 type Saved = {
   clients: Client[];
   meId: string | null;
   meTier: AthleteTier;
   self: Client | null;
-  active: ActiveWorkout | null;
   history: Record<string, Session[]>;
   custom?: Exercise[];
   foodLogs?: Record<string, FoodLog[]>;
@@ -327,10 +332,37 @@ type Saved = {
 /** Sample extras added after the first release of the sample data (D64). */
 function withExtras(c: Client): Client {
   if (c.id === "karan" && c.competitive === undefined)
-    return { ...c, competitive: true, enhanced: sampleEnhanced() };
+    return withProgram({
+      ...c,
+      competitive: true,
+      enhanced: sampleEnhanced(),
+    });
   if (c.id === "priya" && c.supplements === undefined)
-    return { ...c, supplements: cloneItems(sampleStacks()[1].items) };
-  return c;
+    return withProgram({
+      ...c,
+      supplements: cloneItems(sampleStacks()[1].items),
+    });
+  return withProgram(c);
+}
+
+/**
+ * Sample clients arrive with their coach's plan as a name only ("Fat loss · 4 days"). Give each
+ * the program behind that name, as the coach's builder already shows it, so the athlete's Coach
+ * plan and every screen that reads the program see what the coach assigned (D105). The start date
+ * puts them partway through, in line with how long they've been with the coach.
+ */
+function withProgram(c: Client): Client {
+  const name = c.plan?.training;
+  if (c.program || c.pending || !name) return c;
+  const program = { ...programFromTemplate(name), name };
+  const weeksIn = Math.max(0, (c.weeksWithYou - 1) % program.weeks);
+  return {
+    ...c,
+    program,
+    programStart:
+      c.programStart ??
+      new Date(Date.now() - weeksIn * 7 * 86400000).toISOString(),
+  };
 }
 
 /** Saved self plans from before exact foods: rebuild the example day with foods (sample data only). */
@@ -388,7 +420,8 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
   const [meId, setMeId] = useState<string | null>(null);
   const [meTier, setMeTier] = useState<AthleteTier>("coached");
   const [self, setSelf] = useState<Client | null>(null);
-  const [active, setActive] = useState<ActiveWorkout | null>(null);
+  // The workout in progress lives in its own store (ActiveWorkout.tsx) so logging a set is cheap.
+  const setActive = useSetActive();
   const [history, setHistory] = useState<Record<string, Session[]>>({});
   const [joiningCoach, setJoiningCoach] = useState(false);
   const [hydrated, setHydrated] = useState(false);
@@ -409,9 +442,21 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
   // F4-09: the workout in progress, history and the athlete's plan are saved on the phone after every
   // change, so closing the app mid-workout loses nothing. Sample build: plain AsyncStorage; the real
   // build syncs to Supabase and keeps the offline copy in encrypted storage.
+  //
+  // Safety rules:
+  // - If the saved copy can't be read, it is backed up and saving stops for this run, so sample
+  //   data never replaces what's stored.
+  // - A finished workout saves at once (urgent), before the cleared workout in progress does, so
+  //   closing the app straight after Finish can't lose it.
+  // - A change still waiting for its save is written if the provider goes away.
+  const saveBlocked = useRef(false);
+  const saveUrgent = useRef(false);
+  const pendingSave = useRef<(() => void) | null>(null);
   useEffect(() => {
+    let stored: string | null = null;
     AsyncStorage.getItem(STORE_KEY)
       .then((raw) => {
+        stored = raw;
         if (!raw) return;
         const s = JSON.parse(migrateNames(raw)) as Partial<Saved>;
         if (s.clients) setClients(s.clients.map(withExtras));
@@ -419,7 +464,6 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
         if (s.meId !== undefined) setMeId(s.meId);
         if (s.meTier) setMeTier(s.meTier);
         if (s.self !== undefined) setSelf(upgradeSelfPlan(s.self));
-        if (s.active !== undefined) setActive(s.active);
         if (s.history) setHistory(s.history);
         if (s.custom) setCustom(s.custom);
         if (s.foodLogs) setFoodLogs(s.foodLogs);
@@ -431,9 +475,13 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
         if (s.coach) setCoach(s.coach);
         if (s.settings) setSettings(s.settings);
       })
-      .catch(() => {})
+      .catch(() => {
+        saveBlocked.current = true;
+        if (stored) AsyncStorage.setItem(BACKUP_KEY, stored).catch(() => {});
+      })
       .finally(() => setHydrated(true));
   }, []);
+  useEffect(() => () => pendingSave.current?.(), []);
   useEffect(() => {
     if (!hydrated) return;
     const saved: Saved = {
@@ -441,7 +489,6 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       meId,
       meTier,
       self,
-      active,
       history,
       custom: customExercises,
       foodLogs,
@@ -454,14 +501,29 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       settings,
       stacks,
     };
-    AsyncStorage.setItem(STORE_KEY, JSON.stringify(saved)).catch(() => {});
+    // Serialising the whole store is slow, so save once changes settle, and at once when the app
+    // leaves the foreground, instead of on every tap.
+    const save = () => {
+      pendingSave.current = null;
+      saveUrgent.current = false;
+      if (saveBlocked.current) return;
+      AsyncStorage.setItem(STORE_KEY, JSON.stringify(saved)).catch(() => {});
+    };
+    pendingSave.current = save;
+    const t = setTimeout(save, saveUrgent.current ? 0 : SAVE_DELAY_MS);
+    const sub = AppState.addEventListener("change", (st) => {
+      if (st !== "active") save();
+    });
+    return () => {
+      clearTimeout(t);
+      sub.remove();
+    };
   }, [
     hydrated,
     clients,
     meId,
     meTier,
     self,
-    active,
     history,
     customExercises,
     foodLogs,
@@ -646,12 +708,21 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
     },
     client: (id) =>
       self && id === self.id ? self : clients.find((c) => c.id === id),
-    active,
-    setActive,
     sessions: (id) => history[id] ?? [],
     foodLogs: (id) => foodLogs[id] ?? [],
-    addFoodLogs: (id, logs) =>
-      setFoodLogs((all) => ({ ...all, [id]: [...(all[id] ?? []), ...logs] })),
+    addFoodLogs: (id, logs) => {
+      // Stamp the clock time on today's new logs, for the caffeine cut-off (D96).
+      const now = new Date();
+      const today = isoToday();
+      const minute = now.getHours() * 60 + now.getMinutes();
+      const stamped = logs.map((l) =>
+        l.at === undefined && l.date === today ? { ...l, at: minute } : l,
+      );
+      setFoodLogs((all) => ({
+        ...all,
+        [id]: [...(all[id] ?? []), ...stamped],
+      }));
+    },
     updateFoodLog: (id, log) =>
       setFoodLogs((all) => ({
         ...all,
@@ -746,6 +817,7 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
         routines: (c.routines ?? []).filter((x) => x.id !== routineId),
       })),
     finishWorkout: (id, s) => {
+      saveUrgent.current = true;
       setHistory((h) => ({ ...h, [id]: [s, ...(h[id] ?? [])] }));
       const top =
         s.bests[0]?.text ??
@@ -902,6 +974,7 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
     },
 
     assignPlan: (id, training, meals) => {
+      const now = new Date().toISOString();
       const t = templates.find(
         (x) => x.kind === "training" && x.name === training,
       );
@@ -912,11 +985,12 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
         program: t?.program
           ? { ...cloneProgram(t.program), name: t.name }
           : programFromTemplate(training),
-        programStart: new Date().toISOString(),
+        programStart: now,
+        programUpdatedAt: now,
         nutritionPlan: m?.nutrition
           ? cloneNutrition(m.nutrition)
           : c.nutritionPlan,
-        line: "Plan assigned · starts Monday",
+        line: "Plan assigned · starts today",
         attention: undefined,
       }));
       bumpTemplates([t?.id, m?.id], 1);
@@ -963,13 +1037,15 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
     assignTemplate: (id, clientIds) => {
       const t = templates.find((x) => x.id === id);
       if (!t || !clientIds.length) return;
+      const now = new Date().toISOString();
       for (const cid of clientIds) {
         if (t.kind === "training" && t.program) {
           const program = { ...cloneProgram(t.program), name: t.name };
           update(cid, (c) => ({
             isNew: false,
             program,
-            programStart: new Date().toISOString(),
+            programStart: now,
+            programUpdatedAt: now,
             plan: { training: t.name, meals: c.plan?.meals ?? "" },
             training: {
               ...c.training,
@@ -1013,18 +1089,22 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
             },
         training: { ...c.training, weekPlanned: 7 - restDays.length },
       })),
-    saveProgram: (id, p) =>
-      update(id, (c) => ({
-        program: p,
-        programStart: c.programStart ?? new Date().toISOString(),
-        plan: { training: p.name, meals: c.plan?.meals ?? "" },
-        training: {
-          ...c.training,
-          weekPlanned: c.protocol
-            ? 7 - c.protocol.restDays.length
-            : p.days.length,
-        },
-      })),
+    saveProgram: (id, p, opts) =>
+      update(id, (c) => {
+        const now = new Date().toISOString();
+        return {
+          program: p,
+          programStart: opts?.restart || !c.programStart ? now : c.programStart,
+          programUpdatedAt: now,
+          plan: { training: p.name, meals: c.plan?.meals ?? "" },
+          training: {
+            ...c.training,
+            weekPlanned: c.protocol
+              ? 7 - c.protocol.restDays.length
+              : p.days.length,
+          },
+        };
+      }),
     saveNutrition: (id, n) =>
       update(id, (c) => ({
         nutritionPlan: n,
@@ -1104,6 +1184,28 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       })),
     logWeight: (id, kg) =>
       update(id, (c) => ({
+        // Self-guided: calorie and macro targets follow the new weight (D96). Coached athletes'
+        // targets stay with their coach.
+        ...(meTier !== "coached" && c.selfAnswers && c.nutritionPlan
+          ? (() => {
+              const t = selfPlan({ ...c.selfAnswers, weightKg: kg }).nutrition;
+              const n = c.nutritionPlan;
+              return {
+                nutritionPlan: {
+                  ...n,
+                  kcal: t.kcal,
+                  protein: t.protein,
+                  carbs: t.carbs,
+                  fat: t.fat,
+                },
+                nutrition: {
+                  ...c.nutrition,
+                  targetKcal: t.kcal,
+                  proteinG: t.protein,
+                },
+              };
+            })()
+          : {}),
         weights: [...c.weights, kg],
         weighIns: [
           ...(c.weighIns ?? []).filter((w) => w.date !== isoToday()),
@@ -1415,9 +1517,4 @@ export function useCoachData() {
   return v;
 }
 
-/** Clients the coach should look at first (K-01): open check-ins, overdue, low adherence, unread. */
-export const needsAttention = (c: Client) =>
-  !c.isNew &&
-  !c.pending &&
-  (c.status === "active" || c.status === "leaving") &&
-  (!!c.attention || c.unread > 0);
+// Who needs attention (K-01) is worked out in ./checkins (needsAttentionNow), not stored.

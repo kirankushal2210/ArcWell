@@ -4,7 +4,6 @@ import { router, useLocalSearchParams } from "expo-router";
 import { PencilLine, Trash2 } from "lucide-react-native";
 import { useState } from "react";
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -24,6 +23,7 @@ import { type Session, setLabel } from "@/features/athlete/training";
 import { NotJoined, useMe } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Page, PageHeader, StatTile } from "@/features/coach/parts";
+import { alert } from "@/lib/alert";
 import {
   colors,
   fontFamilyFor,
@@ -32,6 +32,7 @@ import {
   space,
   textSizes,
 } from "@/theme";
+import { NotFound } from "@/features/system/SystemStates";
 
 const EFFORT = ["", "Easy", "Moderate", "Hard", "Very hard", "All out"];
 
@@ -79,7 +80,7 @@ export default function SessionDetail() {
     router.canGoBack() ? router.back() : router.replace("/athlete/history");
   if (!me) return <NotJoined />;
   const saved = sessions(me.id).find((x) => x.id === id);
-  if (!saved) return <PageHeader title="Workout" onBack={back} />;
+  if (!saved) return <NotFound title="Workout" what="workout" onBack={back} />;
   const s = draft ?? saved;
   const editing = draft !== null;
 
@@ -111,7 +112,7 @@ export default function SessionDetail() {
     });
 
   const remove = () =>
-    Alert.alert(
+    alert(
       "Delete this workout?",
       "It's removed from your history and this week's count.",
       [

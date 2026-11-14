@@ -21,7 +21,8 @@ import {
 } from "@/components/primitives";
 import { SectionTabs } from "@/components/SectionTabs";
 import { dateLabel, shiftDate } from "@/features/athlete/foods";
-import { DEVICE_LABEL, todayDate } from "@/features/athlete/recovery";
+import { DEVICE_LABEL } from "@/features/athlete/recovery";
+import { useDayPicker } from "@/features/athlete/useToday";
 import {
   Overview,
   RecoveryPage,
@@ -29,7 +30,10 @@ import {
   SleepPage,
   StrainPage,
 } from "@/features/athlete/RecoveryPages";
-import { athleteMenuAction } from "@/features/athlete/MenuParts";
+import {
+  athleteMenuAction,
+  progressAction,
+} from "@/features/athlete/MenuParts";
 import { useRecovery } from "@/features/athlete/RecoveryParts";
 import { AthleteDock, AthletePage, NotJoined } from "@/features/athlete/useMe";
 import { PageHeader } from "@/features/coach/parts";
@@ -46,8 +50,7 @@ const TABS: { key: RecoveryTab; label: string }[] = [
 export default function Recovery() {
   const r = useRecovery();
   const p = useLocalSearchParams<{ tab?: RecoveryTab }>();
-  const [today] = useState(todayDate);
-  const [date, setDate] = useState(today);
+  const { today, date, setDate } = useDayPicker();
   const [tab, setTab] = useState<RecoveryTab>(p.tab ?? "overview");
   // Opened from Today's rings with a section in mind: switch to it.
   const [asked, setAsked] = useState(p.tab);
@@ -60,7 +63,10 @@ export default function Recovery() {
   if (r.tier === "free")
     return (
       <View style={styles.root}>
-        <PageHeader title="Recovery" actions={[athleteMenuAction]} />
+        <PageHeader
+          title="Recovery"
+          actions={[progressAction, athleteMenuAction]}
+        />
         <AthletePage>
           <View style={styles.locked}>
             <Lock size={32} strokeWidth={1.6} color={colors.text} />
@@ -93,7 +99,10 @@ export default function Recovery() {
 
   return (
     <View style={styles.root}>
-      <PageHeader title="Recovery" actions={[athleteMenuAction]} />
+      <PageHeader
+        title="Recovery"
+        actions={[progressAction, athleteMenuAction]}
+      />
       <View style={styles.dates}>
         <IconButton
           icon={ChevronLeft}

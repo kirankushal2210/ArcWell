@@ -191,6 +191,34 @@ const setsWord = (n: number) => `${fmt(n)} set${n === 1 ? "" : "s"}`;
  * going all the way gives at most a trivial extra benefit. So: 0–3 reps in reserve. Beginners learn
  * the lifts at 2–3 in reserve. RIR scale: helms2016rir.
  */
+/**
+ * RPE on the reps-in-reserve scale (helms2016rir): RPE 10 = no more reps possible, 9 = one left,
+ * 8 = two left, and so on. Targets mirror rirFor: RPE = 10 − reps in reserve.
+ */
+export const RPE_OPTIONS: { value: number; label: string }[] = [
+  { value: 10, label: "Failure: no more reps" },
+  { value: 9, label: "1 rep left" },
+  { value: 8, label: "2 reps left" },
+  { value: 7, label: "3 reps left" },
+  { value: 6, label: "4 reps left" },
+  { value: 5, label: "5 or 6 reps left" },
+  { value: 4, label: "Easy, many reps left" },
+  { value: 3, label: "Light" },
+  { value: 2, label: "Very light" },
+  { value: 1, label: "Barely any effort" },
+];
+
+/** Target RPE range for an exercise, from the reps-in-reserve rule. */
+export function rpeTargetFor(
+  experience: string,
+  compound: boolean,
+): [number, number] {
+  if (experience === "new") return [7, 8];
+  return compound ? [7, 9] : [8, 10];
+}
+
+export const isCompound = (name: string) => COMPOUND.test(name);
+
 export function rirFor(experience: string, compound: boolean) {
   if (experience === "new") return "2–3";
   return compound ? "1–3" : "0–2";
@@ -323,7 +351,8 @@ export const GAIN_RATE_WEEK = [0.0025, 0.005] as const;
 export const FIBRE_G = [25, 29] as const;
 export const WATER_L = { female: 2.0, male: 2.5 } as const;
 
-/** Calorie targets use the Mifflin–St Jeor equation for resting energy (mifflin1990). */
+/** Calorie targets use the Mifflin–St Jeor equation for resting energy (mifflin1990), or lean mass
+ * (cunningham1980) when the athlete gave a body fat level (D84). */
 export const ENERGY_EQUATION = "mifflin1990";
 
 /**

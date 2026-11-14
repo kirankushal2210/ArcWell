@@ -1,7 +1,7 @@
 // Hybrid-race plan rules (D76): phases counted back from race day, the weekly template by days
 // available, the sim schedule, taper and running-load checks. Sources: stoggl2014 (intensity mix),
 // schumann2022 / wilson2012 / eddens2018 (concurrent training), bosquet2007 (taper),
-// frandsen2025 (single-run spikes).
+// frandsen2025 (single-run spikes), gutierrezhellin2026hyrox (race running pace).
 import type { TrainingDay, TrainingProgram } from "@/features/coach/plans";
 import { STATIONS } from "@/features/race/data";
 
@@ -11,12 +11,6 @@ export const PHASE_LABEL: Record<Phase, string> = {
   build: "Build",
   specific: "Specific",
   taper: "Taper",
-};
-export const PHASE_TEXT: Record<Phase, string> = {
-  base: "Building your engine and technique: mostly easy running and strength.",
-  build: "More race-pace running, stations at race weight, and half sims.",
-  specific: "Race rehearsal: compromised running, a full sim, race loads.",
-  taper: "Less volume, same intensity: arrive fresh.",
 };
 
 export const daysUntil = (date: string, today: string) =>
@@ -32,12 +26,6 @@ export function phaseFor(daysToRace: number): Phase {
   if (daysToRace <= 112) return "build";
   return "base";
 }
-
-/** Taper: cut volume by about half, keep intensity and how often you train (meta-analysis). */
-export const TAPER_VOLUME = 0.5;
-
-/** About 80% of endurance time easy, 20% hard. */
-export const EASY_SHARE = 0.8;
 
 export type SessionKind = "strength" | "run_easy" | "run_hard" | "hybrid";
 /** Sessions a week by days available (3–6). */
@@ -100,13 +88,64 @@ function strengthDay(name: string, lower: boolean): TrainingDay {
   };
 }
 
-function runDay(kind: "run_easy" | "run_hard", phase: Phase): TrainingDay {
+/** What the athlete told us (onboarding or race setup) that shapes the plan. */
+export type RaceProfile = {
+  level?: "first" | "returning" | "advanced";
+  weeklyKm?: number;
+  recent5kSec?: number;
+  /** Advanced: real in-race pace. */
+  racePaceSec?: number;
+  weak?: string[];
+  stationsTried?: string[];
+};
+
+const pace = (sec: number) =>
+  `${Math.floor(sec / 60)}:${String(Math.round(sec % 60)).padStart(2, "0")}`;
+
+/**
+ * Race-day running pace per km. Pro men averaged about 84% of second-threshold speed in a race
+ * (gutierrezhellin2026hyrox); threshold sits a little slower than 5 km pace, so race pace is about
+ * 1.25 × 5 km pace. A starting estimate, replaced by real sim splits.
+ */
+export function racePace(p: RaceProfile): number | null {
+  if (p.racePaceSec) return p.racePaceSec;
+  if (p.recent5kSec) return (p.recent5kSec / 5) * 1.25;
+  return null;
+}
+
+/** Easy run length by how much the athlete runs now. */
+export function easyRun(weeklyKm: number | undefined, phase: Phase) {
+  if (phase === "taper") return "20 min easy";
+  const k = weeklyKm ?? 5;
+  return k === 0
+    ? "20-25 min run-walk: 2 min run, 1 min walk"
+    : k < 10
+      ? "25-35 min easy"
+      : k < 20
+        ? "30-45 min easy"
+        : k < 35
+          ? "40-60 min easy"
+          : "50-75 min easy";
+}
+
+function runDay(
+  kind: "run_easy" | "run_hard",
+  phase: Phase,
+  p: RaceProfile = {},
+): TrainingDay {
+  const rp = racePace(p);
+  const at = rp ? ` at about ${pace(rp)}/km` : " at race pace";
+  const fast = p.recent5kSec
+    ? ` at about ${pace(p.recent5kSec / 5)}/km`
+    : " hard";
   const hard =
     phase === "base"
-      ? "6 × 400 m hard, 90 s easy"
+      ? p.level === "advanced"
+        ? `6 × 1 km${fast}, 90 s easy`
+        : `6 × 400 m${fast}, 90 s easy`
       : phase === "taper"
-        ? "3 × 1 km at race pace"
-        : "5 × 1 km at race pace, 90 s easy";
+        ? `3 × 1 km${at}`
+        : `5 × 1 km${at}, 90 s easy`;
   return {
     id: id("day"),
     name: kind === "run_easy" ? "Easy run" : "Run intervals",
@@ -119,60 +158,81 @@ function runDay(kind: "run_easy" | "run_hard", phase: Phase): TrainingDay {
         id: id("ex"),
         name: "Running",
         sets: 1,
-        reps:
-          kind === "run_easy"
-            ? phase === "taper"
-              ? "20 min easy"
-              : "30-45 min easy"
-            : hard,
+        reps: kind === "run_easy" ? easyRun(p.weeklyKm, phase) : hard,
         restSec: 0,
       },
     ],
   };
 }
 
-function hybridDay(phase: Phase): TrainingDay {
-  const stations = phase === "base" ? STATIONS.slice(0, 4) : STATIONS.slice(4);
-  const rounds = phase === "taper" ? 2 : phase === "base" ? 3 : 4;
+/** Stations in practice order: weak ones first, then (for first races) untried ones, then the rest. */
+export function stationOrder(p: RaceProfile) {
+  const weak = new Set(p.weak ?? []);
+  const tried = new Set(p.stationsTried ?? []);
+  const rank = (k: string) =>
+    weak.has(k) ? 0 : p.level === "first" && !tried.has(k) ? 1 : 2;
+  return [...STATIONS].sort((a, b) => rank(a.key) - rank(b.key));
+}
+
+function hybridDay(phase: Phase, p: RaceProfile = {}): TrainingDay {
+  const weak = new Set(p.weak ?? []);
+  const technique = phase === "base" && p.level !== "advanced";
+  const stations = stationOrder(p).slice(0, 4);
+  const rounds = phase === "taper" ? 2 : technique ? 3 : 4;
+  const rp = racePace(p);
+  const notes = [
+    technique
+      ? "Learn each station at a light load; smooth, not fast."
+      : `${rounds} rounds: 1 km run straight into a station at race weight.`,
+    weak.has("roxzone")
+      ? "Practise transitions: jog into each station and start at once."
+      : "",
+    weak.has("fade") || weak.has("running")
+      ? `Hold the same pace on the last run as the first${rp ? ` (about ${pace(rp)}/km)` : ""}.`
+      : "",
+  ].filter(Boolean);
   return {
     id: id("day"),
-    name: phase === "base" ? "Station technique" : "Compromised running",
-    note:
-      phase === "base"
-        ? "Learn each station at a light load; smooth, not fast."
-        : `${rounds} rounds: 1 km run straight into a station at race weight.`,
+    name: technique ? "Station technique" : "Compromised running",
+    note: notes.join(" "),
     exercises: [
-      ...(phase === "base"
+      ...(technique
         ? []
         : [
             {
               id: id("ex"),
               name: "Running",
               sets: rounds,
-              reps: "1 km at race pace",
+              reps: rp ? `1 km at about ${pace(rp)}/km` : "1 km at race pace",
               restSec: 0,
             },
           ]),
       ...stations.map((s) => ({
         id: id("ex"),
         name: s.exercise,
-        sets: phase === "base" ? 3 : rounds,
+        // One extra round on a weak station.
+        sets: (technique ? 3 : rounds) + (weak.has(s.key) ? 1 : 0),
         reps: s.reps
           ? `${Math.round(s.reps / 4)} reps`
           : `${Math.round((s.metres ?? 0) / 4)} m`,
-        restSec: phase === "base" ? 90 : 0,
+        restSec: technique ? 90 : 0,
       })),
     ],
   };
 }
 
-/** Build the week for the current phase from the athlete's days a week (3–6). */
+/** Days a week for the level: first races at most 5, so recovery keeps up. */
+export const daysFor = (daysPerWeek: number, level?: RaceProfile["level"]) =>
+  Math.min(level === "first" ? 5 : 6, Math.max(3, daysPerWeek));
+
+/** Build the week for the current phase from the athlete's days a week (3–6) and race profile. */
 export function hybridProgram(
   daysPerWeek: number,
   daysToRace: number,
+  p: RaceProfile = {},
 ): TrainingProgram {
   const phase = phaseFor(daysToRace);
-  const kinds = WEEK_TEMPLATE[Math.min(6, Math.max(3, daysPerWeek))];
+  const kinds = WEEK_TEMPLATE[daysFor(daysPerWeek, p.level)];
   let lower = true;
   const days = kinds.map((k) => {
     if (k === "strength") {
@@ -183,8 +243,8 @@ export function hybridProgram(
       lower = !lower;
       return d;
     }
-    if (k === "hybrid") return hybridDay(phase);
-    return runDay(k, phase);
+    if (k === "hybrid") return hybridDay(phase, p);
+    return runDay(k, phase, p);
   });
   return {
     name: `Race plan · ${PHASE_LABEL[phase]}`,

@@ -13,10 +13,22 @@ import {
   Sparkles,
   X,
 } from "lucide-react-native";
-import { useEffect, useState } from "react";
-import { Alert, ScrollView, StyleSheet, TextInput, View } from "react-native";
+import {
+  memo,
+  type ReactNode,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { ScrollView, StyleSheet, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import {
+  useActiveWorkout,
+  useSetActive,
+} from "@/features/athlete/ActiveWorkout";
 import {
   Button,
   IconButton,
@@ -28,6 +40,7 @@ import {
   cancelRestAlert,
   scheduleRestAlert,
 } from "@/features/athlete/restAlert";
+import { confirmDiscard } from "@/features/athlete/discardWorkout";
 import { ExercisePicker } from "@/features/athlete/ExercisePicker";
 import {
   type ExerciseType,
@@ -41,12 +54,14 @@ import { Sheet, SheetRow } from "@/features/athlete/Sheet";
 import {
   type ActiveWorkout,
   clockTime,
+  countsVolume,
   defaultTarget,
   exerciseFrom,
   exType,
   groupOf,
   type LoggedExercise,
   type LoggedSet,
+  type Session,
   now,
   previousSets,
   setFields,
@@ -57,7 +72,7 @@ import {
 import { NotJoined, useMe } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Pills } from "@/features/coach/parts";
-import { uid } from "@/features/coach/plans";
+import { rpeText, uid } from "@/features/coach/plans";
 import { alternativesFor } from "@/features/onboarding/workouts";
 import {
   colors,
@@ -68,6 +83,8 @@ import {
   textSizes,
 } from "@/theme";
 import { OfflineBanner } from "@/features/system/SystemStates";
+import { RpeScale } from "@/features/athlete/RpeScale";
+import { isCompound, rpeTargetFor } from "@/features/science/rules";
 
 const REST_STEPS = [0, 30, 60, 90, 120, 180];
 
@@ -104,72 +121,8 @@ const writePad = (f: KeypadField, v: number | null): Partial<LoggedSet> =>
 
 export default function Workout() {
   const me = useMe();
-  const {
-    active,
-    setActive,
-    sessions,
-    finishWorkout,
-    meTier,
-    coachName,
-    saveProgram,
-  } = useCoachData();
+  const active = useActiveWorkout();
   const insets = useSafeAreaInsets();
-  const [clock, setClock] = useState(now);
-  const [menu, setMenu] = useState<string | null>(null);
-  const [swap, setSwap] = useState<string | null>(null);
-  const [swapScope, setSwapScope] = useState<"today" | "plan">("today");
-  const [adding, setAdding] = useState(false);
-  const [browsing, setBrowsing] = useState(false);
-  const [finishing, setFinishing] = useState(false);
-  const [noting, setNoting] = useState<string | null>(null);
-  const [pad, setPad] = useState<KeypadTarget | null>(null);
-
-  // One clock for the elapsed time, the rest countdown and timed sets.
-  useEffect(() => {
-    const t = setInterval(() => setClock(now()), 1000);
-    return () => clearInterval(t);
-  }, []);
-
-  // Rest over while the app is open: one vibration, then the timer clears (F4-04).
-  const restEnds = active?.rest?.endsAt;
-  useEffect(() => {
-    if (restEnds && clock >= restEnds) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(
-        () => {},
-      );
-      cancelRestAlert();
-      setActive((w) => (w ? { ...w, rest: null } : w));
-    }
-  }, [clock, restEnds, setActive]);
-
-  // A timed set reached zero: vibrate, tick it and start the rest (TR-08).
-  const timerEnds = active?.timer?.endsAt;
-  const timerSet = active?.timer?.setId;
-  useEffect(() => {
-    if (!timerEnds || !timerSet || clock < timerEnds) return;
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(
-      () => {},
-    );
-    setActive((w) => {
-      if (!w) return w;
-      const ex = w.exercises.find((e) => e.sets.some((s) => s.id === timerSet));
-      const exercises = w.exercises.map((e) => ({
-        ...e,
-        sets: e.sets.map((s) => (s.id === timerSet ? { ...s, done: true } : s)),
-      }));
-      const rest =
-        ex && ex.restSec > 0
-          ? {
-              endsAt: now() + ex.restSec * 1000,
-              total: ex.restSec,
-              next: ex.name,
-            }
-          : null;
-      if (rest && ex) scheduleRestAlert(ex.restSec, ex.name);
-      return { ...w, exercises, timer: null, rest };
-    });
-  }, [clock, timerEnds, timerSet, setActive]);
-
   if (!me) return <NotJoined />;
   if (!active)
     return (
@@ -182,6 +135,90 @@ export default function Workout() {
         />
       </View>
     );
+  return <Logger me={me} active={active} />;
+}
+
+function Logger({
+  me,
+  active,
+}: {
+  me: NonNullable<ReturnType<typeof useMe>>;
+  active: ActiveWorkout;
+}) {
+  const { sessions, finishWorkout, meTier, coachName, saveProgram } =
+    useCoachData();
+  const setActive = useSetActive();
+  const insets = useSafeAreaInsets();
+  const [menu, setMenu] = useState<string | null>(null);
+  const [swap, setSwap] = useState<string | null>(null);
+  const [swapScope, setSwapScope] = useState<"today" | "plan">("today");
+  const [adding, setAdding] = useState(false);
+  const [browsing, setBrowsing] = useState(false);
+  const [finishing, setFinishing] = useState(false);
+  const [noting, setNoting] = useState<string | null>(null);
+  const [pad, setPad] = useState<KeypadTarget | null>(null);
+  /** The set whose RPE is being picked. */
+  const [rpeFor, setRpeFor] = useState<{ exId: string; setId: string } | null>(
+    null,
+  );
+
+  // The ticking numbers (elapsed time, rest and timed-set countdowns) are small <Live> parts with
+  // their own clock, so the logger itself doesn't re-render every second.
+
+  // Rest over while the app is open: one vibration, then the timer clears (F4-04).
+  const restEnds = active.rest?.endsAt;
+  useEffect(() => {
+    if (!restEnds) return;
+    const t = setTimeout(
+      () => {
+        Haptics.notificationAsync(
+          Haptics.NotificationFeedbackType.Success,
+        ).catch(() => {});
+        cancelRestAlert();
+        setActive((w) => (w ? { ...w, rest: null } : w));
+      },
+      Math.max(0, restEnds - now()),
+    );
+    return () => clearTimeout(t);
+  }, [restEnds, setActive]);
+
+  // A timed set reached zero: vibrate, tick it and start the rest (TR-08).
+  const timerEnds = active.timer?.endsAt;
+  const timerSet = active.timer?.setId;
+  useEffect(() => {
+    if (!timerEnds || !timerSet) return;
+    const t = setTimeout(
+      () => {
+        Haptics.notificationAsync(
+          Haptics.NotificationFeedbackType.Success,
+        ).catch(() => {});
+        setActive((w) => {
+          if (!w) return w;
+          const ex = w.exercises.find((e) =>
+            e.sets.some((s) => s.id === timerSet),
+          );
+          const exercises = w.exercises.map((e) => ({
+            ...e,
+            sets: e.sets.map((s) =>
+              s.id === timerSet ? { ...s, done: true } : s,
+            ),
+          }));
+          const rest =
+            ex && ex.restSec > 0
+              ? {
+                  endsAt: now() + ex.restSec * 1000,
+                  total: ex.restSec,
+                  next: ex.name,
+                }
+              : null;
+          if (rest && ex) scheduleRestAlert(ex.restSec, ex.name);
+          return { ...w, exercises, timer: null, rest };
+        });
+      },
+      Math.max(0, timerEnds - now()),
+    );
+    return () => clearTimeout(t);
+  }, [timerEnds, timerSet, setActive]);
 
   const history = sessions(me.id);
   const coached = meTier === "coached";
@@ -251,6 +288,36 @@ export default function Workout() {
     if (!s.done) startRest(e, s.id);
   };
 
+  // Stable handlers for the memoised cards: they always call the latest version of each action.
+  const latest = useRef<CardActions>(null as unknown as CardActions);
+  // Runs after every render on purpose (the latest-handler pattern), so no dependency list.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useLayoutEffect(() => {
+    latest.current = {
+      edit,
+      editEx,
+      editSet,
+      tick,
+      setMenu,
+      setNoting,
+      setPad,
+      setRpeFor,
+    };
+  });
+  const act = useMemo<CardActions>(
+    () => ({
+      edit: (fn) => latest.current.edit(fn),
+      editEx: (id, fn) => latest.current.editEx(id, fn),
+      editSet: (ex, set, patch) => latest.current.editSet(ex, set, patch),
+      tick: (e, st) => latest.current.tick(e, st),
+      setMenu: (v) => latest.current.setMenu(v),
+      setNoting: (v) => latest.current.setNoting(v),
+      setPad: (v) => latest.current.setPad(v),
+      setRpeFor: (v) => latest.current.setRpeFor(v),
+    }),
+    [],
+  );
+
   const finish = (markAll: boolean) => {
     cancelRestAlert();
     const s = toSession(active, history, markAll);
@@ -289,8 +356,11 @@ export default function Workout() {
           .map((x) => ({ name: x.name, group: swapEx.group }))
     : [];
   const rest = active.rest;
-  const restLeft = rest ? Math.max(0, rest.endsAt - clock) : 0;
 
+  const rpeEx = rpeFor
+    ? active.exercises.find((e) => e.id === rpeFor.exId)
+    : undefined;
+  const rpeSet = rpeEx?.sets.find((x) => x.id === rpeFor?.setId);
   const padEx = pad
     ? active.exercises.find((e) => e.id === pad.exId)
     : undefined;
@@ -358,8 +428,10 @@ export default function Workout() {
             {active.name}
           </Text>
           <Text variant="label" weight="regular" tone="muted" numeric>
-            {clockTime(clock - active.startedAt)} · {exDone} of{" "}
-            {active.exercises.length} exercises
+            <Live render={(t) => clockTime(t - active.startedAt)} /> ·{" "}
+            {active.exercises.length === 1
+              ? `${active.exercises[0].sets.filter((s) => s.done).length} of ${active.exercises[0].sets.length} ${active.exercises[0].sets.length === 1 ? "set" : "sets"}`
+              : `${exDone} of ${active.exercises.length} exercises`}
           </Text>
         </View>
         <Button
@@ -386,331 +458,23 @@ export default function Workout() {
           {ticked} of {total} sets · saved on this phone as you go
         </Text>
 
-        {active.exercises.map((e) => {
-          const prev = previousSets(history, e.name);
-          const hint = suggestion(history, e);
-          if (e.skipped)
-            return (
-              <View key={e.id} style={[styles.card, styles.dim]}>
-                <View style={styles.cardHead}>
-                  <Text weight="semibold" style={styles.flex}>
-                    {e.name}
-                  </Text>
-                  <Button
-                    label="Undo skip"
-                    variant="ghost"
-                    onPress={() =>
-                      editEx(e.id, (x) => ({ ...x, skipped: false }))
-                    }
-                  />
-                </View>
-                <Text variant="label" tone="muted">
-                  Skipped{coached ? `, ${coachName} will see this` : ""}
-                </Text>
-              </View>
-            );
-          return (
-            <View key={e.id} style={styles.card}>
-              <View style={styles.cardHead}>
-                <PressableScale
-                  onPress={() =>
-                    router.push({
-                      pathname: "/athlete/exercises/[name]",
-                      params: { name: e.name },
-                    })
-                  }
-                  accessibilityRole="button"
-                  accessibilityLabel={`${e.name}, how to do it`}
-                  style={styles.flex}
-                >
-                  <Text variant="heading">{e.name}</Text>
-                  <Text variant="label" weight="regular" tone="muted">
-                    {e.swappedFrom ? `Swapped for ${e.swappedFrom} · ` : ""}
-                    {e.group} · target {e.target} · rest{" "}
-                    {e.restSec ? clockTime(e.restSec * 1000) : "none"}
-                  </Text>
-                </PressableScale>
-                <IconButton
-                  icon={Ellipsis}
-                  accessibilityLabel={`${e.name} options`}
-                  onPress={() => setMenu(e.id)}
-                />
-              </View>
-
-              {hint && !e.sets.some((s) => s.done) ? (
-                <View style={styles.hint}>
-                  <Sparkles size={16} color={colors.text} />
-                  <Text variant="label" weight="regular" style={styles.flex}>
-                    {hint.text}
-                  </Text>
-                  {hint.kg !== null &&
-                  e.sets.some((s) => !s.warmup && s.kg !== hint.kg) ? (
-                    <PressableScale
-                      onPress={() =>
-                        editEx(e.id, (x) => ({
-                          ...x,
-                          sets: x.sets.map((s) =>
-                            s.done || s.warmup ? s : { ...s, kg: hint.kg },
-                          ),
-                        }))
-                      }
-                      accessibilityRole="button"
-                      accessibilityLabel={`Use ${hint.kg} kg for every set`}
-                      style={styles.use}
-                    >
-                      <Text variant="label">Use</Text>
-                    </PressableScale>
-                  ) : null}
-                </View>
-              ) : null}
-
-              {e.note ? (
-                <Text
-                  variant="label"
-                  weight="regular"
-                  tone="muted"
-                  style={styles.note}
-                >
-                  {e.note}
-                </Text>
-              ) : null}
-              {noting === e.id ? (
-                <TextInput
-                  autoFocus
-                  defaultValue={e.note}
-                  onEndEditing={(ev) => {
-                    const v = ev.nativeEvent.text.trim();
-                    editEx(e.id, (x) => ({ ...x, note: v }));
-                    setNoting(null);
-                  }}
-                  placeholder={
-                    coached ? `Note for ${coachName}` : "Note for this exercise"
-                  }
-                  placeholderTextColor={colors.textMuted}
-                  style={styles.noteInput}
-                  accessibilityLabel={`${e.name} note`}
-                />
-              ) : null}
-
-              <View style={styles.tableHead}>
-                <Text variant="caption" tone="muted" style={styles.colSet}>
-                  SET
-                </Text>
-                <Text variant="caption" tone="muted" style={styles.colPrev}>
-                  PREVIOUS
-                </Text>
-                {setFields(e).map((f) => (
-                  <Text
-                    key={f}
-                    variant="caption"
-                    tone="muted"
-                    style={
-                      setFields(e).length === 1 ? styles.colWide : styles.colIn
-                    }
-                  >
-                    {fieldHead(f, exType(e))}
-                  </Text>
-                ))}
-                <View style={styles.colTick} />
-              </View>
-
-              {e.sets.map((s, k) => {
-                const workNo = e.sets
-                  .slice(0, k + 1)
-                  .filter((x) => !x.warmup).length;
-                const p = s.warmup ? undefined : prev[workNo - 1];
-                const running = active.timer?.setId === s.id;
-                const cell = (
-                  field: KeypadField,
-                  text: string,
-                  placeholder: string,
-                  style: object,
-                ) => (
-                  <PressableScale
-                    key={field}
-                    onPress={() => setPad({ exId: e.id, setId: s.id, field })}
-                    accessibilityRole="button"
-                    accessibilityLabel={`${e.name} set ${workNo} ${field}, ${text || "empty"}`}
-                    style={[styles.cell, style]}
-                  >
-                    <Text
-                      weight="semibold"
-                      tone={text ? "default" : "muted"}
-                      numeric
-                    >
-                      {text || placeholder}
-                    </Text>
-                  </PressableScale>
-                );
-                return (
-                  <View
-                    key={s.id}
-                    style={[styles.setRow, s.done && styles.setDone]}
-                  >
-                    <PressableScale
-                      onPress={() => editSet(e.id, s.id, { warmup: !s.warmup })}
-                      accessibilityRole="button"
-                      accessibilityLabel={
-                        s.warmup
-                          ? "Warm-up set, tap to make it a working set"
-                          : `Set ${workNo}, tap to mark as warm-up`
-                      }
-                      style={styles.colSet}
-                    >
-                      <Text
-                        weight="semibold"
-                        tone={s.warmup ? "warning" : "default"}
-                        numeric
-                      >
-                        {s.warmup ? "W" : workNo}
-                      </Text>
-                    </PressableScale>
-                    <Text
-                      variant="label"
-                      weight="regular"
-                      tone="muted"
-                      numeric
-                      style={styles.colPrev}
-                      numberOfLines={1}
-                    >
-                      {p ? setLabel(p, e.name) : "—"}
-                    </Text>
-                    {setFields(e).map((f) => {
-                      const type = exType(e);
-                      const single = setFields(e).length === 1;
-                      if (f === "seconds" && type === "duration")
-                        return (
-                          <View
-                            key={f}
-                            style={[styles.colWide, styles.timedRow]}
-                          >
-                            {running ? (
-                              <View
-                                style={[
-                                  styles.cell,
-                                  styles.flex,
-                                  styles.cellLive,
-                                ]}
-                              >
-                                <Text weight="semibold" tone="onBrand" numeric>
-                                  {clockTime(
-                                    Math.max(
-                                      0,
-                                      (active.timer?.endsAt ?? 0) - clock,
-                                    ),
-                                  )}
-                                </Text>
-                              </View>
-                            ) : (
-                              cell(
-                                "seconds",
-                                s.seconds === null
-                                  ? ""
-                                  : clockTime(s.seconds * 1000),
-                                "time",
-                                styles.flex,
-                              )
-                            )}
-                            {s.done ? null : (
-                              <IconButton
-                                icon={running ? X : Play}
-                                variant="filled"
-                                accessibilityLabel={
-                                  running
-                                    ? "Stop timer"
-                                    : `Start ${s.seconds ?? 30} second timer`
-                                }
-                                onPress={() =>
-                                  edit((w) => ({
-                                    ...w,
-                                    timer: running
-                                      ? null
-                                      : {
-                                          setId: s.id,
-                                          endsAt:
-                                            now() + (s.seconds ?? 30) * 1000,
-                                        },
-                                  }))
-                                }
-                              />
-                            )}
-                          </View>
-                        );
-                      const v =
-                        f === "km" ? (s.km ?? null) : (s[f] as number | null);
-                      const text =
-                        v === null
-                          ? ""
-                          : f === "seconds"
-                            ? clockTime(v * 1000)
-                            : f === "km" && type === "weight_distance"
-                              ? `${Math.round(v * 1000)}`
-                              : String(v);
-                      const placeholder =
-                        f === "kg"
-                          ? type === "weight_reps" || type === "weight_distance"
-                            ? "kg"
-                            : "0"
-                          : f === "seconds"
-                            ? "time"
-                            : f === "km" && type === "weight_distance"
-                              ? "m"
-                              : f;
-                      return cell(
-                        padFieldOf(f, type),
-                        text,
-                        placeholder,
-                        single ? styles.colWide : styles.colIn,
-                      );
-                    })}
-                    <PressableScale
-                      onPress={() => tick(e, s)}
-                      accessibilityRole="checkbox"
-                      accessibilityState={{ checked: s.done }}
-                      accessibilityLabel={`${e.name} set ${workNo} done`}
-                      style={[
-                        styles.colTick,
-                        styles.tick,
-                        s.done && styles.tickOn,
-                      ]}
-                    >
-                      <Check
-                        size={20}
-                        strokeWidth={3}
-                        color={s.done ? colors.onPillar : colors.textMuted}
-                      />
-                    </PressableScale>
-                  </View>
-                );
-              })}
-              <Button
-                label="Add set"
-                icon={Plus}
-                variant="ghost"
-                onPress={() =>
-                  editEx(e.id, (x) => {
-                    const last = x.sets[x.sets.length - 1];
-                    return {
-                      ...x,
-                      sets: [
-                        ...x.sets,
-                        {
-                          id: uid("s"),
-                          warmup: false,
-                          kg: last?.kg ?? null,
-                          reps: last?.reps ?? null,
-                          seconds: last?.seconds ?? null,
-                          km: last?.km ?? null,
-                          done: false,
-                        },
-                      ],
-                    };
-                  })
-                }
-              />
-            </View>
-          );
-        })}
+        {active.exercises.map((e) => (
+          <ExerciseCard
+            key={e.id}
+            e={e}
+            history={history}
+            experience={me.profile?.experience ?? "some"}
+            coached={coached}
+            coachName={coachName}
+            noting={noting === e.id}
+            timer={
+              active.timer && e.sets.some((x) => x.id === active.timer?.setId)
+                ? active.timer
+                : null
+            }
+            act={act}
+          />
+        ))}
 
         <Button
           label="Add exercise"
@@ -724,22 +488,11 @@ export default function Workout() {
           variant="ghost"
           fullWidth
           onPress={() =>
-            Alert.alert(
-              "Discard this workout?",
-              "Nothing from this session will be saved.",
-              [
-                { text: "Keep going", style: "cancel" },
-                {
-                  text: "Discard",
-                  style: "destructive",
-                  onPress: () => {
-                    cancelRestAlert();
-                    setActive(null);
-                    router.replace("/athlete/training");
-                  },
-                },
-              ],
-            )
+            confirmDiscard(() => {
+              cancelRestAlert();
+              setActive(null);
+              router.replace("/athlete/training");
+            })
           }
         />
       </ScrollView>
@@ -793,19 +546,23 @@ export default function Workout() {
               </Text>
             </View>
             <Text variant="display" numeric>
-              {clockTime(restLeft)}
+              <Live render={(t) => clockTime(Math.max(0, rest.endsAt - t))} />
             </Text>
           </View>
-          <View style={styles.track}>
-            <View
-              style={[
-                styles.fill,
-                {
-                  width: `${Math.round((restLeft / (rest.total * 1000)) * 100)}%`,
-                },
-              ]}
-            />
-          </View>
+          <Live
+            render={(t) => (
+              <View style={styles.track}>
+                <View
+                  style={[
+                    styles.fill,
+                    {
+                      width: `${Math.round((Math.max(0, rest.endsAt - t) / (rest.total * 1000)) * 100)}%`,
+                    },
+                  ]}
+                />
+              </View>
+            )}
+          />
           <View style={styles.restRow}>
             {(
               [
@@ -850,6 +607,30 @@ export default function Workout() {
           </View>
         </View>
       ) : null}
+
+      {/* RPE for a set: how many more good reps were left (helms2016rir) */}
+      <Sheet
+        visible={!!rpeFor}
+        onClose={() => setRpeFor(null)}
+        title="How hard was that set?"
+      >
+        {rpeEx && rpeSet ? (
+          <RpeScale
+            value={rpeSet.rpe}
+            target={
+              rpeEx.rpe ??
+              rpeTargetFor(
+                me.profile?.experience ?? "some",
+                isCompound(rpeEx.name),
+              )
+            }
+            onPick={(v) => {
+              editSet(rpeEx.id, rpeSet.id, { rpe: v });
+              setRpeFor(null);
+            }}
+          />
+        ) : null}
+      </Sheet>
 
       {/* Exercise options (F4-06) */}
       <Sheet
@@ -1148,7 +929,8 @@ const styles = StyleSheet.create({
   setDone: { backgroundColor: colors.bg },
   colSet: { width: 32, alignItems: "center" },
   colPrev: { flex: 1 },
-  colIn: { width: 64 },
+  colIn: { width: 58 },
+  colRpe: { width: 44, alignItems: "center", justifyContent: "center" },
   colWide: { width: 136 },
   colTick: { width: 44 },
   timedRow: { flexDirection: "row", alignItems: "center", gap: space[2] },
@@ -1190,3 +972,368 @@ const styles = StyleSheet.create({
   restRow: { flexDirection: "row", gap: space[2] },
   sheetList: { maxHeight: 360 },
 });
+
+type CardActions = {
+  edit: (fn: (w: ActiveWorkout) => ActiveWorkout) => void;
+  editEx: (exId: string, fn: (e: LoggedExercise) => LoggedExercise) => void;
+  editSet: (exId: string, setId: string, patch: Partial<LoggedSet>) => void;
+  tick: (e: LoggedExercise, s: LoggedSet) => void;
+  setMenu: (exId: string | null) => void;
+  setNoting: (exId: string | null) => void;
+  setPad: (t: KeypadTarget | null) => void;
+  setRpeFor: (t: { exId: string; setId: string } | null) => void;
+};
+
+/**
+ * One exercise in the logger. Memoised: logging a set re-renders only the card it belongs to,
+ * not every card in the workout.
+ */
+const ExerciseCard = memo(function ExerciseCard({
+  e,
+  history,
+  experience,
+  coached,
+  coachName,
+  noting,
+  timer,
+  act,
+}: {
+  e: LoggedExercise;
+  history: Session[];
+  experience: string;
+  coached: boolean;
+  coachName: string;
+  noting: boolean;
+  timer: ActiveWorkout["timer"] | null;
+  act: CardActions;
+}) {
+  const prev = previousSets(history, e.name);
+  // The coach's target effort when set (K-07), else the rules range (D69).
+  const rpeT = e.rpe ?? rpeTargetFor(experience, isCompound(e.name));
+  const rated = countsVolume(exType(e));
+  const hint = suggestion(history, e, rated ? rpeT : undefined);
+  if (e.skipped)
+    return (
+      <View key={e.id} style={[styles.card, styles.dim]}>
+        <View style={styles.cardHead}>
+          <Text weight="semibold" style={styles.flex}>
+            {e.name}
+          </Text>
+          <Button
+            label="Undo skip"
+            variant="ghost"
+            onPress={() => act.editEx(e.id, (x) => ({ ...x, skipped: false }))}
+          />
+        </View>
+        <Text variant="label" tone="muted">
+          Skipped{coached ? `, ${coachName} will see this` : ""}
+        </Text>
+      </View>
+    );
+  return (
+    <View key={e.id} style={styles.card}>
+      <View style={styles.cardHead}>
+        <PressableScale
+          onPress={() =>
+            router.push({
+              pathname: "/athlete/exercises/[name]",
+              params: { name: e.name },
+            })
+          }
+          accessibilityRole="button"
+          accessibilityLabel={`${e.name}, how to do it`}
+          style={styles.flex}
+        >
+          <Text variant="heading">{e.name}</Text>
+          <Text variant="label" weight="regular" tone="muted">
+            {e.swappedFrom ? `Swapped for ${e.swappedFrom} · ` : ""}
+            {e.group} · target {e.target}
+            {e.pace ? ` · pace ${e.pace}` : ""}
+            {rated || e.rpe ? ` · ${rpeText(rpeT)}` : ""}
+            {` · rest ${e.restSec ? clockTime(e.restSec * 1000) : "none"}`}
+          </Text>
+        </PressableScale>
+        <IconButton
+          icon={Ellipsis}
+          accessibilityLabel={`${e.name} options`}
+          onPress={() => act.setMenu(e.id)}
+        />
+      </View>
+
+      {hint && !e.sets.some((s) => s.done) ? (
+        <View style={styles.hint}>
+          <Sparkles size={16} color={colors.text} />
+          <Text variant="label" weight="regular" style={styles.flex}>
+            {hint.text}
+          </Text>
+          {hint.kg !== null &&
+          e.sets.some((s) => !s.warmup && s.kg !== hint.kg) ? (
+            <PressableScale
+              onPress={() =>
+                act.editEx(e.id, (x) => ({
+                  ...x,
+                  sets: x.sets.map((s) =>
+                    s.done || s.warmup ? s : { ...s, kg: hint.kg },
+                  ),
+                }))
+              }
+              accessibilityRole="button"
+              accessibilityLabel={`Use ${hint.kg} kg for every set`}
+              style={styles.use}
+            >
+              <Text variant="label">Use</Text>
+            </PressableScale>
+          ) : null}
+        </View>
+      ) : null}
+
+      {e.note ? (
+        <Text variant="label" weight="regular" tone="muted" style={styles.note}>
+          {e.note}
+        </Text>
+      ) : null}
+      {noting ? (
+        <TextInput
+          autoFocus
+          defaultValue={e.note}
+          onEndEditing={(ev) => {
+            const v = ev.nativeEvent.text.trim();
+            act.editEx(e.id, (x) => ({ ...x, note: v }));
+            act.setNoting(null);
+          }}
+          placeholder={
+            coached ? `Note for ${coachName}` : "Note for this exercise"
+          }
+          placeholderTextColor={colors.textMuted}
+          style={styles.noteInput}
+          accessibilityLabel={`${e.name} note`}
+        />
+      ) : null}
+
+      <View style={styles.tableHead}>
+        <Text variant="caption" tone="muted" style={styles.colSet}>
+          SET
+        </Text>
+        <Text variant="caption" tone="muted" style={styles.colPrev}>
+          PREVIOUS
+        </Text>
+        {setFields(e).map((f) => (
+          <Text
+            key={f}
+            variant="caption"
+            tone="muted"
+            style={setFields(e).length === 1 ? styles.colWide : styles.colIn}
+          >
+            {fieldHead(f, exType(e))}
+          </Text>
+        ))}
+        {rated ? (
+          <Text variant="caption" tone="muted" style={styles.colRpe}>
+            RPE
+          </Text>
+        ) : null}
+        <View style={styles.colTick} />
+      </View>
+
+      {e.sets.map((s, k) => {
+        const workNo = e.sets.slice(0, k + 1).filter((x) => !x.warmup).length;
+        const p = s.warmup ? undefined : prev[workNo - 1];
+        const running = timer?.setId === s.id;
+        const cell = (
+          field: KeypadField,
+          text: string,
+          placeholder: string,
+          style: object,
+        ) => (
+          <PressableScale
+            key={field}
+            onPress={() => act.setPad({ exId: e.id, setId: s.id, field })}
+            accessibilityRole="button"
+            accessibilityLabel={`${e.name} set ${workNo} ${field}, ${text || "empty"}`}
+            style={[styles.cell, style]}
+          >
+            <Text weight="semibold" tone={text ? "default" : "muted"} numeric>
+              {text || placeholder}
+            </Text>
+          </PressableScale>
+        );
+        return (
+          <View key={s.id} style={[styles.setRow, s.done && styles.setDone]}>
+            <PressableScale
+              onPress={() => act.editSet(e.id, s.id, { warmup: !s.warmup })}
+              accessibilityRole="button"
+              accessibilityLabel={
+                s.warmup
+                  ? "Warm-up set, tap to make it a working set"
+                  : `Set ${workNo}, tap to mark as warm-up`
+              }
+              style={styles.colSet}
+            >
+              <Text
+                weight="semibold"
+                tone={s.warmup ? "warning" : "default"}
+                numeric
+              >
+                {s.warmup ? "W" : workNo}
+              </Text>
+            </PressableScale>
+            <Text
+              variant="label"
+              weight="regular"
+              tone="muted"
+              numeric
+              style={styles.colPrev}
+              numberOfLines={1}
+            >
+              {p
+                ? `${setLabel(p, e.name)}${typeof p.rpe === "number" ? ` @${p.rpe}` : ""}`
+                : "—"}
+            </Text>
+            {setFields(e).map((f) => {
+              const type = exType(e);
+              const single = setFields(e).length === 1;
+              if (f === "seconds" && type === "duration")
+                return (
+                  <View key={f} style={[styles.colWide, styles.timedRow]}>
+                    {running ? (
+                      <View style={[styles.cell, styles.flex, styles.cellLive]}>
+                        <Text weight="semibold" tone="onBrand" numeric>
+                          <Live
+                            render={(t) =>
+                              clockTime(Math.max(0, (timer?.endsAt ?? 0) - t))
+                            }
+                          />
+                        </Text>
+                      </View>
+                    ) : (
+                      cell(
+                        "seconds",
+                        s.seconds === null ? "" : clockTime(s.seconds * 1000),
+                        "time",
+                        styles.flex,
+                      )
+                    )}
+                    {s.done ? null : (
+                      <IconButton
+                        icon={running ? X : Play}
+                        variant="filled"
+                        accessibilityLabel={
+                          running
+                            ? "Stop timer"
+                            : `Start ${s.seconds ?? 30} second timer`
+                        }
+                        onPress={() =>
+                          act.edit((w) => ({
+                            ...w,
+                            timer: running
+                              ? null
+                              : {
+                                  setId: s.id,
+                                  endsAt: now() + (s.seconds ?? 30) * 1000,
+                                },
+                          }))
+                        }
+                      />
+                    )}
+                  </View>
+                );
+              const v = f === "km" ? (s.km ?? null) : (s[f] as number | null);
+              const text =
+                v === null
+                  ? ""
+                  : f === "seconds"
+                    ? clockTime(v * 1000)
+                    : f === "km" && type === "weight_distance"
+                      ? `${Math.round(v * 1000)}`
+                      : String(v);
+              const placeholder =
+                f === "kg"
+                  ? type === "weight_reps" || type === "weight_distance"
+                    ? "kg"
+                    : "0"
+                  : f === "seconds"
+                    ? "time"
+                    : f === "km" && type === "weight_distance"
+                      ? "m"
+                      : f;
+              return cell(
+                padFieldOf(f, type),
+                text,
+                placeholder,
+                single ? styles.colWide : styles.colIn,
+              );
+            })}
+            {rated ? (
+              s.warmup ? (
+                <View style={styles.colRpe} />
+              ) : (
+                <PressableScale
+                  onPress={() => act.setRpeFor({ exId: e.id, setId: s.id })}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${e.name} set ${workNo} RPE, ${typeof s.rpe === "number" ? s.rpe : "not set"}`}
+                  style={[styles.cell, styles.colRpe]}
+                >
+                  <Text
+                    weight="semibold"
+                    tone={typeof s.rpe === "number" ? "default" : "muted"}
+                    numeric
+                  >
+                    {typeof s.rpe === "number" ? String(s.rpe) : "–"}
+                  </Text>
+                </PressableScale>
+              )
+            ) : null}
+            <PressableScale
+              onPress={() => act.tick(e, s)}
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: s.done }}
+              accessibilityLabel={`${e.name} set ${workNo} done`}
+              style={[styles.colTick, styles.tick, s.done && styles.tickOn]}
+            >
+              <Check
+                size={20}
+                strokeWidth={3}
+                color={s.done ? colors.onPillar : colors.textMuted}
+              />
+            </PressableScale>
+          </View>
+        );
+      })}
+      <Button
+        label="Add set"
+        icon={Plus}
+        variant="ghost"
+        onPress={() =>
+          act.editEx(e.id, (x) => {
+            const last = x.sets[x.sets.length - 1];
+            return {
+              ...x,
+              sets: [
+                ...x.sets,
+                {
+                  id: uid("s"),
+                  warmup: false,
+                  kg: last?.kg ?? null,
+                  reps: last?.reps ?? null,
+                  seconds: last?.seconds ?? null,
+                  km: last?.km ?? null,
+                  done: false,
+                },
+              ],
+            };
+          })
+        }
+      />
+    </View>
+  );
+});
+
+/** A piece of the screen that follows the clock, re-rendering on its own once a second. */
+function Live({ render }: { render: (t: number) => ReactNode }) {
+  const [t, setT] = useState(now);
+  useEffect(() => {
+    const i = setInterval(() => setT(now()), 1000);
+    return () => clearInterval(i);
+  }, []);
+  return <>{render(t)}</>;
+}

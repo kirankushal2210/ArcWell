@@ -43,7 +43,7 @@ export function useRace() {
     /** Replace the plan with the race plan (self-guided only; a coach decides for coached athletes). */
     switchPlan: (daysPerWeek: number) => {
       if (!me || !goal) return;
-      const p = hybridProgram(daysPerWeek, daysUntil(goal.date, isoToday()));
+      const p = hybridProgram(daysPerWeek, daysUntil(goal.date, isoToday()), goal);
       startProgram(me.id, p, me.protocol?.restDays ?? []);
     },
     start: (

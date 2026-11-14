@@ -27,7 +27,7 @@ export function HistoryWeeks({ me }: { me: Client }) {
   if (all.length === 0)
     return (
       <Text tone="muted">
-        Finished workouts show here, with time, volume and your best sets.
+        No workouts yet.
       </Text>
     );
 

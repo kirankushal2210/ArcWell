@@ -11,7 +11,6 @@ import {
   UserRound,
   Users,
 } from "lucide-react-native";
-import { Alert } from "react-native";
 
 import { Button } from "@/components/primitives";
 import { useAuth } from "@/features/auth/AuthProvider";
@@ -20,6 +19,7 @@ import { backTo, MenuPage, NavRow } from "@/features/athlete/MenuParts";
 import { NotJoined, useMe } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Group } from "@/features/coach/parts";
+import { alert } from "@/lib/alert";
 
 export default function Account() {
   const me = useMe();
@@ -39,21 +39,17 @@ export default function Account() {
             variant="secondary"
             fullWidth
             onPress={() =>
-              Alert.alert(
-                "Sign out?",
-                "Your plan and history stay on this phone.",
-                [
-                  { text: "Cancel", style: "cancel" },
-                  {
-                    text: "Sign out",
-                    onPress: () =>
-                      auth.signOut().finally(() => {
-                        if (router.canDismiss()) router.dismissAll();
-                        router.replace("/");
-                      }),
-                  },
-                ],
-              )
+              alert("Sign out?", "Your plan and history stay on this phone.", [
+                { text: "Cancel", style: "cancel" },
+                {
+                  text: "Sign out",
+                  onPress: () =>
+                    auth.signOut().finally(() => {
+                      if (router.canDismiss()) router.dismissAll();
+                      router.replace("/");
+                    }),
+                },
+              ])
             }
           />
         ) : undefined

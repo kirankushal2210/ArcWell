@@ -24,11 +24,14 @@ export function PageHeader({
   sub,
   actions = [],
   onBack,
+  right,
 }: {
   title: string;
   sub?: string;
   actions?: { icon: LucideIcon; label: string; onPress: () => void }[];
   onBack?: () => void;
+  /** Something small beside the title, before the actions (the nutrition streak). */
+  right?: ReactNode;
 }) {
   const insets = useSafeAreaInsets();
   return (
@@ -50,6 +53,7 @@ export function PageHeader({
         >
           {title}
         </Text>
+        {right}
         {actions.map((a) => (
           <IconButton
             key={a.label}

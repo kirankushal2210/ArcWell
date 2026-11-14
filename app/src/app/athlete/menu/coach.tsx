@@ -1,13 +1,16 @@
-// My coach (L-01): who coaches you and since when, earlier-history access (AC-10), and leaving.
+// My coach (L-01): who coaches you and since when, their profile (D43), earlier-history access
+// (AC-10), and leaving.
 import { router } from "expo-router";
 import { MessageCircle } from "lucide-react-native";
 import { StyleSheet, View } from "react-native";
 
-import { Avatar, Button, StatusChip, Text } from "@/components/primitives";
+import { Button, StatusChip, Text } from "@/components/primitives";
 import { backTo, MenuPage, NavRow } from "@/features/athlete/MenuParts";
 import { NotJoined, useMe } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
+import { CoachPhoto, FoldedBio } from "@/features/coach/CoachProfileView";
 import { Group } from "@/features/coach/parts";
+import { TransformationsStrip } from "@/features/coach/TransformationsStrip";
 import { colors, radius, space } from "@/theme";
 
 export default function MyCoach() {
@@ -30,7 +33,7 @@ export default function MyCoach() {
       }
     >
       <View style={styles.card}>
-        <Avatar name={first} size={48} />
+        <CoachPhoto name={coach.name} uri={coach.photo} size={48} />
         <View style={styles.flex}>
           <Text variant="title">{coach.name}</Text>
           <Text variant="label" weight="regular" tone="muted">
@@ -39,7 +42,7 @@ export default function MyCoach() {
         </View>
         <StatusChip status={me.status} />
       </View>
-      {coach.bio ? <Text tone="muted">{coach.bio}</Text> : null}
+      <FoldedBio bio={coach.bio} />
       <Group>
         <NavRow
           first
@@ -53,6 +56,7 @@ export default function MyCoach() {
           onPress={() => router.push("/athlete/menu/history-access")}
         />
       </Group>
+      <TransformationsStrip />
     </MenuPage>
   );
 }

@@ -22,8 +22,8 @@ export const MODULES: {
 }[] = [
   {
     key: "morning",
-    label: "Morning start",
-    sub: "Daylight, water, moving and coffee after waking, with your day's rhythm",
+    label: "Cortisol meter",
+    sub: "Sunlight, water, caffeine and movement after waking, and a meter for your day",
   },
   {
     key: "cardio_fitness",
@@ -458,15 +458,14 @@ export const MORNING_ITEMS: {
   hint: string;
   optional?: boolean;
 }[] = [
-  { key: "light", label: "Daylight", hint: "10 min outside" },
+  { key: "light", label: "Sunlight", hint: "10 min outside" },
   { key: "water", label: "Water", hint: "A glass or two" },
-  { key: "move", label: "Move", hint: "A walk or your workout" },
   {
     key: "caffeine",
-    label: "Coffee or tea",
-    hint: "Only if you drink it",
-    optional: true,
+    label: "Caffeine",
+    hint: "Coffee or tea, if you drink it",
   },
+  { key: "move", label: "Movement", hint: "A walk or your workout" },
 ];
 
 /** Morning start shows from waking until 3 hours after. */
@@ -502,5 +501,52 @@ export function cortisolCurve(r: Rhythm, n = 48) {
   return Array.from({ length: n + 1 }, (_, i) => {
     const t = r.wake + (i / n) * 1440;
     return { t, v: typicalCortisol(t, r) };
+  });
+}
+
+// ---------- Cortisol meter (D80) ----------
+
+export type MeterPhase = "morning" | "day" | "night";
+
+/**
+ * The cortisol meter on Today: an estimate, never a measurement. On waking it starts moderate; each
+ * of the four morning steps (sunlight, water, caffeine, movement) raises the morning peak, and after
+ * the morning it follows the typical daily fall to low at night, which is what sleep needs.
+ */
+export function cortisolMeter(done: number, now: number, r: Rhythm) {
+  const bed = bedAfterWake(r);
+  const t = now < r.wake - 3 * H ? now + 1440 : now;
+  const peak = 0.4 + 0.6 * (Math.min(4, Math.max(0, done)) / 4);
+  if (t >= bed - H || t < r.wake)
+    return {
+      value: Math.max(0.05, typicalCortisol(t, r) * 0.5),
+      phase: "night" as MeterPhase,
+    };
+  if (t <= r.wake + MORNING_WINDOW_MIN)
+    return { value: peak, phase: "morning" as MeterPhase };
+  return {
+    value: Math.max(0.08, peak * typicalCortisol(t, r)),
+    phase: "day" as MeterPhase,
+  };
+}
+
+export const meterLabel = (v: number) =>
+  v >= 0.75 ? "High" : v >= 0.45 ? "Moderate" : "Low";
+
+/**
+ * The day's cortisol curve for the graph, 0–1, from waking to the next waking. An illustration of
+ * the pattern, never a measurement: with all four morning steps done the morning peak is high and
+ * the night low (a steep day-to-night slope); with fewer, the curve is flatter (lower morning,
+ * higher night), the pattern linked with poorer health in long-term studies (adam2017).
+ */
+export function cortisolDay(done: number, r: Rhythm, n = 72) {
+  const k = Math.min(4, Math.max(0, done)) / 4;
+  const peak = 0.55 + 0.45 * k;
+  const floor = 0.3 - 0.22 * k;
+  return Array.from({ length: n + 1 }, (_, i) => {
+    const t = r.wake + (i / n) * 1440;
+    const shape = typicalCortisol(t, r); // 1 at the morning peak, about 0.08 at night
+    const v = floor + ((shape - 0.08) / 0.92) * (peak - floor);
+    return { t, v: Math.max(0, Math.min(1, v)) };
   });
 }

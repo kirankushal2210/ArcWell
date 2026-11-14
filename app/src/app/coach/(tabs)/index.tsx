@@ -12,7 +12,9 @@ import {
   Text,
 } from "@/components/primitives";
 import { menuAction } from "@/features/coach/coachProfile";
-import { needsAttention, useCoachData } from "@/features/coach/CoachData";
+import { adherenceFromLogs } from "@/features/coach/adherence";
+import { useCoachData } from "@/features/coach/CoachData";
+import { attentionOf, needsAttentionNow } from "@/features/coach/checkins";
 import { plansReady } from "@/features/coach/PlanRows";
 import {
   ActionDock,
@@ -23,22 +25,36 @@ import {
   PageHeader,
   Pills,
 } from "@/features/coach/parts";
-import { sampleCoach } from "@/features/coach/sampleData";
+import { type Client, sampleCoach } from "@/features/coach/sampleData";
 import { colors, radius, space } from "@/theme";
 import { BillingBanner } from "@/features/coach/limits";
 import { Tip } from "@/features/athlete/Tip";
+
+const pct = (v: number | null) => (v === null ? "—" : `${v}%`);
 
 type Filter =
   "attention" | "active" | "paused" | "leaving" | "completed" | "all";
 
 export default function ClientsTab() {
-  const { clients, templates } = useCoachData();
+  const { clients, templates, sessions } = useCoachData();
   const [filter, setFilter] = useState<Filter>("attention");
   const [setupHidden, setSetupHidden] = useState(false);
 
   const fresh = clients.filter((c) => c.isNew);
   const pending = clients.filter((c) => c.pending);
   const linked = clients.filter((c) => !c.isNew && !c.pending);
+  // Adherence from logged workouts (stored figure until there's a plan) and attention reasons,
+  // worked out now rather than read from stored text.
+  const now = new Date();
+  const fromLogs = new Map(
+    linked.map((c) => [c.id, adherenceFromLogs(c, sessions(c.id), now)]),
+  );
+  const adherence = (c: Client) =>
+    fromLogs.get(c.id) ?? c.adherence;
+  const attention = (c: Client) =>
+    attentionOf(c, now, fromLogs.get(c.id));
+  const needsAttention = (c: Client) =>
+    needsAttentionNow(c, now, fromLogs.get(c.id));
   const count = {
     attention: linked.filter(needsAttention).length,
     active: linked.filter((c) => c.status === "active").length,
@@ -55,7 +71,7 @@ export default function ClientsTab() {
           ? true
           : c.status === filter,
     )
-    .sort((a, b) => (a.adherence ?? 101) - (b.adherence ?? 101));
+    .sort((a, b) => (adherence(a) ?? 101) - (adherence(b) ?? 101));
 
   // CO-13: onboarding steps, then the ones checked against what the coach has actually done.
   const setup: { label: string; done: boolean; action?: string; go?: Href }[] =
@@ -242,7 +258,7 @@ export default function ClientsTab() {
                 key={c.id}
                 first={i === 0}
                 onPress={() => open(c.id)}
-                label={`${c.name}, ${c.attention ?? c.line}`}
+                label={`${c.name}, ${attention(c) ?? c.line}`}
               >
                 <Avatar name={c.name} />
                 <View style={styles.flex}>
@@ -262,13 +278,13 @@ export default function ClientsTab() {
                     numberOfLines={2}
                   >
                     {filter === "attention"
-                      ? (c.attention ?? "Unread message")
+                      ? (attention(c) ?? "Unread message")
                       : c.line}
                   </Text>
                 </View>
                 <View style={styles.right}>
                   <Text weight="semibold" numeric>
-                    {c.adherence === null ? "—" : `${c.adherence}%`}
+                    {pct(adherence(c))}
                   </Text>
                   <StatusChip status={c.status} />
                 </View>
@@ -277,8 +293,7 @@ export default function ClientsTab() {
           </Group>
         )}
         <Text variant="caption" tone="muted">
-          Percentages are this week&apos;s adherence: planned workouts, meals
-          and check-ins done.
+          Percentages are planned workouts done over the last 4 weeks.
         </Text>
       </Page>
       {(() => {

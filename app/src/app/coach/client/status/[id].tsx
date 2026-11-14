@@ -5,7 +5,7 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { Check } from "lucide-react-native";
 import { useState } from "react";
-import { Alert, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import {
   Button,
@@ -16,6 +16,7 @@ import {
 } from "@/components/primitives";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Page, PageHeader } from "@/features/coach/parts";
+import { alert } from "@/lib/alert";
 import { colors, radius, space } from "@/theme";
 
 const OPTIONS: { value: ClientStatus; label: string; what: string }[] = [
@@ -58,7 +59,7 @@ export default function ClientStatusScreen() {
       setStatus(c.id, s);
       return;
     }
-    Alert.alert(
+    alert(
       `Complete coaching with ${first}?`,
       `You won't see ${first}'s new workouts, food, recovery or check-ins. ${first} keeps everything and your plan stays in their app, read-only. You can't undo this; they'd need a new invite to come back.`,
       [
@@ -91,7 +92,7 @@ export default function ClientStatusScreen() {
               variant="secondary"
               fullWidth
               onPress={() =>
-                Alert.alert(
+                alert(
                   `Remove ${first}?`,
                   "Their plans and invite are deleted.",
                   [

@@ -21,7 +21,7 @@ export type ButtonProps = {
   label: string;
   onPress?: () => void;
   variant?: ButtonVariant;
-  /** Fills a primary button with a pillar colour (dark text), for that pillar's main action (D67). */
+  /** Which pillar this action belongs to. Kept for call sites; every primary is red now (D93). */
   pillar?: ButtonPillar;
   /** "sm" is 32 dp to look at; both sizes keep a 48 dp tap area. */
   size?: "md" | "sm";
@@ -64,12 +64,6 @@ const look: Record<ButtonVariant, Look> = {
   },
 };
 
-const pillarFill: Record<ButtonPillar, string> = {
-  training: colors.training,
-  nutrition: colors.nutrition,
-  recovery: colors.recovery,
-};
-
 /**
  * DESIGN.md §6 button (D81): 36 dp tall (28 dp small), 12 dp corners (10 small), label
  * 14/600. The tap area is always at least 48 dp: the shape is smaller, the
@@ -92,8 +86,9 @@ export function Button({
 }: ButtonProps) {
   const inactive = disabled || loading;
   const v = look[variant];
-  const fill = pillar && variant === "primary" ? pillarFill[pillar] : v.bg;
-  const fg = pillar && variant === "primary" ? colors.onPillar : v.fg;
+  // Every main button is the red primary with white text (D83, D93), whatever the pillar.
+  const fill = v.bg;
+  const fg = v.fg;
   const tone: TextTone = inactive ? "disabled" : v.tone;
   const height = size === "sm" ? controlHeightSm : controlHeight;
   const slop = Math.max(0, (tapMin - height) / 2);
@@ -118,7 +113,9 @@ export function Button({
               minHeight: height,
               borderRadius: size === "sm" ? radius.sm : radius.md,
               paddingHorizontal:
-                size === "sm" ? space[2] + space[1] / 2 : space[3] + space[1] / 2,
+                size === "sm"
+                  ? space[2] + space[1] / 2
+                  : space[3] + space[1] / 2,
             },
             inactive
               ? styles.inactive

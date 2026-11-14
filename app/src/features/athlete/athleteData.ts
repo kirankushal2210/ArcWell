@@ -103,6 +103,10 @@ export type AthleteSettings = {
   morning?: Record<string, Partial<Record<MorningItem, number>>>;
   /** Cardio fitness (D79). */
   cardio?: CardioState;
+  /** Rest mode (D98): on while sick, injured or run down; strain targets pause. */
+  restMode?: { since: string; reason: "sick" | "injured" | "run_down" | "other" };
+  /** Period start dates for cycle tracking (D98), women only, optional. */
+  periods?: string[];
   /** HYROX race track (D76). */
   race?: RaceState;
   /** If-then plans (implementation intentions) for goals and habits. */
@@ -155,6 +159,19 @@ export type RaceState = {
     recent5kSec?: number;
     kit: string[];
     event?: string;
+    /** first: first race; returning: raced before; advanced: Pro, podiums, qualifying. */
+    level?: RaceLevel;
+    /** Running now, km a week (0, 5, 15, 28, 40). */
+    weeklyKm?: number;
+    aim?: "finish" | "nowalk" | "time";
+    prevSec?: number;
+    prevDivision?: "open" | "pro" | "doubles";
+    /** Where time was lost: station keys, "running", "fade" or "roxzone". */
+    weak?: WeakArea[];
+    stationsTried?: StationKey[];
+    /** Advanced: average run pace in the last race, seconds per km. */
+    racePaceSec?: number;
+    seasonGoal?: "pb" | "podium" | "worlds";
   };
   status?: "active" | "done" | "cancelled";
   sims: RaceSim[];
@@ -169,6 +186,9 @@ export type RaceState = {
     substitutes: Partial<Record<StationKey, string>>;
   };
 };
+
+export type RaceLevel = "first" | "returning" | "advanced";
+export type WeakArea = StationKey | "running" | "fade" | "roxzone";
 
 export type IfThen = { id: string; goal: string; obstacle: string; plan: string };
 

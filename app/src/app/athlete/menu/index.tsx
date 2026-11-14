@@ -10,14 +10,13 @@ import {
   Camera,
   ChartColumn,
   ChartLine,
-  Dumbbell,
-  History,
   ListChecks,
   MapPin,
   Ruler,
   Scale,
   SlidersHorizontal,
   UserRound,
+  TrendingUp,
 } from "lucide-react-native";
 import { StyleSheet, View } from "react-native";
 
@@ -91,14 +90,9 @@ export default function AthleteMenu() {
       <Group>
         <NavRow
           first
-          icon={Dumbbell}
-          label="Exercises"
-          onPress={() => router.push("/athlete/exercises")}
-        />
-        <NavRow
           icon={ListChecks}
           label="Workouts"
-          sub="Your plan and your own routines"
+          sub="Your plan and your templates"
           onPress={() => router.push("/athlete/training")}
         />
         <NavRow
@@ -114,8 +108,8 @@ export default function AthleteMenu() {
           onPress={() => router.push("/athlete/analytics")}
         />
         <NavRow
-          icon={History}
-          label="History"
+          icon={TrendingUp}
+          label="Progressive overload"
           onPress={() => router.push("/athlete/history")}
         />
       </Group>

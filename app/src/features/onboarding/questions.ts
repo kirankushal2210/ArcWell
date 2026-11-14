@@ -1,5 +1,6 @@
 // Athlete onboarding questions (SPEC.md, D52): one question per screen in five sections.
 // Screens follow the hi-fi mockups AO-01 to AO-17 (docs/design/hifi-mockups/onboarding-flow.html).
+import { HORMONAL_OPTIONS } from "@/features/science/womensHealth";
 import {
   Activity,
   Armchair,
@@ -132,12 +133,20 @@ export type Field =
       kind: "features";
       items: { icon: LucideIcon; title: string; sub: string }[];
     }
-  | { kind: "agree"; key: string; label: string }
+  | {
+      kind: "agree";
+      key: string;
+      label: string;
+      /** Show links to the Terms of Use and Privacy Policy under it (D106). */
+      links?: boolean;
+    }
   | { kind: "photo"; key: string }
   | { kind: "services"; key: string }
   /** Coach's existing Excel, Google Sheets or CSV workout file (D55). */
   | { kind: "sheet"; key: string; showIf: { key: string; equals: string } }
-  | { kind: "invite"; nameKey: string };
+  | { kind: "invite"; nameKey: string }
+  /** Body fat level from drawn torsos (D84); bands follow the answer under `sexKey`. */
+  | { kind: "bodyFat"; key: string; sexKey: string };
 
 export type Question = {
   id: string;
@@ -155,13 +164,34 @@ export type Question = {
   logoHeader?: boolean;
   /** Small line under the main button, e.g. "Takes about 5 minutes". */
   caption?: string;
-  /** Only shown when an earlier answer matches (the HYROX branch, D76). */
-  showIf?: { key: string; equals: string };
+  /** Only shown when earlier answers match (the HYROX branch, D76); all conditions must hold. */
+  showIf?: Cond | Cond[];
+};
+
+/** equals: the answer is this; in: one of these; not: anything but this (unanswered counts). */
+export type Cond = {
+  key: string;
+  equals?: string;
+  in?: string[];
+  not?: string;
+};
+
+const holds = (c: Cond, answers: Record<string, unknown>) => {
+  const v = answers[c.key];
+  if (c.equals !== undefined) return v === c.equals;
+  if (c.in) return typeof v === "string" && c.in.includes(v);
+  // For lists (chips), "not" means the list doesn't include it.
+  if (c.not !== undefined)
+    return Array.isArray(v) ? !v.includes(c.not) : v !== c.not;
+  return true;
 };
 
 /** Whether a question applies, given the answers so far. */
 export const questionShown = (q: Question, answers: Record<string, unknown>) =>
-  !q.showIf || answers[q.showIf.key] === q.showIf.equals;
+  !q.showIf ||
+  (Array.isArray(q.showIf) ? q.showIf : [q.showIf]).every((c) =>
+    holds(c, answers),
+  );
 
 export type Section = { id: string; name: string; dot?: ColorRole };
 export type Flow = { sections: Section[]; questions: Question[] };
@@ -229,7 +259,7 @@ export const questions: Question[] = [
         key: "age",
         initial: 27,
         unit: "years",
-        values: range(13, 80, 1, (v) => String(v)),
+        values: range(18, 80, 1, (v) => String(v)),
       },
     ],
   },
@@ -264,6 +294,60 @@ export const questions: Question[] = [
         unit: "kg",
         laterUnit: "lb · later",
         values: kg,
+      },
+    ],
+  },
+  {
+    id: "AO-04b",
+    section: "you",
+    glyph: Scale,
+    title: "What's your body fat level?",
+    sub: "Pick the closest look. It doesn't need to be exact.",
+    skippable: true,
+    fields: [{ kind: "bodyFat", key: "bodyFatPct", sexKey: "sex" }],
+  },
+  // Women's hormonal health (D87): only for women, both skippable.
+  {
+    id: "WH-01",
+    section: "you",
+    glyph: Flower2,
+    title: "Do any of these apply to you?",
+    sub: "They can change how you train and eat.",
+    skippable: true,
+    showIf: { key: "sex", equals: "female" },
+    fields: [
+      {
+        kind: "chips",
+        key: "hormonal",
+        options: [...HORMONAL_OPTIONS],
+        exclusive: "None",
+      },
+      {
+        kind: "note",
+        text: "Only you, and your coach if you have one, see this. Arcwell isn't a medical service; your doctor's advice comes first.",
+      },
+    ],
+  },
+  {
+    id: "WH-02",
+    section: "you",
+    glyph: Flower2,
+    title: "Are your periods usually regular?",
+    skippable: true,
+    showIf: [
+      { key: "sex", equals: "female" },
+      { key: "hormonal", not: "Pregnant" },
+    ],
+    fields: [
+      {
+        kind: "single",
+        key: "cycle",
+        options: [
+          { value: "regular", label: "Regular" },
+          { value: "irregular", label: "Irregular" },
+          { value: "none", label: "No periods right now" },
+          { value: "skip", label: "Prefer not to say" },
+        ],
       },
     ],
   },
@@ -320,12 +404,44 @@ export const questions: Question[] = [
       },
     ],
   },
-  // ---------- HYROX branch (D76): only after choosing the race goal ----------
+  // ---------- HYROX branch (D76): only after choosing the race goal, then by race experience ----------
   {
-    id: "AO-05R1",
+    id: "HX-01",
+    section: "goal",
+    glyph: Medal,
+    title: "Have you raced HYROX before?",
+    sub: "Your questions and your plan follow your answer.",
+    showIf: { key: "goal", equals: "hyrox" },
+    fields: [
+      {
+        kind: "single",
+        key: "raceLevel",
+        required: true,
+        options: [
+          {
+            value: "first",
+            label: "This will be my first race",
+            sub: "We'll build your engine and teach every station",
+          },
+          {
+            value: "returning",
+            label: "I've raced before",
+            sub: "We'll work on where you lost time",
+          },
+          {
+            value: "advanced",
+            label: "I race Pro, or chase podiums and qualifying",
+            sub: "Pacing, compromised running and every second",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "HX-02",
     section: "goal",
     glyph: CalendarDays,
-    title: "How far away is your race?",
+    title: "How far away is your next race?",
     sub: "We count your plan back from race day.",
     showIf: { key: "goal", equals: "hyrox" },
     fields: [
@@ -339,11 +455,11 @@ export const questions: Question[] = [
     ],
   },
   {
-    id: "AO-05R2",
+    id: "HX-03",
     section: "goal",
     glyph: Trophy,
     title: "Your division and kit",
-    sub: "Station weights follow your division.",
+    sub: "Station weights follow your division. Doubles and Mixed race at Open weights.",
     showIf: { key: "goal", equals: "hyrox" },
     fields: [
       {
@@ -366,20 +482,238 @@ export const questions: Question[] = [
     ],
   },
   {
-    id: "AO-05R3",
+    id: "HX-04",
+    section: "goal",
+    glyph: Footprints,
+    title: "How much do you run now?",
+    sub: "Half the race is running, so this sets where your running starts.",
+    showIf: { key: "goal", equals: "hyrox" },
+    fields: [
+      {
+        kind: "single",
+        key: "weeklyKm",
+        required: true,
+        options: [
+          { value: "0", label: "I'm not running yet" },
+          { value: "5", label: "Under 10 km a week" },
+          { value: "15", label: "10 to 20 km a week" },
+          { value: "28", label: "20 to 35 km a week" },
+          { value: "40", label: "More than 35 km a week" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "HX-05",
     section: "goal",
     glyph: Timer,
     title: "Your recent 5 km time",
     sub: "A rough guess is fine. It sets your running paces.",
     skippable: true,
-    showIf: { key: "goal", equals: "hyrox" },
+    showIf: [
+      { key: "goal", equals: "hyrox" },
+      { key: "weeklyKm", not: "0" },
+    ],
     fields: [
       {
         kind: "wheel",
         key: "recent5k",
         initial: 30,
         unit: "min",
-        values: range(16, 60, 1, (v) => String(v)),
+        values: range(15, 60, 1, (v) => String(v)),
+      },
+    ],
+  },
+  // First race
+  {
+    id: "HX-F1",
+    section: "goal",
+    glyph: Dumbbell,
+    title: "Which stations have you tried?",
+    sub: "We'll teach the new ones early, at light weights.",
+    showIf: [
+      { key: "goal", equals: "hyrox" },
+      { key: "raceLevel", equals: "first" },
+    ],
+    fields: [
+      {
+        kind: "chips",
+        key: "stationsTried",
+        options: [
+          "None yet",
+          "SkiErg",
+          "Sled push",
+          "Sled pull",
+          "Burpee broad jumps",
+          "Row",
+          "Farmers carry",
+          "Sandbag lunges",
+          "Wall balls",
+        ],
+        exclusive: "None yet",
+      },
+    ],
+  },
+  {
+    id: "HX-F2",
+    section: "goal",
+    glyph: Flag,
+    title: "What's your aim for this race?",
+    showIf: [
+      { key: "goal", equals: "hyrox" },
+      { key: "raceLevel", equals: "first" },
+    ],
+    fields: [
+      {
+        kind: "single",
+        key: "raceAim",
+        required: true,
+        options: [
+          { value: "finish", label: "Finish strong and enjoy it" },
+          { value: "nowalk", label: "Run every kilometre without walking" },
+          { value: "time", label: "Hit a target time" },
+        ],
+      },
+    ],
+  },
+  // Raced before (and advanced)
+  {
+    id: "HX-P1",
+    section: "goal",
+    glyph: Timer,
+    title: "Your best HYROX finish time",
+    sub: "From your results page, roughly.",
+    showIf: [
+      { key: "goal", equals: "hyrox" },
+      { key: "raceLevel", in: ["returning", "advanced"] },
+    ],
+    fields: [
+      {
+        kind: "wheel",
+        key: "prevMin",
+        initial: 95,
+        unit: "h:mm",
+        values: range(
+          50,
+          180,
+          1,
+          (v) => `${Math.floor(v / 60)}:${String(v % 60).padStart(2, "0")}`,
+        ),
+      },
+    ],
+  },
+  {
+    id: "HX-P2",
+    section: "goal",
+    glyph: Target,
+    title: "Where did you lose the most time?",
+    sub: "Pick up to three. Your plan works on these first.",
+    showIf: [
+      { key: "goal", equals: "hyrox" },
+      { key: "raceLevel", in: ["returning", "advanced"] },
+    ],
+    fields: [
+      {
+        kind: "single",
+        key: "prevDivision",
+        options: [
+          { value: "open", label: "That was Open" },
+          { value: "pro", label: "That was Pro" },
+          { value: "doubles", label: "Doubles or relay" },
+        ],
+      },
+      {
+        kind: "chips",
+        key: "weakAreas",
+        label: "Where it went slow",
+        max: 3,
+        options: [
+          "Running",
+          "Slowing down on later runs",
+          "Roxzone transitions",
+          "SkiErg",
+          "Sled push",
+          "Sled pull",
+          "Burpee broad jumps",
+          "Row",
+          "Farmers carry",
+          "Sandbag lunges",
+          "Wall balls",
+        ],
+      },
+    ],
+  },
+  {
+    id: "HX-A1",
+    section: "goal",
+    glyph: Activity,
+    title: "Your average run pace in that race",
+    sub: "Per kilometre, across all 8 runs. Your results page shows it.",
+    skippable: true,
+    showIf: [
+      { key: "goal", equals: "hyrox" },
+      { key: "raceLevel", equals: "advanced" },
+    ],
+    fields: [
+      {
+        kind: "wheel",
+        key: "racePaceSec",
+        initial: 270,
+        unit: "/km",
+        values: range(
+          195,
+          480,
+          5,
+          (v) => `${Math.floor(v / 60)}:${String(v % 60).padStart(2, "0")}`,
+        ),
+      },
+    ],
+  },
+  {
+    id: "HX-A2",
+    section: "goal",
+    glyph: Trophy,
+    title: "What are you racing for this season?",
+    showIf: [
+      { key: "goal", equals: "hyrox" },
+      { key: "raceLevel", equals: "advanced" },
+    ],
+    fields: [
+      {
+        kind: "single",
+        key: "seasonGoal",
+        required: true,
+        options: [
+          { value: "pb", label: "A personal best" },
+          { value: "podium", label: "An age-group podium" },
+          { value: "worlds", label: "Qualifying for the World Championships" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "HX-T1",
+    section: "goal",
+    glyph: Flag,
+    title: "Your target time",
+    sub: "Be honest but ambitious. Sims will show if it's on track.",
+    showIf: [
+      { key: "goal", equals: "hyrox" },
+      { key: "raceAim", not: "finish" },
+      { key: "raceAim", not: "nowalk" },
+    ],
+    fields: [
+      {
+        kind: "wheel",
+        key: "targetMin",
+        initial: 90,
+        unit: "h:mm",
+        values: range(
+          50,
+          180,
+          1,
+          (v) => `${Math.floor(v / 60)}:${String(v % 60).padStart(2, "0")}`,
+        ),
       },
     ],
   },
@@ -390,6 +724,7 @@ export const questions: Question[] = [
     title: "What's your goal weight?",
     sub: "Where do you want to be?",
     skippable: true,
+    showIf: { key: "goal", not: "hyrox" },
     fields: [
       {
         kind: "wheel",

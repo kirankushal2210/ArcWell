@@ -6,6 +6,7 @@ import { Linking, StyleSheet, View } from "react-native";
 
 import { Button, PressableScale, Text } from "@/components/primitives";
 import { Eyebrow, Page, PageHeader } from "@/features/coach/parts";
+import { LegalRows } from "@/features/legal/LegalLinks";
 import { colors, radius, space } from "@/theme";
 
 const FAQ: { q: string; a: string }[] = [
@@ -103,9 +104,11 @@ export default function Help() {
           ))}
         </View>
         <Text variant="caption" tone="muted">
-          You agreed to these when you set up coaching. The full Terms and
-          Privacy Policy are on arcwell.app.
+          You agreed to these when you set up coaching. The full terms, with the
+          extra terms for coaches, are below.
         </Text>
+        <Eyebrow>Policies</Eyebrow>
+        <LegalRows />
       </Page>
     </View>
   );

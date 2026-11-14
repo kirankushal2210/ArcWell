@@ -90,7 +90,7 @@ export default function Transformations() {
                         <Text
                           variant="caption"
                           weight="semibold"
-                          tone={t.status === "approved" ? "onBrand" : "muted"}
+                          tone={t.status === "approved" ? "onPillar" : "muted"}
                         >
                           {STATUS[t.status]}
                         </Text>

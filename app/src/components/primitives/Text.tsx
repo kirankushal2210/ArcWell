@@ -24,18 +24,20 @@ export type TextTone =
   | "success"
   | "warning"
   | "danger"
-  | "onBrand";
+  | "onBrand"
+  | "onPillar";
 
 const toneColor: Record<TextTone, string> = {
   default: colors.text,
   muted: colors.textMuted,
   disabled: colors.textDisabled,
-  brand: colors.brand,
+  brand: colors.accent,
   accent: colors.accent,
   success: colors.success,
   warning: colors.warning,
   danger: colors.danger,
   onBrand: colors.onBrand,
+  onPillar: colors.onPillar,
 };
 
 export type TextProps = RNTextProps & {

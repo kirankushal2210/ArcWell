@@ -14,9 +14,11 @@ import {
   ToggleRow,
 } from "@/features/athlete/MenuParts";
 import { Sheet } from "@/features/athlete/Sheet";
+import { recordConsent } from "@/features/auth/consent";
 import { NotJoined, useMe } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Eyebrow, Group } from "@/features/coach/parts";
+import { LegalRows } from "@/features/legal/LegalLinks";
 import { space } from "@/theme";
 import { openPlaySubscriptions } from "@/features/system/store";
 
@@ -27,6 +29,10 @@ export default function Privacy() {
   if (!me) return <NotJoined />;
   const s = settingsOf(me.id);
   const coached = meTier === "coached";
+  const turnAi = (on: boolean) => {
+    setAthleteSettings(me.id, { ai: on });
+    void recordConsent("ai", on);
+  };
   const shared = (me.transformations ?? []).filter(
     (t) => t.status === "approved",
   ).length;
@@ -46,16 +52,17 @@ export default function Privacy() {
           label="Progress photos"
           sub="Optional. Check-ins can be sent without photos."
           value={s.photos}
-          onChange={(v) => setAthleteSettings(me.id, { photos: v })}
+          onChange={(v) => {
+            setAthleteSettings(me.id, { photos: v });
+            void recordConsent("photos", v);
+          }}
         />
         {meTier === "pro" ? (
           <ToggleRow
             label="AI features"
             sub="Turning this off stops AI plans and photo logging. Your logs stay."
             value={s.ai}
-            onChange={(v) =>
-              v ? setAthleteSettings(me.id, { ai: true }) : setConfirmAi(true)
-            }
+            onChange={(v) => (v ? turnAi(true) : setConfirmAi(true))}
           />
         ) : null}
       </Group>
@@ -96,7 +103,7 @@ export default function Privacy() {
             label="Turn off AI"
             fullWidth
             onPress={() => {
-              setAthleteSettings(me.id, { ai: false });
+              turnAi(false);
               setConfirmAi(false);
             }}
           />
@@ -117,6 +124,8 @@ export default function Privacy() {
           />
         </View>
       </Sheet>
+      <Eyebrow>Policies</Eyebrow>
+      <LegalRows />
     </MenuPage>
   );
 }

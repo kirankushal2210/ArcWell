@@ -6,7 +6,6 @@ import { router, useLocalSearchParams } from "expo-router";
 import { Plus, ShieldAlert, Trash2 } from "lucide-react-native";
 import { useState } from "react";
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -30,6 +29,7 @@ import {
   PHASE_LABEL,
 } from "@/features/coach/enhanced";
 import { Eyebrow, Page, PageHeader, Pills } from "@/features/coach/parts";
+import { alert } from "@/lib/alert";
 import { colors, fontFamilyFor, radius, space, textSizes } from "@/theme";
 
 export default function EnhancedScreen() {
@@ -67,7 +67,7 @@ export default function EnhancedScreen() {
           {note}
           <Text tone="muted">
             {e?.declinedAt
-              ? `${first} said no ${onDay(e.declinedAt.slice(0, 10))}. Nothing is tracked. You can ask again if they change their mind.`
+              ? `${first} said no ${onDay(ymd(new Date(e.declinedAt)))}. Nothing is tracked. You can ask again if they change their mind.`
               : e?.requestedAt
                 ? `Waiting for ${first} to say yes in their app. Nothing is tracked until they do.`
                 : `${first} decides. When you ask, ${first} sees exactly what's recorded and who sees it (only you and them), and says yes or no in their app.`}
@@ -103,7 +103,7 @@ export default function EnhancedScreen() {
     >
       <PageHeader
         title={`Enhanced · ${first}`}
-        sub={`${first} opted in ${onDay(e.consentAt?.slice(0, 10) ?? today)}`}
+        sub={`${first} opted in ${onDay(e.consentAt ? ymd(new Date(e.consentAt)) : today)}`}
         onBack={back}
       />
       <Page>
@@ -339,7 +339,7 @@ export default function EnhancedScreen() {
               }));
               setEffect("");
               if (sev === 3)
-                Alert.alert(
+                alert(
                   "Severe side effect",
                   `Ask ${first} to see a doctor today. For chest pain, trouble breathing or fainting, call 112.`,
                 );

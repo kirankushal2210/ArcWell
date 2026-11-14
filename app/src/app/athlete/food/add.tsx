@@ -1,7 +1,7 @@
 // Add food (F5-04, F5-05): opens on Recent, because Indian diets repeat and most logs are one tap on
 // "+" (the last-used portion). Search matches Hindi names and spellings, dishes before ingredients.
 // The meal follows the time of day and can be changed in the header. The camera is photo logging:
-// free athletes get the upgrade sheet, Pro sees it's coming with the AI update, coached never see it.
+// free athletes get the upgrade sheet, Plus scans the meal (D96), coached never see it.
 import { router, useLocalSearchParams } from "expo-router";
 import { Camera, ChevronDown, Search, X } from "lucide-react-native";
 import { useState } from "react";

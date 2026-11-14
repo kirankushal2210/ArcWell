@@ -1,14 +1,17 @@
 // One onboarding question screen: athlete AO-01 to AO-17 and coach CO-02 to CO-11. Layout follows the hi-fi mockups:
 // top bar, centred header, the question's fields, and a Next button pinned at the bottom.
-import * as DocumentPicker from "expo-document-picker";
+import * as Clipboard from "expo-clipboard";
+import { Image } from "expo-image";
 import {
   Camera,
   Check,
+  Copy,
   FileSpreadsheet,
   FileUp,
   MessageCircle,
   MessageSquare,
   Plus,
+  QrCode,
   Share2,
   Trash2,
   TrendingDown,
@@ -25,9 +28,13 @@ import {
   TextInput,
   View,
 } from "react-native";
+import QRCode from "react-native-qrcode-svg";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { PressableScale, Text } from "@/components/primitives";
+import { importSummary } from "@/features/coach/importSheet";
+import { choosePhoto } from "@/features/coach/PhotoSlot";
+import { type PickedSheet, pickSheet } from "@/features/coach/readSheet";
 import {
   colors,
   fontFamilyFor,
@@ -36,7 +43,10 @@ import {
   space,
   textSizes,
 } from "@/theme";
+import { PolicyLinks } from "@/features/legal/LegalLinks";
+import { coachLink } from "@/features/coach/coachProfile";
 
+import { BodyFatPicker } from "./BodyFatPicker";
 import { useOnboarding } from "./OnboardingContext";
 import {
   DayPicker,
@@ -52,12 +62,7 @@ import {
   Tokens,
   Wheel,
 } from "./parts";
-import {
-  athleteFlow,
-  type Field,
-  type Flow,
-  questionShown,
-} from "./questions";
+import { athleteFlow, type Field, type Flow, questionShown } from "./questions";
 
 export type QuestionScreenProps = {
   flow?: Flow;
@@ -205,6 +210,15 @@ function FieldView({ field: f }: { field: Field }) {
     case "wheel":
       return <WheelField field={f} />;
 
+    case "bodyFat":
+      return (
+        <BodyFatPicker
+          sex={answers[f.sexKey]}
+          value={answers[f.key]}
+          onChange={(v) => setAnswer(f.key, v)}
+        />
+      );
+
     case "timePair":
       return (
         <View style={styles.pair}>
@@ -335,7 +349,7 @@ function FieldView({ field: f }: { field: Field }) {
 
     case "agree": {
       const on = answers[f.key] === true;
-      return (
+      const box = (
         <PressableScale
           onPress={() => setAnswer(f.key, !on)}
           accessibilityRole="checkbox"
@@ -352,23 +366,50 @@ function FieldView({ field: f }: { field: Field }) {
           </View>
         </PressableScale>
       );
+      return f.links ? (
+        <View style={styles.agreeWrap}>
+          {box}
+          <PolicyLinks />
+        </View>
+      ) : (
+        box
+      );
     }
 
-    case "photo":
+    case "photo": {
+      const uri = answers[f.key] as string | undefined;
       return (
-        <View style={styles.photoRow}>
-          <View style={styles.photo} accessibilityLabel="Profile photo">
-            <Camera size={28} color={colors.textMuted} />
+        <PressableScale
+          onPress={() => choosePhoto((u) => setAnswer(f.key, u))}
+          accessibilityRole="button"
+          accessibilityLabel={
+            uri ? "Change profile photo" : "Add a profile photo"
+          }
+          style={styles.photoRow}
+        >
+          <View style={styles.photo}>
+            {uri ? (
+              <Image
+                source={{ uri }}
+                style={styles.photoImage}
+                contentFit="cover"
+                accessible={false}
+              />
+            ) : (
+              <Camera size={28} color={colors.textMuted} />
+            )}
           </View>
           <View style={styles.flex}>
-            <Text weight="semibold">Add a photo</Text>
+            <Text weight="semibold">
+              {uri ? "Change photo" : "Add a photo"}
+            </Text>
             <Text variant="label" weight="regular" tone="muted">
-              A clear face photo builds trust on WhatsApp previews. You can add
-              it once your account is set up.
+              Optional. A clear face photo builds trust on WhatsApp previews.
             </Text>
           </View>
-        </View>
+        </PressableScale>
       );
+    }
 
     case "services":
       return <ServicesField storeKey={f.key} />;
@@ -558,6 +599,7 @@ function ServicesField({ storeKey }: { storeKey: string }) {
                 }
                 accessibilityRole="button"
                 accessibilityLabel="Remove service"
+                hitSlop={8}
                 style={styles.remove}
               >
                 <Trash2 size={18} color={colors.textMuted} />
@@ -599,16 +641,6 @@ function ServicesField({ storeKey }: { storeKey: string }) {
 
 // ---------- Coach spreadsheet (CO-10, D55): the workouts coaches already keep in Excel or Sheets ----------
 
-type SheetFile = { name: string; size?: number };
-
-const SHEET_TYPES = [
-  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
-  "application/vnd.ms-excel", // .xls
-  "application/vnd.google-apps.spreadsheet", // Google Sheets (Android Drive)
-  "text/csv",
-  "text/comma-separated-values",
-];
-
 const fileSize = (bytes?: number) =>
   bytes === undefined
     ? ""
@@ -618,18 +650,25 @@ const fileSize = (bytes?: number) =>
 
 function SheetField({ storeKey }: { storeKey: string }) {
   const { answers, setAnswer } = useOnboarding();
-  const file = answers[storeKey] as SheetFile | undefined;
-  // The file stays on the phone for now. Uploading (signed URL) and turning it into a
-  // draft template come with accounts; nothing here leaves the device.
+  const file = answers[storeKey] as PickedSheet | undefined;
+  const [busy, setBusy] = useState(false);
+  // Read on the phone into a draft template; nothing leaves the device. The coach checks the
+  // draft before saving it (app/coach/template/import.tsx).
   const pick = async () => {
-    const res = await DocumentPicker.getDocumentAsync({
-      type: SHEET_TYPES,
-      copyToCacheDirectory: true,
-      multiple: false,
-    }).catch(() => null);
-    const asset = res && !res.canceled ? res.assets[0] : undefined;
-    if (asset) setAnswer(storeKey, { name: asset.name, size: asset.size });
+    setBusy(true);
+    const picked = await pickSheet();
+    setBusy(false);
+    if (picked) setAnswer(storeKey, picked);
   };
+  const unmatched = file?.draft?.unmatched.length ?? 0;
+  const status = file?.error
+    ? file.error
+    : file?.draft
+      ? [
+          importSummary(file.draft),
+          unmatched ? `${unmatched} to check` : "Ready to copy",
+        ].join(" · ")
+      : fileSize(file?.size);
 
   return (
     <View style={styles.field}>
@@ -640,10 +679,12 @@ function SheetField({ storeKey }: { storeKey: string }) {
             <Text weight="semibold" numberOfLines={1}>
               {file.name}
             </Text>
-            <Text variant="label" weight="regular" tone="muted">
-              {[fileSize(file.size), "Ready to copy"]
-                .filter(Boolean)
-                .join(" · ")}
+            <Text
+              variant="label"
+              weight="regular"
+              tone={file.error ? "danger" : "muted"}
+            >
+              {status}
             </Text>
           </View>
           <PressableScale
@@ -658,6 +699,7 @@ function SheetField({ storeKey }: { storeKey: string }) {
             onPress={() => setAnswer(storeKey, undefined)}
             accessibilityRole="button"
             accessibilityLabel="Remove file"
+            hitSlop={8}
             style={styles.remove}
           >
             <X size={18} color={colors.textMuted} />
@@ -671,17 +713,18 @@ function SheetField({ storeKey }: { storeKey: string }) {
           style={styles.sheetPick}
         >
           <FileUp size={28} strokeWidth={1.6} color={colors.text} />
-          <Text weight="semibold">Choose your spreadsheet</Text>
+          <Text weight="semibold">
+            {busy ? "Reading…" : "Choose your spreadsheet"}
+          </Text>
           <Text variant="label" weight="regular" tone="muted">
-            Excel (.xlsx, .xls), Google Sheets or CSV
+            Excel (.xlsx) or CSV
           </Text>
         </PressableScale>
       )}
       <Text variant="caption" tone="muted">
-        Works best with one row per exercise: day, exercise, sets and reps. We
-        turn it into a draft template after setup, and you check it before any
-        client sees it. File on your laptop? Skip and add it later from
-        Templates.
+        One row per exercise: day, exercise, sets and reps. You check the draft
+        template before any client sees it. Google Sheets: download it as .xlsx
+        or .csv first. File on your laptop? Skip and import it later from Plans.
       </Text>
     </View>
   );
@@ -691,13 +734,10 @@ function SheetField({ storeKey }: { storeKey: string }) {
 
 function InviteField({ name }: { name: string }) {
   const { answers, setAnswer } = useOnboarding();
-  // Placeholder link until the invite-link domain is chosen (PLAN.md); the server issues the real one.
-  const slug =
-    name
-      .toLowerCase()
-      .replace(/^coach\s+/, "")
-      .replace(/[^a-z0-9]+/g, "") || "yourname";
-  const link = `arcwell.app/j/${slug}`;
+  const [copied, setCopied] = useState<"link" | "message" | null>(null);
+  const [qr, setQr] = useState(false);
+  const link = coachLink(name);
+  const url = `https://${link}`;
   const message =
     (answers.inviteMessage as string | undefined) ??
     `Hi! I'm moving our coaching to Arcwell: your plans, check-ins and chat in one app. Join here: ${link}`;
@@ -705,21 +745,50 @@ function InviteField({ name }: { name: string }) {
     Platform.OS === "ios"
       ? `sms:&body=${encodeURIComponent(message)}`
       : `sms:?body=${encodeURIComponent(message)}`;
+  const more = () => Share.share({ message });
   const share = [
     {
       icon: MessageCircle,
       label: "WhatsApp",
+      a11y: "Share on WhatsApp",
       run: () =>
         Linking.openURL(
           `whatsapp://send?text=${encodeURIComponent(message)}`,
-        ).catch(() => Share.share({ message })),
+        ).catch(more),
+    },
+    {
+      // Instagram can't take a ready message: copy it, open the app to paste it in a DM or the bio.
+      icon: Camera,
+      label: "Instagram",
+      a11y: "Share on Instagram",
+      run: async () => {
+        await Clipboard.setStringAsync(message).catch(() => undefined);
+        setCopied("message");
+        await Linking.openURL("instagram://app").catch(more);
+      },
     },
     {
       icon: MessageSquare,
       label: "SMS",
-      run: () => Linking.openURL(sms).catch(() => Share.share({ message })),
+      a11y: "Share by SMS",
+      run: () => Linking.openURL(sms).catch(more),
     },
-    { icon: Share2, label: "More", run: () => Share.share({ message }) },
+    {
+      icon: Copy,
+      label: copied === "link" ? "Copied" : "Copy link",
+      a11y: "Copy link",
+      run: async () => {
+        await Clipboard.setStringAsync(url).catch(() => undefined);
+        setCopied("link");
+      },
+    },
+    {
+      icon: QrCode,
+      label: "QR code",
+      a11y: qr ? "Hide QR code" : "Show QR code",
+      run: () => setQr((v) => !v),
+    },
+    { icon: Share2, label: "More", a11y: "More ways to share", run: more },
   ];
   return (
     <View style={styles.inviteBlock}>
@@ -729,15 +798,20 @@ function InviteField({ name }: { name: string }) {
         </Text>
       </View>
       <View style={styles.shareRow}>
-        {share.map(({ icon: Icon, label, run }) => (
+        {share.map(({ icon: Icon, label, a11y, run }) => (
           <PressableScale
-            key={label}
+            key={a11y}
             onPress={run}
             accessibilityRole="button"
-            accessibilityLabel={`Share on ${label}`}
+            accessibilityLabel={a11y}
             style={styles.shareItem}
           >
-            <View style={styles.shareIcon}>
+            <View
+              style={[
+                styles.shareIcon,
+                Icon === QrCode && qr && styles.shareOn,
+              ]}
+            >
               <Icon size={20} color={colors.text} />
             </View>
             <Text variant="caption" tone="muted">
@@ -746,6 +820,29 @@ function InviteField({ name }: { name: string }) {
           </PressableScale>
         ))}
       </View>
+      {copied === "message" ? (
+        <Text variant="caption" tone="muted" accessibilityLiveRegion="polite">
+          Message copied. Paste it in a DM or your bio.
+        </Text>
+      ) : null}
+      {qr ? (
+        <View style={styles.qrBox}>
+          <View
+            style={styles.qr}
+            accessibilityLabel="QR code for your invite link"
+          >
+            <QRCode
+              value={url}
+              size={168}
+              color={colors.text}
+              backgroundColor={colors.surface}
+            />
+          </View>
+          <Text variant="caption" tone="muted">
+            Clients scan this at the gym to join you.
+          </Text>
+        </View>
+      ) : null}
       <NoteInput
         label="Message (edit if you like)"
         placeholder=""
@@ -855,6 +952,7 @@ const styles = StyleSheet.create({
   features: { gap: space[4], paddingTop: space[1] },
   feature: { flexDirection: "row", alignItems: "flex-start", gap: space[4] },
   featureText: { flex: 1, gap: space[1] / 2 },
+  agreeWrap: { gap: space[2] },
   agree: {
     flexDirection: "row",
     alignItems: "center",
@@ -885,7 +983,9 @@ const styles = StyleSheet.create({
     borderColor: colors.borderStrong,
     alignItems: "center",
     justifyContent: "center",
+    overflow: "hidden",
   },
+  photoImage: { width: "100%", height: "100%" },
   service: {
     gap: space[1],
     padding: space[4],
@@ -950,8 +1050,20 @@ const styles = StyleSheet.create({
     borderColor: colors.borderStrong,
     backgroundColor: colors.surface,
   },
-  shareRow: { flexDirection: "row", justifyContent: "space-around" },
-  shareItem: { alignItems: "center", gap: space[1], minWidth: 64 },
+  shareRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-around",
+    rowGap: space[3],
+  },
+  shareItem: { alignItems: "center", gap: space[1], minWidth: 56 },
+  shareOn: { borderWidth: 1, borderColor: colors.borderStrong },
+  qrBox: { alignItems: "center", gap: space[2] },
+  qr: {
+    padding: space[2],
+    borderRadius: radius.md,
+    backgroundColor: colors.surface,
+  },
   shareIcon: {
     width: 48,
     height: 48,

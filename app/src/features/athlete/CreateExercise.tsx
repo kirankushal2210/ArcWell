@@ -10,14 +10,7 @@ import {
   Search,
 } from "lucide-react-native";
 import { useState } from "react";
-import {
-  Alert,
-  Image,
-  ScrollView,
-  StyleSheet,
-  TextInput,
-  View,
-} from "react-native";
+import { Image, ScrollView, StyleSheet, TextInput, View } from "react-native";
 
 import {
   Button,
@@ -26,6 +19,7 @@ import {
   Text,
 } from "@/components/primitives";
 import { useCoachData } from "@/features/coach/CoachData";
+import { alert } from "@/lib/alert";
 import {
   colors,
   fontFamilyFor,
@@ -149,7 +143,7 @@ export function CreateExercise({
       ? await ImagePicker.requestCameraPermissionsAsync()
       : await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!perm.granted) {
-      Alert.alert(
+      alert(
         camera ? "Camera is off for Arcwell" : "Photos are off for Arcwell",
         "You can turn access on in Settings.",
       );

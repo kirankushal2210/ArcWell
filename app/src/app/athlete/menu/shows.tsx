@@ -3,13 +3,14 @@
 import { router } from "expo-router";
 import { StyleSheet, View } from "react-native";
 
-import { Chip, Text } from "@/components/primitives";
+import { Chip, PressableScale, Text } from "@/components/primitives";
 import {
   backTo,
   InfoCard,
   MenuPage,
   ToggleRow,
 } from "@/features/athlete/MenuParts";
+import { isoToday } from "@/features/athlete/athleteData";
 import { NotJoined } from "@/features/athlete/useMe";
 import { useVisibility } from "@/features/athlete/visibility";
 import { useCoachData } from "@/features/coach/CoachData";
@@ -31,7 +32,7 @@ export default function WhatArcwellShows() {
     machines: ["bike", "rower"] as Machine[],
     days: [],
     tests: [],
-    startedAt: new Date().toISOString().slice(0, 10),
+    startedAt: isoToday(),
   };
   const setCardio = (patch: Partial<typeof cardio>) =>
     setAthleteSettings(me.id, { cardio: { ...cardio, ...patch } });
@@ -136,14 +137,16 @@ export default function WhatArcwellShows() {
       <Text variant="caption" tone="muted">
         Never between bedtime and waking.
       </Text>
-      <Text
-        variant="label"
-        tone="muted"
+      <PressableScale
         onPress={() => router.push("/athlete/habits")}
-        style={styles.link}
+        accessibilityRole="button"
+        hitSlop={{ top: space[3], bottom: space[3] }}
+        style={styles.linkBox}
       >
-        Choose daily habits
-      </Text>
+        <Text variant="label" tone="muted" style={styles.link}>
+          Choose daily habits
+        </Text>
+      </PressableScale>
     </MenuPage>
   );
 }
@@ -152,4 +155,5 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   wrap: { flexDirection: "row", flexWrap: "wrap", gap: space[2] },
   link: { textDecorationLine: "underline" },
+  linkBox: { alignSelf: "flex-start" },
 });

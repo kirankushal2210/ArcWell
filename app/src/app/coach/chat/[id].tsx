@@ -10,6 +10,7 @@ import { dueText } from "@/features/coach/checkins";
 import { useCoachData } from "@/features/coach/CoachData";
 import { PageHeader } from "@/features/coach/parts";
 import { colors } from "@/theme";
+import { NotFound } from "@/features/system/SystemStates";
 
 export default function Chat() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -22,7 +23,7 @@ export default function Chat() {
     if (c?.unread) markRead(c.id);
   }, [c?.id, c?.unread, markRead]);
 
-  if (!c) return <PageHeader title="Chat" onBack={back} />;
+  if (!c) return <NotFound title="Chat" what="client" onBack={back} />;
   const first = c.name.split(" ")[0];
 
   return (
@@ -32,7 +33,7 @@ export default function Chat() {
     >
       <PageHeader
         title={c.name}
-        sub={`Check-in ${dueText(c).toLowerCase()}`}
+        sub={`Check-in: ${dueText(c)}`}
         onBack={back}
         actions={[
           {

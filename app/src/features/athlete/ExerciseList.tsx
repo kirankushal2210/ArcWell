@@ -87,34 +87,37 @@ function FilterButton({
   onPress: () => void;
   onClear: () => void;
 }) {
+  // The clear button sits beside the filter button, not inside it (no button inside a button).
   return (
-    <PressableScale
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={`Filter: ${label}`}
-      style={[styles.filter, active && styles.filterOn]}
-    >
-      <Text
-        variant="label"
-        weight="medium"
-        tone={active ? "onBrand" : "default"}
-        style={styles.flexShrink}
+    <View style={[styles.filter, active && styles.filterOn]}>
+      <PressableScale
+        onPress={onPress}
+        accessibilityRole="button"
+        accessibilityLabel={`Filter: ${label}`}
+        style={[styles.filterMain, active && styles.filterMainOn]}
       >
-        {label}
-      </Text>
+        <Text
+          variant="label"
+          weight="medium"
+          tone={active ? "onBrand" : "default"}
+          style={styles.flexShrink}
+        >
+          {label}
+        </Text>
+        {active ? null : <ChevronDown size={16} color={colors.textMuted} />}
+      </PressableScale>
       {active ? (
         <PressableScale
           onPress={onClear}
           accessibilityRole="button"
           accessibilityLabel={`Clear ${label}`}
-          hitSlop={12}
+          hitSlop={{ top: space[3], bottom: space[3], left: space[2] }}
+          style={styles.filterClear}
         >
           <X size={16} color={colors.onBrand} />
         </PressableScale>
-      ) : (
-        <ChevronDown size={16} color={colors.textMuted} />
-      )}
-    </PressableScale>
+      ) : null}
+    </View>
   );
 }
 
@@ -314,30 +317,33 @@ export function ExerciseList({
         renderItem={({ item: e }) => {
           const on = selected.includes(e.name);
           return (
-            <PressableScale
-              onPress={() => onPress(e)}
-              accessibilityRole="button"
-              accessibilityState={{ selected: on }}
-              accessibilityLabel={`${e.name}, ${MUSCLE_LABEL[e.muscle]}`}
-              style={[styles.row, on && styles.rowOn]}
-            >
-              <View>
-                <ExerciseAvatar e={e} />
-                {on ? (
-                  <View style={styles.tick}>
-                    <Check size={12} strokeWidth={3} color={colors.onBrand} />
-                  </View>
-                ) : null}
-              </View>
-              <View style={styles.flex}>
-                <Text weight="medium" numberOfLines={2}>
-                  {e.name}
-                </Text>
-                <Text variant="label" weight="regular" tone="muted">
-                  {MUSCLE_LABEL[e.muscle]}
-                  {e.custom ? " · Yours" : ""}
-                </Text>
-              </View>
+            // The row and its About button are siblings (no button inside a button).
+            <View style={[styles.rowWrap, on && styles.rowOn]}>
+              <PressableScale
+                onPress={() => onPress(e)}
+                accessibilityRole="button"
+                accessibilityState={{ selected: on }}
+                accessibilityLabel={`${e.name}, ${MUSCLE_LABEL[e.muscle]}`}
+                style={styles.row}
+              >
+                <View>
+                  <ExerciseAvatar e={e} />
+                  {on ? (
+                    <View style={styles.tick}>
+                      <Check size={12} strokeWidth={3} color={colors.onBrand} />
+                    </View>
+                  ) : null}
+                </View>
+                <View style={styles.flex}>
+                  <Text weight="medium" numberOfLines={2}>
+                    {e.name}
+                  </Text>
+                  <Text variant="label" weight="regular" tone="muted">
+                    {MUSCLE_LABEL[e.muscle]}
+                    {e.custom ? " · Yours" : ""}
+                  </Text>
+                </View>
+              </PressableScale>
               {onInfo ? (
                 <IconButton
                   icon={Info}
@@ -346,7 +352,7 @@ export function ExerciseList({
                   onPress={() => onInfo(e)}
                 />
               ) : null}
-            </PressableScale>
+            </View>
           );
         }}
       />
@@ -410,28 +416,42 @@ const styles = StyleSheet.create({
   filter: {
     flex: 1,
     flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: space[1],
+    alignItems: "stretch",
     minHeight: controlHeight,
-    paddingHorizontal: space[3],
     borderRadius: radius.full,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
   },
+  filterMain: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: space[1],
+    paddingHorizontal: space[3],
+  },
+  filterMainOn: { paddingRight: space[1] },
+  filterClear: { justifyContent: "center", paddingRight: space[3] },
   filterOn: { backgroundColor: colors.brand, borderColor: colors.brand },
   list: { paddingHorizontal: rhythm.gutter, paddingTop: space[2] },
   sectionHead: { paddingTop: space[4], paddingBottom: space[2] },
   empty: { paddingTop: space[6], textAlign: "center" },
+  rowWrap: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space[1],
+    paddingRight: space[2],
+    borderRadius: radius.md,
+  },
   row: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
     gap: space[3],
     minHeight: 64,
     paddingVertical: space[2],
     paddingHorizontal: space[2],
-    borderRadius: radius.md,
   },
   rowOn: { backgroundColor: colors.surfaceRaised },
   avatar: {

@@ -3,9 +3,11 @@
 // SAMPLE DATA: values are estimates. The real data is IFCT 2017 plus Arcwell-reviewed dishes, with
 // standard portion weights checked by a nutrition reviewer (PLAN.md pre-launch tasks); no crowd data (D45).
 
+import { EXISTING_TAGS, URBAN_ROWS } from "./foodsUrban";
+
 export type Macros = { kcal: number; p: number; c: number; f: number };
 export type Unit = { key: string; label: string; grams: number };
-export type FoodSource = "verified" | "ifct" | "mine";
+export type FoodSource = "verified" | "ifct" | "mine" | "estimate";
 
 export type Food = {
   id: string;
@@ -20,6 +22,12 @@ export type Food = {
   units: Unit[];
   /** Cooked with oil, so home-style or restaurant changes the numbers (F5-06). */
   oil: boolean;
+  /** Fibre per 100 g, where known (D95). */
+  fibre?: number;
+  /** Live-culture food, or ultra-processed (NOVA group 4), where labelled (D95). */
+  tag?: "fermented" | "ultra";
+  /** Caffeine in mg per 100 g, where there is any (D95). */
+  caffeine?: number;
 };
 
 export type MealSlot = "breakfast" | "lunch" | "snacks" | "dinner";
@@ -55,6 +63,10 @@ export type FoodLog = {
   cooked?: "home" | "restaurant";
   source: FoodSource | "quick";
   macros: Macros;
+  /** Clock minute it was logged at, for the caffeine cut-off (D96); older logs don't have it. */
+  at?: number;
+  /** The plate photo, when logged with a scan (D94). */
+  photoUri?: string;
   /** Logged from the meal plan with "Ate this" (F5-12). */
   fromPlan?: string;
   /** Logged with "Ate something else" instead of this plan meal: the coach sees the swap. */
@@ -1949,18 +1961,57 @@ const parseUnits = (s: string): Unit[] =>
       return { key, label: UNIT_LABEL[key] ?? key, grams: Number(g) };
     });
 
-export const FOODS: Food[] = ROWS.map(
-  ([id, name, aliases, src, kind, kcal, p, c, f, units, oil]) => ({
-    id,
-    name,
-    aliases: aliases ? aliases.split("|") : [],
-    source: src === "v" ? "verified" : "ifct",
-    kind: kind === "d" ? "dish" : "ingredient",
-    per100: { kcal, p, c, f },
-    units: parseUnits(units),
-    oil: oil === 1,
-  }),
-);
+const TAG = { f: "fermented", u: "ultra" } as const;
+
+export const FOODS: Food[] = [
+  ...ROWS.map(
+    ([id, name, aliases, src, kind, kcal, p, c, f, units, oil]): Food => {
+      const extra = EXISTING_TAGS[id];
+      return {
+        id,
+        name,
+        aliases: aliases ? aliases.split("|") : [],
+        source: src === "v" ? "verified" : "ifct",
+        kind: kind === "d" ? "dish" : "ingredient",
+        per100: { kcal, p, c, f },
+        units: parseUnits(units),
+        oil: oil === 1,
+        ...(extra?.tag ? { tag: TAG[extra.tag] } : {}),
+        ...(extra?.caffeine ? { caffeine: extra.caffeine } : {}),
+      };
+    },
+  ),
+  // Tier-1 city foods (D95), estimates until reviewed.
+  ...URBAN_ROWS.map(
+    ([
+      id,
+      name,
+      aliases,
+      kind,
+      kcal,
+      p,
+      c,
+      f,
+      fibre,
+      units,
+      oil,
+      tag,
+      caffeine,
+    ]): Food => ({
+      id,
+      name,
+      aliases: aliases ? aliases.split("|") : [],
+      source: "estimate",
+      kind: kind === "d" ? "dish" : "ingredient",
+      per100: { kcal, p, c, f },
+      units: parseUnits(units),
+      oil: oil === 1,
+      fibre,
+      ...(tag ? { tag: TAG[tag] } : {}),
+      ...(caffeine ? { caffeine } : {}),
+    }),
+  ),
+];
 
 export const GRAMS: Unit = { key: "g", label: "g", grams: 1 };
 export const unitsOf = (f: Food) => [...f.units, GRAMS];
@@ -2058,6 +2109,7 @@ export const SOURCE_LABEL: Record<FoodSource | "quick", string> = {
   verified: "Verified",
   ifct: "IFCT",
   mine: "Mine",
+  estimate: "Estimate",
   quick: "Quick add",
 };
 

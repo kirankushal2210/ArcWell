@@ -10,6 +10,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button, PressableScale, Text } from "@/components/primitives";
 import { AIConsentPoints } from "@/features/athlete/AIConsent";
 import { selfClient, selfPlan } from "@/features/athlete/selfPlan";
+import { recordConsent } from "@/features/auth/consent";
 import { useCoachData } from "@/features/coach/CoachData";
 import { useOnboarding } from "@/features/onboarding/OnboardingContext";
 import { ProgressBar, QuestionHeader } from "@/features/onboarding/parts";
@@ -60,6 +61,8 @@ export default function Pro() {
         : c,
       tier,
     );
+    // "Allow and start free trial" is the AI consent asked at sign-up (SPEC key rules).
+    if (tier === "pro") void recordConsent("ai", true);
     if (router.canDismiss()) router.dismissAll();
     router.replace("/athlete");
   };

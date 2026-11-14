@@ -5,7 +5,8 @@ import { Linking } from "react-native";
 
 import { Button, Text, TextField } from "@/components/primitives";
 import { backTo, InfoCard, MenuPage } from "@/features/athlete/MenuParts";
-import { Group, GroupRow } from "@/features/coach/parts";
+import { Eyebrow, Group, GroupRow } from "@/features/coach/parts";
+import { LegalRows } from "@/features/legal/LegalLinks";
 
 const TOPICS: [string, string][] = [
   [
@@ -14,7 +15,7 @@ const TOPICS: [string, string][] = [
   ],
   [
     "Logging food and portions",
-    "Tap + and Log food, search in English or Hindi, and pick a portion in katori, roti or grams. Recent foods are one tap away.",
+    "Tap the round red button above the tab bar on Today or Nutrition: a scan with Plus, or + to search. Search in English or Hindi and pick a portion in katori, roti or grams. Recent foods are one tap away.",
   ],
   [
     "Subscriptions and the trial",
@@ -80,6 +81,8 @@ export default function Help() {
           Nothing matches. Contact support and we&apos;ll answer directly.
         </InfoCard>
       )}
+      <Eyebrow>Policies</Eyebrow>
+      <LegalRows />
     </MenuPage>
   );
 }

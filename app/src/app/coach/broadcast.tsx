@@ -14,6 +14,7 @@ import {
 } from "@/components/primitives";
 import { backTo, InfoCard, MenuPage } from "@/features/athlete/MenuParts";
 import { useCoachData } from "@/features/coach/CoachData";
+import { attentionOf } from "@/features/coach/checkins";
 import { Eyebrow, Group, GroupRow, Pills } from "@/features/coach/parts";
 import { colors, radius, space } from "@/theme";
 
@@ -38,7 +39,7 @@ export default function Broadcast() {
             ? true
             : p === "paused"
               ? c.status === "paused"
-              : !!c.attention,
+              : !!attentionOf(c),
         )
         .map((c) => c.id),
     );
@@ -104,7 +105,7 @@ export default function Broadcast() {
             { value: "all", label: `Everyone · ${linked.length}` },
             {
               value: "attention",
-              label: `Needs attention · ${linked.filter((c) => c.attention).length}`,
+              label: `Needs attention · ${linked.filter((c) => attentionOf(c)).length}`,
             },
             {
               value: "paused",

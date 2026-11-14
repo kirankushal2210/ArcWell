@@ -8,7 +8,7 @@ Rough estimates assume two builders using AI tools heavily. Total ≈ 18–24 we
 - [ ] IFCT 2017: confirm usage rights; get it into machine-readable form
 - [ ] Groq: current free models, rate limits, data retention, vision support
 - [ ] Accounts: Google Play Console, Supabase (hosted, Mumbai; founder creates it, D72), Expo, Razorpay (business KYC)
-- [ ] Privacy policy + DPDP consent text (health data, AI, photos, coach access)
+- [ ] Privacy policy + DPDP consent text (health data, AI, photos, coach access): drafted, with Terms and Copyright policy (D106, docs/legal/README.md); needs legal review and company details
 - [ ] IP India trademark search for "Arcwell" (software and fitness classes)
 - [ ] Confirm Android package name before first Play upload (currently `com.arcwell.app`; permanent once published)
 - [ ] Coach Terms legal review (coaches handle client health data under DPDP)

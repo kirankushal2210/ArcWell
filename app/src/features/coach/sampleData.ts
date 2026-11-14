@@ -121,6 +121,8 @@ export type Client = {
   };
   program?: TrainingProgram;
   nutritionPlan?: NutritionPlan;
+  /** A self-guided athlete's onboarding answers, so targets can follow a new weight (D96). */
+  selfAnswers?: Record<string, unknown>;
   protocol?: RecoveryProtocol;
   invite?: { token: string; code: string; claimed: boolean };
   /** Self-guided athletes: the onboarding answers that shape swaps (equipment, home kit, injuries). */
@@ -139,6 +141,8 @@ export type Client = {
   photo?: string;
   /** When the current training program started, for "Week 3 of 8" (ISO date). */
   programStart?: string;
+  /** When the coach last assigned or changed the program (ISO); a new time is a new plan notice. */
+  programUpdatedAt?: string;
   /** The athlete's own routines, outside the program: extra sessions they plan themselves. */
   routines?: TrainingDay[];
   /** CRM (D63): package, fee, renewal and payment status, recorded by the coach. */

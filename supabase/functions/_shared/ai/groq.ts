@@ -1,11 +1,30 @@
-import type { AiProvider, AiRequest, AiResponse } from "./types.ts";
+import type {
+  AiMessage,
+  AiProvider,
+  AiRequest,
+  AiResponse,
+} from "./types.ts";
 
 // Groq exposes an OpenAI-compatible chat completions endpoint.
 // Verify the current model list, free-tier limits and data-retention terms
 // at https://console.groq.com/docs before choosing GROQ_MODEL.
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 
-export function createGroqProvider(apiKey: string, model: string): AiProvider {
+// OpenAI-style content: text stays a string, parts become text / image_url entries.
+const toWire = (content: AiMessage["content"]) =>
+  typeof content === "string"
+    ? content
+    : content.map((p) =>
+        p.type === "text"
+          ? { type: "text", text: p.text }
+          : { type: "image_url", image_url: { url: p.dataUrl } },
+      );
+
+export function createGroqProvider(
+  apiKey: string,
+  model: string,
+  visionModel?: string,
+): AiProvider {
   return {
     name: "groq",
     async generate(request: AiRequest): Promise<AiResponse> {
@@ -16,8 +35,11 @@ export function createGroqProvider(apiKey: string, model: string): AiProvider {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model,
-          messages: request.messages,
+          model: request.vision ? (visionModel ?? model) : model,
+          messages: request.messages.map((m) => ({
+            role: m.role,
+            content: toWire(m.content),
+          })),
           max_tokens: request.maxOutputTokens ?? 2048,
           ...(request.json ? { response_format: { type: "json_object" } } : {}),
         }),
@@ -32,7 +54,7 @@ export function createGroqProvider(apiKey: string, model: string): AiProvider {
       return {
         text: data.choices?.[0]?.message?.content ?? "",
         provider: "groq",
-        model,
+        model: request.vision ? (visionModel ?? model) : model,
         usage: {
           inputTokens: data.usage?.prompt_tokens ?? 0,
           outputTokens: data.usage?.completion_tokens ?? 0,

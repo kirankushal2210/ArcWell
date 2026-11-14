@@ -295,6 +295,28 @@ Entry points:
 - The Programs catalog card.
 - A coach assigning a race goal or program.
 
+### 3.2b Race questions by level (founder request, 2026-11-13)
+Athletes who pick the race goal answer race questions instead of the goal-weight question. The general body, training, recovery and food questions stay, because calories and recovery need them.
+
+| Everyone | First race | Raced before | Advanced (Pro, podiums, qualifying) |
+|---|---|---|---|
+| Raced before? · weeks to race · division and kit · running now (km a week) · recent 5 km time (skipped if not running yet) | Stations tried · aim (finish, run every km, or a target time) · target time if the aim is a time | Best finish time · that race's division · where time was lost (up to 3: running, slowing on later runs, Roxzone, any station) · target time | Everything in Raced before, plus in-race run pace and the season goal (personal best, age-group podium, World Championships) |
+
+**How the answers shape the plan (`features/science/hybrid.ts`):**
+- First races: at most 5 days a week; untried stations are practised first at light loads.
+- Weak areas: weak stations first, with one extra round; notes for Roxzone and late-race fade.
+- Running: easy-run length follows current weekly km (run-walk for non-runners).
+- Paces: interval and race paces come from the 5 km time (race pace about 1.25 × 5 km pace, from in-race running at about 84% of threshold speed in Pro men, gutierrezhellin2026hyrox) or from the advanced athlete's real race pace. These are starting estimates, replaced by sim splits.
+- Advanced athletes: compromised running from Base and 1 km repeats instead of 400 m.
+
+**What the research says by level:**
+- First-timers mostly lose time on the sleds, sandbag lunges, wall balls and transitions, and slow down on later runs.
+- Running is about half of race time (rappelt2026hyrox, brandt2025hyrox).
+- Strength stations cost slower athletes the most.
+- Elite athletes are even across stations.
+
+Finish-time averages from third-party sites disagree, so the app quotes none.
+
 ### 3.3 The hybrid-race plan (rules in `features/science/hybrid.ts`, D69 sources to verify)
 **Phases, counted back from race day:**
 - **Base:** more than 16 weeks out.

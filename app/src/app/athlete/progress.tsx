@@ -1,12 +1,17 @@
-// Progress for a coached athlete (CP-01 to CP-06): Check-ins · Progress · Chat as section tabs
+// Progress (CP-01 to CP-06, D91): training by week (duration, volume, reps), a dashboard into
+// statistics, exercises, measures and the calendar, then bodyweight. Everyone gets it; coached
+// athletes also have Check-ins and Chat. Check-ins · Progress · Chat as section tabs
 // (D61). Check-ins shows the week's check-in (due, sent and waiting, or replied) and every past one
 // with the coach's reply, each opening read-only. Progress is bodyweight against the coach's goal
 // with a quick weigh-in and the way into Physique. Chat previews the latest messages and opens the
 // full conversation, so the tab bar never covers the message box. Each section docks its action.
 import { router } from "expo-router";
 import {
+  CalendarDays,
   Camera,
+  ChartColumn,
   ChartLine,
+  Dumbbell,
   MessageCircle,
   Ruler,
   Scale,
@@ -14,16 +19,21 @@ import {
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
-import { Avatar, Text } from "@/components/primitives";
+import { Avatar, PressableScale, Text } from "@/components/primitives";
 import { SectionTabs } from "@/components/SectionTabs";
 import { athleteMenuAction, NavRow } from "@/features/athlete/MenuParts";
+import { TrainingChart } from "@/features/athlete/TrainingChart";
 import {
   AthleteDock,
   AthletePage,
   NotJoined,
   useMe,
 } from "@/features/athlete/useMe";
-import { dueText, sentThisWeek } from "@/features/coach/checkins";
+import {
+  checkInStatus,
+  dueText,
+  missedDay,
+} from "@/features/coach/checkins";
 import { useCoachData } from "@/features/coach/CoachData";
 import {
   Eyebrow,
@@ -36,6 +46,14 @@ import {
 import { colors, radius, space } from "@/theme";
 
 type Tab = "checkins" | "progress" | "chat";
+
+/** The four ways into training stats from Progress (D91). */
+const DASHBOARD = [
+  { label: "Statistics", icon: ChartColumn, href: "/athlete/analytics" },
+  { label: "Exercises", icon: Dumbbell, href: "/athlete/exercises" },
+  { label: "Measures", icon: Ruler, href: "/athlete/physique/measurements" },
+  { label: "Calendar", icon: CalendarDays, href: "/athlete/calendar" },
+] as const;
 const TABS: { key: Tab; label: string }[] = [
   { key: "checkins", label: "Check-ins" },
   { key: "progress", label: "Progress" },
@@ -44,14 +62,16 @@ const TABS: { key: Tab; label: string }[] = [
 
 export default function Progress() {
   const me = useMe();
-  const { coachName, settingsOf } = useCoachData();
+  const { coachName, settingsOf, sessions, meTier } = useCoachData();
+  const coached = meTier === "coached";
   const [tab, setTab] = useState<Tab>("checkins");
   if (!me) return <NotJoined />;
   const first = coachName.replace(/^Coach\s+/, "");
   const last = me.weights[me.weights.length - 1] ?? 70;
   const start = me.weights[0] ?? last;
   const k = me.checkIns[0];
-  const sent = sentThisWeek(me);
+  const status = checkInStatus(me);
+  const sent = status.kind === "sent";
   const paused = me.status === "paused";
   const photosOff = !settingsOf(me.id).photos;
 
@@ -67,7 +87,9 @@ export default function Progress() {
                 ? k?.reviewed
                   ? `${first} replied`
                   : "Check-in sent"
-                : "This week's check-in"}
+                : status.kind === "overdue"
+                  ? "Check-in overdue"
+                  : "This week's check-in"}
         </Text>
         <Text tone="muted">
           {paused
@@ -78,7 +100,7 @@ export default function Progress() {
                 ? k?.reviewed
                   ? (k.reply ?? "")
                   : `${first} will look at it and reply here.`
-                : `${dueText(me)} · weight, waist, six quick scores and how the week went.`}
+                : `${status.kind === "overdue" ? `Was due ${missedDay(me, status)}` : dueText(me)} · weight, waist, six quick scores and how the week went.`}
         </Text>
         {!paused && !sent && photosOff ? (
           <Text variant="label" weight="regular" tone="muted">
@@ -118,6 +140,25 @@ export default function Progress() {
 
   const progress = (
     <AthletePage key="p" dock>
+      <TrainingChart sessions={sessions(me.id)} />
+
+      <Text variant="heading">Dashboard</Text>
+      <View style={styles.dash}>
+        {DASHBOARD.map((d) => (
+          <PressableScale
+            key={d.label}
+            onPress={() => router.push(d.href)}
+            accessibilityRole="button"
+            accessibilityLabel={d.label}
+            style={styles.dashTile}
+          >
+            <d.icon size={22} color={colors.text} />
+            <Text weight="semibold">{d.label}</Text>
+          </PressableScale>
+        ))}
+      </View>
+
+      <Eyebrow>Bodyweight</Eyebrow>
       <View style={styles.tiles}>
         <StatTile
           label="Now"
@@ -132,27 +173,12 @@ export default function Progress() {
       </View>
       {me.weights.length > 1 ? (
         <View style={styles.card}>
-          <Text weight="semibold">Bodyweight</Text>
           <WeightChart values={me.weights} target={me.targetKg} />
-          <Text variant="caption" tone="muted">
-            Dashed line is the goal {first} set with you.
-          </Text>
         </View>
       ) : null}
-      <Eyebrow>Physique</Eyebrow>
       <Group>
         <NavRow
           first
-          icon={Scale}
-          label="Bodyweight"
-          onPress={() => router.push("/athlete/physique/bodyweight")}
-        />
-        <NavRow
-          icon={Ruler}
-          label="Measurements"
-          onPress={() => router.push("/athlete/physique/measurements")}
-        />
-        <NavRow
           icon={Camera}
           label="Photos"
           onPress={() => router.push("/athlete/physique/photos")}
@@ -207,16 +233,29 @@ export default function Progress() {
     <View style={styles.root}>
       <PageHeader
         title="Progress"
-        sub={`With ${coachName}`}
+        sub={coached ? `With ${coachName}` : undefined}
+        onBack={() =>
+          router.canGoBack() ? router.back() : router.replace("/athlete")
+        }
         actions={[athleteMenuAction]}
       />
-      <SectionTabs
-        tabs={TABS}
-        value={tab}
-        onChange={setTab}
-        pages={[checkins, progress, chat]}
-      />
-      {tab === "checkins" ? (
+      {coached ? (
+        <SectionTabs
+          tabs={TABS}
+          value={tab}
+          onChange={setTab}
+          pages={[checkins, progress, chat]}
+        />
+      ) : (
+        progress
+      )}
+      {!coached || tab === "progress" ? (
+        <AthleteDock
+          label="Log weight"
+          icon={Scale}
+          onPress={() => router.push("/athlete/physique/bodyweight")}
+        />
+      ) : tab === "checkins" ? (
         paused || (sent && k?.reviewed === false) ? null : (
           <AthleteDock
             label={
@@ -230,12 +269,6 @@ export default function Progress() {
             onPress={() => router.push("/athlete/weekly-check-in")}
           />
         )
-      ) : tab === "progress" ? (
-        <AthleteDock
-          label="Log weight"
-          icon={Scale}
-          onPress={() => router.push("/athlete/physique/bodyweight")}
-        />
       ) : (
         <AthleteDock
           label={`Message ${first}`}
@@ -252,6 +285,22 @@ const styles = StyleSheet.create({
   flex: { flex: 1, gap: space[1] / 2 },
   center: { textAlign: "center" },
   tiles: { flexDirection: "row", gap: space[2] },
+  dash: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    rowGap: space[2],
+  },
+  dashTile: {
+    width: "48.5%",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space[3],
+    minHeight: space[12] + space[2],
+    paddingHorizontal: space[4],
+    borderRadius: radius.lg,
+    backgroundColor: colors.surface,
+  },
   card: {
     gap: space[2],
     padding: space[3],

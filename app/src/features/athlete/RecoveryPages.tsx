@@ -3,15 +3,25 @@
 import { router } from "expo-router";
 import {
   Activity,
+  BedDouble,
   ChevronRight,
+  Flower2,
   HeartPulse,
+  Hourglass,
   Moon,
   Plus,
   Timer,
+  TriangleAlert,
   Watch,
+  Waves,
 } from "lucide-react-native";
+import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
+import {
+  useSetActive,
+  useWorkoutSummary,
+} from "@/features/athlete/ActiveWorkout";
 import {
   Button,
   IconButton,
@@ -19,7 +29,8 @@ import {
   Text,
 } from "@/components/primitives";
 import { useCoachData } from "@/features/coach/CoachData";
-import { Bars, Eyebrow } from "@/features/coach/parts";
+import { Bars, Eyebrow, Pills } from "@/features/coach/parts";
+import { bestEstimate } from "@/features/science/cardio";
 import { colors, fontFamilyFor, radius, space, textSizes } from "@/theme";
 
 import {
@@ -31,9 +42,18 @@ import {
   hm,
   outlookFor,
   plannerFor,
+  simulatedDay,
   suggestFor,
   ZONE_LABEL,
 } from "./recovery";
+import {
+  cycleInfo,
+  fitnessAge,
+  hrvStatus,
+  warningSigns,
+} from "./recoveryInsights";
+import { shiftDate } from "./foods";
+
 import {
   RingButton,
   Ring,
@@ -42,8 +62,15 @@ import {
   useRecovery,
   ZoneDot,
 } from "./RecoveryParts";
+import { Sheet, SheetRow } from "./Sheet";
 import { emptyWorkout } from "./training";
 import { AthletePage } from "./useMe";
+
+const HRV_LABEL = {
+  balanced: "Balanced",
+  low: "Below normal",
+  high: "Above normal",
+};
 
 export type RecoveryTab = "overview" | "sleep" | "recovery" | "strain";
 type R = ReturnType<typeof useRecovery>;
@@ -140,33 +167,101 @@ export function Overview({
   isToday: boolean;
   open: (t: RecoveryTab) => void;
 }) {
-  const { active, setActive } = useCoachData();
+  const active = useWorkoutSummary();
+  const setActive = useSetActive();
   const health = healthMetrics(r.inputs, day.date);
   const inRange = health?.filter((m) => m.inRange).length ?? 0;
   const bedtime = plannerFor(day, r.baseline, "peak").bed;
-  const outlook = outlookFor(day, isToday ? r.planned : null, bedtime);
+
   const brand = r.store.device?.brand;
+  const { settingsOf, setAthleteSettings } = useCoachData();
+  const settings = settingsOf(r.id);
+  const [pickRest, setPickRest] = useState(false);
+  const rest = settings.restMode;
+  const restDay = rest
+    ? Math.max(
+        1,
+        Math.round(
+          (Date.parse(`${day.date}T12:00:00`) -
+            Date.parse(`${rest.since}T12:00:00`)) /
+            86_400_000,
+        ) + 1,
+      )
+    : 0;
+  const warn = !rest && isToday && !!health && warningSigns(health);
+  // HRV over the last three weeks from the device (sample build: the simulated device).
+  const hrv = brand
+    ? hrvStatus(
+        Array.from(
+          { length: 21 },
+          (_, i) =>
+            simulatedDay(shiftDate(day.date, i - 20), r.baseline.sleepTargetH)
+              .hrv,
+        ),
+      )
+    : null;
+  const best = settings.cardio
+    ? bestEstimate(settings.cardio.tests)
+    : undefined;
+  const sex = r.me?.basics?.sex;
+  const fAge =
+    best && (sex === "male" || sex === "female")
+      ? fitnessAge(best.vo2, sex)
+      : null;
+  const cycle =
+    sex === "female" ? cycleInfo(settings.periods ?? [], day.date) : null;
+  const outlook = outlookFor(day, isToday ? r.planned : null, bedtime, !!rest);
 
   return (
     <AthletePage dock>
+      {rest ? (
+        <View style={styles.restCard}>
+          <BedDouble size={20} color={colors.accent} />
+          <View style={styles.flex}>
+            <Text weight="semibold">{`Rest mode · day ${restDay}`}</Text>
+            <Text variant="label" weight="regular" tone="muted">
+              No strain target until you&apos;re back.
+            </Text>
+          </View>
+          <Button
+            label="End"
+            size="sm"
+            variant="secondary"
+            onPress={() => setAthleteSettings(r.id, { restMode: undefined })}
+          />
+        </View>
+      ) : warn ? (
+        <View style={styles.restCard}>
+          <TriangleAlert size={20} color={colors.warning} />
+          <View style={styles.flex}>
+            <Text weight="semibold">Your body may be fighting something</Text>
+            <Text variant="label" weight="regular" tone="muted">
+              Two or more vitals are off together.
+            </Text>
+          </View>
+          <Button
+            label="Rest mode"
+            size="sm"
+            onPress={() =>
+              setAthleteSettings(r.id, {
+                restMode: { since: day.date, reason: "run_down" },
+              })
+            }
+          />
+        </View>
+      ) : null}
       {r.pendingDevice ? (
         <LinkRow
           icon={Watch}
           title={`Finish connecting your ${DEVICE_LABEL[r.pendingDevice]}`}
-          sub="Sleep stages, heart rate and HRV fill in on their own"
           onPress={() => go("/athlete/recovery/connect")}
         />
       ) : null}
       {isToday && !day.log ? (
         <View style={styles.checkIn}>
-          <View style={styles.flex}>
-            <Text weight="semibold">How did you wake up?</Text>
-            <Text variant="label" weight="regular" tone="muted">
-              {day.source === "device"
-                ? "Add how you feel to your device's numbers. 20 seconds."
-                : "Sleep, soreness, energy, stress and mood. 20 seconds."}
-            </Text>
-          </View>
+          <Text weight="semibold" style={styles.flex}>
+            How did you wake up?
+          </Text>
           <Button
             label="Check in"
             size="sm"
@@ -199,8 +294,10 @@ export function Overview({
         />
       </View>
       <View style={styles.zoneRow}>
-        <ZoneDot zone={day.recovery.zone} />
-        <Text weight="semibold">{ZONE_LABEL[day.recovery.zone]}</Text>
+        <ZoneDot zone={rest ? "red" : day.recovery.zone} />
+        <Text weight="semibold">
+          {rest ? "Rest and recover" : ZONE_LABEL[day.recovery.zone]}
+        </Text>
       </View>
       <Text variant="label" weight="regular" tone="muted" style={styles.center}>
         {sourceText(day.source, brand)}
@@ -233,9 +330,9 @@ export function Overview({
             </>
           ) : (
             <>
-              <Text weight="semibold">Connect a device</Text>
+              <Text weight="semibold">Connected device</Text>
               <Text variant="label" weight="regular" tone="muted">
-                Heart rate, HRV, oxygen
+                {brand ? DEVICE_LABEL[brand] : "None yet"}
               </Text>
             </>
           )}
@@ -258,7 +355,104 @@ export function Overview({
             {day.source === "device" ? "Average today" : "From how you feel"}
           </Text>
         </PressableScale>
+        {hrv ? (
+          <PressableScale
+            onPress={() => go("/athlete/recovery/health")}
+            accessibilityRole="button"
+            style={styles.tile}
+          >
+            <View style={styles.tileHead}>
+              <Waves size={18} color={colors.text} />
+              <Text variant="caption" tone="muted" style={styles.flex}>
+                HRV STATUS
+              </Text>
+            </View>
+            <Text
+              weight="semibold"
+              tone={hrv.status === "low" ? "warning" : "default"}
+            >
+              {HRV_LABEL[hrv.status]}
+            </Text>
+            <Text variant="label" weight="regular" tone="muted" numeric>
+              {`7-day ${hrv.avg7} ms · normal ${hrv.low}–${hrv.high}`}
+            </Text>
+          </PressableScale>
+        ) : null}
+        {fAge !== null ? (
+          <PressableScale
+            onPress={() => go("/athlete/cardio")}
+            accessibilityRole="button"
+            style={styles.tile}
+          >
+            <View style={styles.tileHead}>
+              <Hourglass size={18} color={colors.text} />
+              <Text variant="caption" tone="muted" style={styles.flex}>
+                FITNESS AGE
+              </Text>
+            </View>
+            <Text weight="semibold" numeric>
+              {`${fAge} years`}
+            </Text>
+            <Text variant="label" weight="regular" tone="muted" numeric>
+              {`From VO2max ${best?.vo2}`}
+            </Text>
+          </PressableScale>
+        ) : null}
+        {sex === "female" ? (
+          <PressableScale
+            onPress={() => go("/athlete/recovery/cycle")}
+            accessibilityRole="button"
+            style={styles.tile}
+          >
+            <View style={styles.tileHead}>
+              <Flower2 size={18} color={colors.text} />
+              <Text variant="caption" tone="muted" style={styles.flex}>
+                CYCLE
+              </Text>
+            </View>
+            <Text weight="semibold" numeric>
+              {cycle ? `Day ${cycle.day}` : "Log a period"}
+            </Text>
+            <Text variant="label" weight="regular" tone="muted" numeric>
+              {cycle ? `Next in about ${cycle.daysToNext} days` : "Optional"}
+            </Text>
+          </PressableScale>
+        ) : null}
       </View>
+
+      {rest ? null : (
+        <LinkRow
+          icon={BedDouble}
+          title="Sick, injured or run down?"
+          sub="Rest mode pauses strain targets"
+          onPress={() => setPickRest(true)}
+        />
+      )}
+      <Sheet
+        visible={pickRest}
+        onClose={() => setPickRest(false)}
+        title="Rest mode"
+      >
+        {(
+          [
+            ["sick", "I'm sick"],
+            ["injured", "I'm injured"],
+            ["run_down", "I'm run down"],
+            ["other", "Something else"],
+          ] as const
+        ).map(([reason, label]) => (
+          <SheetRow
+            key={reason}
+            label={label}
+            onPress={() => {
+              setAthleteSettings(r.id, {
+                restMode: { since: day.date, reason },
+              });
+              setPickRest(false);
+            }}
+          />
+        ))}
+      </Sheet>
 
       <View style={styles.between}>
         <Text variant="title">My day</Text>
@@ -544,6 +738,9 @@ export function SleepPage({ r, day }: { r: R; day: Day }) {
 export function RecoveryPage({ r, day }: { r: R; day: Day }) {
   const rec = day.recovery;
   const week = daysBack(r.inputs, day.date, 7);
+  // Trend over 7 or 30 days (D98).
+  const [span, setSpan] = useState<"7" | "30">("7");
+  const trend = span === "7" ? week : daysBack(r.inputs, day.date, 30);
   const text =
     rec.zone === "green"
       ? "Your body is ready for a hard session. Push today if it's planned."
@@ -617,10 +814,22 @@ export function RecoveryPage({ r, day }: { r: R; day: Day }) {
       ) : null}
 
       <Card>
-        <Text weight="semibold">Last 7 days</Text>
+        <View style={styles.between}>
+          <Text weight="semibold">Trend</Text>
+          <Pills
+            value={span}
+            onChange={setSpan}
+            options={[
+              { value: "7", label: "7 days" },
+              { value: "30", label: "30 days" },
+            ]}
+          />
+        </View>
         <Bars
-          values={week.map((d) => d.recovery.score)}
-          labels={week.map((d) => d.date.slice(8))}
+          values={trend.map((d) => d.recovery.score)}
+          labels={trend.map((d, i) =>
+            span === "7" || i % 5 === 0 ? d.date.slice(8) : "",
+          )}
         />
       </Card>
 
@@ -661,7 +870,8 @@ export function StrainPage({
       : s.score > hi
         ? "Above today's target: go easy for the rest of the day"
         : "In today's target range";
-  const { active, setActive } = useCoachData();
+  const active = useWorkoutSummary();
+  const setActive = useSetActive();
 
   return (
     <AthletePage dock>
@@ -789,15 +999,28 @@ const styles = StyleSheet.create({
     gap: space[2],
     flexWrap: "wrap",
   },
-  tiles: { flexDirection: "row", gap: space[2] },
+  tiles: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    rowGap: space[2],
+  },
   tile: {
-    flex: 1,
+    width: "48.5%",
     gap: space[1],
     padding: space[3],
     borderRadius: radius.lg,
     backgroundColor: colors.surface,
   },
   tileHead: { flexDirection: "row", alignItems: "center", gap: space[2] },
+  restCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space[3],
+    padding: space[3],
+    borderRadius: radius.lg,
+    backgroundColor: colors.surface,
+  },
   activity: {
     flexDirection: "row",
     alignItems: "center",

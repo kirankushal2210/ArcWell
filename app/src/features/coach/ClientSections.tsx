@@ -23,6 +23,7 @@ import {
   shiftDate,
   slotLabel,
 } from "@/features/athlete/foods";
+import { adherenceFromLogs } from "@/features/coach/adherence";
 import { ClientHabits } from "@/features/coach/ClientHabits";
 import { useCoachData } from "@/features/coach/CoachData";
 import { accountOf, dayInline, inr, renewsOn } from "@/features/coach/crm";
@@ -198,6 +199,9 @@ export function useNutritionWeek(c: Client) {
 // ---------- Overview ----------
 
 export function Overview({ c, go }: { c: Client; go: (s: ClientTab) => void }) {
+  const { sessions } = useCoachData();
+  const fromLogs = adherenceFromLogs(c, sessions(c.id));
+  const adherence = fromLogs ?? c.adherence;
   const change = c.weights[c.weights.length - 1] - c.weights[0];
   const week = useNutritionWeek(c);
   const kcal = avg(week.days.map((d) => d.kcal));
@@ -235,8 +239,8 @@ export function Overview({ c, go }: { c: Client; go: (s: ClientTab) => void }) {
       <View style={styles.tiles}>
         <StatTile
           label="Adherence"
-          value={c.adherence === null ? "—" : `${c.adherence}%`}
-          sub="this week"
+          value={adherence === null ? "—" : `${adherence}%`}
+          sub={fromLogs === null ? "this week" : "last 4 weeks"}
         />
         <StatTile
           label="Weight"
@@ -569,7 +573,7 @@ export function Nutrition({ c }: { c: Client }) {
               const meal = planMeals.find((m) => m.id === mealId);
               return (
                 <Text key={k} variant="label" weight="regular" tone="muted">
-                  {new Date(d).toLocaleDateString("en-IN", {
+                  {new Date(`${d}T12:00:00`).toLocaleDateString("en-IN", {
                     weekday: "short",
                   })}{" "}
                   {meal?.name ?? slotLabel(ls[0].meal)}: ate{" "}

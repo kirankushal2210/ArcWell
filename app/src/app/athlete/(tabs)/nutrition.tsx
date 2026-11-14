@@ -3,7 +3,14 @@
 // Free athletes see calories only and one dismissible Arcwell Plus card (D5); paid and coached
 // athletes see macros and their meal plan. Swipe between days with the arrows.
 import { router } from "expo-router";
-import { ChevronLeft, ChevronRight, Plus, X } from "lucide-react-native";
+import { Image } from "expo-image";
+import {
+  ChevronRight,
+  Plus,
+  RotateCcw,
+  Utensils,
+  X,
+} from "lucide-react-native";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
@@ -11,39 +18,42 @@ import { IconButton, PressableScale, Text } from "@/components/primitives";
 import { SectionTabs } from "@/components/SectionTabs";
 import {
   kcalText,
+  newLogId,
   slotNow,
-  todayKey,
   useNutrition,
 } from "@/features/athlete/FoodParts";
+import { useDayPicker } from "@/features/athlete/useToday";
 import {
-  dateLabel,
   type FoodLog,
   type Macros,
   MEAL_SLOTS,
   type MealSlot,
   portionText,
   shiftDate,
-  slotLabel,
   sumMacros,
 } from "@/features/athlete/foods";
-import { athleteMenuAction } from "@/features/athlete/MenuParts";
+import {
+  athleteMenuAction,
+  progressAction,
+} from "@/features/athlete/MenuParts";
 import { MealPlanBody } from "@/features/athlete/MealPlanBody";
-import { AthleteDock, AthletePage, NotJoined } from "@/features/athlete/useMe";
+import { AthletePage, NotJoined } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Bars, PageHeader, Pills } from "@/features/coach/parts";
 import { colors, radius, space } from "@/theme";
-import { WhyThis } from "@/features/science/WhyThis";
 import { WaterCard } from "@/features/athlete/Water";
 import { UndoDock } from "@/features/athlete/UndoDock";
-
-function Bar({ value, target }: { value: number; target: number }) {
-  const pct = target > 0 ? Math.min(1, value / target) : 0;
-  return (
-    <View style={styles.track}>
-      <View style={[styles.fill, { width: `${pct * 100}%` }]} />
-    </View>
-  );
-}
+import { FoodScanButton } from "@/features/athlete/FoodScanButton";
+import {
+  CaloriesCard,
+  DateStrip,
+  MacroCards,
+  macroColor,
+  StreakPill,
+} from "@/features/athlete/NutritionParts";
+import { logStreak } from "@/features/athlete/streak";
+import { FIBRE_TARGET_G, foodQuality } from "@/features/athlete/foodQuality";
+import { FoodQualityCard } from "@/features/athlete/FoodQualityCard";
 
 function DayPage({
   date,
@@ -62,7 +72,6 @@ function DayPage({
   const day = n.logs.filter((l) => l.date === date);
   const eaten = sumMacros(day.map((l) => l.macros));
   const target = plan?.kcal ?? 0;
-  const left = target - eaten.kcal;
   const open = (meal: MealSlot) =>
     router.push({ pathname: "/athlete/food/add", params: { meal, date } });
   const edit = (l: FoodLog) =>
@@ -77,92 +86,42 @@ function DayPage({
       ).length
     : 0;
 
+  // Fibre comes from the foods with a known fibre value (D103).
+  const quality = foodQuality(day, {
+    weightKg: n.me.weights.at(-1) ?? 70,
+    bedMinute: n.me.protocol?.bed ?? 22 * 60 + 30,
+    mine: n.myFoods,
+  });
+
   return (
     <AthletePage dock>
-      <View style={styles.hero}>
-        {target ? (
-          <>
-            <Text variant="display" numeric>
-              {Math.abs(Math.round(left)).toLocaleString("en-IN")}
-            </Text>
-            <Text tone="muted">
-              {left >= 0 ? "kcal left" : "kcal over target"}
-            </Text>
-            <Bar value={eaten.kcal} target={target} />
-            <Text variant="label" weight="regular" tone="muted" numeric>
-              {Math.round(eaten.kcal).toLocaleString("en-IN")} eaten · target{" "}
-              {target.toLocaleString("en-IN")}
-            </Text>
-            <WhyThis
-              title="How your targets are set"
-              label="How targets are set"
-              points={[
-                "Calories start from your resting energy (the Mifflin–St Jeor equation) times your activity, then a small change for your goal.",
-                "Fat loss is kept to about 0.5–1% of your bodyweight a week. Slower loss kept more muscle in athletes.",
-                "Protein is about 1.8 g per kg a day, or 2.0 g while losing fat. Muscle gains level off around 1.6 g on average, and up to about 2.2 g may help those wanting the most.",
-                "With a higher body fat, Arcwell works protein out from a healthy reference weight so the target isn't inflated. That's our choice, not a research finding.",
-                "Aim for at least 25 g of fibre a day, and about 2 to 2.5 litres of water in total from drinks and food.",
-              ]}
-              sources={[
-                "mifflin1990",
-                "helms2014",
-                "morton2018",
-                "jager2017",
-                "efsa2010fibre",
-                "efsa2010water",
-              ]}
-            />
-          </>
-        ) : (
-          <>
-            <Text variant="display" numeric>
-              {Math.round(eaten.kcal).toLocaleString("en-IN")}
-            </Text>
-            <Text tone="muted">
-              {n.coached
-                ? `kcal eaten · ${n.coachName} is still setting your targets`
-                : "kcal eaten · no daily target set yet"}
-            </Text>
-          </>
-        )}
-      </View>
-
+      <CaloriesCard
+        eaten={eaten.kcal}
+        target={target}
+        waiting={
+          n.coached
+            ? `${n.coachName} is setting your targets`
+            : "Calories eaten"
+        }
+      />
       {n.macros && plan ? (
-        <View style={styles.macros}>
-          {(
-            [
-              ["Protein", eaten.p, plan.protein],
-              ["Carbs", eaten.c, plan.carbs],
-              ["Fat", eaten.f, plan.fat],
-            ] as const
-          ).map(([label, v, t]) => (
-            <View key={label} style={styles.macro}>
-              <Text variant="caption" tone="muted">
-                {label}
-              </Text>
-              <Text weight="semibold" numeric>
-                {Math.round(v)} / {t} g
-              </Text>
-              <Bar value={v} target={t} />
-            </View>
-          ))}
-        </View>
+        <MacroCards
+          eaten={{
+            protein: eaten.p,
+            carbs: eaten.c,
+            fat: eaten.f,
+            fibre: quality.fibre,
+          }}
+          target={{
+            protein: plan.protein,
+            carbs: plan.carbs,
+            fat: plan.fat,
+            fibre: FIBRE_TARGET_G,
+          }}
+        />
       ) : null}
 
-      {n.macros && plan && day.length ? (
-        <Text variant="caption" tone="muted">
-          {`Protein by meal: ${MEAL_SLOTS.filter((m) =>
-            day.some((l) => l.meal === m.value),
-          )
-            .map(
-              (m) =>
-                `${m.label} ${Math.round(sumMacros(day.filter((l) => l.meal === m.value).map((l) => l.macros)).p)} g`,
-            )
-            .join(
-              " · ",
-            )}. Aim for about ${Math.round(0.3 * (n.me?.weights.at(-1) ?? 70))}–${Math.round(0.4 * (n.me?.weights.at(-1) ?? 70))} g at each main meal.`}
-        </Text>
-      ) : null}
+      {n.macros && day.length ? <FoodQualityCard q={quality} /> : null}
 
       {date === today ? <WaterCard /> : null}
 
@@ -211,13 +170,19 @@ function DayPage({
 
       {day.length === 0 ? (
         <View style={styles.empty}>
-          <Text variant="title" style={styles.center}>
-            Nothing logged {date === today ? "yet today" : "this day"}
-          </Text>
+          <View style={styles.ghost}>
+            <View style={styles.thumb}>
+              <Utensils size={20} color={colors.textMuted} />
+            </View>
+            <View style={styles.ghostLines}>
+              <View style={styles.ghostLine} />
+              <View style={[styles.ghostLine, styles.ghostShort]} />
+            </View>
+          </View>
           <Text tone="muted" style={styles.center}>
             {date === today
-              ? "Start with what you just ate. Your recent foods are one tap away."
-              : "Add what you remember. Something beats nothing."}
+              ? "Scan or add your first meal of the day."
+              : "Nothing logged this day."}
           </Text>
         </View>
       ) : null}
@@ -225,6 +190,12 @@ function DayPage({
       {MEAL_SLOTS.map((m) => {
         const items = day.filter((l) => l.meal === m.value);
         const total = sumMacros(items.map((l) => l.macros));
+        // One tap to repeat yesterday's meal into an empty slot (D96): urban routines repeat.
+        const yesterday = items.length
+          ? []
+          : n.logs.filter(
+              (l) => l.date === shiftDate(date, -1) && l.meal === m.value,
+            );
         return (
           <View key={m.value} style={styles.meal}>
             <View style={styles.mealHead}>
@@ -243,6 +214,17 @@ function DayPage({
                 accessibilityLabel={`${l.name}, ${portionText(l.qty, l.unit)}, ${Math.round(l.macros.kcal)} kcal. Edit`}
                 style={styles.item}
               >
+                {l.photoUri ? (
+                  <Image
+                    source={{ uri: l.photoUri }}
+                    style={styles.thumb}
+                    contentFit="cover"
+                  />
+                ) : (
+                  <View style={styles.thumb}>
+                    <Utensils size={18} color={colors.textMuted} />
+                  </View>
+                )}
                 <View style={styles.flex}>
                   <Text weight="medium" numberOfLines={1}>
                     {l.name}
@@ -254,10 +236,62 @@ function DayPage({
                     {l.cooked === "restaurant" ? " · restaurant" : ""}
                     {l.swappedFor ? " · instead of plan" : ""}
                   </Text>
+                  {n.macros ? (
+                    <View style={styles.dots}>
+                      {(
+                        [
+                          ["protein", l.macros.p],
+                          ["carbs", l.macros.c],
+                          ["fat", l.macros.f],
+                        ] as const
+                      ).map(([k, g]) => (
+                        <View key={k} style={styles.dotItem}>
+                          <View
+                            style={[
+                              styles.dot,
+                              { backgroundColor: macroColor(k) },
+                            ]}
+                          />
+                          <Text variant="caption" tone="muted" numeric>
+                            {`${Math.round(g)}g`}
+                          </Text>
+                        </View>
+                      ))}
+                    </View>
+                  ) : null}
                 </View>
-                <Text numeric>{Math.round(l.macros.kcal)}</Text>
+                <Text weight="semibold" numeric>
+                  {Math.round(l.macros.kcal)}
+                </Text>
               </PressableScale>
             ))}
+            {yesterday.length ? (
+              <PressableScale
+                onPress={() =>
+                  n.add(
+                    yesterday.map((l) => ({
+                      ...l,
+                      id: newLogId(),
+                      date,
+                      at: undefined,
+                      fromPlan: undefined,
+                      swappedFor: undefined,
+                    })),
+                  )
+                }
+                accessibilityRole="button"
+                accessibilityLabel={`Log the same ${m.label.toLowerCase()} as yesterday`}
+                style={styles.addRow}
+              >
+                <RotateCcw size={18} color={colors.accent} />
+                <Text weight="medium" style={styles.flex}>
+                  Same as yesterday
+                </Text>
+                <Text variant="label" tone="muted" numeric>
+                  {kcalText(sumMacros(yesterday.map((l) => l.macros)).kcal)}
+                </Text>
+              </PressableScale>
+            ) : null}
             <PressableScale
               onPress={() => open(m.value)}
               accessibilityRole="button"
@@ -270,10 +304,6 @@ function DayPage({
           </View>
         );
       })}
-      <Text variant="caption" tone="muted">
-        Sample food data: numbers are estimates until the reviewed Indian food
-        data arrives.
-      </Text>
     </AthletePage>
   );
 }
@@ -361,10 +391,6 @@ function TrendsPage({ date }: { date: string }) {
           />
         </View>
       ) : null}
-      <Text variant="caption" tone="muted">
-        The line is your target. On target means within 10% of your calories.
-        Days with nothing logged are left out of the averages.
-      </Text>
     </AthletePage>
   );
 }
@@ -380,8 +406,7 @@ const TABS: { key: NutritionTab; label: string }[] = [
 export default function Nutrition() {
   const n = useNutrition();
   const { removedFood } = useCoachData();
-  const [today] = useState(todayKey);
-  const [date, setDate] = useState(today);
+  const { today, date, setDate } = useDayPicker();
   const [tab, setTab] = useState<NutritionTab>("day");
   if (!n.me) return <NotJoined />;
   const slot = date === today ? slotNow() : "lunch";
@@ -389,25 +414,27 @@ export default function Nutrition() {
     <View style={styles.root}>
       <PageHeader
         title="Nutrition"
-        sub={n.coached && n.plan ? `Targets from ${n.coachName}` : undefined}
-        actions={[athleteMenuAction]}
+        right={
+          <StreakPill
+            streak={logStreak(
+              n.logs.map((l) => l.date),
+              today,
+            )}
+          />
+        }
+        actions={[progressAction, athleteMenuAction]}
       />
-      <View style={styles.dates}>
-        <IconButton
-          icon={ChevronLeft}
-          accessibilityLabel="Previous day"
-          onPress={() => setDate((d) => shiftDate(d, -1))}
-        />
-        <Text weight="semibold" style={styles.center}>
-          {dateLabel(date, today)}
-        </Text>
-        <IconButton
-          icon={ChevronRight}
-          accessibilityLabel="Next day"
-          disabled={date >= today}
-          onPress={() => setDate((d) => shiftDate(d, 1))}
-        />
-      </View>
+      <DateStrip
+        date={date}
+        today={today}
+        onSelect={setDate}
+        share={(d) => {
+          const kcal = sumMacros(
+            n.logs.filter((l) => l.date === d).map((l) => l.macros),
+          ).kcal;
+          return n.plan?.kcal ? kcal / n.plan.kcal : kcal > 0 ? 1 : 0;
+        }}
+      />
       <SectionTabs
         tabs={TABS}
         value={tab}
@@ -449,17 +476,7 @@ export default function Nutrition() {
       {removedFood?.clientId === n.me?.id ? (
         <UndoDock />
       ) : tab === "trends" ? null : (
-        <AthleteDock
-          label={`Log ${slotLabel(slot).toLowerCase()}`}
-          icon={Plus}
-          pillar="nutrition"
-          onPress={() =>
-            router.push({
-              pathname: "/athlete/food/add",
-              params: { meal: slot, date },
-            })
-          }
-        />
+        <FoodScanButton meal={slot} date={date} />
       )}
     </View>
   );
@@ -469,29 +486,6 @@ const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
   flex: { flex: 1, gap: space[1] / 2 },
   center: { flex: 1, textAlign: "center" },
-  dates: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: space[2],
-  },
-  hero: {
-    gap: space[1],
-    padding: space[4],
-    borderRadius: radius.lg,
-    backgroundColor: colors.surface,
-  },
-  track: {
-    height: 8,
-    marginTop: space[2],
-    borderRadius: radius.full,
-    backgroundColor: colors.surfaceRaised,
-    overflow: "hidden",
-  },
-  fill: {
-    height: 8,
-    borderRadius: radius.full,
-    backgroundColor: colors.nutrition,
-  },
   macros: { flexDirection: "row", gap: space[2] },
   macro: {
     flex: 1,
@@ -520,12 +514,37 @@ const styles = StyleSheet.create({
   empty: {
     alignItems: "center",
     gap: space[3],
-    padding: space[6],
+    padding: space[4],
     borderRadius: radius.lg,
-    borderWidth: 1,
-    borderStyle: "dashed",
-    borderColor: colors.borderStrong,
+    backgroundColor: colors.surface,
   },
+  ghost: {
+    alignSelf: "stretch",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space[3],
+    padding: space[3],
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceRaised,
+  },
+  ghostLines: { flex: 1, gap: space[2] },
+  ghostLine: {
+    height: space[2],
+    borderRadius: radius.full,
+    backgroundColor: colors.border,
+  },
+  ghostShort: { width: "60%" },
+  thumb: {
+    width: space[12],
+    height: space[12],
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceRaised,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  dots: { flexDirection: "row", gap: space[2], paddingTop: space[1] / 2 },
+  dotItem: { flexDirection: "row", alignItems: "center", gap: space[1] },
+  dot: { width: 7, height: 7, borderRadius: radius.full },
   meal: {
     paddingHorizontal: space[4],
     paddingTop: space[3],

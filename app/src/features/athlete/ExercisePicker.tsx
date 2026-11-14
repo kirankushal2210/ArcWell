@@ -8,6 +8,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Button, IconButton, Text } from "@/components/primitives";
 import { useCoachData } from "@/features/coach/CoachData";
+import { HYROX_EXERCISES } from "@/features/race/data";
 import { colors, rhythm, space } from "@/theme";
 
 import { CreateExercise } from "./CreateExercise";
@@ -15,6 +16,7 @@ import { ExerciseFacts } from "./ExerciseFacts";
 import { ExerciseList } from "./ExerciseList";
 import type { Exercise } from "./library";
 import type { Session } from "./training";
+import { useVisibility } from "./visibility";
 
 /** Distinct exercise names from recent workouts, newest first. */
 export const recentNames = (sessions: Session[]) =>
@@ -35,6 +37,11 @@ function Body({
   onClose,
 }: Omit<PickerProps, "visible">) {
   const insets = useSafeAreaInsets();
+  const { hyrox } = useVisibility();
+  // HYROX athletes see running, the stations and the race-plan lifts first (D83).
+  const shortlist =
+    suggested ??
+    (hyrox ? { title: "HYROX", names: HYROX_EXERCISES } : undefined);
   const [picked, setPicked] = useState<string[]>([]);
   const [view, setView] = useState<"list" | "create" | Exercise>("list");
 
@@ -114,7 +121,7 @@ function Body({
       </View>
       <ExerciseList
         selected={picked}
-        suggested={suggested}
+        suggested={shortlist}
         recent={recentNames(history)}
         bottomInset={multi && picked.length ? 72 : 0}
         onInfo={(e) => setView(e)}

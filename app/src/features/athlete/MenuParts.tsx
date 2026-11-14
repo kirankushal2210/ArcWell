@@ -1,7 +1,12 @@
 // Shared pieces for the athlete side menu (D9) and its pages: the ☰ toolbar action, a page frame
 // with a back button and an optional docked action, navigation and switch rows, and info cards.
 import { router, type Href } from "expo-router";
-import { ChevronRight, type LucideIcon, Menu } from "lucide-react-native";
+import {
+  ChevronRight,
+  Menu,
+  TrendingUp,
+  type LucideIcon,
+} from "lucide-react-native";
 import type { ReactNode } from "react";
 import { StyleSheet, Switch, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -11,6 +16,13 @@ import { GroupRow, Page, PageHeader } from "@/features/coach/parts";
 import { colors, radius, rhythm, space } from "@/theme";
 
 /** ☰ on every athlete tab (D9). */
+/** Progress, top right beside the menu on every athlete tab (D101). */
+export const progressAction = {
+  icon: TrendingUp,
+  label: "Progress",
+  onPress: () => router.push("/athlete/progress"),
+};
+
 export const athleteMenuAction = {
   icon: Menu,
   label: "Menu",

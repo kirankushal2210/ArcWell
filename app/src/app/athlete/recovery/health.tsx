@@ -5,6 +5,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
+import { plusOnly } from "@/features/athlete/PlusOnly";
 import { Button, Text } from "@/components/primitives";
 import {
   DEVICE_LABEL,
@@ -13,10 +14,13 @@ import {
 } from "@/features/athlete/recovery";
 import { useRecovery } from "@/features/athlete/RecoveryParts";
 import { NotJoined } from "@/features/athlete/useMe";
+import { WhyThis } from "@/features/science/WhyThis";
 import { Page, PageHeader } from "@/features/coach/parts";
 import { colors, radius, space } from "@/theme";
 
-export default function Health() {
+export default plusOnly(Health);
+
+function Health() {
   const p = useLocalSearchParams<{ date?: string }>();
   const r = useRecovery();
   const [today] = useState(todayDate);
@@ -61,11 +65,16 @@ export default function Health() {
                 </View>
               ))}
             </View>
-            <Text variant="caption" tone="muted">
-              Several numbers outside your range for a few days can mean
-              you&apos;re getting ill, run down or not sleeping enough. This
-              isn&apos;t a diagnosis; see a doctor if you feel unwell.
-            </Text>
+            <WhyThis
+              label="Why?"
+              title="Reading your vitals"
+              points={[
+                "Your HRV status is the 7-day average against your own normal range: trends say more than one night.",
+                "When resting heart rate, HRV and skin temperature move the wrong way together, it showed up days before symptoms of infection in smartwatch data. Arcwell then suggests rest mode.",
+                "This isn't a diagnosis. See a doctor if you feel unwell.",
+              ]}
+              sources={["plews2013", "mishra2020"]}
+            />
           </>
         ) : (
           <View style={styles.card}>

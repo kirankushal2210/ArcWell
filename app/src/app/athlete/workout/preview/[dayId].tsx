@@ -3,9 +3,13 @@
 // during the workout (D45).
 import { router, useLocalSearchParams } from "expo-router";
 import { ChevronRight, PencilLine, Play } from "lucide-react-native";
-import { Alert, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import {
+  useSetActive,
+  useWorkoutSummary,
+} from "@/features/athlete/ActiveWorkout";
 import { Button, Text } from "@/components/primitives";
 import {
   clockTime,
@@ -17,21 +21,18 @@ import {
 import { NotJoined, useMe } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Group, GroupRow, Page, PageHeader } from "@/features/coach/parts";
+import { planLine } from "@/features/coach/plans";
+import { alert } from "@/lib/alert";
 import { colors, radius, rhythm, space } from "@/theme";
 import { isoToday } from "@/features/athlete/athleteData";
 
 export default function Preview() {
   const { dayId } = useLocalSearchParams<{ dayId: string }>();
   const me = useMe();
-  const {
-    active,
-    setActive,
-    sessions,
-    meTier,
-    coachName,
-    settingsOf,
-    setAthleteSettings,
-  } = useCoachData();
+  const { sessions, meTier, coachName, settingsOf, setAthleteSettings } =
+    useCoachData();
+  const active = useWorkoutSummary();
+  const setActive = useSetActive();
   const insets = useSafeAreaInsets();
   const back = () =>
     router.canGoBack() ? router.back() : router.replace("/athlete/training");
@@ -53,7 +54,7 @@ export default function Preview() {
 
   const start = () => {
     if (active && active.dayId !== day.id) {
-      Alert.alert(
+      alert(
         "A workout is already running",
         `Finish or discard ${active.name} first.`,
         [
@@ -78,7 +79,7 @@ export default function Preview() {
             ? [
                 {
                   icon: PencilLine,
-                  label: "Edit routine",
+                  label: "Edit template",
                   onPress: () =>
                     router.push({
                       pathname: "/athlete/routine/[id]",
@@ -116,11 +117,14 @@ export default function Preview() {
           </View>
         ) : null}
         <Text tone="muted" numeric>
-          About {estimateMinutes(day)} min · {day.exercises.length} exercises ·{" "}
-          {sets} sets
-          {routine ? " · your routine" : coached ? ` · from ${coachName}` : ""}
+          About {estimateMinutes(day)} min
+          {day.exercises.length > 1
+            ? ` · ${day.exercises.length} exercises · ${sets} sets`
+            : ""}
+          {routine ? " · your template" : coached ? ` · from ${coachName}` : ""}
         </Text>
-        {day.note?.trim() ? (
+        {/* Only notes a person wrote: the coach's, or the athlete's own on a routine (D88). */}
+        {day.note?.trim() && (routine || coached) ? (
           <View style={styles.note}>
             <Text variant="label" tone="muted">
               {coached && !routine ? `From ${coachName}` : "Your note"}
@@ -141,12 +145,19 @@ export default function Preview() {
                     params: { name: e.name },
                   })
                 }
-                label={`${e.name}, ${e.sets} sets of ${e.reps}`}
+                label={`${e.name}, ${planLine(e)}`}
               >
                 <View style={styles.flex}>
+                  {e.block ? (
+                    <Text variant="eyebrow" tone="muted">
+                      {e.block.kind === "station"
+                        ? "HYROX station"
+                        : "Intervals"}
+                    </Text>
+                  ) : null}
                   <Text weight="semibold">{e.name}</Text>
                   <Text variant="label" weight="regular" tone="muted" numeric>
-                    {e.sets} × {e.reps}
+                    {planLine(e)}
                     {e.restSec ? ` · rest ${clockTime(e.restSec * 1000)}` : ""}
                     {last.length ? ` · last ${setLabel(last[0], e.name)}` : ""}
                   </Text>
@@ -156,11 +167,6 @@ export default function Preview() {
             );
           })}
         </Group>
-        <Text variant="caption" tone="muted">
-          {coached
-            ? `${coachName} set this session. If equipment is busy, swap an exercise during the workout.`
-            : "Change anything with Edit, or swap an exercise during the workout."}
-        </Text>
       </Page>
       <View
         style={[

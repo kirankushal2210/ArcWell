@@ -5,7 +5,6 @@ import { Bike, ChevronRight, HeartPulse } from "lucide-react-native";
 import { StyleSheet, View } from "react-native";
 
 import { Button, PressableScale, Text } from "@/components/primitives";
-import { WEEKDAYS } from "@/features/coach/plans";
 import { LEVEL_LABEL, MACHINE_LABEL } from "@/features/science/cardio";
 import { colors, radius, space } from "@/theme";
 
@@ -27,10 +26,6 @@ export function CardioCard() {
             Cardio fitness
           </Text>
         </View>
-        <Text variant="label" tone="muted">
-          Start with an estimate of your VO2 max: from your watch, a 12-minute
-          run, a 1-mile walk, or four questions.
-        </Text>
         <Button
           label="Check my cardio fitness"
           size="sm"
@@ -98,16 +93,6 @@ export function CardioCard() {
           </View>
         ) : null}
       </View>
-      {cf.slots.length ? (
-        <Text variant="caption" tone="muted">
-          {`This week: ${cf.slots
-            .map(
-              (s) =>
-                `${WEEKDAYS[s.day]} ${s.kind === "intervals" ? "intervals" : "easy"} (${MACHINE_LABEL[s.machine].toLowerCase()})`,
-            )
-            .join(" · ")}`}
-        </Text>
-      ) : null}
     </PressableScale>
   );
 }

@@ -2,7 +2,14 @@
 // pre-filled from the plan or the last session; finishing turns it into a session in history.
 // Warm-up sets are marked W and left out of volume (F4-03). kg only in v1 (D45). What a set records
 // (kg, reps, time, distance) follows the exercise type in the library.
-import { type TrainingDay, uid } from "@/features/coach/plans";
+import {
+  type PlannedExercise,
+  paceUnit,
+  planLine,
+  type RpeRange,
+  type TrainingDay,
+  uid,
+} from "@/features/coach/plans";
 
 import {
   type ExerciseType,
@@ -22,6 +29,8 @@ export type LoggedSet = {
   seconds: number | null;
   /** Distance for runs, rides and carries. Missing on sets logged before distance existed. */
   km?: number | null;
+  /** Effort on the reps-in-reserve RPE scale (6–10), optional (helms2016rir). */
+  rpe?: number | null;
   done: boolean;
 };
 
@@ -40,6 +49,10 @@ export type LoggedExercise = {
   skipped: boolean;
   /** Set when swapped during the workout; the coach sees it (F4-07). */
   swappedFrom?: string;
+  /** The coach's target effort; without it the logger uses the rules range (D83). */
+  rpe?: RpeRange;
+  /** Target pace for intervals, e.g. "5:00 /km". */
+  pace?: string;
   sets: LoggedSet[];
 };
 
@@ -70,6 +83,7 @@ export type Session = {
       reps: number | null;
       seconds: number | null;
       km?: number | null;
+      rpe?: number | null;
       warmup: boolean;
     }[];
     note?: string;
@@ -189,8 +203,15 @@ export const defaultTarget = (name: string) => {
 };
 
 /** Volume counts lifted weight: kg × reps, including the added weight on weighted bodyweight moves. */
-const countsVolume = (t: ExerciseType) =>
+export const countsVolume = (t: ExerciseType) =>
   t === "weight_reps" || t === "weighted_bodyweight";
+
+/** Distance in km for targets like "400 m" or "1.5 km"; null otherwise. */
+export function targetKm(reps: string): number | null {
+  const m = reps.match(/^(\d+(?:\.\d+)?)\s*(m|km)\b/);
+  if (!m) return null;
+  return m[2] === "km" ? Number(m[1]) : Number(m[1]) / 1000;
+}
 
 export function exerciseFrom(
   name: string,
@@ -198,23 +219,34 @@ export function exerciseFrom(
   reps: string,
   restSec: number,
   sessions: Session[],
+  /** The coach's effort and block for this exercise (K-07, D79). */
+  plan?: Pick<PlannedExercise, "rpe" | "block">,
 ): LoggedExercise {
   const secs = targetSeconds(reps);
+  const plannedKm = targetKm(reps);
   const prev = previousSets(sessions, name);
-  // A plan can time an exercise the library counts in reps ("Burpee 40 s"): then it's timed.
+  // A plan can time an exercise the library counts in reps ("Burpee 40 s"): then it's timed. One
+  // set in metres ("Burpee broad jumps 80 m") logs distance and time instead.
   const libType = typeOf(name);
   const type: ExerciseType =
     secs !== null && !fieldsOf(libType).includes("seconds")
       ? "duration"
-      : libType;
+      : plannedKm !== null && !fieldsOf(libType).includes("km")
+        ? "distance_duration"
+        : libType;
   const fields: SetField[] = fieldsOf(type);
-  const metres = reps.match(/^(\d+)\s*m\b/);
-  const plannedKm = metres ? Number(metres[1]) / 1000 : null;
+  const block = plan?.block;
+  const unit = paceUnit(name);
   return {
     id: uid("x"),
     name,
     group: groupOf(name),
     target: `${sets} × ${reps}`,
+    rpe: plan?.rpe,
+    pace:
+      block?.kind === "interval" && block.pace && unit
+        ? `${block.pace} ${unit}`
+        : undefined,
     restSec,
     type,
     timed: fields.includes("seconds"),
@@ -233,7 +265,7 @@ export function exerciseFrom(
         seconds: fields.includes("seconds")
           ? (secs ?? p?.seconds ?? null)
           : null,
-        km: fields.includes("km") ? (p?.km ?? plannedKm) : null,
+        km: fields.includes("km") ? (plannedKm ?? p?.km ?? null) : null,
         done: false,
       };
     }),
@@ -249,7 +281,7 @@ export function startFromDay(
     name: day.name,
     startedAt: now(),
     exercises: day.exercises.map((e) =>
-      exerciseFrom(e.name, e.sets, e.reps, e.restSec, sessions),
+      exerciseFrom(e.name, e.sets, e.reps, e.restSec, sessions, e),
     ),
     rest: null,
   };
@@ -263,12 +295,25 @@ export const emptyWorkout = (): ActiveWorkout => ({
   rest: null,
 });
 
-/** Rough length of a planned day: about 45 s of work per set plus its rest. */
+/** Seconds of work in one set: the planned time, about 5 min a km for distances, else 45 s. */
+const workSeconds = (reps: string) => {
+  const secs = targetSeconds(reps);
+  if (secs !== null) return secs;
+  const km = targetKm(reps);
+  return km !== null ? Math.max(30, km * 300) : 45;
+};
+
+/** Rough length of a planned day: each set's work plus its rest. */
 export const estimateMinutes = (day: TrainingDay) =>
   Math.max(
     10,
     Math.round(
-      day.exercises.reduce((n, e) => n + e.sets * (45 + e.restSec), 0) / 60 / 5,
+      day.exercises.reduce(
+        (n, e) => n + e.sets * (workSeconds(e.reps) + e.restSec),
+        0,
+      ) /
+        60 /
+        5,
     ) * 5,
   );
 
@@ -351,6 +396,7 @@ export function toSession(
                 reps: s.reps,
                 seconds: s.seconds,
                 km: s.km ?? null,
+                rpe: s.rpe ?? null,
                 warmup: s.warmup,
               }))
           : [],
@@ -381,6 +427,8 @@ const step = (name: string) =>
 export function suggestion(
   sessions: Session[],
   e: LoggedExercise,
+  /** Target RPE range for this exercise; with it, last session's effort steers the advice. */
+  rpe?: [number, number],
 ): { text: string; kg: number | null } | null {
   if (!countsVolume(exType(e))) return null;
   const last = previousSets(sessions, e.name);
@@ -388,6 +436,13 @@ export function suggestion(
   if (!last.length || top === null) return null;
   const kg = Math.max(...last.map((s) => s.kg ?? 0));
   const allTop = last.every((s) => (s.reps ?? 0) >= top);
+  const rated = last
+    .map((s) => s.rpe)
+    .filter((v): v is number => typeof v === "number");
+  const avgRpe = rated.length
+    ? rated.reduce((a, b) => a + b, 0) / rated.length
+    : null;
+  const next = Math.round((kg + step(e.name)) * 4) / 4;
   if (!kg)
     return allTop
       ? {
@@ -395,15 +450,24 @@ export function suggestion(
           kg: null,
         }
       : null;
-  if (allTop) {
-    const next = Math.round((kg + step(e.name)) * 4) / 4;
+  if (allTop && avgRpe !== null && rpe && avgRpe >= 9.5)
     return {
-      text: `Hit ${top} reps on every set last time. Try ${next} kg.`,
+      text: `${top} reps every set last time, but close to failure (RPE ${avgRpe.toFixed(1)}). Stay at ${kg} kg and aim for RPE ${rpe[1]}.`,
+      kg,
+    };
+  if (allTop)
+    return {
+      text: `Hit ${top} reps on every set last time${avgRpe !== null ? ` at RPE ${avgRpe.toFixed(1)}` : ""}. Try ${next} kg.`,
       kg: next,
     };
-  }
+  // Easy: a full rep or more below the bottom of the range, so 4+ reps left on compounds.
+  if (avgRpe !== null && rpe && avgRpe <= rpe[0] - 1)
+    return {
+      text: `Last time felt easy (RPE ${avgRpe.toFixed(1)}). Try ${next} kg.`,
+      kg: next,
+    };
   return {
-    text: `Stay at ${kg} kg and aim for one more rep than last time.`,
+    text: `Stay at ${kg} kg and aim for one more rep than last time${rpe ? `, around RPE ${rpe[0]}–${rpe[1]}` : ""}.`,
     kg,
   };
 }
@@ -432,4 +496,14 @@ export function programWeek(weeks: number, start?: string) {
   const week =
     Math.floor((weekStart(new Date()).getTime() - from) / (7 * 86400000)) + 1;
   return { week: Math.max(1, week), weeks, done: week > weeks };
+}
+
+/**
+ * What a session holds, for cards and notices (D100): one exercise (a run, a HYROX station)
+ * shows what to do, such as "6 × 400 m"; more show the count.
+ */
+export function sessionWhat(exercises: PlannedExercise[]) {
+  return exercises.length === 1
+    ? planLine(exercises[0])
+    : `${exercises.length} exercises`;
 }

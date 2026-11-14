@@ -343,9 +343,12 @@ export function Wheel({
         })}
         ListHeaderComponent={spacer}
         ListFooterComponent={spacer}
-        contentOffset={{ x: 0, y: nearest * item }}
-        initialNumToRender={Math.min(values.length, nearest + rows + 2)}
-        windowSize={7}
+        // Start at the value without building every row above it: the first row shown is
+        // `half` rows above the value, which puts the value in the band.
+        initialScrollIndex={Math.max(0, nearest - half)}
+        initialNumToRender={rows + 4}
+        maxToRenderPerBatch={rows * 2}
+        windowSize={5}
         snapToInterval={item}
         decelerationRate="fast"
         showsVerticalScrollIndicator={false}
@@ -515,7 +518,7 @@ export function DayPicker({
             }
             style={[styles.day, on && styles.dayOn]}
           >
-            <Text variant="label" tone={on ? "onBrand" : "default"}>
+            <Text variant="label" tone={on ? "onPillar" : "default"}>
               {d}
             </Text>
           </PressableScale>
@@ -697,7 +700,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.full,
     backgroundColor: colors.surface,
   },
-  tokenOn: { backgroundColor: colors.accent },
+  tokenOn: { backgroundColor: colors.brand },
 
   days: { flexDirection: "row", justifyContent: "space-between" },
   day: {

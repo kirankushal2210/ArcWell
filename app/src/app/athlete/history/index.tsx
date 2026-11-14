@@ -1,9 +1,9 @@
-// Workout history page (F4-13). The same list is Training's History section tab (D61); this page
-// stays for links from elsewhere (Today, the workout summary).
+// Progressive overload page (D85, D90, D99): opened from the menu (☰ → Training). Lifts from the
+// last 2 weeks against the session before, with past workouts underneath.
 import { router } from "expo-router";
 import { StyleSheet, View } from "react-native";
 
-import { HistoryWeeks } from "@/features/athlete/HistoryWeeks";
+import { OverloadPage } from "@/features/athlete/OverloadPage";
 import { NotJoined, useMe } from "@/features/athlete/useMe";
 import { Page, PageHeader } from "@/features/coach/parts";
 import { colors } from "@/theme";
@@ -15,9 +15,9 @@ export default function HistoryPage() {
   if (!me) return <NotJoined />;
   return (
     <View style={styles.root}>
-      <PageHeader title="History" onBack={back} />
+      <PageHeader title="Progressive overload" onBack={back} />
       <Page>
-        <HistoryWeeks me={me} />
+        <OverloadPage me={me} />
       </Page>
     </View>
   );

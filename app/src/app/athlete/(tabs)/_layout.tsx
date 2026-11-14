@@ -1,16 +1,11 @@
-// Athlete tabs. Self-guided (D57): Today · Training · Nutrition · Recovery. Coached (sitemap): the
-// same four plus Progress. The glass + button sits at the bottom right beside the tab bar (D67); the
-// AI coach is reached from it and from Today, and coached athletes never see AI (D44).
+// Athlete tabs: Today · Training · Nutrition · Recovery for everyone (D101: Progress is a page from
+// the top-right button, not a tab). The round glass button at the bottom right beside the tab bar is
+// the AI coach for self-guided athletes with AI on (D97), and the + log menu for coached athletes
+// (who never see AI, D44) and anyone who turned AI off.
 import { router } from "expo-router";
 import { Tabs } from "expo-router/tabs";
 import { useEffect } from "react";
-import {
-  Dumbbell,
-  House,
-  Moon,
-  TrendingUp,
-  Utensils,
-} from "lucide-react-native";
+import { Dumbbell, House, Moon, Utensils } from "lucide-react-native";
 
 import { View } from "react-native";
 
@@ -46,6 +41,8 @@ export default function AthleteTabs() {
         )}
         screenOptions={{
           headerShown: false,
+          // Hidden tabs don't re-render while another tab is in use.
+          freezeOnBlur: true,
           sceneStyle: { backgroundColor: colors.bg },
         }}
       >
@@ -75,14 +72,6 @@ export default function AthleteTabs() {
           options={{
             title: "Recovery",
             tabBarIcon: ({ color }) => <Moon size={24} color={color} />,
-          }}
-        />
-        <Tabs.Screen
-          name="progress"
-          options={{
-            href: coached ? undefined : null,
-            title: "Progress",
-            tabBarIcon: ({ color }) => <TrendingUp size={24} color={color} />,
           }}
         />
       </Tabs>

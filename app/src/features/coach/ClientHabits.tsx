@@ -75,7 +75,7 @@ export function ClientHabits({ c }: { c: Client }) {
       ) : null}
       {race ? (
         <Text>
-          {`Race in ${Math.ceil(daysUntil(race.date, isoToday()) / 7)} weeks · ${divisionOf(race.division).label} · ${PHASE_LABEL[phaseFor(daysUntil(race.date, isoToday()))]} phase · ${(s.race?.sims ?? []).length} sims logged`}
+          {`Race in ${Math.ceil(daysUntil(race.date, isoToday()) / 7)} weeks · ${divisionOf(race.division).label} · ${PHASE_LABEL[phaseFor(daysUntil(race.date, isoToday()))]} phase · ${race.level === "first" ? "first race" : race.level === "advanced" ? "advanced" : "raced before"} · ${(s.race?.sims ?? []).length} sims logged${race.weak?.length ? ` · works on ${race.weak.join(", ").replace(/_/g, " ")}` : ""}`}
         </Text>
       ) : null}
 

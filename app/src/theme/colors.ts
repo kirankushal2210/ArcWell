@@ -1,6 +1,6 @@
 /**
- * Colour tokens: Liquid Glass with the Stone palette, dark only (D67). Mirrors
- * docs/design/theme-tokens.css (DESIGN.md §5). Colour on charcoal, dark text on colour;
+ * Colour tokens: black and red, dark only (D83, replacing D67's Stone palette). Mirrors
+ * docs/design/theme-tokens.css (DESIGN.md §5). Red primary with white text, dark text on other fills;
  * glass only for the functional layer (tab bar, + button, toolbar buttons, sheets).
  * This folder is the only place hex values may appear; `npm run tokens:check`
  * fails if this file and the CSS drift apart.
@@ -8,27 +8,27 @@
 
 /** Raw palette, named by hue. Components never read these directly. */
 export const palette = {
-  ink900: "#141416",
-  ink800: "#1D1E21",
-  ink700: "#26272B",
-  ink650: "#2A2B30",
-  ink600: "#303136",
-  ink500: "#5E5F66",
-  ink400: "#77787F",
-  mist300: "#9C9CA6",
-  mist200: "#CFD2D8",
-  mist100: "#E8EAEE",
-  mist50: "#ECEDF0",
-  honey400: "#E8B65E",
-  sage400: "#A9C79E",
-  slate400: "#9FB4DC",
-  rose400: "#E79AA8",
-  coral400: "#F2877F",
+  ink900: "#0A0A0A",
+  ink800: "#151515",
+  ink700: "#1F1F1F",
+  ink650: "#1A1A1A",
+  ink600: "#2B2B2B",
+  ink500: "#5C5C5C",
+  ink400: "#767676",
+  mist300: "#A3A3A3",
+  mist50: "#F2F2F2",
+  mist0: "#FFFFFF",
+  red600: "#B71C1C",
+  red500: "#D32F2F",
+  red400: "#FF5A52",
+  green400: "#7BD389",
+  blue400: "#8AB4F8",
+  amber400: "#F5B841",
 } as const;
 
 /** Semantic roles: what components use. Contrast ratios are in theme-tokens.css. */
 export const colors = {
-  /** App background (charcoal). */
+  /** App background (black). */
   bg: palette.ink900,
   /** Cards. */
   surface: palette.ink800,
@@ -40,42 +40,42 @@ export const colors = {
   /** Disabled controls only (WCAG-exempt). */
   textDisabled: palette.ink500,
 
-  /** Primary actions are soft white with dark text. */
-  brand: palette.mist100,
-  brandHover: palette.mist200,
-  onBrand: palette.ink900,
+  /** Primary actions are red with white text. */
+  brand: palette.red500,
+  brandHover: palette.red600,
+  onBrand: palette.mist0,
 
   /** Selection, focus, active tab. */
-  accent: palette.mist50,
+  accent: palette.red400,
   onAccent: palette.ink900,
 
   /** Pillars: fills, rings, numbers and markers. Text on a pillar fill uses `onPillar`. */
-  training: palette.honey400,
-  nutrition: palette.sage400,
-  recovery: palette.slate400,
+  training: palette.red400,
+  nutrition: palette.green400,
+  recovery: palette.red400,
   onPillar: palette.ink900,
 
-  success: palette.sage400,
-  /** Needs attention and new items (rose). */
-  warning: palette.rose400,
+  success: palette.green400,
+  /** Needs attention and new items (amber). */
+  warning: palette.amber400,
   /** Errors and destructive actions only. */
-  danger: palette.coral400,
+  danger: palette.red400,
 
   /** Decorative dividers only. */
   border: palette.ink600,
   /** Input and tick-box outlines (3:1+). */
   borderStrong: palette.ink400,
-  focus: palette.mist50,
+  focus: palette.red400,
 
   /** Glass controls, drawn over a blur. */
-  glass: "rgba(60, 62, 70, 0.42)",
+  glass: "rgba(36, 36, 36, 0.5)",
   /** Hairline edge on glass. */
-  glassEdge: "rgba(255, 255, 255, 0.16)",
+  glassEdge: "rgba(255, 255, 255, 0.14)",
   /** Glass where blur is off or reduced. */
   glassSolid: palette.ink650,
 
   /** Behind modal sheets and dialogs. */
-  scrim: "rgba(0, 0, 0, 0.6)",
+  scrim: "rgba(0, 0, 0, 0.7)",
 } as const;
 
 export type ColorRole = keyof typeof colors;

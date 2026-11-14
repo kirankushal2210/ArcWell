@@ -35,6 +35,8 @@ function TrainingBuilderEditor() {
       c?.program ??
       (c?.plan?.training ? fromTemplate(c.plan.training) : emptyProgram()),
   );
+  // Picking a template or Blank makes it a different program: it starts again from week 1.
+  const [restart, setRestart] = useState(false);
   const back = () =>
     router.canGoBack() ? router.back() : router.replace("/coach");
   if (!c) return <PageHeader title="Training" onBack={back} />;
@@ -53,9 +55,10 @@ function TrainingBuilderEditor() {
         <Eyebrow>Start from</Eyebrow>
         <Pills
           value={p.days.length ? "" : "scratch"}
-          onChange={(v) =>
-            setP(v === "scratch" ? emptyProgram() : fromTemplate(v))
-          }
+          onChange={(v) => {
+            setP(v === "scratch" ? emptyProgram() : fromTemplate(v));
+            setRestart(true);
+          }}
           options={[
             ...training.map((t) => ({ value: t.name, label: t.name })),
             { value: "scratch", label: "Blank" },
@@ -74,6 +77,7 @@ function TrainingBuilderEditor() {
               : `Note for ${first} (optional)`
           }
           history={sessions(c.id)}
+          experience={c.profile?.experience}
         />
       </Page>
       <View
@@ -87,10 +91,14 @@ function TrainingBuilderEditor() {
           fullWidth
           disabled={!programReady(p)}
           onPress={() => {
-            saveProgram(c.id, {
-              ...p,
-              name: p.name.trim() || `${p.days.length}-day program`,
-            });
+            saveProgram(
+              c.id,
+              {
+                ...p,
+                name: p.name.trim() || `${p.days.length}-day program`,
+              },
+              { restart },
+            );
             back();
           }}
         />

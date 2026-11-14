@@ -5,6 +5,7 @@ import { useState } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { plusOnly } from "@/features/athlete/PlusOnly";
 import { Button, NumberStepper, Text } from "@/components/primitives";
 import { todayDate } from "@/features/athlete/recovery";
 import { Scale, TimeStepper } from "@/features/athlete/RecoveryForm";
@@ -27,7 +28,9 @@ const nowMinute = () => {
   return Math.round((d.getHours() * 60 + d.getMinutes()) / 15) * 15;
 };
 
-export default function AddActivity() {
+export default plusOnly(AddActivity);
+
+function AddActivity() {
   const p = useLocalSearchParams<{ date?: string }>();
   const r = useRecovery();
   const insets = useSafeAreaInsets();

@@ -6,6 +6,7 @@ import { ChevronRight } from "lucide-react-native";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
+import { plusOnly } from "@/features/athlete/PlusOnly";
 import { PressableScale, Text } from "@/components/primitives";
 import {
   outlookFor,
@@ -19,12 +20,16 @@ import {
   ZoneDot,
 } from "@/features/athlete/RecoveryParts";
 import { NotJoined } from "@/features/athlete/useMe";
+import { useCoachData } from "@/features/coach/CoachData";
 import { Eyebrow, Page, PageHeader } from "@/features/coach/parts";
 import { colors, radius, space } from "@/theme";
 
-export default function Outlook() {
+export default plusOnly(Outlook);
+
+function Outlook() {
   const p = useLocalSearchParams<{ date?: string }>();
   const r = useRecovery();
+  const { settingsOf } = useCoachData();
   const [today] = useState(todayDate);
   const back = () =>
     router.canGoBack() ? router.back() : router.replace("/athlete/recovery");
@@ -32,7 +37,12 @@ export default function Outlook() {
   const date = p.date ?? today;
   const day = r.day(date);
   const bed = plannerFor(day, r.baseline, "peak").bed;
-  const o = outlookFor(day, date === today ? r.planned : null, bed);
+  const o = outlookFor(
+    day,
+    date === today ? r.planned : null,
+    bed,
+    !!settingsOf(r.id).restMode,
+  );
   const strength = day.strain.items.some((i) => i.kind === "workout");
 
   return (

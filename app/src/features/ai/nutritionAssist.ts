@@ -10,23 +10,43 @@ import {
 
 const first = (q: string) => searchFoods(q, [])[0];
 
+export type DietKey = "veg" | "egg" | "nonveg" | "vegan" | "jain";
+export const DIET_OPTIONS: { value: DietKey; label: string }[] = [
+  { value: "veg", label: "Vegetarian" },
+  { value: "egg", label: "Eggetarian" },
+  { value: "nonveg", label: "Non-veg" },
+  { value: "vegan", label: "Vegan" },
+  { value: "jain", label: "Jain" },
+];
+
+/** The diet from a profile label ("Non-veg", "Vegetarian (no eggs)", "vegan"…); vegetarian if unknown. */
+export function dietKey(label?: string): DietKey {
+  const d = (label ?? "").trim().toLowerCase();
+  if (d.startsWith("vegan")) return "vegan";
+  if (d.startsWith("jain")) return "jain";
+  if (d.startsWith("egg")) return "egg";
+  if (d.startsWith("non") || d.includes("chicken") || d.includes("meat"))
+    return "nonveg";
+  return "veg";
+}
+
 /** High-protein foods people in India eat, by diet. */
-const PROTEIN: Record<string, string[]> = {
-  vegetarian: [
+const PROTEIN: Record<DietKey, string[]> = {
+  veg: [
     "Paneer bhurji",
     "Soya chunks curry",
     "Greek yogurt",
     "Rajma",
     "Chana dal",
   ],
-  eggetarian: [
+  egg: [
     "Egg, boiled",
     "Egg bhurji",
     "Paneer bhurji",
     "Greek yogurt",
     "Soya chunks curry",
   ],
-  "non-vegetarian": [
+  nonveg: [
     "Chicken tikka",
     "Tandoori chicken",
     "Egg, boiled",
@@ -34,7 +54,7 @@ const PROTEIN: Record<string, string[]> = {
     "Greek yogurt",
   ],
   vegan: ["Soya chunks curry", "Rajma", "Chana dal"],
-  Jain: ["Paneer bhurji", "Greek yogurt", "Chana dal"],
+  jain: ["Paneer bhurji", "Greek yogurt", "Chana dal"],
 };
 
 export type Idea = {
@@ -44,9 +64,9 @@ export type Idea = {
   macros: Macros;
 };
 
-/** Servings that close today's protein gap, a portion at a time. */
+/** Servings that close today's protein gap, a portion at a time. `diet` is a profile label. */
 export function proteinIdeas(remainingG: number, diet: string): Idea[] {
-  const names = PROTEIN[diet] ?? PROTEIN.vegetarian;
+  const names = PROTEIN[dietKey(diet)];
   return names
     .map((n) => first(n))
     .filter((f): f is Food => !!f)

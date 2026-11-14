@@ -22,7 +22,23 @@ export type Segment =
       reps?: number;
     };
 
-export const SEASON = "25/26";
+/** What a HYROX athlete's exercise library leads with (D83): running, the eight stations, and the
+ * strength lifts the race plan uses. */
+export const HYROX_EXERCISES = [
+  "Running",
+  "Ski erg",
+  "Sled push",
+  "Sled pull",
+  "Burpee broad jumps",
+  "Rowing machine",
+  "Farmers walk",
+  "Sandbag walking lunge",
+  "Wall ball",
+  "Squat (barbell)",
+  "Romanian deadlift (barbell)",
+  "Walking lunge (dumbbell)",
+  "Pull up",
+];
 
 export const STATIONS: {
   key: StationKey;
@@ -129,8 +145,3 @@ export const loadText = (l?: Load) =>
   !l
     ? ""
     : `${l.perHand ? "2 × " : ""}${l.kg} kg${l.heightM ? ` to ${l.heightM.toFixed(2)} m` : ""}`;
-
-export const segmentLabel = (s: Segment) =>
-  s.kind === "run"
-    ? `Run ${s.n}`
-    : `${stationOf(s.station).label}${s.metres ? ` ${s.metres.toLocaleString("en-IN")} m` : ` ${s.reps} reps`}`;

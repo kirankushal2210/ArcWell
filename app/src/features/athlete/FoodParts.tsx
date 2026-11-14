@@ -87,14 +87,16 @@ export function FoodRow({
   onAdd?: () => void;
   added?: boolean;
 }) {
+  // The row and the add button are siblings, not one inside the other (nested buttons break on
+  // web and hide the inner one from screen readers).
   return (
-    <PressableScale
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={`${name}, ${sub}`}
-      style={styles.row}
-    >
-      <View style={styles.flex}>
+    <View style={styles.row}>
+      <PressableScale
+        onPress={onPress}
+        accessibilityRole="button"
+        accessibilityLabel={`${name}, ${sub}`}
+        style={styles.rowMain}
+      >
         <View style={styles.nameRow}>
           <Text weight="medium" numberOfLines={2} style={styles.shrink}>
             {name}
@@ -104,7 +106,7 @@ export function FoodRow({
         <Text variant="label" weight="regular" tone="muted" numeric>
           {sub}
         </Text>
-      </View>
+      </PressableScale>
       {onAdd ? (
         <IconButton
           icon={added ? Check : Plus}
@@ -113,7 +115,7 @@ export function FoodRow({
           onPress={onAdd}
         />
       ) : null}
-    </PressableScale>
+    </View>
   );
 }
 
@@ -246,6 +248,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: space[3],
     minHeight: 64,
+  },
+  rowMain: {
+    flex: 1,
+    gap: space[1] / 2,
+    alignSelf: "stretch",
+    justifyContent: "center",
     paddingVertical: space[2],
   },
   tag: {

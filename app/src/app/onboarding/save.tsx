@@ -1,6 +1,8 @@
 // Save your plan (D57): sign-up comes after the athlete has seen their plan. Health-data consent is
-// given here, before any answer leaves the phone. Email signs up with a 6-digit code (PLAN Phase 1);
-// Google follows with the development build. Sample builds without accounts continue straight on.
+// given here, before any answer leaves the phone; progress-photo consent is asked here too but is
+// optional and never blocks sign-up (F1-05, D12; Privacy can change it later). Email signs up with a
+// 6-digit code (PLAN Phase 1); Google follows with the development build (D62). Sample builds
+// without accounts continue straight on.
 import { router } from "expo-router";
 import { Check, Mail, ShieldCheck } from "lucide-react-native";
 import { useState } from "react";
@@ -10,20 +12,33 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button, PressableScale, Text } from "@/components/primitives";
 import { newClientFromAnswers } from "@/features/athlete/selfPlan";
 import { useAuth } from "@/features/auth/AuthProvider";
+import { recordConsent } from "@/features/auth/consent";
+import { GoogleButton } from "@/features/auth/GoogleButton";
 import { useCoachData } from "@/features/coach/CoachData";
 import { useOnboarding } from "@/features/onboarding/OnboardingContext";
 import { ProgressBar, QuestionHeader } from "@/features/onboarding/parts";
 import { colors, radius, rhythm, space } from "@/theme";
+import { PolicyLinks } from "@/features/legal/LegalLinks";
 
 export default function SavePlan() {
   const insets = useSafeAreaInsets();
   const [agree, setAgree] = useState(false);
   const { joiningCoach, joinAsNewClient } = useCoachData();
-  const { answers } = useOnboarding();
+  const { answers, setAnswer } = useOnboarding();
+  // Kept with the answers so the new athlete record starts with it (athleteSettings.photos).
+  const photos = answers.photoConsent === true;
   const auth = useAuth();
   const withEmail = () => {
     if (!auth.enabled) return next();
-    auth.begin({ role: "athlete", consent: true, then: next });
+    auth.begin({
+      role: "athlete",
+      consent: true,
+      then: () => {
+        // Signed in by now: the server's consent log gets the photo choice too.
+        void recordConsent("photos", photos);
+        next();
+      },
+    });
     router.push("/auth/email");
   };
   const next = () => {
@@ -58,22 +73,45 @@ export default function SavePlan() {
           title="Save your plan"
           sub="Create your account so your plan, workouts and progress are kept safe and follow you to a new phone."
         />
-        <PressableScale
-          onPress={() => setAgree((a) => !a)}
-          accessibilityRole="checkbox"
-          accessibilityState={{ checked: agree }}
-          style={styles.agree}
-        >
-          <Text weight="medium" style={styles.flex}>
-            I agree to the Terms and Privacy Policy, and to Arcwell storing my
-            health data (answers, workouts, food and sleep) to run my plan.
-          </Text>
-          <View style={[styles.tick, agree && styles.tickOn]}>
-            {agree ? (
-              <Check size={16} strokeWidth={3} color={colors.onBrand} />
-            ) : null}
-          </View>
-        </PressableScale>
+        <View style={styles.choices}>
+          <PressableScale
+            onPress={() => setAgree((a) => !a)}
+            accessibilityRole="checkbox"
+            accessibilityState={{ checked: agree }}
+            style={styles.agree}
+          >
+            <Text weight="medium" style={styles.flex}>
+              I agree to the Terms of Use and Privacy Policy, and to Arcwell
+              storing my health data (answers, workouts, food and sleep) to run
+              my plan. I&apos;m 18 or older.
+            </Text>
+            <View style={[styles.tick, agree && styles.tickOn]}>
+              {agree ? (
+                <Check size={16} strokeWidth={3} color={colors.onBrand} />
+              ) : null}
+            </View>
+          </PressableScale>
+          <PolicyLinks />
+          <PressableScale
+            onPress={() => setAnswer("photoConsent", !photos)}
+            accessibilityRole="checkbox"
+            accessibilityState={{ checked: photos }}
+            style={styles.agree}
+          >
+            <View style={styles.flex}>
+              <Text weight="medium">Progress photos can be stored</Text>
+              <Text variant="label" weight="regular" tone="muted">
+                Optional. Only you, and a coach if you have one, see them.
+                Change it any time in Privacy.
+              </Text>
+            </View>
+            <View style={[styles.tick, photos && styles.tickOn]}>
+              {photos ? (
+                <Check size={16} strokeWidth={3} color={colors.onBrand} />
+              ) : null}
+            </View>
+          </PressableScale>
+        </View>
       </View>
       <View style={styles.footer}>
         <Button
@@ -83,18 +121,12 @@ export default function SavePlan() {
           disabled={!agree}
           onPress={withEmail}
         />
-        <Button
-          label="Continue with Google"
-          variant="secondary"
-          fullWidth
-          disabled
-          onPress={withEmail}
-        />
-        <Text variant="caption" tone="muted" style={styles.center}>
-          {auth.enabled
-            ? "Google sign-in comes with the next build."
-            : "Sample build: accounts are off, so this continues without one."}
-        </Text>
+        <GoogleButton />
+        {auth.enabled ? null : (
+          <Text variant="caption" tone="muted" style={styles.center}>
+            Sample build: accounts are off, so this continues without one.
+          </Text>
+        )}
       </View>
     </View>
   );
@@ -110,6 +142,7 @@ const styles = StyleSheet.create({
     paddingTop: space[2],
   },
   flex: { flex: 1 },
+  choices: { gap: space[3] },
   center: { textAlign: "center" },
   agree: {
     flexDirection: "row",

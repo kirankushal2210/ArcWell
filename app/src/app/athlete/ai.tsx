@@ -32,6 +32,7 @@ import { NavRow } from "@/features/athlete/MenuParts";
 import { shortCite, SOURCES } from "@/features/science/sources";
 import { AIConsentPoints } from "@/features/athlete/AIConsent";
 import { NotJoined, useMe } from "@/features/athlete/useMe";
+import { recordConsent } from "@/features/auth/consent";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Eyebrow, Group, Page, PageHeader } from "@/features/coach/parts";
 import {
@@ -119,6 +120,7 @@ export default function AICoach() {
               fullWidth
               onPress={() => {
                 startPlus("yearly");
+                void recordConsent("ai", true);
                 setConsent(false);
                 router.replace({
                   pathname: "/athlete/switch/[step]",
@@ -185,7 +187,10 @@ function AIHub() {
             <Button
               label="Turn AI back on"
               fullWidth
-              onPress={() => setAthleteSettings(me.id, { ai: true })}
+              onPress={() => {
+                setAthleteSettings(me.id, { ai: true });
+                void recordConsent("ai", true);
+              }}
             />
           </View>
         </Page>

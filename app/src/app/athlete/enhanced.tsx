@@ -5,7 +5,6 @@ import { router } from "expo-router";
 import { Check, ShieldAlert } from "lucide-react-native";
 import { useState } from "react";
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -26,6 +25,7 @@ import {
   PHASE_LABEL,
 } from "@/features/coach/enhanced";
 import { Eyebrow, Page, PageHeader } from "@/features/coach/parts";
+import { alert } from "@/lib/alert";
 import { colors, fontFamilyFor, radius, space, textSizes } from "@/theme";
 
 const WHAT = [
@@ -230,7 +230,7 @@ export default function AthleteEnhanced() {
           variant="ghost"
           fullWidth
           onPress={() =>
-            Alert.alert(
+            alert(
               "Stop sharing?",
               `${coachName} won't see this any more. You can share again later.`,
               [

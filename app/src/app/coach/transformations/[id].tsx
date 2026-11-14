@@ -18,7 +18,7 @@ import { Eyebrow, Group, Pills } from "@/features/coach/parts";
 
 export default function ExportTransformation() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { clients, updateTransformation } = useCoachData();
+  const { clients, settings, updateTransformation } = useCoachData();
   const [clientId, tid] = (id ?? "").split("~");
   const c = clients.find((x) => x.id === clientId);
   const t = c?.transformations?.find((x) => x.id === tid);
@@ -68,6 +68,13 @@ export default function ExportTransformation() {
             onChange={(v) => updateTransformation(c.id, t.id, { onProfile: v })}
           />
         </Group>
+      ) : null}
+      {t.uses.includes("profile") && t.onProfile ? (
+        <Text variant="caption" tone="muted">
+          {settings.showTransformations
+            ? "Shown on your profile, your invite page and to your clients."
+            : "Hidden: transformations are off in Settings and privacy."}
+        </Text>
       ) : null}
       <Text variant="caption" tone="muted">
         Approved by {first} for: {usesText(t.uses)}.
