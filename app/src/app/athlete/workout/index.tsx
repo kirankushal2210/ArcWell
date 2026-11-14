@@ -10,7 +10,7 @@ import {
   Ellipsis,
   Play,
   Plus,
-  Sparkles,
+  TrendingUp,
   X,
 } from "lucide-react-native";
 import {
@@ -1062,7 +1062,9 @@ const ExerciseCard = memo(function ExerciseCard({
 
       {hint && !e.sets.some((s) => s.done) ? (
         <View style={styles.hint}>
-          <Sparkles size={16} color={colors.text} />
+          {/* A rules-based progression hint (D69) that every athlete sees, coached ones too, so it
+              uses a progress icon, never the AI sparkle (D110). */}
+          <TrendingUp size={16} color={colors.text} />
           <Text variant="label" weight="regular" style={styles.flex}>
             {hint.text}
           </Text>

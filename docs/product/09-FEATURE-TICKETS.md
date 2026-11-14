@@ -123,7 +123,6 @@
 
 | Decision | Blocks |
 |---|---|
-| Progression hint icon (the AI sparkle is shown to coached athletes for a rules-based hint) | Design brief §10 (no AI look for coached athletes) |
 | Company details | H-09 |
 | Prices for Plus and coach plans | F-06, F-07 |
 | Invite-link domain | A-10, A-11 |

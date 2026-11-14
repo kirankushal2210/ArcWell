@@ -99,6 +99,7 @@ Sheets are for choices and quick logs, never for long forms.
 ## 7. Imagery and icons
 
 - **Icons:** lucide only, 18 to 24 dp, stroke 2; filled only for selected state.
+- **The sparkle means AI, and only AI (D110).** Use it only for AI features or entry points to the AI coach, never for rules-based hints, and never where a coached athlete can see it.
 - **Brand:** the pull-up silhouette logo (D51), in red on dark or white on red.
 - **Photos:** only the user's own (progress, meals, chat). No stock fitness models.
 - **Exercise media:** none until licensed; use names and cues.
@@ -132,5 +133,5 @@ The full reference board is in [design/references.md](../design/references.md) a
 - [ ] A spinner where a skeleton fits, or a blank screen on error or not-found
 - [ ] A tap target under 48 dp, or an icon button without a label
 - [ ] A number without units or context ("70" instead of "70.0 kg")
-- [ ] AI shown to a coached athlete, or a paywall shown more than at natural moments
+- [ ] AI (or the AI sparkle) shown to a coached athlete, or a paywall shown more than at natural moments
 - [ ] Copy that blames or shames the user
