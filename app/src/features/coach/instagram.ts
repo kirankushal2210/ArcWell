@@ -2,7 +2,7 @@
 // the handle, where on Instagram they came from (DM, reel, post, story, comment, bio link, ad) and
 // which piece of content, so the coach sees what actually brings clients. Leads are added by hand
 // in this build; importing DMs needs the Instagram messaging API and Meta app review (later).
-import { crmId, type Lead, type Period } from "./crm";
+import { crmId, type Lead, type Period, ymd } from "./crm";
 
 export type IgTouch =
   "dm" | "reel" | "post" | "story" | "comment" | "bio_link" | "ad";
@@ -72,6 +72,12 @@ const ago = (days: number, hour = 12) => {
   d.setHours(hour, 0, 0, 0);
   return d.toISOString();
 };
+/** A local calendar day, days from today (follow-ups are days, not instants). */
+const dayAgo = (days: number) => {
+  const d = new Date();
+  d.setDate(d.getDate() - days);
+  return ymd(d);
+};
 const ev = (
   days: number,
   kind: Lead["events"][number]["kind"],
@@ -131,7 +137,7 @@ function extraLeads(): Lead[] {
       goal: "PCOS-friendly fat loss",
       stage: "contacted",
       createdAt: ago(3),
-      followUp: ago(-1).slice(0, 10),
+      followUp: dayAgo(-1),
       instagram: {
         handle: "ishita.b",
         touch: "reel",
@@ -149,7 +155,7 @@ function extraLeads(): Lead[] {
       goal: "Gain weight, skinny since school",
       stage: "new",
       createdAt: ago(0, 8),
-      followUp: ago(0).slice(0, 10),
+      followUp: dayAgo(0),
       instagram: { handle: "mohit.j_", touch: "bio_link" },
       events: [ev(0, "created", "Tapped the link in bio, asked a question")],
     },

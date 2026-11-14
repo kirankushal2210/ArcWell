@@ -32,6 +32,7 @@ import {
   space,
   textSizes,
 } from "@/theme";
+import { NotFound } from "@/features/system/SystemStates";
 
 const EFFORT = ["", "Easy", "Moderate", "Hard", "Very hard", "All out"];
 
@@ -79,7 +80,7 @@ export default function SessionDetail() {
     router.canGoBack() ? router.back() : router.replace("/athlete/history");
   if (!me) return <NotJoined />;
   const saved = sessions(me.id).find((x) => x.id === id);
-  if (!saved) return <PageHeader title="Workout" onBack={back} />;
+  if (!saved) return <NotFound title="Workout" what="workout" onBack={back} />;
   const s = draft ?? saved;
   const editing = draft !== null;
 

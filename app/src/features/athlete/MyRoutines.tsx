@@ -22,7 +22,7 @@ import { alert } from "@/lib/alert";
 import { colors, radius, space } from "@/theme";
 
 import { Sheet, SheetRow } from "./Sheet";
-import { estimateMinutes } from "./training";
+import { estimateMinutes, sessionWhat } from "./training";
 
 const edit = (id: string) =>
   router.push({ pathname: "/athlete/routine/[id]", params: { id } });
@@ -47,11 +47,7 @@ export function RoutineCard({
           <Text weight="semibold">{day.name}</Text>
           <Text variant="caption" tone="muted" numeric>
             {/* D100: a single-exercise session (a run) shows what to do, as on Today. */}
-            {`${
-              day.exercises.length === 1
-                ? day.exercises[0].reps
-                : `${day.exercises.length} exercises`
-            } · ${estimateMinutes(day)} min`}
+            {`${sessionWhat(day.exercises)} · ${estimateMinutes(day)} min`}
           </Text>
         </View>
         {onMenu ? (

@@ -35,7 +35,8 @@ import {
 } from "@/features/coach/CrmParts";
 import { DM_TEMPLATES, igStats, TOUCH_LABEL } from "@/features/coach/instagram";
 import { Eyebrow, Group, GroupRow, Page, Pills } from "@/features/coach/parts";
-import { sampleCoach } from "@/features/coach/sampleData";
+import { coachLink } from "@/features/coach/coachProfile";
+import { useCoachLimits } from "@/features/coach/limits";
 import { colors, radius, space } from "@/theme";
 
 const openLead = (id: string) =>
@@ -376,12 +377,13 @@ export function ClientsPage() {
 // ---------- Invite ----------
 
 export function InvitePage() {
-  const { clients } = useCoachData();
+  const { clients, coachName } = useCoachData();
+  const { limit: clientLimit } = useCoachLimits();
   const [copied, setCopied] = useState(false);
   const used = clients.filter(
     (c) => c.id !== "me" && c.status !== "completed",
   ).length;
-  const { link, clientLimit } = sampleCoach;
+  const link = coachLink(coachName);
   const url = `https://${link}`;
   const message = `Join my coaching on Arcwell: your plans, check-ins and chat in one app. ${url}`;
   return (
@@ -514,7 +516,7 @@ const styles = StyleSheet.create({
 // ---------- Instagram (D66) ----------
 
 export function InstagramPage() {
-  const { leads } = useCoachData();
+  const { leads, coachName } = useCoachData();
   const [period, setPeriod] = useState<Period>("30");
   const [copied, setCopied] = useState<string | null>(null);
   const s = igStats(leads, period);
@@ -525,7 +527,7 @@ export function InstagramPage() {
       const ob = isOpen(b.stage) ? 0 : 1;
       return oa - ob || b.createdAt.localeCompare(a.createdAt);
     });
-  const bio = `https://${sampleCoach.link}?src=instagram`;
+  const bio = `https://${coachLink(coachName)}?src=instagram`;
   const copy = async (key: string, text: string) => {
     await Clipboard.setStringAsync(text);
     setCopied(key);

@@ -338,20 +338,28 @@ A full pass over every route, link, alert, date, gate and recent decision.
 
 ### G. Bugs (all small)
 
-- [ ] **"1 exercises" on single-run days (D100)** in the workout notice (`notifications.ts:83`) and the logger header, "x of 1 exercises" (`workout/index.tsx:432`).
-- [ ] **Nested button in food rows.** The add button sits inside the row's button (`FoodParts.tsx:91/109`, used in `food/add.tsx`). This is the same fix as `ExerciseList`.
-- [ ] **Wrong or blank screen for an unknown id:**
+**All fixed 2026-11-14:**
+- `sessionWhat()` words single-exercise sessions (D100) on cards and notices.
+- `NotFound` (SystemStates) handles pages for missing items.
+- `coachLink()` builds the invite link everywhere, and the limit comes from `useCoachLimits`.
+- `hitSlop` brings the small controls up to the 48 dp tap size.
+
+The two "To decide" items are left for the founder.
+
+- [x] **"1 exercises" on single-run days (D100)** in the workout notice (`notifications.ts:83`) and the logger header, "x of 1 exercises" (`workout/index.tsx:432`).
+- [x] **Nested button in food rows.** The add button sits inside the row's button (`FoodParts.tsx:91/109`, used in `food/add.tsx`). This is the same fix as `ExerciseList`.
+- [x] **Wrong or blank screen for an unknown id:**
   - `habits/[id]` and `race/sim/[id]` say "Join your coach first".
   - `history/[id]`, `recovery/protocol/[id]` and coach `chat/[id]` show an empty page.
-- [ ] **The coach invite page uses sample values** (`BusinessPages.tsx:384`):
+- [x] **The coach invite page uses sample values** (`BusinessPages.tsx:384`):
   - The link is always `arcwell.app/c/anjali-kapoor`, while onboarding builds it from the coach's name.
   - "Client spots" ignores `settings.clientLimit`.
-- [ ] **The coach consent box has no "I'm 18 or older"** (`coachQuestions.ts:111`), unlike the athlete and invite consent boxes and the Terms.
-- [ ] **Small tap targets:**
+- [x] **The coach consent box has no "I'm 18 or older"** (`coachQuestions.ts:111`), unlike the athlete and invite consent boxes and the Terms.
+- [x] **Small tap targets:**
   - The food tick box on the meal-scan result is 24 dp (`food/photo.tsx:385`).
   - The remove buttons in coach onboarding are about 34 dp (`QuestionScreen.tsx:592,696`).
-- [ ] **UTC slice in sample Instagram leads** (`instagram.ts:134,152`). It's correct in India, so low priority.
-- [ ] **Stale comments:**
+- [x] **UTC slice in sample Instagram leads** (`instagram.ts:134,152`). It's correct in India, so low priority.
+- [x] **Stale comments:**
   - `athlete/_layout.tsx:1` (Progress tab).
   - `food/add.tsx:4` (photo logging "coming").
   - A repeated comment in `assistant/nutrition.tsx:40`.
@@ -361,7 +369,7 @@ A full pass over every route, link, alert, date, gate and recent decision.
 
 ### Still open from earlier
 
-- [ ] **F.** The athlete template editor has no effort (RPE) or block fields. Size M.
+- [x] **F.** The athlete template editor now uses the coach's exercise rows: effort (RPE), defaulting to the rules range for the athlete's experience, plus run, erg and HYROX station blocks. The old `ExerciseRows` component is removed.
 - [ ] **C. Tests** are missing for:
   - `recovery.ts`, `selfPlan()`, `toSession`, `programWeek`, `visibility.ts`;
   - `ai/tailor.ts`, `ai/answers.ts`, `science/strength.ts`;

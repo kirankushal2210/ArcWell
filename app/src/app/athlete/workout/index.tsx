@@ -428,8 +428,10 @@ function Logger({
             {active.name}
           </Text>
           <Text variant="label" weight="regular" tone="muted" numeric>
-            <Live render={(t) => clockTime(t - active.startedAt)} /> · {exDone}{" "}
-            of {active.exercises.length} exercises
+            <Live render={(t) => clockTime(t - active.startedAt)} /> ·{" "}
+            {active.exercises.length === 1
+              ? `${active.exercises[0].sets.filter((s) => s.done).length} of ${active.exercises[0].sets.length} ${active.exercises[0].sets.length === 1 ? "set" : "sets"}`
+              : `${exDone} of ${active.exercises.length} exercises`}
           </Text>
         </View>
         <Button

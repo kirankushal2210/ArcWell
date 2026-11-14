@@ -8,6 +8,7 @@ import { useCoachData } from "@/features/coach/CoachData";
 
 import { dayText, isoDate } from "./athleteData";
 import { useTodayWorkout } from "./QuickLog";
+import { sessionWhat } from "./training";
 import { useMe } from "./useMe";
 
 export type Note = {
@@ -80,7 +81,7 @@ export function useNotifications(): { items: Note[]; unread: number } {
     items.push({
       id: "workout",
       title: `${today.day.name} is ready`,
-      sub: `${today.day.exercises.length} exercises`,
+      sub: sessionWhat(today.day.exercises),
       when: "Today",
       href: {
         pathname: "/athlete/workout/preview/[dayId]",

@@ -108,7 +108,7 @@ const questions: Question[] = [
         kind: "agree",
         key: "coachTerms",
         label:
-          "I agree to the Terms of Use, including the extra terms for coaches, and the Privacy Policy",
+          "I agree to the Terms of Use, including the extra terms for coaches, and the Privacy Policy. I'm 18 or older.",
         links: true,
       },
     ],

@@ -27,6 +27,7 @@ import {
 } from "@/features/science/habits";
 import { WhyThis } from "@/features/science/WhyThis";
 import { colors, radius, space } from "@/theme";
+import { NotFound } from "@/features/system/SystemStates";
 
 const nowMs = () => Date.now();
 
@@ -61,7 +62,7 @@ export default function HabitPage() {
   }, [running]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!hb.me) return <NotJoined />;
-  if (!h) return <NotJoined />;
+  if (!h) return <NotFound title="Habit" what="habit" />;
   const active = hb.isActive(h.id);
   const w = windowOf(h, hb.rhythm);
   const val = hb.log[h.id];

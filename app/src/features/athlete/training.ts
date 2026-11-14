@@ -5,6 +5,7 @@
 import {
   type PlannedExercise,
   paceUnit,
+  planLine,
   type RpeRange,
   type TrainingDay,
   uid,
@@ -495,4 +496,14 @@ export function programWeek(weeks: number, start?: string) {
   const week =
     Math.floor((weekStart(new Date()).getTime() - from) / (7 * 86400000)) + 1;
   return { week: Math.max(1, week), weeks, done: week > weeks };
+}
+
+/**
+ * What a session holds, for cards and notices (D100): one exercise (a run, a HYROX station)
+ * shows what to do, such as "6 × 400 m"; more show the count.
+ */
+export function sessionWhat(exercises: PlannedExercise[]) {
+  return exercises.length === 1
+    ? planLine(exercises[0])
+    : `${exercises.length} exercises`;
 }

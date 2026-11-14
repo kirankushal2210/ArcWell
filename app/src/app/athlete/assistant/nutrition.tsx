@@ -37,7 +37,6 @@ export default function NutritionAssistant() {
   const plan = me?.nutritionPlan;
   const meals = plan?.meals.filter((m) => m.items?.length) ?? [];
   const [mealId, setMealId] = useState(meals[0]?.id ?? "");
-  // AI is Plus only; coached athletes never see it, even from a link (D44).
   if (!me || !n.me) return <NotJoined />;
   // AI is Plus-only and coached athletes never see it (D44): a direct link goes back to Today.
   if (n.tier !== "pro") return <Redirect href="/athlete" />;

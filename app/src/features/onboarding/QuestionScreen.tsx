@@ -44,6 +44,7 @@ import {
   textSizes,
 } from "@/theme";
 import { PolicyLinks } from "@/features/legal/LegalLinks";
+import { coachLink } from "@/features/coach/coachProfile";
 
 import { BodyFatPicker } from "./BodyFatPicker";
 import { useOnboarding } from "./OnboardingContext";
@@ -598,6 +599,7 @@ function ServicesField({ storeKey }: { storeKey: string }) {
                 }
                 accessibilityRole="button"
                 accessibilityLabel="Remove service"
+                hitSlop={8}
                 style={styles.remove}
               >
                 <Trash2 size={18} color={colors.textMuted} />
@@ -697,6 +699,7 @@ function SheetField({ storeKey }: { storeKey: string }) {
             onPress={() => setAnswer(storeKey, undefined)}
             accessibilityRole="button"
             accessibilityLabel="Remove file"
+            hitSlop={8}
             style={styles.remove}
           >
             <X size={18} color={colors.textMuted} />
@@ -733,13 +736,7 @@ function InviteField({ name }: { name: string }) {
   const { answers, setAnswer } = useOnboarding();
   const [copied, setCopied] = useState<"link" | "message" | null>(null);
   const [qr, setQr] = useState(false);
-  // Placeholder link until the invite-link domain is chosen (PLAN.md); the server issues the real one.
-  const slug =
-    name
-      .toLowerCase()
-      .replace(/^coach\s+/, "")
-      .replace(/[^a-z0-9]+/g, "") || "yourname";
-  const link = `arcwell.app/j/${slug}`;
+  const link = coachLink(name);
   const url = `https://${link}`;
   const message =
     (answers.inviteMessage as string | undefined) ??

@@ -91,3 +91,16 @@ export const menuAction = {
   label: "Menu",
   onPress: () => router.push("/coach/menu"),
 };
+
+/**
+ * The coach's personal invite link, from their name (CO-11), the same everywhere it's shown.
+ * Placeholder domain until the invite-link domain is chosen (PLAN.md); the server issues the real one.
+ */
+export function coachLink(name: string) {
+  const slug =
+    name
+      .toLowerCase()
+      .replace(/^coach\s+/, "")
+      .replace(/[^a-z0-9]+/g, "") || "yourname";
+  return `arcwell.app/j/${slug}`;
+}

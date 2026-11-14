@@ -13,6 +13,7 @@ import { useRecovery } from "@/features/athlete/RecoveryParts";
 import { NotJoined } from "@/features/athlete/useMe";
 import { Eyebrow, Page, PageHeader } from "@/features/coach/parts";
 import { colors, radius, rhythm, space } from "@/theme";
+import { NotFound } from "@/features/system/SystemStates";
 
 export default plusOnly(ProtocolDetail);
 
@@ -25,7 +26,7 @@ function ProtocolDetail() {
     router.canGoBack() ? router.back() : router.replace("/athlete/recovery");
   const p = protocolById(id);
   if (!r.me) return <NotJoined />;
-  if (!p) return <PageHeader title="Protocol" onBack={back} />;
+  if (!p) return <NotFound title="Protocol" what="protocol" onBack={back} />;
   const done = r.store.done.includes(`${today}:${p.id}`);
 
   return (

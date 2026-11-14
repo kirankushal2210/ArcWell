@@ -390,6 +390,7 @@ export default function ScanMeal() {
                   }
                   accessibilityRole="checkbox"
                   accessibilityState={{ checked: x.keep }}
+                  hitSlop={12}
                   accessibilityLabel={x.name}
                   style={[styles.box, x.keep && styles.boxOn]}
                 >

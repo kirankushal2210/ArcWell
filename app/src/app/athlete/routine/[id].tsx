@@ -1,8 +1,10 @@
 // Routine editor (F4-01): the athlete's own saved workout, outside their program, for sessions they
 // repeat (an extra arm day, a hotel-gym circuit). Coached athletes keep their coach's program as is
-// and can still plan these; the coach sees what was logged, as with any workout.
+// and can still plan these; the coach sees what was logged, as with any workout. Each exercise has
+// sets, target, rest and a target effort (RPE, defaulting to the rules range for their experience),
+// and runs, erg intervals and HYROX stations go in as blocks, as in the coach's builder (D104).
 import { router, useLocalSearchParams } from "expo-router";
-import { Dumbbell, Plus, Trash2 } from "lucide-react-native";
+import { Dumbbell, Plus, Timer, Trash2, Trophy } from "lucide-react-native";
 import { useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -15,13 +17,22 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Button, Text } from "@/components/primitives";
 import { ExercisePicker } from "@/features/athlete/ExercisePicker";
+import { Sheet, SheetRow } from "@/features/athlete/Sheet";
 import { typeOf } from "@/features/athlete/library";
 import { defaultTarget } from "@/features/athlete/training";
 import { NotJoined, useMe } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
-import { ExerciseRows } from "@/features/coach/ExerciseRows";
 import { Page } from "@/features/coach/parts";
-import { type TrainingDay, uid } from "@/features/coach/plans";
+import { PlanExerciseRows } from "@/features/coach/PlanExerciseRows";
+import {
+  INTERVAL_EXERCISES,
+  newInterval,
+  newStation,
+  type PlannedExercise,
+  type TrainingDay,
+  uid,
+} from "@/features/coach/plans";
+import { STATIONS } from "@/features/race/data";
 import { alert } from "@/lib/alert";
 import {
   colors,
@@ -42,6 +53,12 @@ export default function RoutineEditor() {
     () => saved ?? { id: uid("r"), name: "", exercises: [] },
   );
   const [picking, setPicking] = useState(false);
+  /** Choosing a machine for intervals, or a HYROX station. */
+  const [block, setBlock] = useState<"interval" | "station" | null>(null);
+  const addBlock = (e: PlannedExercise) => {
+    setR((x) => ({ ...x, exercises: [...x.exercises, e] }));
+    setBlock(null);
+  };
   const [tried, setTried] = useState(false);
   const back = () =>
     router.canGoBack() ? router.back() : router.replace("/athlete/training");
@@ -112,8 +129,9 @@ export default function RoutineEditor() {
         {r.exercises.length ? (
           <>
             <View style={styles.card}>
-              <ExerciseRows
+              <PlanExerciseRows
                 exercises={r.exercises}
+                experience={me.profile?.experience}
                 onChange={(list) => setR((x) => ({ ...x, exercises: list }))}
               />
             </View>
@@ -124,6 +142,20 @@ export default function RoutineEditor() {
               fullWidth
               onPress={() => setPicking(true)}
             />
+            <View style={styles.adds}>
+              <Button
+                label="Intervals"
+                icon={Timer}
+                variant="ghost"
+                onPress={() => setBlock("interval")}
+              />
+              <Button
+                label="HYROX station"
+                icon={Trophy}
+                variant="ghost"
+                onPress={() => setBlock("station")}
+              />
+            </View>
           </>
         ) : (
           <View style={styles.empty}>
@@ -137,6 +169,20 @@ export default function RoutineEditor() {
               fullWidth
               onPress={() => setPicking(true)}
             />
+            <View style={styles.adds}>
+              <Button
+                label="Intervals"
+                icon={Timer}
+                variant="ghost"
+                onPress={() => setBlock("interval")}
+              />
+              <Button
+                label="HYROX station"
+                icon={Trophy}
+                variant="ghost"
+                onPress={() => setBlock("station")}
+              />
+            </View>
           </View>
         )}
 
@@ -175,6 +221,35 @@ export default function RoutineEditor() {
           setPicking(false);
         }}
       />
+      <Sheet
+        visible={block !== null}
+        onClose={() => setBlock(null)}
+        title={block === "station" ? "Add a HYROX station" : "Add intervals"}
+        sub={
+          block === "station"
+            ? "At race distance; change it after."
+            : "Distance or time repeats with rest. Set pace or effort after."
+        }
+      >
+        {block === "station"
+          ? STATIONS.map((s) => (
+              <SheetRow
+                key={s.key}
+                label={s.label}
+                sub={s.metres ? `${s.metres} m` : `${s.reps} reps`}
+                onPress={() => addBlock(newStation(s.key))}
+              />
+            ))
+          : block
+            ? INTERVAL_EXERCISES.map((name) => (
+                <SheetRow
+                  key={name}
+                  label={name}
+                  onPress={() => addBlock(newInterval(name))}
+                />
+              ))
+            : null}
+      </Sheet>
     </KeyboardAvoidingView>
   );
 }
@@ -209,6 +284,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     backgroundColor: colors.surface,
   },
+  adds: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center" },
   empty: {
     alignItems: "center",
     gap: space[3],

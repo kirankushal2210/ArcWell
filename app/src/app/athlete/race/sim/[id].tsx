@@ -12,13 +12,14 @@ import { SimBar } from "@/features/race/RacePage";
 import { fmtTime, runPaces, stepsFor } from "@/features/race/sim";
 import { useRace } from "@/features/race/useRace";
 import { colors, radius, space } from "@/theme";
+import { NotFound } from "@/features/system/SystemStates";
 
 export default function SimResult() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const rc = useRace();
   if (!rc.me) return <NotJoined />;
   const sim = rc.sims.find((s) => s.id === id);
-  if (!sim) return <NotJoined />;
+  if (!sim) return <NotFound title="Race sim" what="race sim" />;
   const prev = rc.sims.find(
     (s) => s.kind === sim.kind && s.date <= sim.date && s.id !== sim.id,
   );

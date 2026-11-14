@@ -1,7 +1,7 @@
 // The exercises in one workout of a coach's program (K-06, K-07): tap a row to set sets, the target,
 // rest and target effort (RPE), move it or remove it. Run and erg intervals and HYROX stations
-// (D76, D79) edit their distance or time, repeats, pace and station here too. The athlete's own
-// routine editor keeps the simpler ExerciseRows.
+// (D76, D79) edit their distance or time, repeats, pace and station here too. Shared by the coach's
+// program builder and the athlete's own template editor.
 import {
   ArrowDown,
   ArrowUp,
@@ -23,7 +23,6 @@ import { countsVolume } from "@/features/athlete/training";
 import { STATIONS, type StationKey } from "@/features/race/data";
 import { colors, fontFamilyFor, radius, space, textSizes } from "@/theme";
 
-import { restText } from "./ExerciseRows";
 import { Pills } from "./parts";
 import {
   defaultRpe,
@@ -38,6 +37,9 @@ import {
   validPace,
   withBlock,
 } from "./plans";
+
+export const restText = (s: number) =>
+  s === 0 ? "no rest" : s < 60 ? `${s} s rest` : `${s / 60} min rest`;
 
 const key = (r: RpeRange) => `${r[0]}-${r[1]}`;
 
