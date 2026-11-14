@@ -285,10 +285,17 @@ export type ClientAccount = {
 export function renewsOn(a: ClientAccount, today = new Date()) {
   const step = BILLING_MONTHS[a.billing];
   if (!step) return undefined;
-  const d = new Date(`${a.startedAt}T00:00:00`);
+  const [y, m, day] = a.startedAt.split("-").map(Number);
   const t = ymd(today);
-  for (let i = 0; i < 240 && ymd(d) <= t; i++) d.setMonth(d.getMonth() + step);
-  return ymd(d);
+  // Each renewal counts from the start date, landing on the month's last day when it's shorter
+  // (31 Jan → 28 Feb → 31 Mar), so a renewal never slips into the next month.
+  const nth = (i: number) => {
+    const last = new Date(y, m - 1 + i * step + 1, 0).getDate();
+    return ymd(new Date(y, m - 1 + i * step, Math.min(day, last)));
+  };
+  let i = 0;
+  while (i < 240 && nth(i) <= t) i++;
+  return nth(i);
 }
 
 /** Monthly value of a client's fee, for the revenue estimate. */

@@ -98,7 +98,7 @@
 |---|---|---|---|---|
 | H-01 | The 10 product documents | `docs/product/01`–`10` and AGENTS.md, linked from the README | M | ✅ |
 | H-02 | CI runs every required check | lint (ESLint, tokens, legal), typecheck, Jest, pgTAP, db lint, deno check | S | ✅ |
-| H-03 | Tests for untested logic | `recovery.ts`, `selfPlan()`, `programWeek`, `visibility.ts`, `tailor.ts`, `crm.ts`, `readSheet.ts`, `lib/alert.ts` | M | ⬜ |
+| H-03 | Tests for untested logic | `recovery.ts`, `selfPlan()`, `programWeek`, `visibility.ts`, `tailor.ts`, `crm.ts`, `readSheet.ts`, `lib/alert.ts` | M | ✅ 94 tests in 8 files; found and fixed two bugs: vegan example day had chicken and dairy, and renewals from the 29th–31st slipped into the next month |
 | H-12 | EAS build profiles | `app/eas.json`: development, preview (APK), production (app bundle) with channels | S | ✅ (linking to an Expo account is part of H-06) |
 | H-13 | Billing mapping unit tests | RevenueCat and Razorpay event mapping covered by Jest | S | ✅ |
 | H-14 | Foreign-key indexes | Every foreign key indexed (migration `fk_indexes`) | S | ✅ |
