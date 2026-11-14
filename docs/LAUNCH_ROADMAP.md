@@ -35,7 +35,7 @@ Written 14 November 2026, after the full front-end audit (FRONTEND_AUDIT.md §9)
 |---|---|
 | Tests for logic that has none. Athlete: `recovery.ts`, `selfPlan()`, `toSession`, `programWeek`, `visibility.ts`, `notifications.ts`. AI: `tailor.ts`, `answers.ts`. Science: `strength.ts`. Coach: `crm.ts`, `enhanced.ts`, `supplements.ts`, `readSheet.ts`. Also `lib/alert.ts`. | M |
 | Docs: bring `SPEC.md` up to D106. Update `DESIGN.md` §3, §6 and §7 and `sitemap.md`. Fix the two contradictions in `DECISIONS.md`. Correct `PLAN.md`'s "not built" lines. | M |
-| Two founder calls (§6): the AI chat forgets its messages, and the logger's progression hint uses the AI sparkle icon. | S |
+| One founder call (§6): the logger's progression hint uses the AI sparkle icon. (AI chat memory is settled by D109.) | S |
 
 ### Needs a development build, not Expo Go
 
@@ -266,7 +266,7 @@ These figures leave out the revenue cuts above.
 
 ## 6. Decisions waiting on the founder
 
-1. **AI chat memory:** should past AI chat messages be kept (stored server-side in B8), or start fresh each time?
+1. ~~**AI chat memory**~~: settled by D109 (today's chat on the phone only).
 2. **Progression hint icon:** the workout logger's progression hint is rules-based but shows the AI sparkle icon, and coached athletes see it too. Should it get a different icon?
 3. **Company details for the legal pages:** registered name, address, Grievance Officer and the city for disputes.
 4. **Launch availability:** India only, which is recommended?

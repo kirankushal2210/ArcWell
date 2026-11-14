@@ -209,7 +209,7 @@ Three steps: Measurements → About you / the week → Review → **Send**.
 
 | Screen | Tap | Server |
 |---|---|---|
-| `/athlete/ai` chat | Ask (chip or typed) | `ai-coach` chat: entitled → cap (40/day) → out-of-scope declined → model or rules → checked → reply with sources |
+| `/athlete/ai` chat | Ask (chip or typed) · **Clear chat** | `ai-coach` chat: entitled → cap (40/day) → out-of-scope declined → model or rules → checked → reply with sources. Today's chat is saved on the phone only and comes back when the screen reopens; it clears at midnight, on Clear chat, sign-out, deletion or AI off (D109) |
 | `/athlete/assistant/tailor` | Type what's different → **Suggest a change**, or pick a chip | `ai-coach` tailor: kinds from the fixed list → the rules change today's workout → **Apply to today** (today only) |
 | `/athlete/assistant/review` | Open | `ai-coach` review: up to 3 checked suggestions, each opening a tool |
 | `/athlete/assistant/plan` · `meal-plan` | Build → **Use this plan** | Rules on the phone; saved as plans when accepted |

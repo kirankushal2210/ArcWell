@@ -90,7 +90,7 @@
 | G-01 | AI chat, tailor today, weekly review on the server (D108) | Entitlement, then cap (40, 15, 6); out of scope declined; rules fallback; sources | L | ✅ |
 | G-02 | Coached athletes never served (D44) | 403 from the server even by direct call | S | ✅ |
 | G-03 | Switch on the model | `GROQ_API_KEY` and `GROQ_MODEL` set on the hosted project | S | ⬜ free key |
-| G-04 | AI chat memory | Founder call: keep past chat on the server, or start fresh | S | ⬜ founder decision |
+| G-04 | AI chat memory (D109) | Today's chat kept on the phone only; clears at midnight and on Clear chat, sign-out, deletion, AI off; nothing on the server | S | ✅ |
 
 ## Epic H · Platform, quality and launch
 
@@ -123,7 +123,6 @@
 
 | Decision | Blocks |
 |---|---|
-| AI chat memory (keep or start fresh) | G-04 |
 | Progression hint icon (the AI sparkle is shown to coached athletes for a rules-based hint) | Design brief §10 (no AI look for coached athletes) |
 | Company details | H-09 |
 | Prices for Plus and coach plans | F-06, F-07 |

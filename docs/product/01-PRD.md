@@ -82,7 +82,7 @@ Market: **India first**, English at launch (layouts allow Hindi later), **Androi
   - AI meal scan (Plus).
 - **Recovery (Plus and coached):** Sleep, Recovery and Strain, morning check-in, sleep planner, protocols, habits; devices through Health Connect (needs a development build).
 - **Progress:** weight, measurements and photos; check-ins and coach replies; chat.
-- **AI coach (Plus only):** chat, tailor today and weekly review on the server with guardrails (D108); plan builder and meal-plan generator (rules).
+- **AI coach (Plus only):** chat, tailor today and weekly review on the server with guardrails (D108); today's chat is kept on the phone only and clears at midnight (D109); plan builder and meal-plan generator (rules).
 - **Account:**
   - privacy and permissions; history sharing with the coach;
   - export my data; delete account;

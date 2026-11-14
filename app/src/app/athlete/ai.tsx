@@ -1,8 +1,8 @@
 // AI coach (D57, D68, D70), opened from Today's toolbar and the + menu. Plus members get today's
 // recovery-aware suggestion, the tools (tailor today, build a plan, nutrition assistant, weekly
 // review) and a chat; Free members see the trial offer with the AI permission step (D35). Coached
-// athletes never reach this screen (D44). Front end only: answers come from the evidence rules and
-// sample text until the server AI service exists (supabase/functions/_shared/ai).
+// athletes never reach this screen (D44). With accounts, answers come from the ai-coach function (B8,
+// D108); the sample build answers from the evidence rules. Today's chat stays on the phone only (D109).
 import { type Href, Redirect, router } from "expo-router";
 import {
   Camera,
@@ -14,7 +14,7 @@ import {
   Utensils,
   Wand2,
 } from "lucide-react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -25,7 +25,9 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Button, Chip, IconButton, Text } from "@/components/primitives";
-import { type Answer, answer, PROMPTS } from "@/features/ai/answers";
+import { answer, PROMPTS } from "@/features/ai/answers";
+import type { ChatMsg } from "@/features/ai/chatMemory";
+import { clearAllChats, loadChat, saveChat } from "@/features/ai/chatStore";
 import {
   askCoach,
   useCoachContext,
@@ -154,22 +156,33 @@ export default function AICoach() {
   return <AIHub />;
 }
 
-type Msg = {
-  from: "me" | "ai";
-  text: string;
-  kind?: Answer["kind"] | "unknown";
-  sources?: string[];
-  /** Waiting for the server's answer. */
-  pending?: boolean;
-};
+type Msg = ChatMsg;
 
-/** The AI coach for Plus members (D70): today's suggestion, tools, and a chat. Sample answers only. */
+/** The AI coach for Plus members (D70): today's suggestion, tools, and a chat kept for today (D109). */
 function AIHub() {
   const me = useMe();
   const { settingsOf, setAthleteSettings } = useCoachData();
   const insets = useSafeAreaInsets();
   const [msgs, setMsgs] = useState<Msg[]>([]);
+  // The saved chat is loaded once; nothing is saved before that, so it can't be overwritten.
+  const [loaded, setLoaded] = useState(false);
   const [text, setText] = useState("");
+  const chatId = me?.id ?? "";
+  useEffect(() => {
+    let live = true;
+    if (!chatId) return;
+    void loadChat(chatId, isoToday()).then((saved) => {
+      if (!live) return;
+      setMsgs((m) => (m.length ? m : saved));
+      setLoaded(true);
+    });
+    return () => {
+      live = false;
+    };
+  }, [chatId]);
+  useEffect(() => {
+    if (loaded && chatId) saveChat(chatId, isoToday(), msgs);
+  }, [loaded, chatId, msgs]);
   // With accounts, questions go to the ai-coach function (B8); the sample build answers locally.
   const server = useServerCoach();
   const [now] = useState(() => Date.now());
@@ -314,7 +327,22 @@ function AIHub() {
             />
           ))}
         </Group>
-        <Eyebrow>Ask</Eyebrow>
+        <View style={styles.head}>
+          <View style={styles.flex}>
+            <Eyebrow>Ask</Eyebrow>
+          </View>
+          {msgs.some((m) => !m.pending) ? (
+            <Button
+              label="Clear chat"
+              variant="ghost"
+              size="sm"
+              onPress={() => {
+                setMsgs([]);
+                void clearAllChats();
+              }}
+            />
+          ) : null}
+        </View>
         {msgs.length ? (
           msgs.map((m, i) => (
             <View
@@ -350,6 +378,11 @@ function AIHub() {
             ))}
           </View>
         )}
+        {msgs.length ? (
+          <Text variant="caption" tone="muted">
+            Today&apos;s chat stays on this phone and clears at midnight.
+          </Text>
+        ) : null}
         {limited ? (
           <View style={styles.card}>
             <Text weight="semibold">

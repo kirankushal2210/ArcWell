@@ -77,7 +77,8 @@ A user's role can't be changed by the user (`check_role` trigger). One account i
 | Location | Production data in Supabase **Mumbai (ap-south-1)** |
 | In transit | HTTPS only (TLS from Supabase); no plain-HTTP endpoints in hosted builds |
 | At rest | Supabase encryption at rest (disk and backups). The on-phone cache is AsyncStorage (not encrypted yet: ticket SEC-05) |
-| To AI | Only week-level numbers and the user's question; never names, email, notes, messages or ids (`cleanContext`) |
+| To AI | Only week-level numbers and the user's question; never names, email, notes, messages, ids or earlier chat (`cleanContext`) |
+| AI chat | Kept on the phone only, for the day; never stored on the server; wiped on Clear chat, sign-out, account deletion and AI off (D109) |
 | In push | "New message, from <name>": never message text or health data |
 | In logs | **No health data or personal data in logs or error messages**: functions log an error *name* or *code* only. App errors shown to users are plain sentences |
 | Secrets | Never in the app or git. Public app config only (`EXPO_PUBLIC_*`). Function secrets via `supabase secrets set`. The service-role key lives only inside functions |
