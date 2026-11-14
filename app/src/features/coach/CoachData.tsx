@@ -653,6 +653,7 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       wasSignedIn.current = false;
       resetToSample();
     }
+    // Runs only when the signed-in account changes; resetToSample is a plain store reset.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cloudUid]);
 

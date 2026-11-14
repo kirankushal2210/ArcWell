@@ -1,5 +1,7 @@
 # Arcwell — Implementation Plan
 
+> **Superseded as the source of truth (14 November 2026).** Work now lives in the [feature tickets](product/09-FEATURE-TICKETS.md). The current documents are in [docs/product/](product/README.md); where they differ, they win. This file is kept for detail and history.
+
 Rough estimates assume two builders using AI tools heavily. Total ≈ 18–24 weeks. Phase 7 can run in parallel with Phases 5–6.
 
 ## Pre-build blockers (no code, clear in parallel)

@@ -1,5 +1,7 @@
 # Arcwell — Design
 
+> **Superseded as the source of truth (14 November 2026).** The rules now live in the [design brief](product/04-DESIGN-BRIEF.md); tokens are still checked against `docs/design/theme-tokens.css`. The current documents are in [docs/product/](product/README.md); where they differ, they win. This file is kept for detail and history.
+
 Single source of truth for Arcwell's UI/UX: principles, brand, app structure, flows, design tokens, components and screen status. Code in `app/src/theme/` must match the tokens here; change this file first, then the code.
 
 Mockups and wireframes live in `docs/design/`.

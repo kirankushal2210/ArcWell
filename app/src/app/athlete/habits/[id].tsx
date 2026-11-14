@@ -59,6 +59,7 @@ export default function HabitPage() {
       } else setLeft(remain);
     }, 500);
     return () => clearInterval(t);
+    // Only start or stop the timer when it starts or stops; the habit and store are read when it ends.
   }, [running]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!hb.me) return <NotJoined />;

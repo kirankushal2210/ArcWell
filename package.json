@@ -12,6 +12,7 @@
     "app:start": "npm --prefix app run start",
     "typecheck": "npm --prefix app run typecheck",
     "lint": "npm --prefix app run lint",
+    "test": "npm --prefix app test",
     "demo:seed": "node scripts/demo-seed.mjs"
   },
   "devDependencies": {

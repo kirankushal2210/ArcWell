@@ -116,6 +116,7 @@ export function BuildingScreen({ onDone }: { onDone: () => void }) {
     );
     const finish = setTimeout(onDone, step * STEPS.length + 450);
     return () => [...timers, finish].forEach(clearTimeout);
+    // Plays once when the screen opens; a new onDone from a re-render mustn't restart it.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
