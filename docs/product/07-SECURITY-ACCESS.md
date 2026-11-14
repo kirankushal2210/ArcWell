@@ -77,7 +77,7 @@ A user's role can't be changed by the user (`check_role` trigger). One account i
 |---|---|
 | Location | Production data in Supabase **Mumbai (ap-south-1)** |
 | In transit | HTTPS only (TLS from Supabase); no plain-HTTP endpoints in hosted builds |
-| At rest | Supabase encryption at rest (disk and backups). The on-phone cache is AsyncStorage (not encrypted yet: ticket SEC-05) |
+| At rest | Supabase encryption at rest (disk and backups). On the phone, everything the app saves (the synced copy, AI chat, the workout in progress) is encrypted with XChaCha20-Poly1305; the key is made per install and kept in the Android Keystore or iOS Keychain, this device only, never backed up (D113). The web preview has no secure storage, so it isn't protected there. The sign-in session sits in the app's private storage, as Supabase does by default |
 | To AI | Only week-level numbers and the user's question; never names, email, notes, messages, ids or earlier chat (`cleanContext`) |
 | AI chat | Kept on the phone only, for the day; never stored on the server; wiped on Clear chat, sign-out, account deletion and AI off (D109) |
 | In push | "New message, from <name>", or a fixed reminder line ("Training time", "Check-in due today"): never message text or health data. Each athlete's notification switches are honoured on the server |
@@ -144,5 +144,5 @@ Every screen handles all five states, using the shared components:
 | SEC-02 | Sentry with PII scrubbing not wired | Before beta |
 | ~~SEC-03~~ | ~~Retention purge job~~: done (D111, `purge_expired` and the `cron` storage sweep); turns on per project with the Vault secrets | ✅ |
 | SEC-04 | CAPTCHA on sign-up (Supabase Auth supports hCaptcha / Turnstile) | If abuse appears |
-| SEC-05 | On-phone cache not encrypted | v1.1 |
+| ~~SEC-05~~ | ~~On-phone cache not encrypted~~: done (D113, `lib/localStore`) | ✅ |
 | SEC-06 | External security review / pen test | After funding, before public launch |

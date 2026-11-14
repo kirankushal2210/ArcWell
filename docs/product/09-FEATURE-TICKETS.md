@@ -120,7 +120,7 @@
 | S-02 (SEC-02) | Sentry with PII scrubbing | App and functions; no health data in events | S | ⬜ free tier |
 | S-03 (SEC-03) | Retention purge job | 30 days live, 90 days backups, as the Privacy Policy says | S | ✅ `purge_expired` + `cron` storage sweep, daily (D111) |
 | S-04 (SEC-04) | CAPTCHA on sign-up | hCaptcha or Turnstile in Supabase Auth | S | ⬜ if abuse appears |
-| S-05 (SEC-05) | Encrypt the on-phone cache | Encrypted storage for synced data | M | ⬜ v1.1 |
+| S-05 (SEC-05) | Encrypt the on-phone cache | Encrypted storage for synced data | M | ✅ `lib/localStore` (XChaCha20-Poly1305, key in secure storage), old plain values migrated; 22 tests; lint blocks raw AsyncStorage (D113) |
 | S-06 (SEC-06) | External security review | Pen test before public launch | M | 💰 |
 
 ## Founder decisions blocking tickets

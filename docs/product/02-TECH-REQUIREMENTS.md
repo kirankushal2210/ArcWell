@@ -12,7 +12,7 @@
 | Styling | Own design system: tokens in `app/src/theme/`, primitives in `app/src/components/` | **No** Tailwind/NativeWind, styled-components or UI kits. `npm run tokens:check` bans raw colours and spacing |
 | Icons | lucide-react-native | No other icon set |
 | App state | One store: `CoachDataProvider` (`features/coach/CoachData.tsx`) and `ActiveWorkout` for the live workout | **No** Redux, Zustand, MobX or React Query |
-| Device storage | AsyncStorage (store cache, per account), expo-sqlite localStorage (auth session) | Encrypted offline copy later |
+| Device storage | AsyncStorage through `lib/localStore` (store cache per account, AI chat, workout in progress), every value sealed with XChaCha20-Poly1305 (`@noble/ciphers`); the key in `expo-secure-store`. expo-sqlite localStorage holds the auth session | Lint blocks direct AsyncStorage use (S-05, D113) |
 | Backend | **Supabase**: Postgres 17 with row-level security, Auth, Storage, Realtime, Edge Functions (Deno 2) | Region **Mumbai (ap-south-1)** for production (D72) |
 | Data access | `@supabase/supabase-js ^2.119` only; sync layer in `app/src/features/sync/` | No other ORM, GraphQL or REST client |
 | Server logic | SQL functions (security definer, `search_path = ''`) and Edge Functions in `supabase/functions/` | No separate Node or Express server |

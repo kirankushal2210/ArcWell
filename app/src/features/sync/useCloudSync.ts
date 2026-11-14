@@ -6,7 +6,7 @@
 // - A pull runs every 20 seconds, when the app comes back to the foreground, and at once when a new
 //   message arrives (Realtime). It never overwrites a change made while it was running.
 // - Messages received are marked read once the chat has been opened (the store's unread count).
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { localStore } from "@/lib/localStore";
 import { useEffect, useRef, useState } from "react";
 import { AppState } from "react-native";
 
@@ -153,9 +153,9 @@ export function useCloudSync({
       ready.current = true;
       worldRef.current = shown;
       apply(shown);
-      AsyncStorage.setItem(cloudCacheKey(c.uid), JSON.stringify(shown)).catch(
-        () => {},
-      );
+      localStore
+        .setItem(cloudCacheKey(c.uid), JSON.stringify(shown))
+        .catch(() => {});
       setState("ready");
       if (first) await flush();
     } catch {
@@ -183,7 +183,8 @@ export function useCloudSync({
     }
     ctx.current = { uid, role };
     let live = true;
-    AsyncStorage.getItem(cloudCacheKey(uid))
+    localStore
+      .getItem(cloudCacheKey(uid))
       .then((raw) => {
         if (live && raw) apply(JSON.parse(raw) as World);
       })

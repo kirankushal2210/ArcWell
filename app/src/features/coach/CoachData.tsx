@@ -1,7 +1,7 @@
 // Holds the sample data in memory so both sides of the app feel real while there is no backend.
 // It sits at the root of the app, standing in for the server: what the coach plans here is what the
 // coached athlete sees after joining (D56), and what the athlete logs shows up on the coach's side.
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { localStore } from "@/lib/localStore";
 import { AppState } from "react-native";
 
 import { useSetActive } from "@/features/athlete/ActiveWorkout";
@@ -469,8 +469,8 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
   registerCustomExercises(customExercises);
 
   // F4-09: the workout in progress, history and the athlete's plan are saved on the phone after every
-  // change, so closing the app mid-workout loses nothing. Sample build: plain AsyncStorage; the real
-  // build syncs to Supabase and keeps the offline copy in encrypted storage.
+  // change, so closing the app mid-workout loses nothing. Signed in, it's the offline copy of what's
+  // synced to Supabase. Either way it's encrypted on the phone (localStore, S-05, D113).
   //
   // Safety rules:
   // - If the saved copy can't be read, it is backed up and saving stops for this run, so sample
@@ -483,7 +483,8 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
   const pendingSave = useRef<(() => void) | null>(null);
   useEffect(() => {
     let stored: string | null = null;
-    AsyncStorage.getItem(STORE_KEY)
+    localStore
+      .getItem(STORE_KEY)
       .then((raw) => {
         stored = raw;
         if (!raw) return;
@@ -506,7 +507,7 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       })
       .catch(() => {
         saveBlocked.current = true;
-        if (stored) AsyncStorage.setItem(BACKUP_KEY, stored).catch(() => {});
+        if (stored) localStore.setItem(BACKUP_KEY, stored).catch(() => {});
       })
       .finally(() => setHydrated(true));
   }, []);
@@ -537,10 +538,12 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       saveUrgent.current = false;
       if (saveBlocked.current) return;
       // Signed in, the phone's copy belongs to that account; the sample store is left alone.
-      AsyncStorage.setItem(
-        cloudUid ? cloudCacheKey(cloudUid) : STORE_KEY,
-        JSON.stringify(saved),
-      ).catch(() => {});
+      localStore
+        .setItem(
+          cloudUid ? cloudCacheKey(cloudUid) : STORE_KEY,
+          JSON.stringify(saved),
+        )
+        .catch(() => {});
     };
     pendingSave.current = save;
     const t = setTimeout(save, saveUrgent.current ? 0 : SAVE_DELAY_MS);
@@ -643,7 +646,7 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
     setLeads(withInstagram(sampleLeads()));
     setCoach(defaultCoachProfile());
     setSettings(defaultCoachSettings());
-    AsyncStorage.removeItem(STORE_KEY).catch(() => {});
+    localStore.removeItem(STORE_KEY).catch(() => {});
   };
   // Signing out returns the phone to the sample world.
   const wasSignedIn = useRef(false);

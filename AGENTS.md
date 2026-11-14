@@ -60,6 +60,7 @@ A new dependency needs a reason in the PR. A new outside service needs a decisio
 | Design tokens (`theme/`) and primitives (`components/`) | Raw hex, magic spacing, a new button style |
 | Shared screen states (`LoadingScreen`, `ScreenError`, `OfflineBanner`, `NotFound`), and an empty state with one action | Blank screens, spinners where a skeleton fits |
 | `lib/alert` for confirms | `Alert.alert` directly (breaks on web) |
+| `lib/localStore` for anything kept on the phone (encrypted, D113) | AsyncStorage directly (lint blocks it) |
 | Local-day helpers for dates (IST) | `toISOString().slice(0, 10)` |
 | Pure, unit-tested logic in `features/<area>/*.ts` and `_shared/*.ts` | Business rules inside JSX |
 | Pass `now` into render code | `Date.now()` / `new Date()` in render (React Compiler purity) |
