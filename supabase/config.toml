@@ -437,3 +437,11 @@ enabled = true
 
 [functions.scan-meal]
 verify_jwt = true
+
+# Billing webhooks are called by RevenueCat and Razorpay, not by signed-in users: each checks its
+# own secret or signature instead of a user's JWT.
+[functions.revenuecat-webhook]
+verify_jwt = false
+
+[functions.razorpay-webhook]
+verify_jwt = false

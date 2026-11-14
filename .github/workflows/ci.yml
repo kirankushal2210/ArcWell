@@ -45,4 +45,11 @@ jobs:
       - uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
-      - run: deno check supabase/functions/_shared/ai/index.ts
+      - run: >-
+          deno check
+          supabase/functions/_shared/ai/index.ts
+          supabase/functions/scan-meal/index.ts
+          supabase/functions/revenuecat-webhook/index.ts
+          supabase/functions/razorpay-webhook/index.ts
+          supabase/functions/delete-account/index.ts
+          supabase/functions/notify/index.ts
