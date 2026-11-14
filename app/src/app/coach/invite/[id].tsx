@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { Linking, Share, StyleSheet, View } from "react-native";
 
 import { Avatar, Button, Text } from "@/components/primitives";
+import { useAuth } from "@/features/auth/AuthProvider";
 import { useCoachData } from "@/features/coach/CoachData";
 import { Eyebrow, Page, PageHeader } from "@/features/coach/parts";
 import { PlanRows } from "@/features/coach/PlanRows";
@@ -16,6 +17,7 @@ import { NotFound } from "@/features/system/SystemStates";
 export default function Invite() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { client, createInvite, coachName } = useCoachData();
+  const auth = useAuth();
   const c = client(id);
   const [copied, setCopied] = useState(false);
   const back = () =>
@@ -127,23 +129,28 @@ export default function Invite() {
           entered. You can still edit any plan after they join.
         </Text>
 
-        <Eyebrow>Try it</Eyebrow>
-        <Button
-          label={`Preview as ${first}`}
-          icon={Smartphone}
-          variant="ghost"
-          onPress={() =>
-            invite &&
-            router.push({
-              pathname: "/join/[code]",
-              params: { code: invite.token },
-            })
-          }
-        />
-        <Text variant="caption" tone="muted">
-          Sample build: opens the join screen on this phone, as {first} would
-          see it after tapping the link.
-        </Text>
+        {/* Sample build only: with real accounts the client joins on their own phone. */}
+        {auth.enabled ? null : (
+          <>
+            <Eyebrow>Try it</Eyebrow>
+            <Button
+              label={`Preview as ${first}`}
+              icon={Smartphone}
+              variant="ghost"
+              onPress={() =>
+                invite &&
+                router.push({
+                  pathname: "/join/[code]",
+                  params: { code: invite.token },
+                })
+              }
+            />
+            <Text variant="caption" tone="muted">
+              Sample build: opens the join screen on this phone, as {first}{" "}
+              would see it after tapping the link.
+            </Text>
+          </>
+        )}
       </Page>
     </View>
   );
