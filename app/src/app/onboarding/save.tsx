@@ -13,7 +13,6 @@ import { Button, PressableScale, Text } from "@/components/primitives";
 import { newClientFromAnswers } from "@/features/athlete/selfPlan";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { recordConsent } from "@/features/auth/consent";
-import { GoogleButton } from "@/features/auth/GoogleButton";
 import { useCoachData } from "@/features/coach/CoachData";
 import { useOnboarding } from "@/features/onboarding/OnboardingContext";
 import { ProgressBar, QuestionHeader } from "@/features/onboarding/parts";
@@ -121,7 +120,6 @@ export default function SavePlan() {
           disabled={!agree}
           onPress={withEmail}
         />
-        <GoogleButton />
         {auth.enabled ? null : (
           <Text variant="caption" tone="muted" style={styles.center}>
             Sample build: accounts are off, so this continues without one.

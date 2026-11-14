@@ -14,10 +14,12 @@ import {
 import { NotJoined, useMe } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
 import { colors } from "@/theme";
+import { useAccountActions } from "@/features/accounts/useAccountActions";
 
 export default function DeleteAccount() {
   const me = useMe();
   const { meTier, coachName, resetSample } = useCoachData();
+  const account = useAccountActions();
   const [typed, setTyped] = useState("");
   if (!me) return <NotJoined />;
   const back = backTo("/athlete/menu/account");
@@ -36,8 +38,11 @@ export default function DeleteAccount() {
             label="Delete my account"
             destructive
             disabled={!ok}
-            onConfirm={() => {
-              resetSample();
+            onConfirm={async () => {
+              // With accounts, the server deletes everything; signing out returns to the sample.
+              if (account.live) {
+                if (!(await account.deleteNow())) return;
+              } else resetSample();
               if (router.canDismiss()) router.dismissAll();
               router.replace("/");
             }}

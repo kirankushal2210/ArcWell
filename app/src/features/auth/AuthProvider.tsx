@@ -11,6 +11,7 @@ import {
   useState,
 } from "react";
 
+import { clearAllChats } from "@/features/ai/chatStore";
 import { accountsEnabled, POLICY_VERSION, supabase } from "@/lib/supabase";
 
 export type Role = "athlete" | "coach";
@@ -151,6 +152,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     setPending(null);
+    // Today's AI chat lives only on the phone (D109); it goes with the account.
+    await clearAllChats();
     if (supabase) await supabase.auth.signOut();
     setSession(null);
     setProfile(null);

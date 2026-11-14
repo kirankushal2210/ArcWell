@@ -13,6 +13,7 @@ import {
   NavRow,
   ToggleRow,
 } from "@/features/athlete/MenuParts";
+import { clearAllChats } from "@/features/ai/chatStore";
 import { Sheet } from "@/features/athlete/Sheet";
 import { recordConsent } from "@/features/auth/consent";
 import { NotJoined, useMe } from "@/features/athlete/useMe";
@@ -32,6 +33,8 @@ export default function Privacy() {
   const turnAi = (on: boolean) => {
     setAthleteSettings(me.id, { ai: on });
     void recordConsent("ai", on);
+    // Withdrawing AI consent also wipes today's AI chat from the phone (D109).
+    if (!on) void clearAllChats();
   };
   const shared = (me.transformations ?? []).filter(
     (t) => t.status === "approved",

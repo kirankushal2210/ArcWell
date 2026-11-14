@@ -36,6 +36,7 @@ import {
   textSizes,
 } from "@/theme";
 import { useBillingGate } from "@/features/coach/limits";
+import { NotFound } from "@/features/system/SystemStates";
 
 function TimeStepper({
   label,
@@ -79,16 +80,17 @@ function RecoveryBuilderEditor() {
   const { client, saveProtocol } = useCoachData();
   const c = client(id);
   const insets = useSafeAreaInsets();
-  const [r, setR] = useState<RecoveryProtocol>(
-    () =>
-      c?.protocol ?? {
-        ...defaultProtocol(),
-        sleepH: c?.recovery.sleepTargetH ?? 7.5,
-      },
-  );
+  const [r, setR] = useState<RecoveryProtocol>(() => {
+    if (c?.protocol) return c.protocol;
+    // A first protocol: the client's sleep target, with a wake time that leaves room for it.
+    const base = defaultProtocol();
+    const sleepH = c?.recovery.sleepTargetH ?? base.sleepH;
+    const wake = Math.round(((base.bed + sleepH * 60) % 1440) / 15) * 15;
+    return { ...base, sleepH, wake };
+  });
   const back = () =>
     router.canGoBack() ? router.back() : router.replace("/coach");
-  if (!c) return <PageHeader title="Recovery" onBack={back} />;
+  if (!c) return <NotFound title="Recovery" what="client" onBack={back} />;
 
   const span = (r.wake + 1440 - (r.bed % 1440)) % 1440;
   const trainingDays = 7 - r.restDays.length;

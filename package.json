@@ -4,14 +4,16 @@
   "private": true,
   "description": "Arcwell \u2014 training, nutrition and recovery platform for coaches and athletes",
   "scripts": {
-    "db:start": "supabase start",
+    "db:start": "mkdir -p supabase/.temp && printf v1.89.0 > supabase/.temp/storage-version && supabase start",
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
     "db:test": "supabase test db",
     "db:lint": "supabase db lint",
     "app:start": "npm --prefix app run start",
     "typecheck": "npm --prefix app run typecheck",
-    "lint": "npm --prefix app run lint"
+    "lint": "npm --prefix app run lint",
+    "test": "npm --prefix app test",
+    "demo:seed": "node scripts/demo-seed.mjs"
   },
   "devDependencies": {
     "supabase": "^3.1.0"

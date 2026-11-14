@@ -10,6 +10,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button, PressableScale, Text } from "@/components/primitives";
 import { AIConsentPoints } from "@/features/athlete/AIConsent";
 import { selfClient, selfPlan } from "@/features/athlete/selfPlan";
+import { demoBilling, demoPlus } from "@/features/accounts/repo";
 import { recordConsent } from "@/features/auth/consent";
 import { useCoachData } from "@/features/coach/CoachData";
 import { useOnboarding } from "@/features/onboarding/OnboardingContext";
@@ -63,6 +64,8 @@ export default function Pro() {
     );
     // "Allow and start free trial" is the AI consent asked at sign-up (SPEC key rules).
     if (tier === "pro") void recordConsent("ai", true);
+    // Demo builds with accounts: the trial is granted on the server, as a Play purchase would be.
+    if (tier === "pro" && demoBilling) void demoPlus("trial");
     if (router.canDismiss()) router.dismissAll();
     router.replace("/athlete");
   };

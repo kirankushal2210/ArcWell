@@ -14,6 +14,7 @@ import { Group, GroupRow, Page, PageHeader } from "@/features/coach/parts";
 import { alert } from "@/lib/alert";
 import { colors, radius, rhythm, space } from "@/theme";
 import { useBillingGate } from "@/features/coach/limits";
+import { NotFound } from "@/features/system/SystemStates";
 
 function AssignTemplateEditor() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -23,7 +24,7 @@ function AssignTemplateEditor() {
   const t = templates.find((x) => x.id === id);
   const back = () =>
     router.canGoBack() ? router.back() : router.replace("/coach/plans");
-  if (!t) return <PageHeader title="Template not found" onBack={back} />;
+  if (!t) return <NotFound title="Template" what="template" onBack={back} />;
 
   const training = t.kind === "training";
   const list = clients.filter((c) => c.status !== "completed");

@@ -138,3 +138,144 @@ export async function savePreferences(
     ? fail("Couldn't save your settings.")
     : { data: true, error: null };
 }
+
+// ---------- Invite page before sign-up (D43, D40) ----------
+
+/** The coach's profile and whether they're taking clients, for a valid code (no sign-in needed). */
+export async function invitePage(
+  code: string,
+): Promise<Res<{ profile: Record<string, unknown>; open: boolean }>> {
+  if (!accountsEnabled || !supabase) return off();
+  const [p, o] = await Promise.all([
+    supabase.rpc("invite_coach_profile", { p_code: code }),
+    supabase.rpc("invite_open", { p_code: code }),
+  ]);
+  if (p.error || !p.data)
+    return fail(
+      "That invite isn't valid. Check the code, or ask your coach for a new one.",
+    );
+  return {
+    data: {
+      profile: p.data as Record<string, unknown>,
+      open: o.data !== false,
+    },
+    error: null,
+  };
+}
+
+// ---------- Links (D21, D37) ----------
+
+/** Ends coaching with the other person: the athlete leaves; the coach completes or removes. */
+export async function endLink(
+  otherId: string,
+  reason: "left" | "completed" | "removed",
+): Promise<Res<true>> {
+  if (!accountsEnabled || !supabase) return off();
+  const { error } = await supabase.rpc("end_link", { other: otherId, reason });
+  return error
+    ? fail("Couldn't end coaching right now. Try again.")
+    : { data: true, error: null };
+}
+
+/** The athlete leaves their current coach. */
+export async function leaveCurrentCoach(): Promise<Res<true>> {
+  if (!accountsEnabled || !supabase) return off();
+  const { data } = await supabase
+    .from("coach_clients")
+    .select("coach_id")
+    .is("ended_at", null)
+    .maybeSingle();
+  if (!data) return { data: true, error: null };
+  return endLink(data.coach_id as string, "left");
+}
+
+/** "Share my history from before I joined" (D37). */
+export async function shareHistory(share: boolean): Promise<Res<true>> {
+  if (!accountsEnabled || !supabase) return off();
+  const { error } = await supabase.rpc("share_history", { share });
+  return error
+    ? fail("Couldn't change history sharing.")
+    : { data: true, error: null };
+}
+
+/** Withdraw a personal invite that hasn't been used. */
+export async function revokeInviteCode(code: string): Promise<Res<true>> {
+  if (!accountsEnabled || !supabase) return off();
+  const { error } = await supabase
+    .from("invites")
+    .update({ revoked_at: new Date().toISOString() })
+    .eq("code", code.replace(/[^A-Za-z0-9]/g, "").toUpperCase());
+  return error
+    ? fail("Couldn't withdraw that invite.")
+    : { data: true, error: null };
+}
+
+// ---------- Export and delete (X-09, AC, Google Play) ----------
+
+export async function exportMyData(): Promise<Res<Record<string, unknown>>> {
+  if (!accountsEnabled || !supabase) return off();
+  const { data, error } = await supabase.rpc("export_my_data");
+  return error
+    ? fail("Couldn't prepare your export.")
+    : { data: data as Record<string, unknown>, error: null };
+}
+
+export async function deleteMyAccount(): Promise<Res<true>> {
+  if (!accountsEnabled || !supabase) return off();
+  const { error } = await supabase.functions.invoke("delete-account", {
+    method: "POST",
+  });
+  return error
+    ? fail("Couldn't delete your account. Try again, or contact support.")
+    : { data: true, error: null };
+}
+
+// ---------- Push (B5) ----------
+
+export async function registerPushToken(
+  token: string,
+  platform: "android" | "ios" | "web",
+) {
+  if (!accountsEnabled || !supabase) return;
+  await supabase
+    .from("push_tokens")
+    .upsert({ token, platform }, { onConflict: "token" });
+}
+
+export type NotifyEvent =
+  | { kind: "message"; id: string }
+  | { kind: "check_in"; id: string }
+  | { kind: "check_in_reply"; athleteId: string; id: string }
+  | { kind: "plan"; athleteId: string };
+
+/** Tell the other person something happened. Never blocks the app; a failed push is just skipped. */
+export async function notify(e: NotifyEvent) {
+  if (!accountsEnabled || !supabase) return;
+  await supabase.functions.invoke("notify", { body: e }).catch(() => {});
+}
+
+/** Whether the signed-in athlete has anything stored yet (a returning athlete on a new phone). */
+export async function hasAthleteProfile(): Promise<boolean> {
+  if (!accountsEnabled || !supabase) return false;
+  const { data } = await supabase
+    .from("athlete_profiles")
+    .select("athlete_id")
+    .maybeSingle();
+  return !!data;
+}
+
+// ---------- Billing (B7) ----------
+
+/** Investor demo builds: the paywall's trial goes through the demo-billing function (no Play yet). */
+export const demoBilling = process.env.EXPO_PUBLIC_DEMO_BILLING === "1";
+
+/** Start (or cancel) the demo Plus trial. Real builds buy through Google Play and RevenueCat. */
+export async function demoPlus(action: "trial" | "cancel"): Promise<Res<true>> {
+  if (!accountsEnabled || !supabase) return off();
+  const { error } = await supabase.functions.invoke("demo-billing", {
+    body: { action },
+  });
+  return error
+    ? fail("Couldn't start the trial. Try again.")
+    : { data: true, error: null };
+}

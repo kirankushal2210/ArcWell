@@ -2,16 +2,19 @@
 
 Training, nutrition and recovery in one Android app — a client-management platform for coaches, with an optional AI coach for athletes.
 
-- Product spec: [docs/SPEC.md](docs/SPEC.md)
-- Implementation plan: [docs/PLAN.md](docs/PLAN.md)
-- Design (principles, tokens, components, screens): [docs/DESIGN.md](docs/DESIGN.md)
+**Start with the product documents in [docs/product/](docs/product/README.md):** PRD, technical requirements, app flow, design brief, backend schema, API integrations, security and access, the AI guardrails ([AGENTS.md](AGENTS.md)), the feature tickets and the deployment and testing runbook. They're the source of truth; the older docs below are detail and history.
+
+- Decisions: [docs/DECISIONS.md](docs/DECISIONS.md)
+- Investor demo: [docs/DEMO.md](docs/DEMO.md)
+- Launch roadmap and costs: [docs/LAUNCH_ROADMAP.md](docs/LAUNCH_ROADMAP.md)
+- History and detail: [SPEC.md](docs/SPEC.md), [PLAN.md](docs/PLAN.md), [DESIGN.md](docs/DESIGN.md)
 
 ## Repository layout
 
 ```
 app/        Expo SDK 58 + React Native + TypeScript (Expo Router), Android-first
 supabase/   Postgres migrations, pgTAP tests, seed data, Edge Functions
-docs/       Spec and plan
+docs/       Product documents (docs/product/), decisions, design, roadmap
 ```
 
 ## Prerequisites
@@ -32,12 +35,13 @@ npm run app:start      # Expo dev server
 ## Checks (also run in CI)
 
 ```bash
-npm run lint
+npm run lint           # ESLint, design tokens, static legal pages
 npm run typecheck
+npm run test           # Jest
 npm run db:test        # pgTAP tests, including row-level security
 npm run db:lint
 ```
 
 ## Secrets
 
-Never commit secrets. Edge Function secrets live in `supabase/functions/.env` locally (see `.env.example`) and are set with `npx supabase secrets set` in staging and production. The mobile app only ever holds the Supabase URL and anon key; AI keys and privileged operations stay server-side.
+Never commit secrets. Edge Function secrets live in `supabase/functions/.env` locally (see `.env.example`) and are set with `npx supabase secrets set` in staging and production. The mobile app only ever holds the Supabase URL and publishable key; AI keys and privileged operations stay server-side.

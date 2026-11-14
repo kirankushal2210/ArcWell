@@ -286,6 +286,7 @@ export function Wheel({
       0,
     );
     return () => clearTimeout(id);
+    // Re-centre only when the list changes, not on every scroll-driven value change.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [values]);
 

@@ -1,5 +1,7 @@
 # Arcwell — Sitemap (v1)
 
+> **Superseded (14 November 2026).** The current route inventory and flows are in [03-APP-FLOW.md](../product/03-APP-FLOW.md). This file is kept for history.
+
 Every screen in the v1 Android app, by role. Tier markers: **[F]** free athlete, **[P]** paid (AI) athlete, **[C]** coached athlete, **[All]** every athlete. 🔒 = shown locked to free users as an upgrade moment. AI screens are never shown to coached athletes.
 
 ## Overview

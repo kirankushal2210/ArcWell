@@ -52,6 +52,10 @@ function logDate(label: string) {
   return dateKey(d);
 }
 
+/** A 1–5 answer, or the neutral 3 when it's missing or off the scale. */
+const onScale = (v: number | undefined) =>
+  typeof v === "number" && v >= 1 && v <= 5 ? v : 3;
+
 /** Score inputs for any client: their recovery store, baseline from answers/protocol, workouts. */
 export function recoveryInputs(
   c: Client | undefined,
@@ -62,10 +66,10 @@ export function recoveryInputs(
     sleepTargetH: c?.protocol?.sleepH ?? c?.recovery.sleepTargetH ?? 7.5,
     bed: evening(c?.protocol?.bed ?? 22 * 60 + 30),
     wake: c?.protocol?.wake ?? 6 * 60 + 30,
-    quality: c?.recovery.quality ?? 3,
-    energy: c?.recovery.energy ?? 3,
-    stress: c?.recovery.stress ?? 3,
-    soreness: c?.recovery.soreness ?? 3,
+    quality: onScale(c?.recovery.quality),
+    energy: onScale(c?.recovery.energy),
+    stress: onScale(c?.recovery.stress),
+    soreness: onScale(c?.recovery.soreness),
   };
   const inputs: DayInputs = {
     store,

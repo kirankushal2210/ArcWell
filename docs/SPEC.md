@@ -1,5 +1,7 @@
 # Arcwell — Product Spec (v1)
 
+> **Superseded as the source of truth (14 November 2026).** Scope now lives in the [PRD](product/01-PRD.md). The current documents are in [docs/product/](product/README.md); where they differ, they win. This file is kept for detail and history.
+
 Agreed 2026-11-10. Source of truth for scope; change it here before changing code.
 
 ## Product

@@ -16,6 +16,7 @@ import {
 import { useCoachLimits } from "@/features/coach/limits";
 import { Page, PageHeader } from "@/features/coach/parts";
 import { TransformationsStrip } from "@/features/coach/TransformationsStrip";
+import { ReportCoachButton } from "@/features/legal/ReportCoach";
 import { colors, rhythm, space } from "@/theme";
 
 function JoinCoachScreen() {
@@ -35,6 +36,7 @@ function JoinCoachScreen() {
           Then {first} builds your training, food and sleep plan, with weekly
           check-ins and chat in the app.
         </Text>
+        <ReportCoachButton coachName={coach.name} />
       </Page>
       <View
         style={[

@@ -32,6 +32,7 @@ import {
   textSizes,
 } from "@/theme";
 import { useBillingGate } from "@/features/coach/limits";
+import { NotFound } from "@/features/system/SystemStates";
 
 const DIETS = ["Vegetarian", "Eggetarian", "Non-vegetarian", "Jain"] as const;
 
@@ -53,7 +54,7 @@ function MealTemplateEditor() {
   const back = () =>
     router.canGoBack() ? router.back() : router.replace("/coach/plans");
   if (id !== "new" && !t)
-    return <PageHeader title="Template not found" onBack={back} />;
+    return <NotFound title="Template" what="template" onBack={back} />;
 
   const ready = n.meals.length > 0;
   const save = () =>

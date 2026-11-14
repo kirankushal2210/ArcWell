@@ -176,6 +176,8 @@ export function ChatThread({
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
+        // Never grow: on web a horizontal list otherwise takes the chat's spare height.
+        style={styles.quickBar}
         contentContainerStyle={styles.quick}
         keyboardShouldPersistTaps="handled"
       >
@@ -310,7 +312,9 @@ const styles = StyleSheet.create({
   time: { alignSelf: "flex-end" },
   seen: { alignSelf: "flex-end" },
   photo: { width: 200, height: 260, borderRadius: radius.md },
+  quickBar: { flexGrow: 0, flexShrink: 0 },
   quick: {
+    alignItems: "center",
     gap: space[2],
     paddingHorizontal: rhythm.gutter,
     paddingVertical: space[2],

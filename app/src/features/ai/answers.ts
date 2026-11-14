@@ -9,9 +9,10 @@ export type Answer = {
   sources: string[];
 };
 
-/** Contest prep, injury rehab, medical questions and PEDs aren't for an AI coach (D22). */
-const OUT_OF_SCOPE =
-  /contest|show prep|peak week|stage|rehab|physio|injur|torn|fracture|surgery|diabet|pregnan|medicat|blood pressure|thyroid|steroid|ped\b|sarm|trt|testosterone|eating disorder/i;
+/** Contest prep, injuries and pain, medical questions, medicines and drugs aren't for an AI coach (D22).
+ * The same pattern as the server's (supabase/functions/_shared/ai/coach.ts); a test checks they match. */
+export const OUT_OF_SCOPE =
+  /contest|show prep|peak week|stage|rehab|physio|injur|torn|fracture|surgery|diabet|pregnan|medicat|blood pressure|thyroid|steroid|\bped\b|sarm|\btrt\b|testosterone|eating disorder|supplement|creatine|nootropic|\bhurts?\b|\bhurting\b|\bpain|\baches?\b|aching|sprain|tendon|tendin|swelling|swollen|\bnumb(?:ness)?\b|tingl|dizz|faint|painkill|ibuprofen|paracetamol|medicine|\bpills?\b|what (?:should|can) i take|\btake (?:for|something for)\b/i;
 
 export function answer(
   q: string,
@@ -21,7 +22,7 @@ export function answer(
   if (OUT_OF_SCOPE.test(t))
     return {
       kind: "out_of_scope",
-      text: "I can't help with that. For injuries, medical conditions, contest prep or performance drugs, please talk to a doctor, physiotherapist or qualified coach. I can still help with your everyday training, food and sleep.",
+      text: "I can't help with that. For injuries, medical conditions, contest prep, supplements or performance drugs, please talk to a doctor, physiotherapist or qualified coach. I can still help with your everyday training, food and sleep.",
       sources: [],
     };
   if (/protein/.test(t))

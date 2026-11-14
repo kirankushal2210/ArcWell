@@ -16,6 +16,7 @@ import { NotJoined, useMe } from "@/features/athlete/useMe";
 import { useCoachData } from "@/features/coach/CoachData";
 import { KeyValues } from "@/features/coach/parts";
 import { colors, space } from "@/theme";
+import { useAccountActions } from "@/features/accounts/useAccountActions";
 
 const INCLUDED = [
   "Profile",
@@ -29,20 +30,24 @@ const INCLUDED = [
 export default function ExportData() {
   const me = useMe();
   const { settingsOf, setAthleteSettings } = useCoachData();
+  const account = useAccountActions();
   if (!me) return <NotJoined />;
   const ex = settingsOf(me.id).export;
   const request = () =>
-    setAthleteSettings(me.id, {
-      export: {
-        status: "preparing",
-        requestedAt: new Date().toLocaleString("en-IN", {
-          day: "numeric",
-          month: "short",
-          hour: "numeric",
-          minute: "2-digit",
-        }),
-      },
-    });
+    // With accounts the export is ready at once: everything the server holds, as a JSON file.
+    account.live
+      ? void account.exportNow()
+      : setAthleteSettings(me.id, {
+          export: {
+            status: "preparing",
+            requestedAt: new Date().toLocaleString("en-IN", {
+              day: "numeric",
+              month: "short",
+              hour: "numeric",
+              minute: "2-digit",
+            }),
+          },
+        });
 
   if (ex?.status === "preparing")
     return (

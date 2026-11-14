@@ -4,8 +4,6 @@
 // Order of checks (AGENTS.md): signed in → entitled (pro athlete, AI consent, no coach: D44) →
 // under today's cap → call the model → validate the answer. Nothing about the photo or the foods
 // is logged; errors carry only a status.
-import { createClient } from "jsr:@supabase/supabase-js@2";
-
 import { getAiProvider } from "../_shared/ai/index.ts";
 import {
   MEAL_SCAN_DAILY_CAP,
@@ -14,17 +12,7 @@ import {
   MEAL_SCAN_PROMPT,
   parseMealScan,
 } from "../_shared/ai/mealScan.ts";
-
-const cors = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
-const reply = (status: number, body: unknown) =>
-  new Response(JSON.stringify(body), {
-    status,
-    headers: { ...cors, "Content-Type": "application/json" },
-  });
+import { asCaller, cors, reply } from "../_shared/http.ts";
 
 const MIME = new Set(["image/jpeg", "image/png", "image/webp"]);
 
@@ -47,11 +35,7 @@ Deno.serve(async (req) => {
   if (image.length > MEAL_SCAN_MAX_BASE64) return reply(413, { error: "too_large" });
 
   // As the user, so the database's own rules decide (entitlement and cap live in SQL).
-  const db = createClient(
-    Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SUPABASE_ANON_KEY") ?? "",
-    { global: { headers: { Authorization: auth } } },
-  );
+  const db = asCaller(auth);
   const { data: user } = await db.auth.getUser();
   if (!user?.user) return reply(401, { error: "signed_out" });
 

@@ -291,63 +291,86 @@ export const describeItems = (items: PlanItem[]) =>
 
 /** An example Indian day for the diet the client named, with exact foods; the coach edits it freely. */
 export function exampleDay(diet: string): Meal[] {
-  const veg = diet.startsWith("Vegetarian") || diet.startsWith("Jain");
+  // Vegan: no meat, egg or dairy anywhere in the day.
+  const vegan = diet.startsWith("Vegan");
+  const veg = vegan || diet.startsWith("Vegetarian") || diet.startsWith("Jain");
   const egg = diet.startsWith("Eggetarian");
   return [
     mealOf(
       "Breakfast",
       "8:00 am",
-      egg
-        ? [
-            it("egg-bhurji", 1, "katori"),
-            it("bread-brown", 2, "slice"),
-            it("coffee-black", 1, "cup"),
-          ]
-        : [it("moong-chilla", 2, "piece"), it("curd", 1, "katori")],
+      vegan
+        ? [it("besan-chilla", 2, "piece"), it("sprouts-salad", 1, "katori")]
+        : egg
+          ? [
+              it("egg-bhurji", 1, "katori"),
+              it("bread-brown", 2, "slice"),
+              it("coffee-black", 1, "cup"),
+            ]
+          : [it("moong-chilla", 2, "piece"), it("curd", 1, "katori")],
     ),
     mealOf(
       "Lunch",
       "1:30 pm",
-      veg || egg
+      vegan
         ? [
             it("phulka", 2, "piece"),
-            it("paneer-bhurji", 100, "g"),
+            it("soya-curry", 1, "katori"),
             it("dal-tadka", 1, "katori"),
             it("salad", 1, "katori"),
           ]
+        : veg || egg
+          ? [
+              it("phulka", 2, "piece"),
+              it("paneer-bhurji", 100, "g"),
+              it("dal-tadka", 1, "katori"),
+              it("salad", 1, "katori"),
+            ]
+          : [
+              it("rice", 1, "katori"),
+              it("chicken-curry", 1, "katori"),
+              it("dal-tadka", 1, "katori"),
+              it("salad", 1, "katori"),
+            ],
+    ),
+    mealOf(
+      "Snack",
+      "5:30 pm",
+      vegan
+        ? [it("roasted-chana", 30, "g"), it("banana", 1, "piece")]
         : [
-            it("rice", 1, "katori"),
-            it("chicken-curry", 1, "katori"),
-            it("dal-tadka", 1, "katori"),
-            it("salad", 1, "katori"),
+            it("roasted-chana", 30, "g"),
+            it("banana", 1, "piece"),
+            it("chai-plain", 1, "cup"),
           ],
     ),
-    mealOf("Snack", "5:30 pm", [
-      it("roasted-chana", 30, "g"),
-      it("banana", 1, "piece"),
-      it("chai-plain", 1, "cup"),
-    ]),
     mealOf(
       "Dinner",
       "8:30 pm",
-      veg
+      vegan
         ? [
             it("phulka", 2, "piece"),
             it("rajma", 1, "katori"),
             it("mixed-veg", 1, "katori"),
-            it("curd", 1, "katori"),
           ]
-        : egg
+        : veg
           ? [
               it("phulka", 2, "piece"),
-              it("egg-curry", 1, "katori"),
+              it("rajma", 1, "katori"),
               it("mixed-veg", 1, "katori"),
+              it("curd", 1, "katori"),
             ]
-          : [
-              it("phulka", 2, "piece"),
-              it("chicken-tikka", 150, "g"),
-              it("mixed-veg", 1, "katori"),
-            ],
+          : egg
+            ? [
+                it("phulka", 2, "piece"),
+                it("egg-curry", 1, "katori"),
+                it("mixed-veg", 1, "katori"),
+              ]
+            : [
+                it("phulka", 2, "piece"),
+                it("chicken-tikka", 150, "g"),
+                it("mixed-veg", 1, "katori"),
+              ],
     ),
   ];
 }

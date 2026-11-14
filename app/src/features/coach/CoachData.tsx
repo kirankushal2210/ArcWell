@@ -1,10 +1,24 @@
 // Holds the sample data in memory so both sides of the app feel real while there is no backend.
 // It sits at the root of the app, standing in for the server: what the coach plans here is what the
 // coached athlete sees after joining (D56), and what the athlete logs shows up on the coach's side.
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { localStore } from "@/lib/localStore";
 import { AppState } from "react-native";
 
 import { useSetActive } from "@/features/athlete/ActiveWorkout";
+import {
+  endLink,
+  leaveCurrentCoach,
+  revokeInviteCode,
+  shareHistory,
+} from "@/features/accounts/repo";
+import { useAuth } from "@/features/auth/AuthProvider";
+import { generalInviteCode, inviteCodeFor, UUID } from "@/features/sync/ids";
+import type { World } from "@/features/sync/map";
+import {
+  cloudCacheKey,
+  type SyncState,
+  useCloudSync,
+} from "@/features/sync/useCloudSync";
 
 import {
   type AthleteSettings,
@@ -18,6 +32,7 @@ import {
   type ReactNode,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -128,6 +143,8 @@ type CoachData = {
   answerEnhanced: (clientId: string, yes: boolean) => void;
   editEnhanced: (clientId: string, fn: (e: Enhanced) => Enhanced) => void;
   coachName: string;
+  /** With accounts: the coach's general invite code, in their public link (D56, D107). */
+  inviteCode?: string;
   client: (id: string) => Client | undefined;
   /** Adds a client (D56); with `leadId`, the lead is marked joined and linked. */
   addClient: (c: NewClient, leadId?: string) => string;
@@ -163,6 +180,10 @@ type CoachData = {
   resetSample: () => void;
   /** Who is using the athlete side: a coached client, or a self-guided athlete on Pro or Free (D57). */
   meTier: AthleteTier;
+  /** Cloud sync for signed-in accounts (D107); "off" in sample builds and before sign-in. */
+  sync: SyncState;
+  /** Push what changed, then pull (signed-in accounts); resolves when done. */
+  syncNow: () => Promise<void>;
   /** A self-guided athlete's own record, built from their onboarding answers. */
   self: Client | null;
   startSelf: (c: Client, tier: "pro" | "free") => void;
@@ -380,6 +401,8 @@ function upgradeSelfPlan(c: Client | null): Client | null {
   };
 }
 
+const isUuid = (id: string) => UUID.test(id);
+
 const nowTime = () =>
   new Date().toLocaleTimeString("en-IN", {
     hour: "numeric",
@@ -399,13 +422,19 @@ const token = () =>
     { length: 8 },
     () => TOKEN_CHARS[Math.floor(Math.random() * TOKEN_CHARS.length)],
   ).join("");
+// Letters and digits only, so the same code works as a real invite code (6–12 characters).
 const code = (coach: string) =>
   `${coach
     .replace(/^Coach\s+/, "")
+    .replace(/[^A-Za-z]/g, "")
     .slice(0, 3)
-    .toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+    .toUpperCase()
+    .padEnd(3, "X")}${Math.floor(1000 + Math.random() * 9000)}`;
 
 export function CoachDataProvider({ children }: { children: ReactNode }) {
+  const auth = useAuth();
+  // A signed-in account with a profile syncs through Supabase; otherwise the store is the sample.
+  const cloudUid = auth.session && auth.profile ? auth.session.user.id : null;
   const [clients, setClients] = useState(() => sampleClients.map(withExtras));
   const [stacks, setStacks] = useState<Stack[]>(sampleStacks);
   const [templates, setTemplates] = useState<Template[]>(() =>
@@ -440,8 +469,8 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
   registerCustomExercises(customExercises);
 
   // F4-09: the workout in progress, history and the athlete's plan are saved on the phone after every
-  // change, so closing the app mid-workout loses nothing. Sample build: plain AsyncStorage; the real
-  // build syncs to Supabase and keeps the offline copy in encrypted storage.
+  // change, so closing the app mid-workout loses nothing. Signed in, it's the offline copy of what's
+  // synced to Supabase. Either way it's encrypted on the phone (localStore, S-05, D113).
   //
   // Safety rules:
   // - If the saved copy can't be read, it is backed up and saving stops for this run, so sample
@@ -454,7 +483,8 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
   const pendingSave = useRef<(() => void) | null>(null);
   useEffect(() => {
     let stored: string | null = null;
-    AsyncStorage.getItem(STORE_KEY)
+    localStore
+      .getItem(STORE_KEY)
       .then((raw) => {
         stored = raw;
         if (!raw) return;
@@ -477,7 +507,7 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       })
       .catch(() => {
         saveBlocked.current = true;
-        if (stored) AsyncStorage.setItem(BACKUP_KEY, stored).catch(() => {});
+        if (stored) localStore.setItem(BACKUP_KEY, stored).catch(() => {});
       })
       .finally(() => setHydrated(true));
   }, []);
@@ -507,7 +537,13 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
       pendingSave.current = null;
       saveUrgent.current = false;
       if (saveBlocked.current) return;
-      AsyncStorage.setItem(STORE_KEY, JSON.stringify(saved)).catch(() => {});
+      // Signed in, the phone's copy belongs to that account; the sample store is left alone.
+      localStore
+        .setItem(
+          cloudUid ? cloudCacheKey(cloudUid) : STORE_KEY,
+          JSON.stringify(saved),
+        )
+        .catch(() => {});
     };
     pendingSave.current = save;
     const t = setTimeout(save, saveUrgent.current ? 0 : SAVE_DELAY_MS);
@@ -535,7 +571,95 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
     coach,
     settings,
     stacks,
+    cloudUid,
   ]);
+  // Signed-in accounts load and save through Supabase (D107); everything else stays on the phone.
+  const cloudWorld = useMemo<World>(
+    () => ({
+      clients,
+      meId,
+      meTier,
+      self,
+      history,
+      custom: customExercises,
+      foodLogs,
+      myFoods,
+      recovery,
+      templates,
+      leads,
+      coach,
+      settings,
+      stacks,
+    }),
+    [
+      clients,
+      meId,
+      meTier,
+      self,
+      history,
+      customExercises,
+      foodLogs,
+      myFoods,
+      recovery,
+      templates,
+      leads,
+      coach,
+      settings,
+      stacks,
+    ],
+  );
+  const cloud = useCloudSync({
+    uid: cloudUid,
+    role: auth.profile?.role ?? null,
+    world: cloudWorld,
+    apply: (w: World) => {
+      setClients(w.clients);
+      setMeId(w.meId);
+      setMeTier(w.meTier);
+      setSelf(w.self);
+      setHistory(w.history);
+      setCustom(w.custom);
+      setFoodLogs(w.foodLogs);
+      setMyFoods(w.myFoods);
+      setRecovery(w.recovery);
+      setTemplates(w.templates);
+      setLeads(w.leads);
+      setCoach(w.coach);
+      setSettings(w.settings);
+      setStacks(w.stacks);
+    },
+  });
+  const resetToSample = () => {
+    setClients(sampleClients.map(withExtras));
+    setStacks(sampleStacks());
+    setMeId(null);
+    setMeTier("coached");
+    setSelf(null);
+    setActive(null);
+    setHistory({});
+    setCustom([]);
+    setFoodLogs({});
+    setMyFoods([]);
+    setHideUpgrade(false);
+    setRecovery({});
+    setTemplates(sampleTemplates.map(fillTemplate));
+    setLeads(withInstagram(sampleLeads()));
+    setCoach(defaultCoachProfile());
+    setSettings(defaultCoachSettings());
+    localStore.removeItem(STORE_KEY).catch(() => {});
+  };
+  // Signing out returns the phone to the sample world.
+  const wasSignedIn = useRef(false);
+  useEffect(() => {
+    if (cloudUid) wasSignedIn.current = true;
+    else if (wasSignedIn.current) {
+      wasSignedIn.current = false;
+      resetToSample();
+    }
+    // Runs only when the signed-in account changes; resetToSample is a plain store reset.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cloudUid]);
+
   const update = (id: string, patch: (c: Client) => Partial<Client>) => {
     if (self && id === self.id) {
       setSelf((s) => (s ? { ...s, ...patch(s) } : s));
@@ -677,29 +801,19 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
         enhanced: fn(c.enhanced ?? emptyEnhanced()),
       })),
     coachName,
+    inviteCode:
+      cloudUid && auth.profile?.role === "coach"
+        ? generalInviteCode(coachName, cloudUid)
+        : undefined,
     reminded,
     meId,
     hydrated,
-    resetSample: () => {
-      setClients(sampleClients.map(withExtras));
-      setStacks(sampleStacks());
-      setMeId(null);
-      setMeTier("coached");
-      setSelf(null);
-      setActive(null);
-      setHistory({});
-      setCustom([]);
-      setFoodLogs({});
-      setMyFoods([]);
-      setHideUpgrade(false);
-      setRecovery({});
-      setTemplates(sampleTemplates.map(fillTemplate));
-      setLeads(withInstagram(sampleLeads()));
-      setCoach(defaultCoachProfile());
-      setSettings(defaultCoachSettings());
-      AsyncStorage.removeItem(STORE_KEY).catch(() => {});
-    },
+    resetSample: () => resetToSample(),
     meTier,
+    sync: cloud.state,
+    syncNow: async () => {
+      await cloud.syncNow();
+    },
     self,
     startSelf: (c, tier) => {
       setSelf(c);
@@ -1127,7 +1241,10 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
     createInvite: (id) => {
       const existing = clients.find((c) => c.id === id)?.invite;
       if (existing && !existing.claimed) return existing;
-      const invite = { token: token(), code: code(coachName), claimed: false };
+      // With accounts the code is the client's saved personal invite (D107).
+      const invite = cloudUid
+        ? { token: inviteCodeFor(id), code: inviteCodeFor(id), claimed: false }
+        : { token: token(), code: code(coachName), claimed: false };
       update(id, () => ({ invite, line: "Invite sent · waiting to join" }));
       return invite;
     },
@@ -1283,7 +1400,9 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
     markReadByClient: (clientId) =>
       update(clientId, () => ({ coachUnread: 0 })),
     markRead: (clientId) => update(clientId, () => ({ unread: 0 })),
-    setStatus: (clientId, status) =>
+    setStatus: (clientId, status) => {
+      if (cloudUid && status === "completed" && isUuid(clientId))
+        void endLink(clientId, "completed");
       update(clientId, (c) => ({
         endedBy: status === "completed" ? "completed" : undefined,
         status,
@@ -1295,12 +1414,18 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
               : status === "completed"
                 ? "Coaching completed"
                 : c.line,
-      })),
+      }));
+    },
     setNotes: (clientId, notes) => update(clientId, () => ({ notes })),
     setCheckInDay: (clientId, day) =>
       update(clientId, () => ({ checkInDay: day })),
-    removeClient: (clientId) =>
-      setClients((all) => all.filter((c) => c.id !== clientId)),
+    removeClient: (clientId) => {
+      const c = clients.find((x) => x.id === clientId);
+      if (cloudUid && c?.pending && c.invite)
+        void revokeInviteCode(c.invite.code);
+      else if (cloudUid && isUuid(clientId)) void endLink(clientId, "removed");
+      setClients((all) => all.filter((x) => x.id !== clientId));
+    },
     remind: (clientId) => setReminded((r) => [...r, clientId]),
 
     editWeighIn: (clientId, id, kg) =>
@@ -1355,7 +1480,8 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
           ...patch,
         },
       })),
-    setHistoryAccess: (clientId, on) =>
+    setHistoryAccess: (clientId, on) => {
+      if (cloudUid) void shareHistory(on);
       update(clientId, (c) => ({
         historyFrom: on ? "2000-01-01" : undefined,
         athleteSettings: {
@@ -1363,7 +1489,8 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
           ...c.athleteSettings,
           historyChangedAt: isoToday(),
         },
-      })),
+      }));
+    },
     updateProfile: (clientId, patch) => update(clientId, () => patch),
     setStatusDetails: (clientId, until, note) =>
       update(clientId, () => ({
@@ -1383,6 +1510,7 @@ export function CoachDataProvider({ children }: { children: ReactNode }) {
     leaveCoach: (withdrawPhotos, reason = "left") => {
       const c = clients.find((x) => x.id === meId);
       if (!c) return;
+      if (cloudUid) void leaveCurrentCoach();
       // The athlete's own copy under a new id: the coach's access ends (D21) and nothing is
       // deleted (D7c). Workouts, food and recovery move with them.
       const id = `${c.id}-own`;

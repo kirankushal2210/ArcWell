@@ -15,6 +15,7 @@ import {
 import { useCoachData } from "@/features/coach/CoachData";
 import { KeyValues } from "@/features/coach/parts";
 import { colors, space } from "@/theme";
+import { useAccountActions } from "@/features/accounts/useAccountActions";
 
 const INCLUDED = [
   "Your profile and services",
@@ -26,21 +27,25 @@ const INCLUDED = [
 
 export default function CoachExport() {
   const { settings, saveSettings } = useCoachData();
+  const account = useAccountActions();
   const back = backTo("/coach/menu/settings");
   const ex = settings.export;
   const request = () =>
-    saveSettings({
-      ...settings,
-      export: {
-        status: "preparing",
-        requestedAt: new Date().toLocaleString("en-IN", {
-          day: "numeric",
-          month: "short",
-          hour: "numeric",
-          minute: "2-digit",
-        }),
-      },
-    });
+    // With accounts the export is ready at once: everything the server holds, as a JSON file.
+    account.live
+      ? void account.exportNow()
+      : saveSettings({
+          ...settings,
+          export: {
+            status: "preparing",
+            requestedAt: new Date().toLocaleString("en-IN", {
+              day: "numeric",
+              month: "short",
+              hour: "numeric",
+              minute: "2-digit",
+            }),
+          },
+        });
 
   if (ex?.status === "preparing")
     return (

@@ -15,6 +15,7 @@ import { ProgramEditor, programReady } from "@/features/coach/ProgramEditor";
 import { alert } from "@/lib/alert";
 import { colors, rhythm, space } from "@/theme";
 import { useBillingGate } from "@/features/coach/limits";
+import { NotFound } from "@/features/system/SystemStates";
 
 function TrainingTemplateEditor() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -28,7 +29,7 @@ function TrainingTemplateEditor() {
   const back = () =>
     router.canGoBack() ? router.back() : router.replace("/coach/plans");
   if (id !== "new" && !t)
-    return <PageHeader title="Template not found" onBack={back} />;
+    return <NotFound title="Template" what="template" onBack={back} />;
 
   const name = p.name.trim() || `${p.days.length}-day program`;
   const save = () =>

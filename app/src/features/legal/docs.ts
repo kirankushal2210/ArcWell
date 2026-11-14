@@ -129,7 +129,7 @@ const privacy: LegalDoc = {
     {
       heading: "Where it's stored",
       blocks: [
-        "Your data is stored in India (Mumbai). AI requests may be processed by our AI provider outside India, only as the DPDP Act allows. We send only what the request needs, such as the meal photo for a meal scan.",
+        "Your data is stored in India (Mumbai). AI requests may be processed by our AI provider outside India, only as the DPDP Act allows. We send only what the request needs, such as the meal photo for a meal scan, or your question and this week's numbers for the AI coach. Your AI coach chat is kept only on your phone, for that day; we don't store it.",
       ],
     },
     {

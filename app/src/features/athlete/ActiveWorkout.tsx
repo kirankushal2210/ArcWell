@@ -5,7 +5,7 @@
 //   minimised bar, Resume buttons and docks;
 // - the setter, which never changes, for buttons that start a workout.
 // Saved on the phone shortly after each change and at once when the app goes to the background.
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { localStore } from "@/lib/localStore";
 import {
   createContext,
   type ReactNode,
@@ -52,10 +52,10 @@ export function ActiveWorkoutProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let stored: string | null = null;
     (async () => {
-      const raw = await AsyncStorage.getItem(ACTIVE_KEY);
+      const raw = await localStore.getItem(ACTIVE_KEY);
       stored = raw;
       if (raw) return JSON.parse(raw) as ActiveWorkout | null;
-      const legacy = await AsyncStorage.getItem(LEGACY_KEY);
+      const legacy = await localStore.getItem(LEGACY_KEY);
       return legacy
         ? ((JSON.parse(legacy) as { active?: ActiveWorkout | null }).active ??
             null)
@@ -67,7 +67,7 @@ export function ActiveWorkoutProvider({ children }: { children: ReactNode }) {
       })
       .catch(() => {
         saveBlocked.current = true;
-        if (stored) AsyncStorage.setItem(BACKUP_KEY, stored).catch(() => {});
+        if (stored) localStore.setItem(BACKUP_KEY, stored).catch(() => {});
       })
       .finally(() => setHydrated(true));
   }, []);
@@ -79,7 +79,7 @@ export function ActiveWorkoutProvider({ children }: { children: ReactNode }) {
     const save = () => {
       pendingSave.current = null;
       if (saveBlocked.current) return;
-      AsyncStorage.setItem(ACTIVE_KEY, JSON.stringify(active)).catch(() => {});
+      localStore.setItem(ACTIVE_KEY, JSON.stringify(active)).catch(() => {});
     };
     pendingSave.current = save;
     const t = setTimeout(save, SAVE_DELAY_MS);

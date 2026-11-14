@@ -96,7 +96,9 @@ export const menuAction = {
  * The coach's personal invite link, from their name (CO-11), the same everywhere it's shown.
  * Placeholder domain until the invite-link domain is chosen (PLAN.md); the server issues the real one.
  */
-export function coachLink(name: string) {
+export function coachLink(name: string, code?: string) {
+  // With accounts the link carries the coach's real general invite code (D107).
+  if (code) return `arcwell.app/j/${code}`;
   const slug =
     name
       .toLowerCase()
